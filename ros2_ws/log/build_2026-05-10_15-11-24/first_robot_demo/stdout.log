@@ -1,0 +1,30 @@
+running egg_info
+creating ../../build/first_robot_demo/first_robot_demo.egg-info
+writing ../../build/first_robot_demo/first_robot_demo.egg-info/PKG-INFO
+writing dependency_links to ../../build/first_robot_demo/first_robot_demo.egg-info/dependency_links.txt
+writing requirements to ../../build/first_robot_demo/first_robot_demo.egg-info/requires.txt
+writing top-level names to ../../build/first_robot_demo/first_robot_demo.egg-info/top_level.txt
+writing manifest file '../../build/first_robot_demo/first_robot_demo.egg-info/SOURCES.txt'
+reading manifest file '../../build/first_robot_demo/first_robot_demo.egg-info/SOURCES.txt'
+writing manifest file '../../build/first_robot_demo/first_robot_demo.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/omar/code/robotics_project/ros2_ws/build/first_robot_demo/build
+creating /home/omar/code/robotics_project/ros2_ws/build/first_robot_demo/build/lib
+creating /home/omar/code/robotics_project/ros2_ws/build/first_robot_demo/build/lib/first_robot_demo
+copying first_robot_demo/__init__.py -> /home/omar/code/robotics_project/ros2_ws/build/first_robot_demo/build/lib/first_robot_demo
+running install
+running install_lib
+creating /home/omar/code/robotics_project/ros2_ws/install/first_robot_demo/lib/python3.12/site-packages/first_robot_demo
+copying /home/omar/code/robotics_project/ros2_ws/build/first_robot_demo/build/lib/first_robot_demo/__init__.py -> /home/omar/code/robotics_project/ros2_ws/install/first_robot_demo/lib/python3.12/site-packages/first_robot_demo
+byte-compiling /home/omar/code/robotics_project/ros2_ws/install/first_robot_demo/lib/python3.12/site-packages/first_robot_demo/__init__.py to __init__.cpython-312.pyc
+running install_data
+creating /home/omar/code/robotics_project/ros2_ws/install/first_robot_demo/share/ament_index
+creating /home/omar/code/robotics_project/ros2_ws/install/first_robot_demo/share/ament_index/resource_index
+creating /home/omar/code/robotics_project/ros2_ws/install/first_robot_demo/share/ament_index/resource_index/packages
+copying resource/first_robot_demo -> /home/omar/code/robotics_project/ros2_ws/install/first_robot_demo/share/ament_index/resource_index/packages
+copying package.xml -> /home/omar/code/robotics_project/ros2_ws/install/first_robot_demo/share/first_robot_demo
+running install_egg_info
+Copying ../../build/first_robot_demo/first_robot_demo.egg-info to /home/omar/code/robotics_project/ros2_ws/install/first_robot_demo/lib/python3.12/site-packages/first_robot_demo-0.0.0-py3.12.egg-info
+running install_scripts
+writing list of installed files to '/home/omar/code/robotics_project/ros2_ws/build/first_robot_demo/install.log'
