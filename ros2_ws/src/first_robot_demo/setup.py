@@ -24,6 +24,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'simple_talker = first_robot_demo.simple_talker:main',
+            'simple_listener = first_robot_demo.simple_listener:main',
         ],
     },
 )
