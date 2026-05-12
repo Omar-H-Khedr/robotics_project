@@ -1,6 +1,6 @@
 # kuka_description
 
-Project-local ROS 2 package for launching KUKA robot descriptions.
+Project-local ROS 2 package for visualizing KUKA robot descriptions in RViz.
 
 The actual KUKA LBR iisy URDF/Xacro, mesh, and joint limit files live in the
 external package:
@@ -12,10 +12,10 @@ ros2_ws/src/external/kuka_robot_descriptions/kuka_lbr_iisy_support
 This package keeps our own launch and RViz configuration separate from the
 external KUKA files.
 
-## Available LBR iisy models
+## KUKA LBR iisy xacro files
 
-The external `kuka_lbr_iisy_support` package currently provides these URDF
-entrypoints:
+The external `kuka_lbr_iisy_support` package provides these LBR iisy URDF/xacro
+entry points:
 
 - `lbr_iisy3_r760.urdf.xacro`
 - `lbr_iisy11_r1300.urdf.xacro`
@@ -39,14 +39,14 @@ source install/setup.bash
 Default model, `lbr_iisy3_r760`:
 
 ```bash
-ros2 launch kuka_description display_lbr_iisy.launch.py
+ros2 launch kuka_description display.launch.py
 ```
 
 Select another supported model:
 
 ```bash
-ros2 launch kuka_description display_lbr_iisy.launch.py model:=lbr_iisy11_r1300
-ros2 launch kuka_description display_lbr_iisy.launch.py model:=lbr_iisy15_r930
+ros2 launch kuka_description display.launch.py model:=lbr_iisy11_r1300
+ros2 launch kuka_description display.launch.py model:=lbr_iisy15_r930
 ```
 
 The launch file starts:
