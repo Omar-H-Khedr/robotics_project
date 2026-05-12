@@ -3,7 +3,7 @@ import os
 
 from setuptools import find_packages, setup
 
-package_name = 'robot_description'
+package_name = 'robot_simulation'
 
 setup(
     name=package_name,
@@ -14,15 +14,14 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml', 'README.md']),
         (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
-        (os.path.join('share', package_name, 'rviz'), glob('rviz/*.rviz')),
-        (os.path.join('share', package_name, 'urdf'), glob('urdf/*')),
+        (os.path.join('share', package_name, 'worlds'), glob('worlds/*.sdf')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='omar',
     maintainer_email='omar.khedr@gu.edu.eg',
     description=(
-        'Beginner-friendly robot description for a simple two-wheel '
+        'Gazebo simulation launch files and worlds for the simple '
         'differential drive robot.'
     ),
     license='Apache-2.0',

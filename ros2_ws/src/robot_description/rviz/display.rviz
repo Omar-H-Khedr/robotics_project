@@ -19,9 +19,9 @@ Visualization Manager:
       Name: RobotModel
       Value: true
   Enabled: true
-  Fixed Frame: base_link
+  Fixed Frame: base_footprint
   Global Options:
-    Fixed Frame: base_link
+    Fixed Frame: base_footprint
     Frame Rate: 30
   Name: root
   Tools:
@@ -42,7 +42,7 @@ Visualization Manager:
         Z: 0
       Name: Current View
       Pitch: 0.6
-      Target Frame: base_link
+      Target Frame: base_footprint
       Yaw: 0.8
 Window Geometry:
   Height: 900
