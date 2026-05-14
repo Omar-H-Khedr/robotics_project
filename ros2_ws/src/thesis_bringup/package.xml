@@ -9,9 +9,11 @@
 
   <depend>launch</depend>
   <depend>launch_ros</depend>
+  <exec_depend>ament_index_python</exec_depend>
   <depend>rclpy</depend>
 
   <exec_depend>peg_in_hole_description</exec_depend>
+  <exec_depend>kuka_gazebo</exec_depend>
   <exec_depend>kuka_task_control</exec_depend>
   <exec_depend>safety_layer</exec_depend>
   <exec_depend>experiment_manager</exec_depend>
