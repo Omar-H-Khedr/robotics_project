@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import math
 from pathlib import Path
 from typing import Any
@@ -30,8 +31,10 @@ class SafetyMonitor(Node):
         self.declare_parameter("config_path", "")
         self.declare_parameter("joint_states_topic", "/joint_states")
         self.declare_parameter("task_phase_topic", "/task_phase")
+        self.declare_parameter("trial_status_topic", "/trial_status")
         self.declare_parameter("safety_status_topic", "/safety_status")
         self.declare_parameter("monitor_period_sec", 0.2)
+        self.declare_parameter("warning_throttle_sec", 2.0)
 
         self._config_path = Path(
             self.get_parameter("config_path").get_parameter_value().string_value
@@ -42,11 +45,17 @@ class SafetyMonitor(Node):
         self._task_phase_topic = (
             self.get_parameter("task_phase_topic").get_parameter_value().string_value
         )
+        self._trial_status_topic = (
+            self.get_parameter("trial_status_topic").get_parameter_value().string_value
+        )
         self._safety_status_topic = (
             self.get_parameter("safety_status_topic").get_parameter_value().string_value
         )
         self._monitor_period_sec = (
             self.get_parameter("monitor_period_sec").get_parameter_value().double_value
+        )
+        self._warning_throttle_sec = (
+            self.get_parameter("warning_throttle_sec").get_parameter_value().double_value
         )
 
         config = self._load_config(self._config_path)
@@ -58,7 +67,9 @@ class SafetyMonitor(Node):
         self._last_joint_state_time = None
         self._last_phase_time = None
         self._current_phase = "uninitialized"
-        self._last_status = ""
+        self._trial_status = "idle"
+        self._last_log_status = ""
+        self._last_publish_by_key: dict[tuple[str, str, str], rclpy.time.Time] = {}
 
         self._status_publisher = self.create_publisher(
             String,
@@ -77,47 +88,86 @@ class SafetyMonitor(Node):
             self._on_task_phase,
             20,
         )
+        self.create_subscription(
+            String,
+            self._trial_status_topic,
+            self._on_trial_status,
+            20,
+        )
         self.create_timer(self._monitor_period_sec, self._publish_monitor_status)
 
         self.get_logger().info(f"Loaded safety limits from {self._config_path}")
         self.get_logger().info(
-            f"Monitoring {self._joint_states_topic} and {self._task_phase_topic}; "
+            f"Monitoring {self._joint_states_topic}, {self._task_phase_topic}, and "
+            f"{self._trial_status_topic}; "
             f"publishing {self._safety_status_topic}"
         )
 
     def _on_joint_state(self, message: JointState) -> None:
         self._last_joint_state_time = self.get_clock().now()
         if not self._safety_enabled:
-            self._publish_status("OK", "safety monitor disabled by configuration")
+            self._publish_status(
+                "OK",
+                "joint_states_valid",
+                "safety monitor disabled by configuration",
+                throttle=True,
+            )
             return
 
         positions_by_name = {
             name: position for name, position in zip(message.name, message.position)
         }
-        problems: list[str] = []
+        violations: list[str] = []
+        warnings: list[str] = []
 
         for joint_name in self.JOINT_NAMES:
             if joint_name not in positions_by_name:
-                problems.append(f"missing {joint_name}")
+                violations.append(f"missing {joint_name}")
                 continue
 
             position = positions_by_name[joint_name]
             if not math.isfinite(position):
-                problems.append(f"{joint_name} is NaN/Inf")
+                violations.append(f"{joint_name} is NaN/Inf")
                 continue
 
             limits = self._joint_limits[joint_name]
             lower = float(limits["min"])
             upper = float(limits["max"])
             if position < lower or position > upper:
-                problems.append(
+                violations.append(
                     f"{joint_name}={position:.4f} outside [{lower:.4f}, {upper:.4f}]"
                 )
+                continue
 
-        if problems:
-            self._publish_status("VIOLATION", "; ".join(problems))
+            margin = min(position - lower, upper - position)
+            warning_band = 0.10 * (upper - lower)
+            if margin <= warning_band:
+                warnings.append(
+                    f"{joint_name}={position:.4f} near soft limit "
+                    f"[{lower:.4f}, {upper:.4f}]"
+                )
+
+        if violations:
+            self._publish_status(
+                "VIOLATION",
+                "joint_limit_violation",
+                "; ".join(violations),
+                throttle=True,
+            )
+        elif warnings:
+            self._publish_status(
+                "WARNING",
+                "joint_limit_warning",
+                "; ".join(warnings),
+                throttle=True,
+            )
         else:
-            self._publish_status("OK", f"joint states valid during phase {self._current_phase}")
+            self._publish_status(
+                "OK",
+                "joint_states_valid",
+                f"joint states valid during phase {self._current_phase}",
+                throttle=True,
+            )
 
     def _on_task_phase(self, message: String) -> None:
         phase = message.data.strip() or "empty_phase"
@@ -125,51 +175,117 @@ class SafetyMonitor(Node):
         self._last_phase_time = self.get_clock().now()
         self.get_logger().info(f"Task phase updated: {phase}")
 
+    def _on_trial_status(self, message: String) -> None:
+        status = message.data.strip() or "empty_status"
+        self._trial_status = status
+        if status == "completed":
+            self._publish_status(
+                "OK",
+                "trial_completed",
+                "trial status reported completed",
+            )
+        elif status == "failed":
+            self._publish_status(
+                "VIOLATION",
+                "trial_failed",
+                "trial status reported failed",
+            )
+
     def _publish_monitor_status(self) -> None:
         if not self._safety_enabled:
-            self._publish_status("OK", "safety monitor disabled by configuration")
+            self._publish_status(
+                "OK",
+                "joint_states_valid",
+                "safety monitor disabled by configuration",
+                throttle=True,
+            )
             return
 
         now = self.get_clock().now()
         if self._last_joint_state_time is None:
-            self._publish_status("WARNING", "waiting for first /joint_states message")
+            self._publish_status(
+                "WARNING",
+                "waiting_for_joint_states",
+                "waiting for first /joint_states message",
+                throttle=True,
+            )
             return
 
         joint_age = self._age_sec(now, self._last_joint_state_time)
         if joint_age > self._joint_state_timeout_sec:
             self._publish_status(
                 "VIOLATION",
+                "joint_state_timeout",
                 f"missing joint states for {joint_age:.2f}s",
+                throttle=True,
             )
             return
 
         if self._last_phase_time is None:
-            self._publish_status("WARNING", "waiting for first /task_phase message")
+            self._publish_status(
+                "WARNING",
+                "waiting_for_task_phase",
+                "waiting for first /task_phase message",
+                throttle=True,
+            )
             return
 
         phase_age = self._age_sec(now, self._last_phase_time)
         if phase_age > self._max_phase_duration_sec:
             self._publish_status(
                 "WARNING",
+                "waiting_for_task_phase",
                 f"phase {self._current_phase} active for {phase_age:.2f}s; "
-                "phase timeout policy is monitor-only in v0.1",
+                "phase timeout policy is monitor-only in v0.2",
+                throttle=True,
             )
 
-    def _publish_status(self, level: str, detail: str) -> None:
-        status = f"{level}: {detail}"
+    def _publish_status(
+        self,
+        level: str,
+        code: str,
+        detail: str,
+        *,
+        throttle: bool = False,
+    ) -> None:
+        if throttle and not self._should_publish(level, code, detail):
+            return
+
+        payload = {
+            "timestamp_ros_sec": self._now_sec(),
+            "level": level,
+            "code": code,
+            "phase": self._current_phase,
+            "message": detail,
+        }
         message = String()
-        message.data = status
+        message.data = json.dumps(payload, sort_keys=True)
         self._status_publisher.publish(message)
 
-        if status == self._last_status:
+        log_status = f"{level}: {code}: {detail}"
+        if log_status == self._last_log_status:
             return
-        self._last_status = status
+        self._last_log_status = log_status
         if level == "OK":
-            self.get_logger().info(status)
+            self.get_logger().info(log_status)
         elif level == "WARNING":
-            self.get_logger().warning(status)
+            self.get_logger().warning(log_status)
         else:
-            self.get_logger().error(status)
+            self.get_logger().error(log_status)
+
+    def _should_publish(self, level: str, code: str, detail: str) -> bool:
+        now = self.get_clock().now()
+        key = (level, code, self._current_phase)
+        last_publish = self._last_publish_by_key.get(key)
+        if last_publish is not None:
+            age_sec = self._age_sec(now, last_publish)
+            if age_sec < self._warning_throttle_sec:
+                return False
+        self._last_publish_by_key[key] = now
+        return True
+
+    def _now_sec(self) -> float:
+        return self.get_clock().now().nanoseconds / 1_000_000_000.0
 
     @staticmethod
     def _age_sec(now: rclpy.time.Time, then: rclpy.time.Time) -> float:
