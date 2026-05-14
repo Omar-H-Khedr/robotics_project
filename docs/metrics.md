@@ -55,3 +55,15 @@ safe_success_rate = successful_trials_without_safety_violations / total_trials
 ```
 
 This metric should be reported with the trial count, scene configuration, controller configuration, and safety-layer configuration.
+
+## Baseline v0.1 Logged Fields
+
+Research Baseline v0.1 writes the following trial summary fields:
+
+- `task_success`: placeholder, not inferred yet.
+- `insertion_success`: placeholder, not inferred yet.
+- `collision_events`: placeholder until Gazebo contact filtering is added.
+- `max_contact_force`: placeholder until contact-force extraction is validated.
+- `safety_violations`: counted from `/safety_status` messages whose level is `VIOLATION`.
+- `execution_time_sec`: elapsed logger runtime for the trial process.
+- `safe_success`: placeholder until task success and safety violation semantics are combined.

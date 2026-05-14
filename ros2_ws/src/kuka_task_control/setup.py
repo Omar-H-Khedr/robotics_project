@@ -23,6 +23,8 @@ setup(
     entry_points={
         "console_scripts": [
             "baseline_trajectory_client = kuka_task_control.baseline_trajectory_client:main",
+            "baseline_joint_sequence_executor = kuka_task_control.baseline_joint_sequence_executor:main",
+            "task_trajectory_executor = kuka_task_control.task_trajectory_executor:main",
         ]
     },
 )

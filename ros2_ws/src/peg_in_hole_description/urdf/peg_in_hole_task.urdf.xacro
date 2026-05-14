@@ -12,7 +12,7 @@
   <joint name="world_to_target_hole_frame" type="fixed">
     <parent link="world"/>
     <child link="target_hole_frame"/>
-    <origin xyz="0.60 0.0 0.81" rpy="0 0 0"/>
+    <origin xyz="0.52 -0.20 0.81" rpy="0 0 0"/>
   </joint>
 
   <link name="peg_tip"/>

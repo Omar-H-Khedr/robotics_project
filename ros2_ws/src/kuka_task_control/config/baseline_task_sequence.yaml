@@ -1,0 +1,66 @@
+metadata:
+  experiment_name: research_baseline_v0_1_task_sequence
+  description: Scripted KUKA joint-space peg-in-hole baseline sequence.
+  controller_action_name: /joint_trajectory_controller/follow_joint_trajectory
+  task_phase_topic: /task_phase
+
+poses:
+  safe_home:
+    positions: [0.0, -0.8, 1.2, 0.0, 0.8, 0.0]
+    duration_sec: 4.0
+    description: Raised parked configuration used as the task sequence start.
+    safety_tag: nominal_clearance
+
+  observe_scene:
+    positions: [0.0, -1.20, 1.35, 0.0, 0.35, 0.0]
+    duration_sec: 5.0
+    description: Camera-friendly observation posture above the workspace.
+    safety_tag: nominal_clearance
+
+  pre_grasp:
+    positions: [0.15, -1.28, 1.42, 0.0, 0.28, 0.0]
+    duration_sec: 6.0
+    description: Staging posture before the peg grasp approach.
+    safety_tag: approach_region
+
+  grasp_approach:
+    positions: [0.22, -1.36, 1.52, 0.0, 0.18, 0.0]
+    duration_sec: 6.0
+    description: Conservative joint-space approach toward the grasp region.
+    safety_tag: close_workspace
+
+  lift_clearance:
+    positions: [0.15, -1.18, 1.32, 0.0, 0.42, 0.0]
+    duration_sec: 6.0
+    description: Lifted clearance posture after the grasp approach.
+    safety_tag: nominal_clearance
+
+  pre_insert:
+    positions: [0.32, -1.26, 1.40, 0.0, 0.30, 0.0]
+    duration_sec: 7.0
+    description: Staging posture before the insertion approach.
+    safety_tag: approach_region
+
+  insertion_approach:
+    positions: [0.38, -1.40, 1.56, 0.0, 0.14, 0.0]
+    duration_sec: 8.0
+    description: Slow approach posture toward the insertion fixture.
+    safety_tag: insertion_region
+
+  insertion_hold:
+    positions: [0.38, -1.40, 1.56, 0.0, 0.14, 0.0]
+    duration_sec: 2.0
+    description: Short hold at the insertion approach for logging and contact instrumentation.
+    safety_tag: insertion_hold
+
+  retreat:
+    positions: [0.0, -1.25, 1.40, 0.0, 0.30, 0.0]
+    duration_sec: 6.0
+    description: Retreat posture that clears the fixture region.
+    safety_tag: retreat_clearance
+
+  return_home:
+    positions: [0.0, -0.8, 1.2, 0.0, 0.8, 0.0]
+    duration_sec: 5.0
+    description: Return to the raised parked home configuration.
+    safety_tag: nominal_clearance
