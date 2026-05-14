@@ -1,0 +1,8 @@
+safety_layer:
+  ros__parameters:
+    enable_filtering: true
+    max_joint_velocity_rad_s: 1.0
+    max_cartesian_speed_m_s: 0.05
+    max_contact_force_n: 0.0
+    max_contact_force_n_is_placeholder: true
+    violation_topic: /safety/violations

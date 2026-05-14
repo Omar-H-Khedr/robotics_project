@@ -1,0 +1,6 @@
+baseline_trials:
+  description: Baseline KUKA Gazebo trajectory-control trials for peg-in-hole assembly.
+  simulator: gazebo
+  controller: joint_trajectory_controller
+  safety_filtering: false
+  repetitions: 10

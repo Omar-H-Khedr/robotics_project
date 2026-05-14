@@ -1,0 +1,11 @@
+kuka_task_control:
+  ros__parameters:
+    controller_name: joint_trajectory_controller
+    command_topic: /joint_trajectory_controller/joint_trajectory
+    robot_joint_names:
+      - joint_1
+      - joint_2
+      - joint_3
+      - joint_4
+      - joint_5
+      - joint_6

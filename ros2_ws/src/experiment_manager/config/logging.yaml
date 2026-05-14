@@ -1,0 +1,11 @@
+experiment_manager:
+  ros__parameters:
+    output_root: experiments/results
+    record_rosbag: true
+    trial_timeout_s: 60.0
+    metrics:
+      - task_success
+      - insertion_success
+      - collision_events
+      - trajectory_execution_time
+      - safety_violations
