@@ -1,0 +1,6 @@
+perception_pipeline:
+  ros__parameters:
+    rgb_topic: /camera/color/image_raw
+    depth_topic: /camera/depth/image_raw
+    camera_info_topic: /camera/color/camera_info
+    output_state_topic: /perception/task_state
