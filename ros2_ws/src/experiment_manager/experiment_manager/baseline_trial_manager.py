@@ -1,4 +1,4 @@
-"""Structured trial logger for Research Baseline v0.2."""
+"""Structured trial logger for Research Baseline v0.3."""
 
 from __future__ import annotations
 
@@ -29,19 +29,20 @@ class BaselineTrialManager(Node):
 
     def __init__(self) -> None:
         super().__init__("baseline_trial_manager")
-        default_results_root = (
-            Path(__file__).resolve().parents[1] / "results" / "baseline_trials"
-        )
+        default_results_root = Path.cwd() / "results" / "baseline_trials"
         self.declare_parameter("results_root", str(default_results_root))
         self.declare_parameter("joint_states_topic", "/joint_states")
         self.declare_parameter("task_phase_topic", "/task_phase")
         self.declare_parameter("task_event_topic", "/task_event")
         self.declare_parameter("trial_status_topic", "/trial_status")
         self.declare_parameter("safety_status_topic", "/safety_status")
+        self.declare_parameter("contact_event_topic", "/contact_event")
+        self.declare_parameter("insertion_metrics_topic", "/insertion_metrics")
 
-        self._results_root = Path(
+        results_root_parameter = (
             self.get_parameter("results_root").get_parameter_value().string_value
         )
+        self._results_root = Path(results_root_parameter).expanduser()
         self._joint_states_topic = (
             self.get_parameter("joint_states_topic").get_parameter_value().string_value
         )
@@ -57,6 +58,12 @@ class BaselineTrialManager(Node):
         self._safety_status_topic = (
             self.get_parameter("safety_status_topic").get_parameter_value().string_value
         )
+        self._contact_event_topic = (
+            self.get_parameter("contact_event_topic").get_parameter_value().string_value
+        )
+        self._insertion_metrics_topic = (
+            self.get_parameter("insertion_metrics_topic").get_parameter_value().string_value
+        )
 
         self._start_time = self.get_clock().now()
         self._timestamp, self._trial_id, self._trial_dir = self._create_trial_dir()
@@ -71,6 +78,14 @@ class BaselineTrialManager(Node):
         self._trial_failed = False
         self._final_trial_status = "idle"
         self._final_task_phase = "uninitialized"
+        self._contact_events_count = 0
+        self._max_contact_force: float | None = None
+        self._insertion_attempted = False
+        self._insertion_hold_reached = False
+        self._insertion_success: bool | None = None
+        self._insertion_success_estimate: bool | None = None
+        self._contact_metrics_available = False
+        self._contact_notes = "No contact metrics have been received yet."
         self._closed = False
 
         self._metadata_path = self._trial_dir / "trial_metadata.json"
@@ -80,9 +95,11 @@ class BaselineTrialManager(Node):
         self._joint_states_file = self._open_csv("joint_states.csv")
         self._task_events_file = self._open_csv("task_events.csv")
         self._safety_events_file = self._open_csv("safety_events.csv")
+        self._contact_events_file = self._open_csv("contact_events.csv")
         self._joint_states_writer = csv.writer(self._joint_states_file)
         self._task_events_writer = csv.writer(self._task_events_file)
         self._safety_events_writer = csv.writer(self._safety_events_file)
+        self._contact_events_writer = csv.writer(self._contact_events_file)
         self._write_headers()
         self._write_summary()
 
@@ -116,6 +133,18 @@ class BaselineTrialManager(Node):
             self._on_safety_status,
             100,
         )
+        self.create_subscription(
+            String,
+            self._contact_event_topic,
+            self._on_contact_event,
+            100,
+        )
+        self.create_subscription(
+            String,
+            self._insertion_metrics_topic,
+            self._on_insertion_metrics,
+            100,
+        )
         self.create_timer(2.0, self._flush_logs)
 
         self.get_logger().info(f"Started baseline trial logging: {self._trial_dir}")
@@ -123,7 +152,8 @@ class BaselineTrialManager(Node):
             "Recording "
             f"{self._joint_states_topic}, {self._task_phase_topic}, "
             f"{self._task_event_topic}, {self._trial_status_topic}, and "
-            f"{self._safety_status_topic}"
+            f"{self._safety_status_topic}; contact metrics from "
+            f"{self._contact_event_topic} and {self._insertion_metrics_topic}"
         )
 
     def _on_joint_state(self, message: JointState) -> None:
@@ -203,6 +233,71 @@ class BaselineTrialManager(Node):
         self._safety_events_file.flush()
         self._write_summary()
 
+    def _on_contact_event(self, message: String) -> None:
+        event = self._parse_json_message(message.data, "contact_event")
+        ros_time_sec = self._event_time_sec(event)
+        phase = str(event.get("phase", self._final_task_phase))
+        source = str(event.get("source", "unknown"))
+        contact_count = self._coerce_int(event.get("contact_count"), default=0)
+        max_contact_force = self._coerce_optional_float(event.get("max_contact_force"))
+        detail = str(event.get("message", message.data))
+
+        self._contact_events_count += 1
+        self._contact_metrics_available = True
+        if max_contact_force is not None:
+            self._max_contact_force = (
+                max_contact_force
+                if self._max_contact_force is None
+                else max(self._max_contact_force, max_contact_force)
+            )
+
+        self._contact_events_writer.writerow(
+            [
+                f"{ros_time_sec:.9f}",
+                phase,
+                source,
+                contact_count,
+                self._format_optional_float(max_contact_force),
+                detail,
+            ]
+        )
+        self._contact_events_file.flush()
+        self._write_summary()
+
+    def _on_insertion_metrics(self, message: String) -> None:
+        metrics = self._parse_json_message(message.data, "insertion_metrics")
+        self._contact_metrics_available = self._contact_metrics_available or bool(
+            metrics.get("contact_metrics_available", False)
+        )
+        self._insertion_attempted = bool(
+            metrics.get("insertion_attempted", self._insertion_attempted)
+        )
+        self._insertion_hold_reached = bool(
+            metrics.get("insertion_hold_reached", self._insertion_hold_reached)
+        )
+        self._insertion_success = self._coerce_optional_bool(
+            metrics.get("insertion_success")
+        )
+        self._insertion_success_estimate = self._coerce_optional_bool(
+            metrics.get("insertion_success_estimate")
+        )
+
+        metrics_contact_count = self._coerce_int(
+            metrics.get("contact_events_count"), default=self._contact_events_count
+        )
+        self._contact_events_count = max(
+            self._contact_events_count, metrics_contact_count
+        )
+        metrics_max_force = self._coerce_optional_float(metrics.get("max_contact_force"))
+        if metrics_max_force is not None:
+            self._max_contact_force = (
+                metrics_max_force
+                if self._max_contact_force is None
+                else max(self._max_contact_force, metrics_max_force)
+            )
+        self._contact_notes = str(metrics.get("notes", self._contact_notes))
+        self._write_summary()
+
     def close(self) -> None:
         if self._closed:
             return
@@ -214,6 +309,7 @@ class BaselineTrialManager(Node):
             self._joint_states_file,
             self._task_events_file,
             self._safety_events_file,
+            self._contact_events_file,
         ):
             file_handle.close()
 
@@ -229,11 +325,12 @@ class BaselineTrialManager(Node):
             "end_effector": "simplified research gripper",
             "task": "peg-in-hole baseline",
             "controller": "joint_trajectory_controller",
-            "framework_version": "v0.2",
+            "framework_version": "v0.3",
             "notes": (
-                "Research Baseline v0.2 logs task events, safety events, trial "
-                "status, and joint states. Contact force and insertion-success "
-                "metrics are Phase 3 placeholders."
+                "Research Baseline v0.3 logs task events, safety events, trial "
+                "status, joint states, contact events, and insertion metrics. "
+                "Contact-force values remain null unless force extraction is "
+                "validated and enabled."
             ),
             "topics": {
                 "joint_states": self._joint_states_topic,
@@ -241,6 +338,8 @@ class BaselineTrialManager(Node):
                 "task_event": self._task_event_topic,
                 "trial_status": self._trial_status_topic,
                 "safety_status": self._safety_status_topic,
+                "contact_event": self._contact_event_topic,
+                "insertion_metrics": self._insertion_metrics_topic,
             },
         }
 
@@ -260,13 +359,14 @@ class BaselineTrialManager(Node):
             "safety_violations_count": self._safety_violations_count,
             "execution_time_sec": execution_time_sec,
             "safe_success": safe_success,
-            "insertion_success": None,
-            "max_contact_force": None,
-            "contact_events_count": None,
-            "notes": (
-                "insertion_success, max_contact_force, and contact_events_count "
-                "are Phase 3 metrics and are not implemented in v0.2."
-            ),
+            "contact_events_count": self._contact_events_count,
+            "max_contact_force": self._max_contact_force,
+            "insertion_attempted": self._insertion_attempted,
+            "insertion_hold_reached": self._insertion_hold_reached,
+            "insertion_success": self._insertion_success,
+            "insertion_success_estimate": self._insertion_success_estimate,
+            "contact_metrics_available": self._contact_metrics_available,
+            "notes": self._summary_notes(),
         }
 
     def _write_headers(self) -> None:
@@ -284,6 +384,16 @@ class BaselineTrialManager(Node):
         )
         self._safety_events_writer.writerow(
             ["ros_time_sec", "level", "code", "phase", "message"]
+        )
+        self._contact_events_writer.writerow(
+            [
+                "ros_time_sec",
+                "phase",
+                "source",
+                "contact_count",
+                "max_contact_force",
+                "message",
+            ]
         )
         self._flush_logs()
 
@@ -308,6 +418,7 @@ class BaselineTrialManager(Node):
         self._joint_states_file.flush()
         self._task_events_file.flush()
         self._safety_events_file.flush()
+        self._contact_events_file.flush()
         self._write_summary()
 
     def _write_summary(self) -> None:
@@ -317,6 +428,21 @@ class BaselineTrialManager(Node):
 
     def _elapsed_sec(self) -> float:
         return (self.get_clock().now() - self._start_time).nanoseconds / 1_000_000_000.0
+
+    def _summary_notes(self) -> str:
+        notes = [self._contact_notes]
+        if not self._contact_metrics_available:
+            notes.append("contact_metrics_available: false")
+        if self._max_contact_force is None:
+            notes.append(
+                "max_contact_force is null unless validated force extraction is enabled."
+            )
+        if self._insertion_success is None:
+            notes.append(
+                "insertion_success is null because no validated contact-based success "
+                "rule is implemented."
+            )
+        return " ".join(notes)
 
     def _message_time_sec(self, message: JointState) -> float:
         stamp = message.header.stamp
@@ -354,6 +480,36 @@ class BaselineTrialManager(Node):
                 "message": data,
             }
         return parsed
+
+    @staticmethod
+    def _coerce_int(value: Any, default: int) -> int:
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return default
+
+    @staticmethod
+    def _coerce_optional_float(value: Any) -> float | None:
+        if value is None or value == "":
+            return None
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
+
+    @staticmethod
+    def _coerce_optional_bool(value: Any) -> bool | None:
+        if value is None:
+            return None
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str):
+            normalized = value.strip().lower()
+            if normalized in {"true", "1", "yes"}:
+                return True
+            if normalized in {"false", "0", "no"}:
+                return False
+        return None
 
     @staticmethod
     def _format_optional_float(value: float | None) -> str:
