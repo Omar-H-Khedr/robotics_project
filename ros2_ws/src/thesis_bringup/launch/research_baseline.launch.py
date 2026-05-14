@@ -172,6 +172,20 @@ def launch_setup(context, *args, **kwargs):
         }.items(),
     )
 
+    contact_ros_gz_bridge = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            PathJoinSubstitution(
+                [FindPackageShare("ros_gz_bridge"), "launch", "ros_gz_bridge.launch.py"]
+            )
+        ),
+        launch_arguments={
+            "config_file": PathJoinSubstitution(
+                [FindPackageShare("thesis_bringup"), "config", "contact_bridge.yaml"]
+            ),
+            "bridge_name": "contact_ros_gz_bridge",
+        }.items(),
+    )
+
     spawn_robot = Node(
         package="ros_gz_sim",
         executable="create",
@@ -251,6 +265,7 @@ def launch_setup(context, *args, **kwargs):
         gz_server,
         spawn_robot,
         ros_gz_bridge,
+        contact_ros_gz_bridge,
         controller_spawner("joint_state_broadcaster", activate=True),
         controller_spawner("joint_trajectory_controller", activate=True),
     ]

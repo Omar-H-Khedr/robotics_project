@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import yaml
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, LogInfo, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -8,15 +10,39 @@ from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
-def generate_launch_description():
-    results_root = (
-        Path.home()
-        / "code"
-        / "robotics_project"
-        / "ros2_ws"
-        / "results"
-        / "baseline_trials"
+def _workspace_results_root() -> Path:
+    for parent in Path(__file__).resolve().parents:
+        if parent.name == "ros2_ws":
+            return parent / "results" / "baseline_trials"
+    return Path.cwd() / "results" / "baseline_trials"
+
+
+def _contact_metrics_parameters() -> dict[str, object]:
+    config_path = (
+        Path(get_package_share_directory("peg_in_hole_metrics"))
+        / "config"
+        / "contact_metrics.yaml"
     )
+    with config_path.open("r", encoding="utf-8") as config_file:
+        config = yaml.safe_load(config_file) or {}
+
+    parameters = config.get("contact_metrics_node", {}).get("ros__parameters", {})
+    contact_topics = parameters.get("contact_topics", [])
+    normalized_topics = []
+    for entry in contact_topics:
+        if isinstance(entry, dict):
+            name = str(entry.get("name", "")).strip()
+            topic = str(entry.get("topic", "")).strip()
+            if name and topic:
+                normalized_topics.append(f"{name}:{topic}")
+        elif entry:
+            normalized_topics.append(str(entry))
+    parameters["contact_topics"] = normalized_topics
+    return parameters
+
+
+def generate_launch_description():
+    results_root = _workspace_results_root()
 
     return LaunchDescription(
         [
@@ -102,15 +128,7 @@ def generate_launch_description():
                         executable="contact_metrics_node",
                         name="contact_metrics_node",
                         output="screen",
-                        parameters=[
-                            PathJoinSubstitution(
-                                [
-                                    FindPackageShare("peg_in_hole_metrics"),
-                                    "config",
-                                    "contact_metrics.yaml",
-                                ]
-                            )
-                        ],
+                        parameters=[_contact_metrics_parameters()],
                     ),
                 ],
             ),

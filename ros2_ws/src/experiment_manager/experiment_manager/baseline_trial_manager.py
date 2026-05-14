@@ -85,6 +85,11 @@ class BaselineTrialManager(Node):
         self._insertion_success: bool | None = None
         self._insertion_success_estimate: bool | None = None
         self._contact_metrics_available = False
+        self._contact_topics_configured: dict[str, str] = {}
+        self._contact_topics_connected: set[str] = set()
+        self._contact_messages_observed = False
+        self._physical_contact_observed = False
+        self._contact_topics_seen: set[str] = set()
         self._contact_notes = "No contact metrics have been received yet."
         self._closed = False
 
@@ -242,7 +247,13 @@ class BaselineTrialManager(Node):
         max_contact_force = self._coerce_optional_float(event.get("max_contact_force"))
         detail = str(event.get("message", message.data))
 
-        self._contact_events_count += 1
+        if source:
+            self._contact_topics_seen.add(source)
+            self._contact_topics_connected.add(source)
+        self._contact_messages_observed = True
+        if contact_count > 0:
+            self._contact_events_count += 1
+            self._physical_contact_observed = True
         self._contact_metrics_available = True
         if max_contact_force is not None:
             self._max_contact_force = (
@@ -266,9 +277,21 @@ class BaselineTrialManager(Node):
 
     def _on_insertion_metrics(self, message: String) -> None:
         metrics = self._parse_json_message(message.data, "insertion_metrics")
-        self._contact_metrics_available = self._contact_metrics_available or bool(
-            metrics.get("contact_metrics_available", False)
+        self._update_contact_topics_configured(metrics.get("contact_topics_configured"))
+        self._contact_topics_connected = self._coerce_string_set(
+            metrics.get("contact_topics_connected"),
+            default=self._contact_topics_connected,
         )
+        self._contact_metrics_available = bool(
+            metrics.get("contact_metrics_available", self._contact_metrics_available)
+        )
+        self._contact_messages_observed = bool(
+            metrics.get("contact_messages_observed", self._contact_messages_observed)
+        )
+        self._physical_contact_observed = bool(
+            metrics.get("physical_contact_observed", self._physical_contact_observed)
+        )
+        self._update_contact_topics_seen(metrics.get("contact_topics_seen"))
         self._insertion_attempted = bool(
             metrics.get("insertion_attempted", self._insertion_attempted)
         )
@@ -365,6 +388,11 @@ class BaselineTrialManager(Node):
             "insertion_hold_reached": self._insertion_hold_reached,
             "insertion_success": self._insertion_success,
             "insertion_success_estimate": self._insertion_success_estimate,
+            "contact_topics_configured": self._contact_topics_configured,
+            "contact_topics_connected": sorted(self._contact_topics_connected),
+            "contact_messages_observed": self._contact_messages_observed,
+            "physical_contact_observed": self._physical_contact_observed,
+            "contact_topics_seen": sorted(self._contact_topics_seen),
             "contact_metrics_available": self._contact_metrics_available,
             "notes": self._summary_notes(),
         }
@@ -431,7 +459,13 @@ class BaselineTrialManager(Node):
 
     def _summary_notes(self) -> str:
         notes = [self._contact_notes]
-        if not self._contact_metrics_available:
+        if self._contact_metrics_available and not self._physical_contact_observed:
+            notes.append(
+                "Contact instrumentation is connected; zero physical contact events "
+                "can be expected when the scripted joint-space sequence does not "
+                "touch instrumented objects."
+            )
+        elif not self._contact_metrics_available:
             notes.append("contact_metrics_available: false")
         if self._max_contact_force is None:
             notes.append(
@@ -510,6 +544,36 @@ class BaselineTrialManager(Node):
             if normalized in {"false", "0", "no"}:
                 return False
         return None
+
+    def _update_contact_topics_seen(self, value: Any) -> None:
+        if isinstance(value, list):
+            for item in value:
+                source = str(item).strip()
+                if source:
+                    self._contact_topics_seen.add(source)
+        elif isinstance(value, str):
+            source = value.strip()
+            if source:
+                self._contact_topics_seen.add(source)
+
+    def _update_contact_topics_configured(self, value: Any) -> None:
+        if isinstance(value, dict):
+            configured = {
+                str(name).strip(): str(topic).strip()
+                for name, topic in value.items()
+                if str(name).strip() and str(topic).strip()
+            }
+            if configured:
+                self._contact_topics_configured = configured
+
+    @staticmethod
+    def _coerce_string_set(value: Any, default: set[str]) -> set[str]:
+        if isinstance(value, list):
+            return {str(item).strip() for item in value if str(item).strip()}
+        if isinstance(value, str):
+            source = value.strip()
+            return {source} if source else set(default)
+        return set(default)
 
     @staticmethod
     def _format_optional_float(value: float | None) -> str:

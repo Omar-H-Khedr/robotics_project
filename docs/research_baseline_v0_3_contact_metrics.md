@@ -20,13 +20,23 @@ Gazebo publishes the configured contact sensor data on:
 - `/gazebo/contacts/hole`
 - `/gazebo/contacts/target`
 
-`thesis_bringup/config/contact_bridge.yaml` bridges those topics from `gz.msgs.Contacts` to `ros_gz_interfaces/msg/Contacts`. The metrics node subscribes to the ROS-side topics when `ros_gz_interfaces/msg/Contacts` is available. If contact topics or message types are missing, it logs a warning and continues publishing `/insertion_metrics` with `contact_metrics_available: false`.
+`thesis_bringup/config/contact_bridge.yaml` bridges those topics from `gz.msgs.Contacts` to `ros_gz_interfaces/msg/Contacts`. The metrics node subscribes to the ROS-side topics when `ros_gz_interfaces/msg/Contacts` is available. If the message type is missing, it logs a warning and continues publishing `/insertion_metrics` with `contact_metrics_available: false`.
+
+`contact_metrics_available` means contact instrumentation is connected: at least one configured ROS contact topic has a visible ROS publisher in the topic graph. It does not mean a `Contacts` message has been received, and it does not mean physical insertion or contact occurred.
+
+The related diagnostics separate the contact pipeline stages:
+
+- `contact_topics_configured`: configured contact source names and ROS topic names.
+- `contact_topics_connected`: configured contact sources whose ROS topics currently have publishers.
+- `contact_messages_observed`: true after at least one ROS `Contacts` message callback is received.
+- `physical_contact_observed`: true after a received `Contacts` message contains `contact_count > 0`.
+- `contact_topics_seen`: contact sources that have produced at least one message.
 
 ## New Metrics
 
 `peg_in_hole_metrics/contact_metrics_node` publishes:
 
-- `/contact_event` as `std_msgs/msg/String` JSON when a non-empty contact message is observed.
+- `/contact_event` as `std_msgs/msg/String` JSON when a contact message is observed. Zero-contact messages are throttled to avoid log spam, and non-empty contacts are always published.
 - `/insertion_metrics` as `std_msgs/msg/String` JSON at 2 Hz.
 
 `experiment_manager/baseline_trial_manager` records:
@@ -35,16 +45,23 @@ Gazebo publishes the configured contact sensor data on:
 - contact-related fields in `trial_summary.json`
 
 The summary fields include `contact_events_count`, `max_contact_force`, `insertion_attempted`, `insertion_hold_reached`, `insertion_success`, `insertion_success_estimate`, `contact_metrics_available`, and `notes`.
+The summary also preserves `contact_topics_configured`, `contact_topics_connected`, `contact_messages_observed`, `physical_contact_observed`, and `contact_topics_seen`.
 
 ## Task Completion vs Contact vs Insertion Success
 
 Task completion means the scripted task sequence reached its terminal completed status.
 
+Contact telemetry availability means contact topic publishers are visible from ROS. `contact_messages_observed` means ROS `Contacts` messages reached the metrics node. `contact_events_count` counts positive physical contact events (`contact_count > 0`), so it can remain zero when the scripted trajectory completes but does not physically touch the peg, hole, or target contact sensors.
+
+Zero contact events are expected for the current scripted joint-space sequence unless that sequence physically touches the instrumented objects.
+
 Contact observation means Gazebo reported contact on one or more instrumented bodies. Contact alone does not prove insertion success; it can also represent table contact, rim contact, fixture contact, or incidental collisions.
 
 True insertion success should mean the peg reached a validated insertion depth and alignment tolerance. v0.3 does not yet implement a defensible geometric or force-based success rule, so `insertion_success` remains `null`.
 
-`insertion_success_estimate` also remains `null` in v0.3. It is reserved for a future explicitly documented heuristic if a validated success rule is still unavailable.
+`task_completed` means the scripted sequence reached the completed trial status. `insertion_hold_reached` means the task phase reached the insertion hold phase. `insertion_success_estimate` is a heuristic that can be true only when insertion hold was reached, the trial completed, and no explicit failure status was observed. It is not validated insertion success.
+
+`max_contact_force` remains `null` by default until Gazebo contact wrench extraction is validated.
 
 ## Run
 
@@ -79,7 +96,7 @@ metrics, the safety monitor, and the experiment manager.
 
 ## Inspect
 
-Trial outputs are written under `ros2_ws/src/experiment_manager/results/baseline_trials/<trial_id>/`.
+Trial outputs are written under `ros2_ws/results/baseline_trials/<trial_id>/`.
 
 - `contact_events.csv` contains contact event rows with ROS time, phase, source, contact count, max contact force, and message.
 - `trial_summary.json` contains the trial-level v0.2 fields plus the v0.3 contact and insertion metric fields.
