@@ -8,15 +8,19 @@ The scene is intentionally simple and reviewable: primitive SDF geometry, explic
 
 ## Geometry Assumptions
 
-- Peg radius: `0.015 m`
-- Peg length: `0.08 m`
-- Hole radius: `0.016 m`
+- KUKA model: real-scale `lbr_iisy3_r760`; the robot is not scaled in the task scene.
+- Work table: `0.80 m x 0.60 m` top, `0.05 m` top thickness, `0.75 m` surface height.
+- Table placement in the unified baseline: centered at `[0.50, 0.0, 0.0]`, putting the near table edge at `x=0.10 m` from the default robot base at world origin.
+- Peg radius: `0.0125 m`
+- Peg length: `0.11 m`
+- Hole radius: `0.0135 m`
 - Radial clearance: `0.001 m`
+- Target plate footprint: `0.18 m x 0.18 m`
 - Target plate thickness: `0.02 m`
 - Table surface height: `0.75 m`
-- Nominal target frame: `target_hole_frame` at `[0.60, 0.0, 0.81]` in `world`
+- Nominal target frame: `target_hole_frame` at `[0.48, 0.0, 0.81]` in `world`
 - Insertion axis: negative target-frame Z, `[0.0, 0.0, -1.0]`
-- Nominal insertion depth: `0.06 m`
+- Nominal insertion depth: `0.08 m`
 
 The SDF target plate uses primitive collision bars around the aperture and a visual hole marker. This keeps the scene lightweight while preserving the research-critical radial clearance values in `config/task_geometry.yaml`.
 
@@ -43,6 +47,14 @@ For headless server-only startup:
 ```bash
 ros2 launch peg_in_hole_description peg_in_hole_scene.launch.py use_gui:=false
 ```
+
+The standalone launch is useful for reviewing task geometry without the robot. For the unified research environment, use the `thesis_bringup` baseline instead:
+
+```bash
+ros2 launch thesis_bringup research_baseline.launch.py
+```
+
+That launch starts this package's `worlds/peg_in_hole_world.sdf` and then spawns the KUKA robot and controller stack through `kuka_gazebo` in the same Gazebo simulation.
 
 ## Integration Path
 
