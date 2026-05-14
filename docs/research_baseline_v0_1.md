@@ -1,5 +1,9 @@
 # Research Baseline v0.1
 
+Status: superseded by Research Baseline v0.2 for measurable trial logging. The
+v0.1 Gazebo workcell, launch structure, and scripted KUKA task sequence remain
+the stable baseline that v0.2 extends.
+
 Research Baseline v0.1 is the first publishable, reproducible Gazebo-based KUKA peg-in-hole pipeline in this repository. It starts the simulation, monitors safety, logs trial data, and executes a scripted joint-space task sequence through the confirmed reliable action interface.
 
 ## What It Does
@@ -60,4 +64,6 @@ The baseline separates simulation bringup, task execution, safety monitoring, an
 
 ## Next Milestone
 
-The next milestone is peg/hole contact metrics and perception: add validated Gazebo contact extraction, classify expected insertion contact versus collision, compute insertion depth and alignment metrics, then introduce simulated RGB-D perception for task-state estimation.
+The next milestone after v0.1 is Research Baseline v0.2: structured task events,
+trial status, JSON safety status, reproducible trial folders, and explicit
+`safe_success` summaries. See `docs/research_baseline_v0_2_metrics.md`.

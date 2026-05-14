@@ -11,10 +11,10 @@ def generate_launch_description():
         [
             LogInfo(
                 msg=(
-                    "Starting Research Baseline v0.1: Gazebo baseline, "
+                    "Starting Research Baseline v0.2: Gazebo baseline, "
                     "safety monitor, and trial logger. Launch the task sequence "
-                    "separately with: ros2 launch kuka_task_control "
-                    "run_task_sequence.launch.py"
+                    "separately from Terminal 2 with: ros2 launch "
+                    "kuka_task_control run_task_sequence.launch.py"
                 )
             ),
             IncludeLaunchDescription(
@@ -33,7 +33,7 @@ def generate_launch_description():
                 actions=[
                     LogInfo(
                         msg=(
-                            "Research Baseline v0.1: baseline launch has been "
+                            "Research Baseline v0.2: baseline launch has been "
                             "included; starting safety monitor and trial logger "
                             "after 5 seconds so Gazebo and KUKA spawning are not "
                             "blocked by auxiliary nodes."
@@ -58,9 +58,10 @@ def generate_launch_description():
                     ),
                     LogInfo(
                         msg=(
-                            "Research Baseline v0.1: starting "
+                            "Research Baseline v0.2: starting "
                             "experiment_manager/baseline_trial_manager for "
-                            "non-blocking baseline trial logging."
+                            "non-blocking baseline trial logging. Terminal 2 command: "
+                            "ros2 launch kuka_task_control run_task_sequence.launch.py"
                         )
                     ),
                     Node(
