@@ -38,28 +38,38 @@
       </link>
     </model>
 
+    <!--
+      Real-scale KUKA LBR iisy 3 R760 workcell.
+      The robot is spawned by thesis_bringup at world origin without scaling.
+      The 0.80 m x 0.60 m table is centered at x=0.50 m, leaving its near
+      edge at x=0.10 m so the base is close to the work surface. The target
+      at x=0.48 m is inside the 0.76 m nominal reach envelope.
+    -->
     <include>
       <name>work_table</name>
       <uri>model://work_table</uri>
-      <pose>0.55 0 0 0 0 0</pose>
+      <pose>0.50 0 0 0 0 0</pose>
     </include>
 
+    <!-- Fixture base sits on the 0.75 m table surface and is 40 mm tall. -->
     <include>
       <name>hole_fixture</name>
       <uri>model://hole_fixture</uri>
-      <pose>0.60 0 0.75 0 0 0</pose>
+      <pose>0.48 0 0.75 0 0 0</pose>
     </include>
 
+    <!-- Target plate sits on top of the fixture: z=0.79 m bottom, z=0.81 m top. -->
     <include>
       <name>target_plate</name>
       <uri>model://target_plate</uri>
-      <pose>0.60 0 0.79 0 0 0</pose>
+      <pose>0.48 0 0.79 0 0 0</pose>
     </include>
 
+    <!-- Peg origin is at the table surface; its link offset places the 110 mm peg above the table. -->
     <include>
       <name>cylindrical_peg</name>
       <uri>model://cylindrical_peg</uri>
-      <pose>0.35 -0.18 0.75 0 0 0</pose>
+      <pose>0.34 -0.17 0.75 0 0 0</pose>
     </include>
 
     <light name="key_area_light" type="point">

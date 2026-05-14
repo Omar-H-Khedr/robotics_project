@@ -3,27 +3,28 @@
   <model name="target_plate">
     <static>true</static>
     <link name="plate_link">
+      <!-- 180 mm square, 20 mm thick target plate with a 27 mm nominal hole for a 25 mm peg. -->
       <pose>0 0 0.01 0 0 0</pose>
 
       <collision name="plate_front_collision">
-        <pose>0 0.043 0 0 0 0</pose>
-        <geometry><box><size>0.14 0.054 0.02</size></box></geometry>
+        <pose>0 0.054 0 0 0 0</pose>
+        <geometry><box><size>0.18 0.072 0.02</size></box></geometry>
       </collision>
       <collision name="plate_rear_collision">
-        <pose>0 -0.043 0 0 0 0</pose>
-        <geometry><box><size>0.14 0.054 0.02</size></box></geometry>
+        <pose>0 -0.054 0 0 0 0</pose>
+        <geometry><box><size>0.18 0.072 0.02</size></box></geometry>
       </collision>
       <collision name="plate_left_collision">
-        <pose>-0.043 0 0 0 0 0</pose>
-        <geometry><box><size>0.054 0.032 0.02</size></box></geometry>
+        <pose>-0.054 0 0 0 0 0</pose>
+        <geometry><box><size>0.072 0.036 0.02</size></box></geometry>
       </collision>
       <collision name="plate_right_collision">
-        <pose>0.043 0 0 0 0 0</pose>
-        <geometry><box><size>0.054 0.032 0.02</size></box></geometry>
+        <pose>0.054 0 0 0 0 0</pose>
+        <geometry><box><size>0.072 0.036 0.02</size></box></geometry>
       </collision>
 
       <visual name="plate_visual">
-        <geometry><box><size>0.14 0.14 0.02</size></box></geometry>
+        <geometry><box><size>0.18 0.18 0.02</size></box></geometry>
         <material>
           <ambient>0.18 0.28 0.36 1</ambient>
           <diffuse>0.24 0.40 0.50 1</diffuse>
@@ -32,7 +33,7 @@
       </visual>
       <visual name="hole_opening_visual">
         <pose>0 0 0.0105 0 0 0</pose>
-        <geometry><cylinder><radius>0.016</radius><length>0.003</length></cylinder></geometry>
+        <geometry><cylinder><radius>0.0135</radius><length>0.003</length></cylinder></geometry>
         <material>
           <ambient>0.01 0.01 0.01 1</ambient>
           <diffuse>0.02 0.02 0.02 1</diffuse>

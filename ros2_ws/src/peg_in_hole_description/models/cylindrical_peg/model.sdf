@@ -3,23 +3,24 @@
   <model name="cylindrical_peg">
     <static>false</static>
     <link name="peg_link">
-      <pose>0 0 0.04 0 0 0</pose>
+      <!-- 25 mm diameter, 110 mm long aluminum-class peg for small-part insertion studies. -->
+      <pose>0 0 0.055 0 0 0</pose>
       <inertial>
-        <mass>0.18</mass>
+        <mass>0.15</mass>
         <inertia>
-          <ixx>0.000111</ixx><ixy>0</ixy><ixz>0</ixz>
-          <iyy>0.000111</iyy><iyz>0</iyz><izz>0.000020</izz>
+          <ixx>0.000157</ixx><ixy>0</ixy><ixz>0</ixz>
+          <iyy>0.000157</iyy><iyz>0</iyz><izz>0.0000117</izz>
         </inertia>
       </inertial>
       <collision name="peg_collision">
-        <geometry><cylinder><radius>0.015</radius><length>0.08</length></cylinder></geometry>
+        <geometry><cylinder><radius>0.0125</radius><length>0.11</length></cylinder></geometry>
         <surface>
           <friction><ode><mu>0.35</mu><mu2>0.35</mu2></ode></friction>
           <contact><ode><kp>1000000</kp><kd>10</kd></ode></contact>
         </surface>
       </collision>
       <visual name="peg_visual">
-        <geometry><cylinder><radius>0.015</radius><length>0.08</length></cylinder></geometry>
+        <geometry><cylinder><radius>0.0125</radius><length>0.11</length></cylinder></geometry>
         <material>
           <ambient>0.70 0.72 0.74 1</ambient>
           <diffuse>0.86 0.88 0.90 1</diffuse>
