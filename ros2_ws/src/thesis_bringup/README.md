@@ -19,9 +19,26 @@ The canonical Phase 2B entry point is:
 ros2 launch thesis_bringup research_baseline.launch.py
 ```
 
-## Research Baseline v0.1 Trial Workflow
+## Research Baseline v0.3 Trial Workflow
 
-Use `run_research_trial.launch.py` to start the publishable baseline runtime: Gazebo workcell, KUKA controller stack, monitor-only safety layer, and structured trial logger.
+Use `run_research_trial.launch.py` to start the publishable baseline runtime: Gazebo workcell, KUKA controller stack, contact metrics, monitor-only safety layer, and structured trial logger.
+
+The recommended full research trial workflow is now one command:
+
+```bash
+ros2 launch thesis_bringup run_full_research_trial.launch.py
+```
+
+`run_full_research_trial.launch.py` includes the existing research trial
+baseline, waits until
+`/joint_trajectory_controller/follow_joint_trajectory` is available, and only
+then starts `kuka_task_control/task_trajectory_executor`. This readiness gate
+prevents the task sequence from starting before the Gazebo controller action
+server exists.
+
+The older two-terminal workflow is still supported for debugging when you want
+to inspect the simulator, controllers, contact metrics, safety monitor, and
+logger before starting motion manually.
 
 Terminal 1:
 
@@ -35,9 +52,9 @@ Terminal 2:
 ros2 launch kuka_task_control run_task_sequence.launch.py
 ```
 
-The task executor is intentionally launched separately in v0.1 so the simulator, controllers, safety monitor, and logger can be inspected before motion starts.
+Research Baseline v0.3 adds `peg_in_hole_metrics/contact_metrics_node` after the baseline launch delay. The node listens to `/task_phase`, `/trial_status`, and bridged Gazebo contact topics, then publishes `/contact_event` and `/insertion_metrics`. This is instrumentation only; it does not auto-launch the task executor and does not modify robot control.
 
-This launch file reads `config/research_baseline.yaml`, resolves `peg_in_hole_description/worlds/peg_in_hole_world.sdf`, adds the task package's `models` directory to `GZ_SIM_RESOURCE_PATH`, and includes `kuka_gazebo/launch/gazebo_startup.launch.py` with that world. The KUKA package still owns robot description generation, Gazebo spawning, the ROS-Gazebo bridge, `joint_state_broadcaster`, and `joint_trajectory_controller`.
+This launch file reads `config/research_baseline.yaml`, resolves `peg_in_hole_description/worlds/peg_in_hole_world.sdf`, adds the task package's `models` directory to `GZ_SIM_RESOURCE_PATH`, and starts the KUKA robot in that world. The upstream KUKA bridge remains unchanged; contact topics are bridged separately through `config/contact_bridge.yaml`.
 
 The default KUKA spawn pose is `[x=0.80, y=-0.75, z=0.75, roll=0.0, pitch=0.0, yaw=1.5708]`. The `x=0.80` coordinate aligns the robot base with the table centerline, while `y=-0.75` keeps the base in front of the table. The table surface is `0.75 m` high; the older floor-mounted `z=0.0` spawn made the arm appear under the table even with correct x/y alignment. The research baseline is therefore pedestal-mounted at `z=0.75`, with the static `robot_pedestal` included by `peg_in_hole_world.sdf` under the KUKA base. The table remains centered at `x=0.80, y=0.0`, and the peg, target plate, and hole fixture stay at their world-defined poses.
 
