@@ -14,7 +14,7 @@ Binary trial-level outcome indicating whether the peg reached the target inserti
 
 Initial definition: the peg tip reaches the configured insertion depth along the task insertion axis while remaining within the configured lateral and angular tolerance.
 
-Research Baseline v0.3 status: `insertion_success` remains `null`. Contact observation and task phase progress are not sufficient proof of insertion depth or alignment. `insertion_success_estimate` is also `null` until a documented heuristic is introduced.
+Research Baseline v0.3 status: `insertion_success` remains `null`. Contact observation and task phase progress are not sufficient proof of insertion depth or alignment. `insertion_success_estimate` is a heuristic that can be true only when `insertion_hold_reached` is true, `trial_status` is `completed`, and no explicit failure status was observed.
 
 ## Collision Events
 
@@ -22,7 +22,9 @@ Count of collision or contact events that are outside the expected peg-hole inte
 
 Initial definition: number of unexpected contacts reported during a trial. The exact Gazebo contact topic and filtering rule will be finalized when contact instrumentation is added.
 
-Research Baseline v0.3 status: Gazebo contact sensors are configured for `/gazebo/contacts/peg`, `/gazebo/contacts/hole`, and `/gazebo/contacts/target`. The metrics node publishes `/contact_event` JSON and the experiment manager records `contact_events.csv`.
+Research Baseline v0.3 status: Gazebo contact sensors are configured for `/gazebo/contacts/peg`, `/gazebo/contacts/hole`, and `/gazebo/contacts/target`. The metrics node publishes `/contact_event` JSON and the experiment manager records `contact_events.csv`. `contact_metrics_available` means contact instrumentation is connected: at least one configured ROS contact topic has a visible ROS publisher. `contact_messages_observed` means at least one ROS `Contacts` message was received. `physical_contact_observed` means at least one received message contained `contact_count > 0`. `contact_events_count` is the number of positive physical contact events. It can remain zero if the scripted trajectory completes without physically touching the peg, hole, or target contact sensors.
+
+Zero contact events are expected for the current scripted joint-space sequence unless that sequence physically touches instrumented objects.
 
 ## Maximum Contact Force Placeholder
 
@@ -78,11 +80,18 @@ Research Baseline v0.1 writes the following trial summary fields:
 
 Research Baseline v0.3 preserves the v0.2 summary fields and adds:
 
-- `contact_events_count`: number of `/contact_event` rows observed by the trial manager.
+- `contact_events_count`: number of non-empty contact observations reported through `/contact_event`.
 - `max_contact_force`: maximum validated contact force, or `null` when unavailable.
 - `insertion_attempted`: true once an insertion phase is observed.
 - `insertion_hold_reached`: true once `insertion_hold` is observed.
 - `insertion_success`: true/false only after a validated rule exists; currently `null`.
-- `insertion_success_estimate`: optional future heuristic field; currently `null`.
-- `contact_metrics_available`: true once contact metrics are observed, false if topics/message types are missing.
+- `insertion_success_estimate`: heuristic based on insertion hold, completed trial status, and absence of explicit failure.
+- `contact_topics_configured`: configured contact source names and ROS topic names.
+- `contact_topics_connected`: configured contact sources whose ROS topics currently have publishers.
+- `contact_messages_observed`: true once at least one ROS `Contacts` message callback is received.
+- `physical_contact_observed`: true once at least one received contact message has `contact_count > 0`.
+- `contact_metrics_available`: true when at least one configured ROS contact topic has a visible publisher.
+- `contact_topics_seen`: contact sources that have produced at least one message.
 - `notes`: explanation of unavailable contact force or success semantics.
+
+`task_completed`, `insertion_hold_reached`, `insertion_success_estimate`, and true `insertion_success` are intentionally separate. A trial can complete the scripted trajectory and reach insertion hold without proving the peg reached a validated insertion depth or alignment tolerance.

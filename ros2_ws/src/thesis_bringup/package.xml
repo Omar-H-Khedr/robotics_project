@@ -17,12 +17,14 @@
   <exec_depend>python3-yaml</exec_depend>
   <exec_depend>xacro</exec_depend>
   <depend>rclpy</depend>
+  <depend>control_msgs</depend>
 
   <exec_depend>peg_in_hole_description</exec_depend>
   <exec_depend>kuka_gazebo</exec_depend>
   <exec_depend>kuka_task_control</exec_depend>
   <exec_depend>safety_layer</exec_depend>
   <exec_depend>experiment_manager</exec_depend>
+  <exec_depend>peg_in_hole_metrics</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

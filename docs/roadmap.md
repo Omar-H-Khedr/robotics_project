@@ -26,7 +26,7 @@ Phase 2B status: `thesis_bringup/launch/research_baseline.launch.py` now resolve
 
 Baseline v0.1 status: monitor-only safety is implemented through `safety_monitor`. It checks joint soft limits, NaN/Inf values, missing `/joint_states`, and phase-duration timeout placeholders. It does not yet stop motion or perform force control.
 
-Baseline v0.3 status: contact sensors and contact metric logging are added as instrumentation. They do not change safety behavior or robot control.
+Baseline v0.3 status: contact sensors and contact metric logging are added as instrumentation. The real bridged contact topics are `/gazebo/contacts/peg`, `/gazebo/contacts/hole`, and `/gazebo/contacts/target`. They do not change safety behavior or robot control.
 
 ## Phase 4: Experiment Manager and Reproducible Trials
 
@@ -37,7 +37,7 @@ Baseline v0.3 status: contact sensors and contact metric logging are added as in
 
 Baseline v0.1 status: `baseline_trial_manager` records metadata, `/joint_states`, `/task_phase`, `/safety_status`, and a summary JSON under `results/baseline_trials/`. Contact metrics and success labeling remain explicit placeholders.
 
-Baseline v0.3 status: `baseline_trial_manager` also subscribes to `/contact_event` and `/insertion_metrics`, writes `contact_events.csv`, and includes contact metrics in `trial_summary.json`. `safe_success` remains `task_completed == true AND safety_violations_count == 0`.
+Baseline v0.3 status: `baseline_trial_manager` also subscribes to `/contact_event` and `/insertion_metrics`, writes `contact_events.csv`, and includes contact metrics in `trial_summary.json`. `contact_metrics_available` means at least one real Gazebo contact topic message was observed; `contact_events_count` can remain zero when those messages report no physical contacts. `safe_success` remains `task_completed == true AND safety_violations_count == 0`.
 
 Trial workflow status: `thesis_bringup/launch/run_full_research_trial.launch.py`
 is now the recommended single-command entry point for full baseline trials. It
@@ -67,4 +67,4 @@ automatically. The old two-terminal workflow remains available for debugging.
 - Generate publication-ready logs, plots, tables, and experiment manifests.
 - Document simulator assumptions and limitations.
 
-Near-term v0.3 follow-up: validate Gazebo contact wrench extraction before using `max_contact_force`, then define a defensible insertion-success rule from peg/hole pose, insertion depth, contact state, or a documented combination of those signals.
+Near-term v0.3 follow-up: validate Gazebo contact wrench extraction before using `max_contact_force`, then define a defensible insertion-success rule from peg/hole pose, insertion depth, contact state, or a documented combination of those signals. Until then, `task_completed`, `insertion_hold_reached`, heuristic `insertion_success_estimate`, and true `insertion_success` remain separate metrics.

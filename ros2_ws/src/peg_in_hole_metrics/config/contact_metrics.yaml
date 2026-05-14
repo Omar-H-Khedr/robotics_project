@@ -1,0 +1,14 @@
+contact_metrics_node:
+  ros__parameters:
+    contact_topics:
+      - name: peg
+        topic: /gazebo/contacts/peg
+      - name: hole
+        topic: /gazebo/contacts/hole
+      - name: target
+        topic: /gazebo/contacts/target
+    insertion_phase_name: insertion_hold
+    contact_enabled: true
+    publish_rate_hz: 2.0
+    max_contact_force_available: false
+    zero_contact_event_throttle_sec: 2.0
