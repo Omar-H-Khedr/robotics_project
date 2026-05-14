@@ -20,5 +20,9 @@ setup(
     description="Top-level launch and configuration package for the safe adaptive KUKA peg-in-hole research framework.",
     license="Apache-2.0",
     extras_require={"test": ["pytest"]},
-    entry_points={"console_scripts": []},
+    entry_points={
+        "console_scripts": [
+            "controller_readiness_gate = thesis_bringup.controller_readiness_gate:main",
+        ]
+    },
 )
