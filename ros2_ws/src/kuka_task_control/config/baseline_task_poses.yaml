@@ -1,0 +1,61 @@
+metadata:
+  experiment_name: kuka_peg_in_hole_baseline_joint_sequence
+  description: Safe deterministic joint-space task sequence for the KUKA peg-in-hole research baseline.
+  controller_action_name: /joint_trajectory_controller/follow_joint_trajectory
+
+poses:
+  home:
+    positions: [0.0, -0.8, 1.2, 0.0, 0.8, 0.0]
+    duration_sec: 4.0
+
+  safe_home:
+    positions: [0.0, -0.8, 1.2, 0.0, 0.8, 0.0]
+    duration_sec: 4.0
+    description: Raised parked configuration used as the task sequence start.
+
+  safe_above_table:
+    positions: [0.0, -0.6, 1.0, 0.0, 0.9, 0.0]
+    duration_sec: 4.0
+
+  observe_scene:
+    positions: [0.0, -1.20, 1.35, 0.0, 0.35, 0.0]
+    duration_sec: 5.0
+    description: Camera-friendly observation posture above the workspace.
+
+  pre_grasp:
+    positions: [0.15, -1.28, 1.42, 0.0, 0.28, 0.0]
+    duration_sec: 6.0
+    description: Staging posture before the peg grasp approach.
+
+  grasp_approach:
+    positions: [0.22, -1.36, 1.52, 0.0, 0.18, 0.0]
+    duration_sec: 6.0
+    description: Conservative joint-space approach toward the grasp region.
+
+  lift_clearance:
+    positions: [0.15, -1.18, 1.32, 0.0, 0.42, 0.0]
+    duration_sec: 6.0
+    description: Lifted clearance posture after the grasp approach.
+
+  pre_insert:
+    positions: [0.32, -1.26, 1.40, 0.0, 0.30, 0.0]
+    duration_sec: 7.0
+    description: Staging posture before the insertion approach.
+
+  insertion_approach:
+    positions: [0.38, -1.40, 1.56, 0.0, 0.14, 0.0]
+    duration_sec: 8.0
+    description: Slow approach posture toward the insertion fixture.
+
+  pre_task:
+    positions: [0.25, -1.35, 1.45, 0.0, 0.20, 0.0]
+    duration_sec: 5.0
+
+  approach_workspace:
+    positions: [0.35, -1.48, 1.62, 0.0, 0.08, 0.0]
+    duration_sec: 6.0
+
+  retreat:
+    positions: [0.0, -1.25, 1.40, 0.0, 0.30, 0.0]
+    duration_sec: 6.0
+    description: Retreat posture that clears the fixture region.

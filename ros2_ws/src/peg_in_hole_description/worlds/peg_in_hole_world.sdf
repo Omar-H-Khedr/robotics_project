@@ -40,36 +40,60 @@
 
     <!--
       Real-scale KUKA LBR iisy 3 R760 workcell.
-      The robot is spawned by thesis_bringup at world origin without scaling.
-      The 0.80 m x 0.60 m table is centered at x=0.50 m, leaving its near
-      edge at x=0.10 m so the base is close to the work surface. The target
-      at x=0.48 m is inside the 0.76 m nominal reach envelope.
+      The robot is spawned by thesis_bringup without scaling. The table work
+      surface is at z=0.75 m. A floor-mounted robot spawn at z=0.0 made the
+      arm appear under the table even when x/y alignment was correct, so the
+      research baseline is pedestal-mounted: base_link at
+      [x=0.80, y=-0.75, z=0.75] with yaw=1.5708 rad. The x=0.80 coordinate
+      aligns the robot with the table centerline.
+
+      Robot-cell coordinate layout:
+      - World +X runs along the table depth.
+      - World +Y runs from the robot base toward the table.
+      - Z is vertical, with the table work surface at z=0.75 m.
+
+      Table pose: the 0.80 m x 0.60 m table is centered at [0.8, 0.0, 0.0],
+      putting the robot-side tabletop edge at y=-0.30 m. With the robot base
+      at [x=0.80, y=-0.75], the base is aligned with the table centerline and
+      remains outside the table footprint.
+
+      Task workspace: the peg, fixture, target plate, and nominal hole region
+      sit on the robot-side area of the tabletop. Their z origins match the
+      support stack: table surface at 0.75 m, fixture bottom at 0.75 m, and
+      target plate bottom at 0.79 m.
     -->
     <include>
       <name>work_table</name>
       <uri>model://work_table</uri>
-      <pose>0.50 0 0 0 0 0</pose>
+      <pose>0.80 0 0 0 0 0</pose>
+    </include>
+
+    <!-- Static 0.75 m pedestal under the KUKA base for the research baseline. -->
+    <include>
+      <name>robot_pedestal</name>
+      <uri>model://robot_pedestal</uri>
+      <pose>0.80 -0.75 0.0 0 0 0</pose>
     </include>
 
     <!-- Fixture base sits on the 0.75 m table surface and is 40 mm tall. -->
     <include>
       <name>hole_fixture</name>
       <uri>model://hole_fixture</uri>
-      <pose>0.48 0 0.75 0 0 0</pose>
+      <pose>0.52 -0.20 0.75 0 0 0</pose>
     </include>
 
     <!-- Target plate sits on top of the fixture: z=0.79 m bottom, z=0.81 m top. -->
     <include>
       <name>target_plate</name>
       <uri>model://target_plate</uri>
-      <pose>0.48 0 0.79 0 0 0</pose>
+      <pose>0.52 -0.20 0.79 0 0 0</pose>
     </include>
 
     <!-- Peg origin is at the table surface; its link offset places the 110 mm peg above the table. -->
     <include>
       <name>cylindrical_peg</name>
       <uri>model://cylindrical_peg</uri>
-      <pose>0.34 -0.17 0.75 0 0 0</pose>
+      <pose>0.72 -0.05 0.75 0 0 0</pose>
     </include>
 
     <light name="key_area_light" type="point">

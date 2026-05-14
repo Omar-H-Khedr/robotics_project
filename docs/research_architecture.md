@@ -16,6 +16,12 @@ The framework is built around a modular ROS 2 graph:
 
 Existing demo packages are retained as legacy/demo references. They should not be treated as the primary research architecture, but they can remain useful for regression checks and historical context.
 
+The current canonical simulation entry point is `thesis_bringup`'s `research_baseline.launch.py`. It launches the configured peg-in-hole Gazebo world from `peg_in_hole_description`, exposes that package's `models` directory through `GZ_SIM_RESOURCE_PATH`, builds the robot description from the project-owned `peg_in_hole_description/urdf/lbr_iisy3_r760_research_gripper.urdf.xacro`, and starts the Gazebo entity spawn, bridge, `joint_state_broadcaster`, and `joint_trajectory_controller`.
+
+Research Baseline v0.1 adds the reproducible trial entry point `thesis_bringup/launch/run_research_trial.launch.py`. It composes the Gazebo baseline, `safety_layer/safety_monitor`, and `experiment_manager/baseline_trial_manager`. Robot motion remains a deliberate second command through `kuka_task_control/launch/run_task_sequence.launch.py`, which sends `FollowJointTrajectory` action goals and publishes `/task_phase`.
+
+The project-owned robot wrapper still reuses the upstream KUKA iisy meshes, kinematic macro, and ROS 2 control macro. It adds only the Phase 2 passive research gripper at the upstream `flange` attachment link, with a fixed `gripper_tcp` frame for peg-in-hole task programming. The upstream KUKA description remains unmodified.
+
 ## Why Gazebo Is the Main Simulator
 
 Gazebo is the main simulator because the project requires ROS-native integration, robot controller compatibility, contact-rich task scenes, reproducible world configuration, and future sensor simulation. It provides a practical bridge between KUKA trajectory control, ROS 2 launch workflows, simulated RGB-D perception, and contact-event instrumentation.
@@ -28,9 +34,13 @@ For this thesis framework, Gazebo is not only a visualization tool. It is the co
 
 Owns top-level launch files and high-level configuration for complete research runs. This package should define canonical experiment entry points such as baseline Gazebo control, safety-filtered control, perception-enabled control, and learning-enabled evaluation.
 
+For the Phase 2B baseline, `thesis_bringup/config/research_baseline.yaml` records the simulation world package/file, task identity and frames, insertion axis, robot name, six KUKA joints, and home pose. The launch logs the resolved world, robot model, task frames, and expected controller stack at startup so experiment logs are self-describing.
+
 ### peg_in_hole_description
 
 Owns the peg-in-hole task scene. This includes peg and hole geometry, fixtures, frames, Gazebo worlds, contact/material parameters, and task variants such as clearance, offset, and insertion depth.
+
+For Phase 2, this package also owns the simplified passive gripper/end-effector model used by the research baseline. The gripper is deliberately primitive and fixed: palm block, left/right finger links, box visual/collision geometry, and `gripper_tcp`. Actuation and grasp-state modeling are deferred until the task controller and contact experiments need them.
 
 ### kuka_task_control
 
@@ -43,15 +53,15 @@ Owns task-level command generation for the KUKA arm. It should use the six KUKA 
 - `joint_5`
 - `joint_6`
 
-The package should publish controller-compatible commands while keeping a clean boundary for safety filtering.
+The package should send controller-compatible `FollowJointTrajectory` action goals while keeping a clean boundary for safety filtering and logging. Direct publication to the trajectory command topic is not the baseline control path because the confirmed reliable control path is `/joint_trajectory_controller/follow_joint_trajectory`.
 
 ### safety_layer
 
-Owns safety filters, safety monitors, and violation reporting. It should evaluate proposed robot commands against configured constraints and publish either safe commands or structured violation information.
+Owns safety filters, safety monitors, and violation reporting. In v0.1 it is monitor-only: it subscribes to `/joint_states` and `/task_phase`, checks soft joint limits, NaN/Inf values, missing joint-state timeout, and phase-duration timeout placeholders, then publishes `/safety_status`.
 
 ### experiment_manager
 
-Owns reproducible trial execution. It should manage trial manifests, parameter sweeps, reset logic, metadata, rosbag recording, metrics extraction hooks, and result summaries.
+Owns reproducible trial execution. In v0.1 it records one trial folder under `results/baseline_trials/` with metadata, joint-state CSV rows, task events, safety events, and a summary JSON with explicit placeholders for contact and task-success metrics.
 
 ### perception_pipeline
 
@@ -66,10 +76,10 @@ Owns the future interface between ROS 2 experiments and learning systems. It sho
 The intended command and data flow is:
 
 1. `experiment_manager` selects a trial configuration and starts the experiment through `thesis_bringup`.
-2. `peg_in_hole_description` provides the Gazebo scene and task frames.
-3. `kuka_task_control` generates a proposed joint trajectory or task command.
-4. `safety_layer` evaluates the proposed command and publishes a filtered command to the controller.
-5. `joint_trajectory_controller` executes the command in the KUKA Gazebo simulation.
+2. `thesis_bringup` starts `peg_in_hole_description/worlds/peg_in_hole_world.sdf` and spawns the KUKA robot with the passive research gripper and controller stack into that same Gazebo world.
+3. `kuka_task_control` sends the scripted task sequence through the `FollowJointTrajectory` action interface and publishes `/task_phase`.
+4. `safety_layer` monitors `/joint_states` and `/task_phase` and publishes `/safety_status`.
+5. `joint_trajectory_controller` executes the accepted action goals in the KUKA Gazebo simulation.
 6. Gazebo and ROS 2 topics provide robot state, task state, contacts, controller feedback, and later RGB-D sensor data.
 7. `experiment_manager` records logs and computes trial outcomes.
 8. `perception_pipeline` and `learning_interface` can be added without changing the baseline controller or safety boundary.
