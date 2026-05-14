@@ -7,8 +7,11 @@
   <maintainer email="omar.khedr@gu.edu.eg">Omar Khedr</maintainer>
   <license>Apache-2.0</license>
 
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
   <depend>rclpy</depend>
-  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>ros_gz_sim</exec_depend>
   <exec_depend>robot_state_publisher</exec_depend>
   <exec_depend>xacro</exec_depend>
 

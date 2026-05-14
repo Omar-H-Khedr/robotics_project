@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <model name="target_plate">
+    <static>true</static>
+    <link name="plate_link">
+      <pose>0 0 0.01 0 0 0</pose>
+
+      <collision name="plate_front_collision">
+        <pose>0 0.043 0 0 0 0</pose>
+        <geometry><box><size>0.14 0.054 0.02</size></box></geometry>
+      </collision>
+      <collision name="plate_rear_collision">
+        <pose>0 -0.043 0 0 0 0</pose>
+        <geometry><box><size>0.14 0.054 0.02</size></box></geometry>
+      </collision>
+      <collision name="plate_left_collision">
+        <pose>-0.043 0 0 0 0 0</pose>
+        <geometry><box><size>0.054 0.032 0.02</size></box></geometry>
+      </collision>
+      <collision name="plate_right_collision">
+        <pose>0.043 0 0 0 0 0</pose>
+        <geometry><box><size>0.054 0.032 0.02</size></box></geometry>
+      </collision>
+
+      <visual name="plate_visual">
+        <geometry><box><size>0.14 0.14 0.02</size></box></geometry>
+        <material>
+          <ambient>0.18 0.28 0.36 1</ambient>
+          <diffuse>0.24 0.40 0.50 1</diffuse>
+          <specular>0.25 0.25 0.25 1</specular>
+        </material>
+      </visual>
+      <visual name="hole_opening_visual">
+        <pose>0 0 0.0105 0 0 0</pose>
+        <geometry><cylinder><radius>0.016</radius><length>0.003</length></cylinder></geometry>
+        <material>
+          <ambient>0.01 0.01 0.01 1</ambient>
+          <diffuse>0.02 0.02 0.02 1</diffuse>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>
