@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <model name="hole_fixture">
+    <static>true</static>
+    <link name="fixture_link">
+      <pose>0 0 0.02 0 0 0</pose>
+      <collision name="fixture_front_collision">
+        <pose>0 0.065 0 0 0 0</pose>
+        <geometry><box><size>0.22 0.09 0.04</size></box></geometry>
+      </collision>
+      <collision name="fixture_rear_collision">
+        <pose>0 -0.065 0 0 0 0</pose>
+        <geometry><box><size>0.22 0.09 0.04</size></box></geometry>
+      </collision>
+      <collision name="fixture_left_collision">
+        <pose>-0.065 0 0 0 0 0</pose>
+        <geometry><box><size>0.09 0.04 0.04</size></box></geometry>
+      </collision>
+      <collision name="fixture_right_collision">
+        <pose>0.065 0 0 0 0 0</pose>
+        <geometry><box><size>0.09 0.04 0.04</size></box></geometry>
+      </collision>
+      <visual name="fixture_visual">
+        <geometry><box><size>0.22 0.22 0.04</size></box></geometry>
+        <material>
+          <ambient>0.18 0.22 0.24 1</ambient>
+          <diffuse>0.24 0.30 0.32 1</diffuse>
+          <specular>0.20 0.22 0.22 1</specular>
+        </material>
+      </visual>
+      <visual name="fixture_socket_visual">
+        <pose>0 0 0.021 0 0 0</pose>
+        <geometry><cylinder><radius>0.016</radius><length>0.004</length></cylinder></geometry>
+        <material>
+          <ambient>0.02 0.02 0.02 1</ambient>
+          <diffuse>0.03 0.03 0.03 1</diffuse>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

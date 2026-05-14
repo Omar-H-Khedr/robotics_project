@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="peg_in_hole_task">
+  <xacro:property name="peg_radius" value="0.015"/>
+  <xacro:property name="peg_length" value="0.08"/>
+  <xacro:property name="hole_radius" value="0.016"/>
+  <xacro:property name="plate_thickness" value="0.02"/>
+  <xacro:property name="table_height" value="0.75"/>
+
+  <link name="world"/>
+
+  <link name="target_hole_frame"/>
+  <joint name="world_to_target_hole_frame" type="fixed">
+    <parent link="world"/>
+    <child link="target_hole_frame"/>
+    <origin xyz="0.60 0.0 0.81" rpy="0 0 0"/>
+  </joint>
+
+  <link name="peg_tip"/>
+  <joint name="target_to_nominal_peg_tip" type="fixed">
+    <parent link="target_hole_frame"/>
+    <child link="peg_tip"/>
+    <origin xyz="0 0 0.06" rpy="0 0 0"/>
+  </joint>
+</robot>
