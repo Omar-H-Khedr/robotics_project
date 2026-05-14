@@ -11,7 +11,6 @@ from action_msgs.msg import GoalStatus
 from builtin_interfaces.msg import Duration
 from control_msgs.action import FollowJointTrajectory
 from rclpy.action import ActionClient
-from rclpy.duration import Duration as RclpyDuration
 from rclpy.node import Node
 from rclpy.task import Future
 from std_msgs.msg import String
@@ -45,7 +44,6 @@ class TaskTrajectoryExecutor(Node):
     TASK_PHASE_TOPIC = "/task_phase"
     TASK_EVENT_TOPIC = "/task_event"
     TRIAL_STATUS_TOPIC = "/trial_status"
-    START_DELAY_SEC = 0.25
     PHASE_PUBLISH_PERIOD_SEC = 0.5
     RESULT_TIMEOUT_MARGIN_SEC = 5.0
     RESULT_WAIT_LOG_PERIOD_SEC = 2.0
@@ -376,9 +374,12 @@ class TaskTrajectoryExecutor(Node):
     def _build_goal(self, pose: dict[str, Any]) -> FollowJointTrajectory.Goal:
         goal_msg = FollowJointTrajectory.Goal()
         goal_msg.trajectory.joint_names = list(self.JOINT_NAMES)
-        goal_msg.trajectory.header.stamp = (
-            self.get_clock().now() + RclpyDuration(seconds=self.START_DELAY_SEC)
-        ).to_msg()
+        # A zero trajectory header stamp lets ros2_control's
+        # JointTrajectoryController execute the command immediately. Using
+        # wall/system time can make Gazebo wait for a timestamp that never
+        # occurs in simulation time.
+        goal_msg.trajectory.header.stamp.sec = 0
+        goal_msg.trajectory.header.stamp.nanosec = 0
 
         point = JointTrajectoryPoint()
         point.positions = [float(value) for value in pose["positions"]]
