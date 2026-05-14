@@ -1,0 +1,23 @@
+controller_action_name: /joint_trajectory_controller/follow_joint_trajectory
+
+joint_names:
+  - joint_1
+  - joint_2
+  - joint_3
+  - joint_4
+  - joint_5
+  - joint_6
+
+poses:
+  home: [0.0, -1.5708, 1.5708, 0.0, 0.0, 0.0]
+  pre_task: [0.3, -1.5708, 1.5708, 0.0, 0.0, 0.0]
+  return_home: [0.0, -1.5708, 1.5708, 0.0, 0.0, 0.0]
+
+timing:
+  home_sec: 3
+  pre_task_sec: 6
+  return_home_sec: 9
+
+metadata:
+  experiment_name: phase1_baseline_trajectory
+  description: Initial controlled KUKA joint trajectory for Gazebo baseline validation

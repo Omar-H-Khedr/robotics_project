@@ -20,5 +20,9 @@ setup(
     description="Task-level KUKA control interfaces for peg-in-hole assembly experiments.",
     license="Apache-2.0",
     extras_require={"test": ["pytest"]},
-    entry_points={"console_scripts": []},
+    entry_points={
+        "console_scripts": [
+            "baseline_trajectory_client = kuka_task_control.baseline_trajectory_client:main",
+        ]
+    },
 )
