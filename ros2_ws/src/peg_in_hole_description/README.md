@@ -29,6 +29,31 @@ The scene is intentionally simple and reviewable: primitive SDF geometry, explic
 
 The SDF target plate uses primitive collision bars around the aperture and a visual hole marker. This keeps the scene lightweight while preserving the research-critical radial clearance values in `config/task_geometry.yaml`.
 
+## Contact Instrumentation
+
+Research Baseline v0.3 adds Gazebo contact sensors without changing the workcell layout, robot spawn, task poses, or controller behavior. The sensors are instrumentation only.
+
+- `peg_contact_sensor` is attached to `cylindrical_peg::peg_link` and monitors `peg_collision`. It is intended to observe whether the loose peg collides with the table, fixture, plate, gripper, or any other body.
+- `hole_contact_sensor` is attached to `hole_fixture::fixture_link` and monitors the fixture collision bars, including the canonical `hole_fixture_collision` name. It is intended to observe contact with the fixture/nest under the target plate.
+- `target_contact_sensor` is attached to `target_plate::plate_link` and monitors the plate collision bars, including the canonical `target_plate_collision` name. It is intended to observe contact around the nominal hole opening.
+- The tabletop collision is named `table_collision` for clear filtering in future trials.
+
+The configured Gazebo contact topics are:
+
+- `/gazebo/contacts/peg`
+- `/gazebo/contacts/hole`
+- `/gazebo/contacts/target`
+- `/gazebo/contacts/validation` in the separate v0.4 contact-probe validation world
+
+These topic names are declared directly in the SDF sensor `<topic>` fields. If a Gazebo version scopes sensor topics differently, inspect the running Gazebo topic list and update `thesis_bringup/config/contact_bridge.yaml` and `peg_in_hole_metrics/config/contact_metrics.yaml` together.
+
+Research Baseline v0.4 adds `worlds/peg_in_hole_contact_validation_world.sdf`
+as a separate instrumentation check. It preserves the canonical workcell layout
+and adds an isolated `contact_validation_pad` plus a dynamic `contact_probe`
+that falls onto the pad under gravity. This validates Gazebo contact sensors,
+bridges, `contact_metrics_node`, and experiment logging; it is not robot
+insertion and does not require the KUKA to touch anything.
+
 ## Contents
 
 - `models/work_table`: static laboratory work table.
@@ -37,6 +62,7 @@ The SDF target plate uses primitive collision bars around the aperture and a vis
 - `models/hole_fixture`: static fixture block under the target plate.
 - `models/target_plate`: target plate with the nominal hole opening.
 - `worlds/peg_in_hole_world.sdf`: Gazebo world containing the table, fixture, target plate, peg, ground plane, and camera-ready lighting.
+- `worlds/peg_in_hole_contact_validation_world.sdf`: separate passive contact-probe validation world for Research Baseline v0.4 instrumentation checks.
 - `urdf/peg_in_hole_task.urdf.xacro`: reusable task-frame placeholders for future TF integration.
 - `urdf/research_parallel_gripper.xacro`: simplified fixed two-finger research gripper macro with primitive visual/collision geometry and a `gripper_tcp` frame.
 - `urdf/lbr_iisy3_r760_research_gripper.urdf.xacro`: project-owned KUKA wrapper that includes the upstream KUKA iisy description and attaches the passive gripper at `flange`.

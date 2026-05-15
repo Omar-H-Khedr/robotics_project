@@ -10,6 +10,8 @@ The node subscribes to the ROS-side Gazebo contact topics:
 - `/gazebo/contacts/peg`
 - `/gazebo/contacts/hole`
 - `/gazebo/contacts/target`
+- `/gazebo/contacts/validation` for the separate passive contact-probe
+  validation trial
 
 These topics are expected to use `ros_gz_interfaces/msg/Contacts` after the
 Gazebo bridge. If `ros_gz_interfaces/msg/Contacts` is unavailable, the node logs
