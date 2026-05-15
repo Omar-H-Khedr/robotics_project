@@ -1,0 +1,57 @@
+metadata:
+  experiment_name: research_baseline_v0_4_contact_validation_sequence
+  description: Conservative joint-space sequence for validating Gazebo contact metrics.
+  controller_action_name: /joint_trajectory_controller/follow_joint_trajectory
+  task_phase_topic: /task_phase
+
+sequence:
+  - safe_home
+  - observe_scene
+  - validation_pre_contact
+  - validation_contact_approach
+  - validation_hold
+  - validation_retreat
+  - return_home
+
+poses:
+  safe_home:
+    positions: [0.0, -0.8, 1.2, 0.0, 0.8, 0.0]
+    duration_sec: 5.0
+    description: Raised parked configuration used as the validation start.
+    safety_tag: nominal_clearance
+
+  observe_scene:
+    positions: [0.5, -0.8, 1.2, 0.0, 0.8, 0.0]
+    duration_sec: 6.0
+    description: Camera-friendly observation posture before validation motion.
+    safety_tag: nominal_clearance
+
+  validation_pre_contact:
+    positions: [0.34, -1.28, 1.42, 0.0, 0.28, 0.0]
+    duration_sec: 8.0
+    description: Staged posture near the validation pad with clear approach margin.
+    safety_tag: validation_approach_region
+
+  validation_contact_approach:
+    positions: [0.40, -1.43, 1.60, 0.0, 0.08, 0.0]
+    duration_sec: 10.0
+    description: Slow low-risk approach intended to touch the validation contact pad.
+    safety_tag: validation_contact_region
+
+  validation_hold:
+    positions: [0.40, -1.43, 1.60, 0.0, 0.08, 0.0]
+    duration_sec: 3.0
+    description: Short hold for contact sensor observation and logging.
+    safety_tag: validation_contact_hold
+
+  validation_retreat:
+    positions: [0.18, -1.20, 1.34, 0.0, 0.40, 0.0]
+    duration_sec: 8.0
+    description: Slow retreat away from the validation pad.
+    safety_tag: retreat_clearance
+
+  return_home:
+    positions: [0.0, -0.8, 1.2, 0.0, 0.8, 0.0]
+    duration_sec: 6.0
+    description: Return to the raised parked home configuration.
+    safety_tag: nominal_clearance

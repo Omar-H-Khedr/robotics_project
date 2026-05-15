@@ -18,7 +18,14 @@ DEFAULT_CONTACT_TOPICS = (
     {"name": "hole", "topic": "/gazebo/contacts/hole"},
     {"name": "target", "topic": "/gazebo/contacts/target"},
     {"name": "validation", "topic": "/gazebo/contacts/validation"},
-    {"name": "robot_validation", "topic": "/gazebo/contacts/robot_validation"},
+    {
+        "name": "robot_validation",
+        "topic": (
+            "/world/peg_in_hole_robot_contact_validation_world/model/"
+            "robot_contact_validation_pad/link/robot_contact_validation_pad_link/"
+            "sensor/robot_contact_validation_sensor/contact"
+        ),
+    },
 )
 
 FORCE_EXTRACTION_METHOD = "ros_gz_interfaces Contacts.wrenches force magnitude"

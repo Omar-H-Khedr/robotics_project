@@ -54,6 +54,17 @@ that falls onto the pad under gravity. This validates Gazebo contact sensors,
 bridges, `contact_metrics_node`, and experiment logging; it is not robot
 insertion and does not require the KUKA to touch anything.
 
+Research Baseline v0.5 adds
+`worlds/peg_in_hole_robot_contact_validation_world.sdf` as a separate
+robot-to-object contact validation scene. It preserves the baseline table,
+pedestal, peg, hole fixture, target plate, and robot spawn, then adds only a
+static `robot_contact_validation_pad` with contact topic
+`/gazebo/contacts/robot_validation`. The pad is deliberately placed near the
+current `robot_contact_validation_sequence.yaml` hold pose rather than near the
+peg/hole task geometry. If the robot model, gripper, or validation sequence is
+changed, inspect the run in Gazebo and retune this validation-only pad position
+before interpreting missing contact messages as a metrics failure.
+
 ## Contents
 
 - `models/work_table`: static laboratory work table.
@@ -63,6 +74,7 @@ insertion and does not require the KUKA to touch anything.
 - `models/target_plate`: target plate with the nominal hole opening.
 - `worlds/peg_in_hole_world.sdf`: Gazebo world containing the table, fixture, target plate, peg, ground plane, and camera-ready lighting.
 - `worlds/peg_in_hole_contact_validation_world.sdf`: separate passive contact-probe validation world for Research Baseline v0.4 instrumentation checks.
+- `worlds/peg_in_hole_robot_contact_validation_world.sdf`: separate robot-to-object contact validation world for Research Baseline v0.5 checks.
 - `urdf/peg_in_hole_task.urdf.xacro`: reusable task-frame placeholders for future TF integration.
 - `urdf/research_parallel_gripper.xacro`: simplified fixed two-finger research gripper macro with primitive visual/collision geometry and a `gripper_tcp` frame.
 - `urdf/lbr_iisy3_r760_research_gripper.urdf.xacro`: project-owned KUKA wrapper that includes the upstream KUKA iisy description and attaches the passive gripper at `flange`.

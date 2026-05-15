@@ -1,0 +1,64 @@
+metadata:
+  experiment_name: research_baseline_v0_6_robot_contact_validation_sequence
+  description: Conservative joint-space sequence for robot-to-object contact validation.
+  controller_action_name: /joint_trajectory_controller/follow_joint_trajectory
+  task_phase_topic: /task_phase
+  notes: >
+    The contact approach pose is intentionally conservative and slow. The
+    dedicated robot_contact_validation_pad in the separate validation world is
+    tuned near the current robot_contact_hold gripper envelope so this sequence
+    can produce a real robot_validation contact event without disturbing the
+    baseline task scene. If the robot model or gripper geometry changes, retune
+    the pad from Gazebo observation before changing baseline task poses.
+
+sequence:
+  - safe_home
+  - observe_scene
+  - robot_contact_pre_approach
+  - robot_contact_slow_approach
+  - robot_contact_hold
+  - robot_contact_retreat
+  - return_home
+
+poses:
+  safe_home:
+    positions: [0.0, -0.8, 1.2, 0.0, 0.8, 0.0]
+    duration_sec: 6.0
+    description: Raised parked configuration used as the robot contact validation start.
+    safety_tag: nominal_clearance
+
+  observe_scene:
+    positions: [0.18, -0.92, 1.26, 0.0, 0.66, 0.0]
+    duration_sec: 6.0
+    description: Slow observation posture before moving toward the dedicated validation pad.
+    safety_tag: observation_clearance
+
+  robot_contact_pre_approach:
+    positions: [0.42, -1.12, 1.34, 0.0, 0.42, 0.0]
+    duration_sec: 8.0
+    description: Slow staged posture near the dedicated robot validation target.
+    safety_tag: robot_validation_approach_region
+
+  robot_contact_slow_approach:
+    positions: [0.48, -1.34, 1.54, 0.0, 0.16, 0.0]
+    duration_sec: 8.0
+    description: Conservative slow approach toward the validation pad placed under the current hold gripper envelope.
+    safety_tag: robot_validation_contact_region
+
+  robot_contact_hold:
+    positions: [0.48, -1.34, 1.54, 0.0, 0.16, 0.0]
+    duration_sec: 2.0
+    description: Hold the approach pose to allow physical robot_validation contact messages to be recorded.
+    safety_tag: robot_validation_contact_hold
+
+  robot_contact_retreat:
+    positions: [0.28, -1.08, 1.30, 0.0, 0.48, 0.0]
+    duration_sec: 8.0
+    description: Slow retreat from the dedicated validation contact target.
+    safety_tag: robot_validation_retreat_clearance
+
+  return_home:
+    positions: [0.0, -0.8, 1.2, 0.0, 0.8, 0.0]
+    duration_sec: 6.0
+    description: Return to the raised parked home configuration.
+    safety_tag: nominal_clearance
