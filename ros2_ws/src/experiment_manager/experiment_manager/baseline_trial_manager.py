@@ -1,4 +1,4 @@
-"""Structured trial logger for Research Baseline v0.3."""
+"""Structured trial logger for Research Baseline v0.4."""
 
 from __future__ import annotations
 
@@ -38,6 +38,7 @@ class BaselineTrialManager(Node):
         self.declare_parameter("safety_status_topic", "/safety_status")
         self.declare_parameter("contact_event_topic", "/contact_event")
         self.declare_parameter("insertion_metrics_topic", "/insertion_metrics")
+        self.declare_parameter("trial_mode", "baseline_task")
 
         results_root_parameter = (
             self.get_parameter("results_root").get_parameter_value().string_value
@@ -64,6 +65,9 @@ class BaselineTrialManager(Node):
         self._insertion_metrics_topic = (
             self.get_parameter("insertion_metrics_topic").get_parameter_value().string_value
         )
+        self._trial_mode = self._normalize_trial_mode(
+            self.get_parameter("trial_mode").get_parameter_value().string_value
+        )
 
         self._start_time = self.get_clock().now()
         self._timestamp, self._trial_id, self._trial_dir = self._create_trial_dir()
@@ -72,6 +76,7 @@ class BaselineTrialManager(Node):
         self._total_task_events = 0
         self._safety_warnings_count = 0
         self._safety_violations_count = 0
+        self._safety_status_observed = False
         self._completed_phases_count = 0
         self._task_started = False
         self._task_completed = False
@@ -79,6 +84,7 @@ class BaselineTrialManager(Node):
         self._final_trial_status = "idle"
         self._final_task_phase = "uninitialized"
         self._contact_events_count = 0
+        self._contact_samples_count = 0
         self._max_contact_force: float | None = None
         self._insertion_attempted = False
         self._insertion_hold_reached = False
@@ -227,6 +233,7 @@ class BaselineTrialManager(Node):
         phase = str(event.get("phase", self._final_task_phase))
         detail = str(event.get("message", message.data))
 
+        self._safety_status_observed = True
         if level == "WARNING":
             self._safety_warnings_count += 1
         elif level == "VIOLATION":
@@ -241,6 +248,7 @@ class BaselineTrialManager(Node):
     def _on_contact_event(self, message: String) -> None:
         event = self._parse_json_message(message.data, "contact_event")
         ros_time_sec = self._event_time_sec(event)
+        event_type = str(event.get("event_type", "unknown"))
         phase = str(event.get("phase", self._final_task_phase))
         source = str(event.get("source", "unknown"))
         contact_count = self._coerce_int(event.get("contact_count"), default=0)
@@ -251,8 +259,13 @@ class BaselineTrialManager(Node):
             self._contact_topics_seen.add(source)
             self._contact_topics_connected.add(source)
         self._contact_messages_observed = True
-        if contact_count > 0:
+        contact_started = event_type == "contact_started" or (
+            event_type == "unknown" and contact_count > 0
+        )
+        if contact_started:
             self._contact_events_count += 1
+            self._physical_contact_observed = True
+        elif contact_count > 0:
             self._physical_contact_observed = True
         self._contact_metrics_available = True
         if max_contact_force is not None:
@@ -265,6 +278,7 @@ class BaselineTrialManager(Node):
         self._contact_events_writer.writerow(
             [
                 f"{ros_time_sec:.9f}",
+                event_type,
                 phase,
                 source,
                 contact_count,
@@ -285,11 +299,11 @@ class BaselineTrialManager(Node):
         self._contact_metrics_available = bool(
             metrics.get("contact_metrics_available", self._contact_metrics_available)
         )
-        self._contact_messages_observed = bool(
-            metrics.get("contact_messages_observed", self._contact_messages_observed)
+        self._contact_messages_observed = self._contact_messages_observed or bool(
+            metrics.get("contact_messages_observed", False)
         )
-        self._physical_contact_observed = bool(
-            metrics.get("physical_contact_observed", self._physical_contact_observed)
+        self._physical_contact_observed = self._physical_contact_observed or bool(
+            metrics.get("physical_contact_observed", False)
         )
         self._update_contact_topics_seen(metrics.get("contact_topics_seen"))
         self._insertion_attempted = bool(
@@ -311,6 +325,18 @@ class BaselineTrialManager(Node):
         self._contact_events_count = max(
             self._contact_events_count, metrics_contact_count
         )
+        metrics_sample_count = self._coerce_int(
+            metrics.get("contact_samples_count"), default=self._contact_samples_count
+        )
+        self._contact_samples_count = max(
+            self._contact_samples_count, metrics_sample_count
+        )
+        if metrics_contact_count > 0:
+            self._contact_messages_observed = True
+            self._physical_contact_observed = True
+        if metrics_sample_count > 0:
+            self._contact_messages_observed = True
+            self._physical_contact_observed = True
         metrics_max_force = self._coerce_optional_float(metrics.get("max_contact_force"))
         if metrics_max_force is not None:
             self._max_contact_force = (
@@ -340,20 +366,34 @@ class BaselineTrialManager(Node):
         self.get_logger().info(f"Wrote baseline trial summary: {self._summary_path}")
 
     def _build_metadata(self) -> dict[str, object]:
+        is_contact_probe_validation = self._trial_mode == "contact_probe_validation"
         return {
             "trial_id": self._trial_id,
             "timestamp": self._timestamp,
             "simulator": "Gazebo",
-            "robot": "KUKA LBR iisy 3 R760",
-            "end_effector": "simplified research gripper",
-            "task": "peg-in-hole baseline",
-            "controller": "joint_trajectory_controller",
-            "framework_version": "v0.3",
+            "robot": (
+                "none" if is_contact_probe_validation else "KUKA LBR iisy 3 R760"
+            ),
+            "end_effector": (
+                "none" if is_contact_probe_validation else "simplified research gripper"
+            ),
+            "task": (
+                "passive contact probe validation"
+                if is_contact_probe_validation
+                else "peg-in-hole baseline"
+            ),
+            "controller": (
+                "none" if is_contact_probe_validation else "joint_trajectory_controller"
+            ),
+            "framework_version": "v0.4",
+            "trial_mode": self._trial_mode,
             "notes": (
-                "Research Baseline v0.3 logs task events, safety events, trial "
+                "Research Baseline v0.4 logs task events, safety events, trial "
                 "status, joint states, contact events, and insertion metrics. "
                 "Contact-force values remain null unless force extraction is "
-                "validated and enabled."
+                "validated and enabled. The contact_probe_validation mode validates "
+                "instrumentation with a passive Gazebo probe and does not require "
+                "task sequence completion."
             ),
             "topics": {
                 "joint_states": self._joint_states_topic,
@@ -368,9 +408,10 @@ class BaselineTrialManager(Node):
 
     def _build_summary(self) -> dict[str, object]:
         execution_time_sec = self._elapsed_sec()
-        safe_success = self._task_completed and self._safety_violations_count == 0
+        safe_success = self._safe_success()
         return {
             "trial_id": self._trial_id,
+            "trial_mode": self._trial_mode,
             "task_started": self._task_started,
             "task_completed": self._task_completed,
             "trial_failed": self._trial_failed,
@@ -380,9 +421,11 @@ class BaselineTrialManager(Node):
             "total_task_events": self._total_task_events,
             "safety_warnings_count": self._safety_warnings_count,
             "safety_violations_count": self._safety_violations_count,
+            "safety_status_observed": self._safety_status_observed,
             "execution_time_sec": execution_time_sec,
             "safe_success": safe_success,
             "contact_events_count": self._contact_events_count,
+            "contact_samples_count": self._contact_samples_count,
             "max_contact_force": self._max_contact_force,
             "insertion_attempted": self._insertion_attempted,
             "insertion_hold_reached": self._insertion_hold_reached,
@@ -416,6 +459,7 @@ class BaselineTrialManager(Node):
         self._contact_events_writer.writerow(
             [
                 "ros_time_sec",
+                "event_type",
                 "phase",
                 "source",
                 "contact_count",
@@ -459,6 +503,11 @@ class BaselineTrialManager(Node):
 
     def _summary_notes(self) -> str:
         notes = [self._contact_notes]
+        if self._trial_mode == "contact_probe_validation":
+            notes.append(
+                "contact_probe_validation validates Gazebo contact instrumentation "
+                "only; task_completed is not required."
+            )
         if self._contact_metrics_available and not self._physical_contact_observed:
             notes.append(
                 "Contact instrumentation is connected; zero physical contact events "
@@ -477,6 +526,22 @@ class BaselineTrialManager(Node):
                 "rule is implemented."
             )
         return " ".join(notes)
+
+    def _safe_success(self) -> bool | None:
+        if self._trial_mode == "contact_probe_validation":
+            if self._trial_failed or self._safety_violations_count > 0:
+                return False
+            if self._safety_status_observed:
+                return True
+            return None
+        return self._task_completed and self._safety_violations_count == 0
+
+    @staticmethod
+    def _normalize_trial_mode(value: str) -> str:
+        mode = str(value).strip()
+        if mode in {"baseline_task", "contact_probe_validation"}:
+            return mode
+        return "baseline_task"
 
     def _message_time_sec(self, message: JointState) -> float:
         stamp = message.header.stamp

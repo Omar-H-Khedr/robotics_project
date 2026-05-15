@@ -5,7 +5,7 @@
     <link name="fixture_link">
       <!-- Low 180 mm square nest placed directly on the table; the central opening clears the 27 mm hole marker. -->
       <pose>0 0 0.02 0 0 0</pose>
-      <collision name="fixture_front_collision">
+      <collision name="hole_fixture_collision">
         <pose>0 0.054 0 0 0 0</pose>
         <geometry><box><size>0.18 0.072 0.04</size></box></geometry>
       </collision>
@@ -21,6 +21,17 @@
         <pose>0.054 0 0 0 0 0</pose>
         <geometry><box><size>0.072 0.036 0.04</size></box></geometry>
       </collision>
+      <sensor name="hole_contact_sensor" type="contact">
+        <always_on>true</always_on>
+        <update_rate>100.0</update_rate>
+        <topic>/gazebo/contacts/hole</topic>
+        <contact>
+          <collision>hole_fixture_collision</collision>
+          <collision>fixture_rear_collision</collision>
+          <collision>fixture_left_collision</collision>
+          <collision>fixture_right_collision</collision>
+        </contact>
+      </sensor>
       <visual name="fixture_visual">
         <geometry><box><size>0.18 0.18 0.04</size></box></geometry>
         <material>

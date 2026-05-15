@@ -6,7 +6,7 @@
       <!-- 180 mm square, 20 mm thick target plate with a 27 mm nominal hole for a 25 mm peg. -->
       <pose>0 0 0.01 0 0 0</pose>
 
-      <collision name="plate_front_collision">
+      <collision name="target_plate_collision">
         <pose>0 0.054 0 0 0 0</pose>
         <geometry><box><size>0.18 0.072 0.02</size></box></geometry>
       </collision>
@@ -22,6 +22,17 @@
         <pose>0.054 0 0 0 0 0</pose>
         <geometry><box><size>0.072 0.036 0.02</size></box></geometry>
       </collision>
+      <sensor name="target_contact_sensor" type="contact">
+        <always_on>true</always_on>
+        <update_rate>100.0</update_rate>
+        <topic>/gazebo/contacts/target</topic>
+        <contact>
+          <collision>target_plate_collision</collision>
+          <collision>plate_rear_collision</collision>
+          <collision>plate_left_collision</collision>
+          <collision>plate_right_collision</collision>
+        </contact>
+      </sensor>
 
       <visual name="plate_visual">
         <geometry><box><size>0.18 0.18 0.02</size></box></geometry>

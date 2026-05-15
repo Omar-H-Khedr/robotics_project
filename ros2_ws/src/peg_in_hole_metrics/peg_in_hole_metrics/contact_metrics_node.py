@@ -1,4 +1,4 @@
-"""Contact and insertion metrics publisher for Research Baseline v0.3."""
+"""Contact and insertion metrics publisher for Research Baseline v0.4."""
 
 from __future__ import annotations
 
@@ -17,6 +17,7 @@ DEFAULT_CONTACT_TOPICS = (
     {"name": "peg", "topic": "/gazebo/contacts/peg"},
     {"name": "hole", "topic": "/gazebo/contacts/hole"},
     {"name": "target", "topic": "/gazebo/contacts/target"},
+    {"name": "validation", "topic": "/gazebo/contacts/validation"},
 )
 
 
@@ -34,6 +35,7 @@ class ContactMetricsNode(Node):
         self.declare_parameter("publish_rate_hz", 2.0)
         self.declare_parameter("max_contact_force_available", False)
         self.declare_parameter("zero_contact_event_throttle_sec", 2.0)
+        self.declare_parameter("contact_event_debounce_sec", 0.25)
 
         self._contact_topics = self._load_contact_topics()
         self._insertion_phase_name = (
@@ -56,6 +58,12 @@ class ContactMetricsNode(Node):
             .get_parameter_value()
             .double_value,
         )
+        self._contact_event_debounce_sec = max(
+            0.0,
+            self.get_parameter("contact_event_debounce_sec")
+            .get_parameter_value()
+            .double_value,
+        )
 
         self._current_phase = "uninitialized"
         self._trial_status = "idle"
@@ -63,11 +71,16 @@ class ContactMetricsNode(Node):
         self._insertion_attempted = False
         self._insertion_hold_reached = False
         self._contact_events_count = 0
+        self._contact_samples_count = 0
         self._max_contact_force: float | None = None
         self._contact_message_type_available = False
         self._contact_messages_observed = False
         self._physical_contact_observed = False
         self._contact_topic_seen = {name: False for name in self._contact_topics}
+        self._previous_in_contact = {name: False for name in self._contact_topics}
+        self._last_contact_transition_event_sec = {
+            name: None for name in self._contact_topics
+        }
         self._last_zero_contact_event_sec = {
             name: None for name in self._contact_topics
         }
@@ -187,9 +200,6 @@ class ContactMetricsNode(Node):
         self._contact_messages_observed = True
         self._contact_topic_seen[source] = True
 
-        if contact_count == 0 and not self._should_publish_zero_contact_event(source):
-            return
-
         max_force = self._extract_max_force(contacts)
         if max_force is not None:
             self._max_contact_force = (
@@ -197,29 +207,84 @@ class ContactMetricsNode(Node):
                 if self._max_contact_force is None
                 else max(self._max_contact_force, max_force)
             )
-        if contact_count > 0:
-            self._contact_events_count += 1
-            self._physical_contact_observed = True
 
+        if contact_count > 0:
+            self._contact_samples_count += 1
+            self._physical_contact_observed = True
+            if not self._previous_in_contact.get(source, False):
+                self._previous_in_contact[source] = True
+                if self._should_publish_transition_event(source):
+                    self._contact_events_count += 1
+                    self._publish_contact_event(
+                        self._contact_event_payload(
+                            event_type="contact_started",
+                            source=source,
+                            contact_count=contact_count,
+                            max_force=max_force,
+                            message=self._contact_note(contact_count, max_force),
+                        )
+                    )
+            else:
+                self._previous_in_contact[source] = True
+            return
+
+        if self._previous_in_contact.get(source, False):
+            if self._should_publish_transition_event(source):
+                self._previous_in_contact[source] = False
+                self._publish_contact_event(
+                    self._contact_event_payload(
+                        event_type="contact_ended",
+                        source=source,
+                        contact_count=contact_count,
+                        max_force=max_force,
+                        message="Contact ended; no contacts detected.",
+                    )
+                )
+            return
+
+        if self._should_publish_zero_contact_event(source):
+            self._publish_contact_event(
+                self._contact_event_payload(
+                    event_type="no_contact",
+                    source=source,
+                    contact_count=contact_count,
+                    max_force=max_force,
+                    message="Contact topic message received; no contacts detected.",
+                )
+            )
+
+    def _contact_note(self, contact_count: int, max_force: float | None) -> str:
         if contact_count == 0:
-            note = "Contact topic message received; no contacts detected."
-        elif not self._max_contact_force_available:
+            return "Contact topic message received; no contacts detected."
+        if not self._max_contact_force_available:
             note = "Contact observed; force extraction disabled/unvalidated."
         elif max_force is None:
             note = "Contact observed; force value unavailable in parsed message."
         else:
-            note = "Contact observed; max_contact_force parsed from message wrenches."
+            note = (
+                "Contact observed; max_contact_force parsed from message wrenches. "
+                "Force extraction is preliminary/unvalidated."
+            )
+        return note
 
-        self._publish_contact_event(
-            {
-                "timestamp_ros_sec": self._now_sec(),
-                "phase": self._current_phase,
-                "source": source,
-                "contact_count": contact_count,
-                "max_contact_force": max_force,
-                "message": note,
-            }
-        )
+    def _contact_event_payload(
+        self,
+        *,
+        event_type: str,
+        source: str,
+        contact_count: int,
+        max_force: float | None,
+        message: str,
+    ) -> dict[str, Any]:
+        return {
+            "timestamp_ros_sec": self._now_sec(),
+            "event_type": event_type,
+            "phase": self._current_phase,
+            "source": source,
+            "contact_count": contact_count,
+            "max_contact_force": max_force,
+            "message": message,
+        }
 
     def _extract_contacts(self, message: Any) -> list[Any]:
         contacts = getattr(message, "contacts", None)
@@ -243,6 +308,17 @@ class ContactMetricsNode(Node):
         self._last_zero_contact_event_sec[source] = now_sec
         return True
 
+    def _should_publish_transition_event(self, source: str) -> bool:
+        now_sec = self._now_sec()
+        last_event_sec = self._last_contact_transition_event_sec.get(source)
+        if (
+            last_event_sec is not None
+            and now_sec - last_event_sec < self._contact_event_debounce_sec
+        ):
+            return False
+        self._last_contact_transition_event_sec[source] = now_sec
+        return True
+
     def _extract_max_force(self, contacts: list[Any]) -> float | None:
         if not self._max_contact_force_available:
             return None
@@ -259,15 +335,23 @@ class ContactMetricsNode(Node):
         return max_force
 
     def _iter_wrenches(self, contact: Any) -> list[Any]:
-        for field_name in ("wrenches", "wrench"):
+        result = []
+        for field_name in (
+            "wrenches",
+            "wrench",
+            "body_1_wrench",
+            "body_2_wrench",
+            "body1_wrench",
+            "body2_wrench",
+        ):
             wrenches = getattr(contact, field_name, None)
             if wrenches is None:
                 continue
             try:
-                return list(wrenches)
+                result.extend(list(wrenches))
             except TypeError:
-                return [wrenches]
-        return []
+                result.append(wrenches)
+        return result
 
     def _iter_force_vectors(self, wrench: Any) -> list[Any]:
         vectors = []
@@ -279,6 +363,16 @@ class ContactMetricsNode(Node):
             "body2_force",
         ):
             vector = getattr(wrench, field_name, None)
+            if vector is not None:
+                vectors.append(vector)
+        for field_name in (
+            "body_1_wrench",
+            "body_2_wrench",
+            "body1_wrench",
+            "body2_wrench",
+        ):
+            nested_wrench = getattr(wrench, field_name, None)
+            vector = getattr(nested_wrench, "force", None)
             if vector is not None:
                 vectors.append(vector)
         return vectors
@@ -345,6 +439,7 @@ class ContactMetricsNode(Node):
             "physical_contact_observed": self._physical_contact_observed,
             "contact_topics_seen": contact_topics_seen,
             "contact_events_count": self._contact_events_count,
+            "contact_samples_count": self._contact_samples_count,
             "max_contact_force": self._max_contact_force,
             "insertion_success": None,
             "insertion_success_estimate": self._insertion_success_estimate(),
@@ -386,7 +481,7 @@ class ContactMetricsNode(Node):
 
     @staticmethod
     def _source_from_topic(topic: str, index: int) -> str:
-        for source in ("peg", "hole", "target"):
+        for source in ("peg", "hole", "target", "validation"):
             if re.search(rf"(^|/){source}($|/)", topic):
                 return source
         return f"contact_{index}"

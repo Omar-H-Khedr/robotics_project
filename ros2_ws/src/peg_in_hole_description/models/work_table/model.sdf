@@ -4,7 +4,7 @@
     <static>true</static>
     <link name="table_link">
       <!-- Research-cell bench: 0.80 m x 0.60 m top, 0.05 m thick, with a 0.75 m work surface. -->
-      <collision name="tabletop_collision">
+      <collision name="table_collision">
         <pose>0 0 0.725 0 0 0</pose>
         <geometry><box><size>0.80 0.60 0.05</size></box></geometry>
         <surface>

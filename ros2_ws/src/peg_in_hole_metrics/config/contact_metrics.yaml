@@ -7,6 +7,8 @@ contact_metrics_node:
         topic: /gazebo/contacts/hole
       - name: target
         topic: /gazebo/contacts/target
+      - name: validation
+        topic: /gazebo/contacts/validation
     insertion_phase_name: insertion_hold
     contact_enabled: true
     publish_rate_hz: 2.0

@@ -57,7 +57,7 @@ def launch_setup(context, *args, **kwargs):
     task = params["task"]
 
     world_package = simulation["world_package"]
-    world_file = simulation["world_file"]
+    world_file = LaunchConfiguration("world_file").perform(context)
     world_package_share = get_package_share_directory(world_package)
     world_path = os.path.join(world_package_share, "worlds", world_file)
     model_path = os.path.join(world_package_share, "models")
@@ -298,6 +298,11 @@ def generate_launch_description():
             DeclareLaunchArgument("roll", default_value="0"),
             DeclareLaunchArgument("pitch", default_value="0"),
             DeclareLaunchArgument("yaw", default_value="1.5708"),
+            DeclareLaunchArgument(
+                "world_file",
+                default_value=_load_research_baseline_config()["simulation"]["world_file"],
+                description="Gazebo world SDF file from peg_in_hole_description/worlds.",
+            ),
             DeclareLaunchArgument(
                 "use_gui",
                 default_value="true",
