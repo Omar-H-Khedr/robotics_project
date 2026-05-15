@@ -24,6 +24,8 @@ Initial definition: number of unexpected contacts reported during a trial. The e
 
 Research Baseline v0.3 status: Gazebo contact sensors are configured for `/gazebo/contacts/peg`, `/gazebo/contacts/hole`, and `/gazebo/contacts/target`. The metrics node publishes `/contact_event` JSON and the experiment manager records `contact_events.csv`. `contact_metrics_available` means contact instrumentation is connected: at least one configured ROS contact topic has a visible ROS publisher. `contact_messages_observed` means at least one ROS `Contacts` message was received. `physical_contact_observed` means at least one received message contained `contact_count > 0`. `contact_events_count` is the number of positive physical contact events. It can remain zero if the scripted trajectory completes without physically touching the peg, hole, or target contact sensors.
 
+Research Baseline v0.5 status: `contact_events_count` is counted only for positive physical contact events where `contact_count > 0`. Continuous contact is rate controlled with start and update events so `/contact_event` does not flood while still recording meaningful positive contact observations.
+
 Zero contact events are expected for the current scripted joint-space sequence unless that sequence physically touches instrumented objects.
 
 ## Maximum Contact Force Placeholder
@@ -33,6 +35,8 @@ Maximum measured or estimated contact force during a trial.
 Initial status: placeholder metric. The value should remain explicitly marked as unavailable until contact wrench estimation or Gazebo contact-force extraction is implemented and validated.
 
 Research Baseline v0.3 status: `max_contact_force` remains `null` by default because force extraction is disabled/unvalidated. The metrics node does not fake force values.
+
+Research Baseline v0.5 status: `max_contact_force` is extracted from `ros_gz_interfaces/msg/Contacts.wrenches` force vectors. For each available `body_1_wrench.force` and `body_2_wrench.force`, the node computes `sqrt(x^2 + y^2 + z^2)` and tracks the maximum across all contacts and wrenches. If no force vector exists in a message, the value remains `null`; no force values are faked. `force_extraction_available` becomes true after a valid force vector is parsed, and `force_extraction_method` is `ros_gz_interfaces Contacts.wrenches force magnitude`.
 
 ## Trajectory Execution Time
 
@@ -95,3 +99,14 @@ Research Baseline v0.3 preserves the v0.2 summary fields and adds:
 - `notes`: explanation of unavailable contact force or success semantics.
 
 `task_completed`, `insertion_hold_reached`, `insertion_success_estimate`, and true `insertion_success` are intentionally separate. A trial can complete the scripted trajectory and reach insertion hold without proving the peg reached a validated insertion depth or alignment tolerance.
+
+## Baseline v0.5 Contact Force Fields
+
+Research Baseline v0.5 preserves the v0.3 contact fields and adds validated force extraction:
+
+- `max_contact_force`: maximum extracted contact force magnitude in newtons, or `null` until a force vector is observed.
+- `force_extraction_available`: true once a valid force vector has been extracted.
+- `force_extraction_method`: extraction method string for reproducibility.
+- `contact_events.csv`: includes `ros_time_sec`, `phase`, `source`, `contact_count`, `max_contact_force`, and `message` for each logged contact event.
+
+The minimal contact validation world is the validation source for v0.5. A 0.1 kg passive probe should report approximately `0.1 * 9.81 = 0.981 N`, matching the observed Gazebo contact wrench before applying the same extraction path to KUKA insertion experiments.

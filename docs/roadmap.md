@@ -28,6 +28,8 @@ Baseline v0.1 status: monitor-only safety is implemented through `safety_monitor
 
 Baseline v0.3 status: contact sensors and contact metric logging are added as instrumentation. The real bridged contact topics are `/gazebo/contacts/peg`, `/gazebo/contacts/hole`, and `/gazebo/contacts/target`. They do not change safety behavior or robot control.
 
+Baseline v0.5 status: validated contact force extraction is implemented for bridged `ros_gz_interfaces/msg/Contacts` messages. `max_contact_force` is computed from `Contacts.wrenches` force-vector magnitudes and was validated first in the minimal passive contact world, where a 0.1 kg probe produces approximately 0.981 N under gravity. This remains metrics instrumentation only and does not modify KUKA task control.
+
 ## Phase 4: Experiment Manager and Reproducible Trials
 
 - Define trial manifests, parameter sweeps, seeds, and metadata.
@@ -38,6 +40,8 @@ Baseline v0.3 status: contact sensors and contact metric logging are added as in
 Baseline v0.1 status: `baseline_trial_manager` records metadata, `/joint_states`, `/task_phase`, `/safety_status`, and a summary JSON under `results/baseline_trials/`. Contact metrics and success labeling remain explicit placeholders.
 
 Baseline v0.3 status: `baseline_trial_manager` also subscribes to `/contact_event` and `/insertion_metrics`, writes `contact_events.csv`, and includes contact metrics in `trial_summary.json`. `contact_metrics_available` means at least one real Gazebo contact topic message was observed; `contact_events_count` can remain zero when those messages report no physical contacts. `safe_success` remains `task_completed == true AND safety_violations_count == 0`.
+
+Baseline v0.5 status: `contact_events.csv` records event time, phase, source, contact count, extracted maximum force, and message text. `trial_summary.json` includes `max_contact_force`, `force_extraction_available`, `force_extraction_method`, `contact_events_count`, `contact_messages_observed`, `physical_contact_observed`, `contact_topics_connected`, and `contact_topics_seen`. Minimal contact validation trials remain valid even when no task sequence is running.
 
 Trial workflow status: `thesis_bringup/launch/run_full_research_trial.launch.py`
 is now the recommended single-command entry point for full baseline trials. It
@@ -67,4 +71,4 @@ automatically. The old two-terminal workflow remains available for debugging.
 - Generate publication-ready logs, plots, tables, and experiment manifests.
 - Document simulator assumptions and limitations.
 
-Near-term v0.3 follow-up: validate Gazebo contact wrench extraction before using `max_contact_force`, then define a defensible insertion-success rule from peg/hole pose, insertion depth, contact state, or a documented combination of those signals. Until then, `task_completed`, `insertion_hold_reached`, heuristic `insertion_success_estimate`, and true `insertion_success` remain separate metrics.
+Near-term follow-up after v0.5: define a defensible insertion-success rule from peg/hole pose, insertion depth, contact state, or a documented combination of those signals. Until then, `task_completed`, `insertion_hold_reached`, heuristic `insertion_success_estimate`, and true `insertion_success` remain separate metrics.
