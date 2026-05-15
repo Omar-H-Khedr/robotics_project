@@ -1,4 +1,4 @@
-"""Structured trial logger for Research Baseline v0.6."""
+"""Structured trial logger for Research Baseline v0.7."""
 
 from __future__ import annotations
 
@@ -87,8 +87,11 @@ class BaselineTrialManager(Node):
         self._final_trial_status = "idle"
         self._final_task_phase = "uninitialized"
         self._contact_events_count = 0
+        self._contact_episode_count = 0
         self._contact_samples_count = 0
         self._max_contact_force: float | None = None
+        self._force_threshold_warning = False
+        self._force_threshold_violation = False
         self._force_extraction_available = False
         self._force_extraction_method = FORCE_EXTRACTION_METHOD
         self._insertion_attempted = False
@@ -199,11 +202,12 @@ class BaselineTrialManager(Node):
 
         self._final_task_phase = phase
         self._total_task_events += 1
-        if event_type == "sequence_started":
+        if event_type in {"sequence_started", "phase_started"}:
             self._task_started = True
-        elif event_type == "phase_succeeded":
+        if event_type == "phase_succeeded":
             self._completed_phases_count += 1
         elif event_type == "sequence_completed":
+            self._task_started = True
             self._task_completed = True
         elif event_type == "sequence_failed":
             self._trial_failed = True
@@ -265,14 +269,14 @@ class BaselineTrialManager(Node):
             self._contact_topics_seen.add(source)
             self._contact_topics_connected.add(source)
         self._contact_messages_observed = True
-        positive_contact_event = contact_count > 0 and (
-            event_type in {"contact_started", "contact_updated"}
-            or event_type == "unknown"
+        positive_physical_contact = (
+            contact_count > 0 and self._counts_as_physical_contact(source)
         )
-        if positive_contact_event and self._counts_as_physical_contact(source):
-            self._contact_events_count += 1
+        if positive_physical_contact and event_type in {"contact_started", "unknown"}:
+            self._contact_episode_count += 1
+            self._contact_events_count = self._contact_episode_count
             self._physical_contact_observed = True
-        elif contact_count > 0 and self._counts_as_physical_contact(source):
+        elif positive_physical_contact:
             self._physical_contact_observed = True
         self._contact_metrics_available = True
         if max_contact_force is not None:
@@ -342,6 +346,12 @@ class BaselineTrialManager(Node):
         self._contact_events_count = max(
             self._contact_events_count, metrics_contact_count
         )
+        metrics_episode_count = self._coerce_int(
+            metrics.get("contact_episode_count"), default=self._contact_episode_count
+        )
+        self._contact_episode_count = max(
+            self._contact_episode_count, metrics_episode_count
+        )
         metrics_sample_count = self._coerce_int(
             metrics.get("contact_samples_count"), default=self._contact_samples_count
         )
@@ -358,6 +368,11 @@ class BaselineTrialManager(Node):
             self._physical_contact_observed = self._physical_contact_observed or bool(
                 metrics.get("physical_contact_observed", False)
             )
+        if metrics_episode_count > 0:
+            self._contact_messages_observed = True
+            self._physical_contact_observed = self._physical_contact_observed or bool(
+                metrics.get("physical_contact_observed", False)
+            )
         metrics_max_force = self._coerce_optional_float(metrics.get("max_contact_force"))
         if metrics_max_force is not None:
             self._force_extraction_available = True
@@ -366,6 +381,12 @@ class BaselineTrialManager(Node):
                 if self._max_contact_force is None
                 else max(self._max_contact_force, metrics_max_force)
             )
+        self._force_threshold_warning = self._force_threshold_warning or bool(
+            metrics.get("force_threshold_warning", False)
+        )
+        self._force_threshold_violation = self._force_threshold_violation or bool(
+            metrics.get("force_threshold_violation", False)
+        )
         self._contact_notes = str(metrics.get("notes", self._contact_notes))
         self._write_summary()
 
@@ -411,7 +432,7 @@ class BaselineTrialManager(Node):
                 "none" if is_contact_probe_validation else "joint_trajectory_controller"
             ),
             "framework_version": (
-                "v0.6" if is_robot_contact_validation else "v0.5"
+                "v0.7" if is_robot_contact_validation else "v0.5"
             ),
             "trial_mode": self._trial_mode,
             "notes": (
@@ -443,7 +464,7 @@ class BaselineTrialManager(Node):
         return {
             "trial_id": self._trial_id,
             "trial_mode": self._trial_mode,
-            "task_started": self._task_started,
+            "task_started": self._effective_task_started(),
             "task_completed": self._task_completed,
             "trial_failed": self._trial_failed,
             "final_trial_status": self._final_trial_status,
@@ -457,8 +478,11 @@ class BaselineTrialManager(Node):
             "safe_success": safe_success,
             "robot_contact_validation_success": robot_contact_validation_success,
             "contact_events_count": self._contact_events_count,
+            "contact_episode_count": self._contact_episode_count,
             "contact_samples_count": self._contact_samples_count,
             "max_contact_force": self._max_contact_force,
+            "force_threshold_warning": self._force_threshold_warning,
+            "force_threshold_violation": self._force_threshold_violation,
             "force_extraction_available": self._force_extraction_available,
             "force_extraction_method": self._force_extraction_method,
             "insertion_attempted": self._insertion_attempted,
@@ -558,6 +582,17 @@ class BaselineTrialManager(Node):
                     "contact; tune the joint-space contact pose after Gazebo "
                     "observation if needed."
                 )
+            if self._force_threshold_violation:
+                notes.append(
+                    "High contact force exceeded the configured simulation "
+                    "violation threshold; robot_contact_validation_success is false."
+                )
+            elif self._force_threshold_warning:
+                notes.append(
+                    "Contact force exceeded the configured simulation warning "
+                    "threshold; inspect max_contact_force before treating the run as "
+                    "low-force validation."
+                )
         if self._contact_metrics_available and not self._physical_contact_observed:
             notes.append(
                 "Contact instrumentation is connected; zero physical contact events "
@@ -585,12 +620,6 @@ class BaselineTrialManager(Node):
             if self._safety_status_observed:
                 return True
             return None
-        if self._trial_mode == "robot_contact_validation":
-            return (
-                self._task_completed
-                and self._physical_contact_observed
-                and self._safety_violations_count == 0
-            )
         return self._task_completed and self._safety_violations_count == 0
 
     def _robot_contact_validation_success(self) -> bool | None:
@@ -599,7 +628,14 @@ class BaselineTrialManager(Node):
         return (
             self._task_completed
             and self._physical_contact_observed
+            and self._force_extraction_available
+            and not self._force_threshold_violation
             and self._safety_violations_count == 0
+        )
+
+    def _effective_task_started(self) -> bool:
+        return self._task_started or (
+            self._task_completed and self._total_task_events > 0
         )
 
     def _counts_as_physical_contact(self, source: str) -> bool:

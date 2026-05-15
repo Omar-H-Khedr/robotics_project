@@ -39,7 +39,7 @@
     </model>
 
     <!--
-      Research Baseline v0.6 uses the same workcell and KUKA spawn pose as the
+      Research Baseline v0.7 uses the same workcell and KUKA spawn pose as the
       working baseline. The additional robot_contact_validation_pad is isolated
       from the table, peg, hole, target, and passive contact probe.
     -->
@@ -79,17 +79,17 @@
         Validation-only contact target.
 
         The baseline robot spawn is [0.80, -0.75, 0.75] with yaw=1.5708.
-        FK of robot_contact_validation_sequence.yaml places the current
+        FK of robot_contact_validation_sequence.yaml previously placed the
         robot_contact_hold gripper/finger envelope near x=1.04..1.09,
-        y=-0.31..-0.23, with the lower finger geometry near z=1.166. This
-        pad is intentionally moved into that robot-side hold area so the
-        validation run can produce a real robot_validation event without
-        changing the baseline world or task sequence.
+        y=-0.31..-0.23, with the lower finger geometry near z=1.166. v0.7
+        keeps the pad near that robot-side hold area but shifts it slightly
+        farther from the approach envelope and lowers the top surface to reduce
+        penetration and peak simulated contact force.
 
         Expected Gazebo contact topic:
         /world/peg_in_hole_robot_contact_validation_world/model/robot_contact_validation_pad/link/robot_contact_validation_pad_link/sensor/robot_contact_validation_sensor/contact
       -->
-      <pose>1.05 -0.27 1.135 0 0 0</pose>
+      <pose>1.08 -0.235 1.125 0 0 0</pose>
       <link name="robot_contact_validation_pad_link">
         <collision name="robot_contact_validation_pad_collision">
           <geometry>
