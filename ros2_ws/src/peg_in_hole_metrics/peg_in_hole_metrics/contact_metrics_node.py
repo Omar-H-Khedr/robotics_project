@@ -1,4 +1,4 @@
-"""Contact and insertion metrics publisher for Research Baseline v0.4."""
+"""Contact and insertion metrics publisher for Research Baseline v0.5."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import importlib
 import json
 import math
 import re
-from typing import Any
+from typing import Any, Optional
 
 import rclpy
 from rclpy.node import Node
@@ -21,6 +21,91 @@ DEFAULT_CONTACT_TOPICS = (
     {"name": "robot_validation", "topic": "/gazebo/contacts/robot_validation"},
 )
 
+FORCE_EXTRACTION_METHOD = "ros_gz_interfaces Contacts.wrenches force magnitude"
+
+
+def extract_max_contact_force(contacts_msg: Any) -> Optional[float]:
+    """Return the maximum force-vector magnitude in a Contacts message."""
+    max_force: float | None = None
+    for contact in _extract_contacts_from_message(contacts_msg):
+        for wrench in _iter_contact_wrenches(contact):
+            for vector in _iter_wrench_force_vectors(wrench):
+                magnitude = _vector_magnitude(vector)
+                if magnitude is not None:
+                    max_force = (
+                        magnitude if max_force is None else max(max_force, magnitude)
+                    )
+    return max_force
+
+
+def _extract_contacts_from_message(message: Any) -> list[Any]:
+    contacts = getattr(message, "contacts", None)
+    if contacts is None:
+        contacts = getattr(message, "contact", None)
+    if contacts is None:
+        return []
+    try:
+        return list(contacts)
+    except TypeError:
+        return []
+
+
+def _iter_contact_wrenches(contact: Any) -> list[Any]:
+    result = []
+    for field_name in (
+        "wrenches",
+        "wrench",
+        "body_1_wrench",
+        "body_2_wrench",
+        "body1_wrench",
+        "body2_wrench",
+    ):
+        wrenches = getattr(contact, field_name, None)
+        if wrenches is None:
+            continue
+        try:
+            result.extend(list(wrenches))
+        except TypeError:
+            result.append(wrenches)
+    return result
+
+
+def _iter_wrench_force_vectors(wrench: Any) -> list[Any]:
+    vectors = []
+    for field_name in (
+        "force",
+        "body_1_force",
+        "body_2_force",
+        "body1_force",
+        "body2_force",
+    ):
+        vector = getattr(wrench, field_name, None)
+        if vector is not None:
+            vectors.append(vector)
+    for field_name in (
+        "body_1_wrench",
+        "body_2_wrench",
+        "body1_wrench",
+        "body2_wrench",
+    ):
+        nested_wrench = getattr(wrench, field_name, None)
+        vector = getattr(nested_wrench, "force", None)
+        if vector is not None:
+            vectors.append(vector)
+    return vectors
+
+
+def _vector_magnitude(vector: Any) -> float | None:
+    if vector is None:
+        return None
+    try:
+        x = float(getattr(vector, "x"))
+        y = float(getattr(vector, "y"))
+        z = float(getattr(vector, "z"))
+        return math.sqrt(x * x + y * y + z * z)
+    except (AttributeError, TypeError, ValueError):
+        return None
+
 
 class ContactMetricsNode(Node):
     """Convert contact messages and task phases into trial metrics JSON."""
@@ -34,9 +119,11 @@ class ContactMetricsNode(Node):
         self.declare_parameter("insertion_phase_name", "insertion_hold")
         self.declare_parameter("contact_enabled", True)
         self.declare_parameter("publish_rate_hz", 2.0)
-        self.declare_parameter("max_contact_force_available", False)
+        self.declare_parameter("max_contact_force_available", True)
         self.declare_parameter("zero_contact_event_throttle_sec", 2.0)
         self.declare_parameter("contact_event_debounce_sec", 0.25)
+        self.declare_parameter("positive_contact_event_throttle_sec", 1.0)
+        self.declare_parameter("contact_force_update_epsilon", 1.0e-6)
         self.declare_parameter("physical_contact_sources", [""])
 
         self._contact_topics = self._load_contact_topics()
@@ -66,6 +153,18 @@ class ContactMetricsNode(Node):
             .get_parameter_value()
             .double_value,
         )
+        self._positive_contact_event_throttle_sec = max(
+            0.0,
+            self.get_parameter("positive_contact_event_throttle_sec")
+            .get_parameter_value()
+            .double_value,
+        )
+        self._contact_force_update_epsilon = max(
+            0.0,
+            self.get_parameter("contact_force_update_epsilon")
+            .get_parameter_value()
+            .double_value,
+        )
         self._physical_contact_sources = self._load_physical_contact_sources()
 
         self._current_phase = "uninitialized"
@@ -76,6 +175,7 @@ class ContactMetricsNode(Node):
         self._contact_events_count = 0
         self._contact_samples_count = 0
         self._max_contact_force: float | None = None
+        self._force_extraction_available = False
         self._contact_message_type_available = False
         self._contact_messages_observed = False
         self._physical_contact_observed = False
@@ -86,6 +186,12 @@ class ContactMetricsNode(Node):
             name: None for name in self._contact_topics
         }
         self._last_zero_contact_event_sec = {
+            name: None for name in self._contact_topics
+        }
+        self._last_positive_contact_event_sec = {
+            name: None for name in self._contact_topics
+        }
+        self._last_reported_contact_force = {
             name: None for name in self._contact_topics
         }
         self._warned_missing_publishers = False
@@ -212,8 +318,9 @@ class ContactMetricsNode(Node):
         self._contact_messages_observed = True
         self._contact_topic_seen[source] = True
 
-        max_force = self._extract_max_force(contacts)
+        max_force = self._extract_max_force(message)
         if max_force is not None:
+            self._force_extraction_available = True
             self._max_contact_force = (
                 max_force
                 if self._max_contact_force is None
@@ -230,7 +337,9 @@ class ContactMetricsNode(Node):
             if not self._previous_in_contact.get(source, False):
                 self._previous_in_contact[source] = True
                 if self._should_publish_transition_event(source):
-                    self._contact_events_count += 1
+                    if self._counts_as_physical_contact(source):
+                        self._contact_events_count += 1
+                    self._record_positive_contact_event(source, max_force)
                     self._publish_contact_event(
                         self._contact_event_payload(
                             event_type="contact_started",
@@ -242,6 +351,18 @@ class ContactMetricsNode(Node):
                     )
             else:
                 self._previous_in_contact[source] = True
+                if self._should_publish_positive_contact_event(source, max_force):
+                    if self._counts_as_physical_contact(source):
+                        self._contact_events_count += 1
+                    self._publish_contact_event(
+                        self._contact_event_payload(
+                            event_type="contact_updated",
+                            source=source,
+                            contact_count=contact_count,
+                            max_force=max_force,
+                            message=self._contact_note(contact_count, max_force),
+                        )
+                    )
             return
 
         if self._previous_in_contact.get(source, False):
@@ -272,14 +393,12 @@ class ContactMetricsNode(Node):
     def _contact_note(self, contact_count: int, max_force: float | None) -> str:
         if contact_count == 0:
             return "Contact topic message received; no contacts detected."
-        if not self._max_contact_force_available:
-            note = "Contact observed; force extraction disabled/unvalidated."
-        elif max_force is None:
+        if max_force is None:
             note = "Contact observed; force value unavailable in parsed message."
         else:
             note = (
-                "Contact observed; max_contact_force parsed from message wrenches. "
-                "Force extraction is preliminary/unvalidated."
+                "Contact observed; max_contact_force parsed from Contacts.wrenches "
+                "force vectors."
             )
         return note
 
@@ -303,15 +422,7 @@ class ContactMetricsNode(Node):
         }
 
     def _extract_contacts(self, message: Any) -> list[Any]:
-        contacts = getattr(message, "contacts", None)
-        if contacts is None:
-            contacts = getattr(message, "contact", None)
-        if contacts is None:
-            return []
-        try:
-            return list(contacts)
-        except TypeError:
-            return []
+        return _extract_contacts_from_message(message)
 
     def _should_publish_zero_contact_event(self, source: str) -> bool:
         now_sec = self._now_sec()
@@ -335,75 +446,39 @@ class ContactMetricsNode(Node):
         self._last_contact_transition_event_sec[source] = now_sec
         return True
 
-    def _extract_max_force(self, contacts: list[Any]) -> float | None:
+    def _record_positive_contact_event(
+        self, source: str, max_force: float | None
+    ) -> None:
+        self._last_positive_contact_event_sec[source] = self._now_sec()
+        if max_force is not None:
+            self._last_reported_contact_force[source] = max_force
+
+    def _should_publish_positive_contact_event(
+        self, source: str, max_force: float | None
+    ) -> bool:
+        now_sec = self._now_sec()
+        last_event_sec = self._last_positive_contact_event_sec.get(source)
+        last_force = self._last_reported_contact_force.get(source)
+        force_increased = (
+            max_force is not None
+            and (
+                last_force is None
+                or max_force > last_force + self._contact_force_update_epsilon
+            )
+        )
+        throttle_elapsed = (
+            last_event_sec is None
+            or now_sec - last_event_sec >= self._positive_contact_event_throttle_sec
+        )
+        if not force_increased and not throttle_elapsed:
+            return False
+        self._record_positive_contact_event(source, max_force)
+        return True
+
+    def _extract_max_force(self, message: Any) -> float | None:
         if not self._max_contact_force_available:
             return None
-
-        max_force: float | None = None
-        for contact in contacts:
-            for wrench in self._iter_wrenches(contact):
-                for vector in self._iter_force_vectors(wrench):
-                    magnitude = self._vector_magnitude(vector)
-                    if magnitude is not None:
-                        max_force = (
-                            magnitude if max_force is None else max(max_force, magnitude)
-                        )
-        return max_force
-
-    def _iter_wrenches(self, contact: Any) -> list[Any]:
-        result = []
-        for field_name in (
-            "wrenches",
-            "wrench",
-            "body_1_wrench",
-            "body_2_wrench",
-            "body1_wrench",
-            "body2_wrench",
-        ):
-            wrenches = getattr(contact, field_name, None)
-            if wrenches is None:
-                continue
-            try:
-                result.extend(list(wrenches))
-            except TypeError:
-                result.append(wrenches)
-        return result
-
-    def _iter_force_vectors(self, wrench: Any) -> list[Any]:
-        vectors = []
-        for field_name in (
-            "force",
-            "body_1_force",
-            "body_2_force",
-            "body1_force",
-            "body2_force",
-        ):
-            vector = getattr(wrench, field_name, None)
-            if vector is not None:
-                vectors.append(vector)
-        for field_name in (
-            "body_1_wrench",
-            "body_2_wrench",
-            "body1_wrench",
-            "body2_wrench",
-        ):
-            nested_wrench = getattr(wrench, field_name, None)
-            vector = getattr(nested_wrench, "force", None)
-            if vector is not None:
-                vectors.append(vector)
-        return vectors
-
-    @staticmethod
-    def _vector_magnitude(vector: Any) -> float | None:
-        if vector is None:
-            return None
-        try:
-            x = float(getattr(vector, "x"))
-            y = float(getattr(vector, "y"))
-            z = float(getattr(vector, "z"))
-            return math.sqrt(x * x + y * y + z * z)
-        except (AttributeError, TypeError, ValueError):
-            return None
+        return extract_max_contact_force(message)
 
     def _publish_contact_event(self, payload: dict[str, Any]) -> None:
         message = String()
@@ -434,6 +509,11 @@ class ContactMetricsNode(Node):
                 "max_contact_force is null because force extraction is "
                 "disabled/unvalidated."
             )
+        elif not self._force_extraction_available:
+            notes.append(
+                "Force extraction is enabled, but no Contacts.wrenches force vector "
+                "has been observed yet."
+            )
         notes.append(
             "insertion_success remains null until a validated success rule is "
             "implemented."
@@ -458,6 +538,8 @@ class ContactMetricsNode(Node):
             "contact_events_count": self._contact_events_count,
             "contact_samples_count": self._contact_samples_count,
             "max_contact_force": self._max_contact_force,
+            "force_extraction_available": self._force_extraction_available,
+            "force_extraction_method": FORCE_EXTRACTION_METHOD,
             "insertion_success": None,
             "insertion_success_estimate": self._insertion_success_estimate(),
             "contact_metrics_available": contact_metrics_available,

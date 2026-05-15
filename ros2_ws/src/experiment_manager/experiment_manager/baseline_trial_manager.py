@@ -1,4 +1,4 @@
-"""Structured trial logger for Research Baseline v0.4."""
+"""Structured trial logger for Research Baseline v0.5."""
 
 from __future__ import annotations
 
@@ -13,6 +13,9 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from std_msgs.msg import String
+
+
+FORCE_EXTRACTION_METHOD = "ros_gz_interfaces Contacts.wrenches force magnitude"
 
 
 class BaselineTrialManager(Node):
@@ -86,6 +89,8 @@ class BaselineTrialManager(Node):
         self._contact_events_count = 0
         self._contact_samples_count = 0
         self._max_contact_force: float | None = None
+        self._force_extraction_available = False
+        self._force_extraction_method = FORCE_EXTRACTION_METHOD
         self._insertion_attempted = False
         self._insertion_hold_reached = False
         self._insertion_success: bool | None = None
@@ -260,18 +265,18 @@ class BaselineTrialManager(Node):
             self._contact_topics_seen.add(source)
             self._contact_topics_connected.add(source)
         self._contact_messages_observed = True
-        contact_started = event_type == "contact_started" or (
-            event_type == "unknown" and contact_count > 0
+        positive_contact_event = contact_count > 0 and (
+            event_type in {"contact_started", "contact_updated"}
+            or event_type == "unknown"
         )
-        if contact_started:
+        if positive_contact_event and self._counts_as_physical_contact(source):
             self._contact_events_count += 1
-            if self._counts_as_physical_contact(source):
-                self._physical_contact_observed = True
-        elif contact_count > 0:
-            if self._counts_as_physical_contact(source):
-                self._physical_contact_observed = True
+            self._physical_contact_observed = True
+        elif contact_count > 0 and self._counts_as_physical_contact(source):
+            self._physical_contact_observed = True
         self._contact_metrics_available = True
         if max_contact_force is not None:
+            self._force_extraction_available = True
             self._max_contact_force = (
                 max_contact_force
                 if self._max_contact_force is None
@@ -310,6 +315,14 @@ class BaselineTrialManager(Node):
         )
         self._update_contact_topics_seen(metrics.get("contact_topics_seen"))
         self._update_positive_contact_counts(metrics.get("positive_contact_counts"))
+        self._force_extraction_available = self._force_extraction_available or bool(
+            metrics.get("force_extraction_available", False)
+        )
+        force_method = str(
+            metrics.get("force_extraction_method", self._force_extraction_method)
+        ).strip()
+        if force_method:
+            self._force_extraction_method = force_method
         self._insertion_attempted = bool(
             metrics.get("insertion_attempted", self._insertion_attempted)
         )
@@ -337,7 +350,9 @@ class BaselineTrialManager(Node):
         )
         if metrics_contact_count > 0:
             self._contact_messages_observed = True
-            self._physical_contact_observed = True
+            self._physical_contact_observed = self._physical_contact_observed or bool(
+                metrics.get("physical_contact_observed", False)
+            )
         if metrics_sample_count > 0:
             self._contact_messages_observed = True
             self._physical_contact_observed = self._physical_contact_observed or bool(
@@ -345,6 +360,7 @@ class BaselineTrialManager(Node):
             )
         metrics_max_force = self._coerce_optional_float(metrics.get("max_contact_force"))
         if metrics_max_force is not None:
+            self._force_extraction_available = True
             self._max_contact_force = (
                 metrics_max_force
                 if self._max_contact_force is None
@@ -394,14 +410,15 @@ class BaselineTrialManager(Node):
             "controller": (
                 "none" if is_contact_probe_validation else "joint_trajectory_controller"
             ),
-            "framework_version": "v0.5" if is_robot_contact_validation else "v0.4",
+            "framework_version": "v0.5",
             "trial_mode": self._trial_mode,
             "notes": (
-                "Research Baseline v0.4/v0.5 logs task events, safety events, trial "
+                "Research Baseline v0.5 logs task events, safety events, trial "
                 "status, joint states, contact events, and insertion metrics. "
-                "Contact-force values remain null unless force extraction is "
-                "validated and enabled. The contact_probe_validation mode validates "
-                "instrumentation with a passive Gazebo probe. The "
+                "Contact-force values are extracted from validated "
+                "ros_gz_interfaces Contacts.wrenches force vectors when present. "
+                "The contact_probe_validation mode validates instrumentation with a "
+                "passive Gazebo probe. The "
                 "robot_contact_validation mode runs a separate scripted robot "
                 "approach toward a dedicated contact target; contact absence is "
                 "reported without failing the trial."
@@ -438,6 +455,8 @@ class BaselineTrialManager(Node):
             "contact_events_count": self._contact_events_count,
             "contact_samples_count": self._contact_samples_count,
             "max_contact_force": self._max_contact_force,
+            "force_extraction_available": self._force_extraction_available,
+            "force_extraction_method": self._force_extraction_method,
             "insertion_attempted": self._insertion_attempted,
             "insertion_hold_reached": self._insertion_hold_reached,
             "insertion_success": self._insertion_success,
@@ -545,7 +564,8 @@ class BaselineTrialManager(Node):
             notes.append("contact_metrics_available: false")
         if self._max_contact_force is None:
             notes.append(
-                "max_contact_force is null unless validated force extraction is enabled."
+                "max_contact_force is null until a Contacts.wrenches force vector is "
+                "observed."
             )
         if self._insertion_success is None:
             notes.append(

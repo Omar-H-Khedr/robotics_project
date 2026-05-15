@@ -16,7 +16,9 @@ contact_metrics_node:
     insertion_phase_name: insertion_hold
     contact_enabled: true
     publish_rate_hz: 2.0
-    max_contact_force_available: false
+    max_contact_force_available: true
+    positive_contact_event_throttle_sec: 1.0
+    contact_force_update_epsilon: 1.0e-6
     zero_contact_event_throttle_sec: 2.0
     physical_contact_sources:
       - ""
