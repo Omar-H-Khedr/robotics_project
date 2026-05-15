@@ -12,7 +12,7 @@ contact_metrics_node:
       - name: validation
         topic: /gazebo/contacts/validation
       - name: robot_validation
-        topic: /gazebo/contacts/robot_validation
+        topic: /world/peg_in_hole_robot_contact_validation_world/model/robot_contact_validation_pad/link/robot_contact_validation_pad_link/sensor/robot_contact_validation_sensor/contact
     insertion_phase_name: insertion_hold
     contact_enabled: true
     publish_rate_hz: 2.0

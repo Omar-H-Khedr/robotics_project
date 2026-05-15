@@ -7,6 +7,7 @@ from typing import Any
 
 import rclpy
 import yaml
+from ament_index_python.packages import get_package_share_directory
 from action_msgs.msg import GoalStatus
 from builtin_interfaces.msg import Duration
 from control_msgs.action import FollowJointTrajectory
@@ -53,14 +54,13 @@ class TaskTrajectoryExecutor(Node):
     def __init__(self) -> None:
         super().__init__("task_trajectory_executor")
         self.declare_parameter("config_path", "")
+        self.declare_parameter("task_sequence_file", "baseline_task_sequence.yaml")
         self.declare_parameter("action_server", self.ACTION_SERVER)
         self.declare_parameter("task_phase_topic", self.TASK_PHASE_TOPIC)
         self.declare_parameter("task_event_topic", self.TASK_EVENT_TOPIC)
         self.declare_parameter("trial_status_topic", self.TRIAL_STATUS_TOPIC)
 
-        self._config_path = Path(
-            self.get_parameter("config_path").get_parameter_value().string_value
-        )
+        self._config_path = self._resolve_config_path()
         self._action_server = (
             self.get_parameter("action_server").get_parameter_value().string_value
         )
@@ -74,7 +74,8 @@ class TaskTrajectoryExecutor(Node):
             self.get_parameter("trial_status_topic").get_parameter_value().string_value
         )
         self._config = self._load_config(self._config_path)
-        self._poses = self._validate_and_get_poses(self._config)
+        self._pose_order = self._load_pose_order(self._config)
+        self._poses = self._validate_and_get_poses(self._config, self._pose_order)
         self._action_client = ActionClient(
             self,
             FollowJointTrajectory,
@@ -123,12 +124,12 @@ class TaskTrajectoryExecutor(Node):
             message="Task pose sequence started.",
         )
 
-        for index, pose_name in enumerate(self.POSE_ORDER, start=1):
+        for index, pose_name in enumerate(self._pose_order, start=1):
             pose = self._poses[pose_name]
             description = pose["description"]
             safety_tag = pose["safety_tag"]
             self.get_logger().info(
-                f"Executing pose {index}/{len(self.POSE_ORDER)} '{pose_name}': "
+                f"Executing pose {index}/{len(self._pose_order)} '{pose_name}': "
                 f"{description} [safety_tag={safety_tag}]"
             )
             self._publish_phase(pose_name)
@@ -160,7 +161,7 @@ class TaskTrajectoryExecutor(Node):
         self._publish_event(
             "sequence_completed",
             phase="sequence_complete",
-            pose_index=len(self.POSE_ORDER),
+            pose_index=len(self._pose_order),
             safety_tag="sequence",
             message="All task poses completed successfully.",
         )
@@ -419,7 +420,7 @@ class TaskTrajectoryExecutor(Node):
             "event_type": event_type,
             "phase": phase,
             "pose_index": pose_index,
-            "total_poses": len(self.POSE_ORDER),
+            "total_poses": len(self._pose_order),
             "safety_tag": safety_tag,
             "message": message,
         }
@@ -428,25 +429,66 @@ class TaskTrajectoryExecutor(Node):
         self._event_publisher.publish(ros_message)
         self.get_logger().info(
             f"task_event={event_type} phase={phase} pose={pose_index}/"
-            f"{len(self.POSE_ORDER)} safety_tag={safety_tag}: {message}"
+            f"{len(self._pose_order)} safety_tag={safety_tag}: {message}"
         )
         rclpy.spin_once(self, timeout_sec=0.05)
+
+    def _resolve_config_path(self) -> Path:
+        config_path = Path(
+            self.get_parameter("config_path").get_parameter_value().string_value
+        )
+        if str(config_path) != ".":
+            return config_path
+
+        task_sequence_file = (
+            self.get_parameter("task_sequence_file").get_parameter_value().string_value
+        ).strip()
+        if not task_sequence_file:
+            task_sequence_file = "baseline_task_sequence.yaml"
+
+        sequence_path = Path(task_sequence_file)
+        if sequence_path.is_absolute():
+            return sequence_path
+
+        return (
+            Path(get_package_share_directory("kuka_task_control"))
+            / "config"
+            / sequence_path
+        )
+
+    @classmethod
+    def _load_pose_order(cls, config: dict[str, Any]) -> tuple[str, ...]:
+        sequence = config.get("sequence")
+        if sequence is None:
+            return cls.POSE_ORDER
+        if not isinstance(sequence, list) or not sequence:
+            raise ValueError(
+                "Task sequence config field 'sequence' must be a non-empty list."
+            )
+        for pose_name in sequence:
+            if not isinstance(pose_name, str) or not pose_name.strip():
+                raise ValueError("Task sequence entries must be non-empty strings.")
+        return tuple(sequence)
 
     def _now_sec(self) -> float:
         now = self.get_clock().now()
         return now.nanoseconds / 1_000_000_000.0
 
     @classmethod
-    def _validate_and_get_poses(cls, config: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    def _validate_and_get_poses(
+        cls,
+        config: dict[str, Any],
+        pose_order: tuple[str, ...],
+    ) -> dict[str, dict[str, Any]]:
         poses = config.get("poses")
         if not isinstance(poses, dict):
             raise ValueError("Baseline task pose config must contain a 'poses' mapping.")
 
-        missing = [pose_name for pose_name in cls.POSE_ORDER if pose_name not in poses]
+        missing = [pose_name for pose_name in pose_order if pose_name not in poses]
         if missing:
             raise ValueError(f"Missing required task poses: {missing}")
 
-        for pose_name in cls.POSE_ORDER:
+        for pose_name in pose_order:
             pose = poses[pose_name]
             if not isinstance(pose, dict):
                 raise ValueError(f"Pose '{pose_name}' must be a YAML mapping.")

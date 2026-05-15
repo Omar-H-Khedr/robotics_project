@@ -127,6 +127,21 @@ pre_grasp:
 
 Use conservative timing while calibrating the research baseline. Increase `duration_sec` values when validating new poses near the table, target plate, hole fixture, or peg.
 
+## Robot Contact Validation Sequence
+
+`config/robot_contact_validation_sequence.yaml` is separate from the normal
+baseline task sequence. It is used by
+`thesis_bringup/run_full_robot_contact_validation_trial.launch.py` with the
+validation-only Gazebo world
+`peg_in_hole_robot_contact_validation_world.sdf`.
+
+The validation pad in that world is tuned near the current
+`robot_contact_hold` gripper envelope so the run can create a physical
+`/gazebo/contacts/robot_validation` event. This sequence and target may need
+manual tuning from Gazebo observation when the KUKA model, gripper geometry, or
+validation joints change. Keep the normal `baseline_task_sequence.yaml`
+unchanged while doing this validation tuning.
+
 ## Phase 1B Action Baseline
 
 Phase 1B adds a research-grade `FollowJointTrajectory` action client for the KUKA Gazebo baseline. The trajectory is configured in `config/baseline_trajectory.yaml` and sends the robot through:

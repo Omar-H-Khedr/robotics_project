@@ -4,15 +4,15 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 
 
+def _workspace_results_root() -> Path:
+    for parent in Path(__file__).resolve().parents:
+        if parent.name == "ros2_ws":
+            return parent / "results" / "baseline_trials"
+    return Path.cwd() / "results" / "baseline_trials"
+
+
 def generate_launch_description():
-    results_root = (
-        Path.home()
-        / "code"
-        / "robotics_project"
-        / "ros2_ws"
-        / "results"
-        / "baseline_trials"
-    )
+    results_root = _workspace_results_root()
 
     return LaunchDescription(
         [

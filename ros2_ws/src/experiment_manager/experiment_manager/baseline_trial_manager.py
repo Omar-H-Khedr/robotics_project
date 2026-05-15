@@ -1,4 +1,4 @@
-"""Structured trial logger for Research Baseline v0.5."""
+"""Structured trial logger for Research Baseline v0.6."""
 
 from __future__ import annotations
 
@@ -410,10 +410,12 @@ class BaselineTrialManager(Node):
             "controller": (
                 "none" if is_contact_probe_validation else "joint_trajectory_controller"
             ),
-            "framework_version": "v0.5",
+            "framework_version": (
+                "v0.6" if is_robot_contact_validation else "v0.5"
+            ),
             "trial_mode": self._trial_mode,
             "notes": (
-                "Research Baseline v0.5 logs task events, safety events, trial "
+                "Research Baseline logging records task events, safety events, trial "
                 "status, joint states, contact events, and insertion metrics. "
                 "Contact-force values are extracted from validated "
                 "ros_gz_interfaces Contacts.wrenches force vectors when present. "
@@ -437,6 +439,7 @@ class BaselineTrialManager(Node):
     def _build_summary(self) -> dict[str, object]:
         execution_time_sec = self._elapsed_sec()
         safe_success = self._safe_success()
+        robot_contact_validation_success = self._robot_contact_validation_success()
         return {
             "trial_id": self._trial_id,
             "trial_mode": self._trial_mode,
@@ -452,6 +455,7 @@ class BaselineTrialManager(Node):
             "safety_status_observed": self._safety_status_observed,
             "execution_time_sec": execution_time_sec,
             "safe_success": safe_success,
+            "robot_contact_validation_success": robot_contact_validation_success,
             "contact_events_count": self._contact_events_count,
             "contact_samples_count": self._contact_samples_count,
             "max_contact_force": self._max_contact_force,
@@ -582,8 +586,21 @@ class BaselineTrialManager(Node):
                 return True
             return None
         if self._trial_mode == "robot_contact_validation":
-            return self._task_completed and self._safety_violations_count == 0
+            return (
+                self._task_completed
+                and self._physical_contact_observed
+                and self._safety_violations_count == 0
+            )
         return self._task_completed and self._safety_violations_count == 0
+
+    def _robot_contact_validation_success(self) -> bool | None:
+        if self._trial_mode != "robot_contact_validation":
+            return None
+        return (
+            self._task_completed
+            and self._physical_contact_observed
+            and self._safety_violations_count == 0
+        )
 
     def _counts_as_physical_contact(self, source: str) -> bool:
         if self._trial_mode == "robot_contact_validation":
