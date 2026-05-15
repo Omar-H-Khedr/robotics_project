@@ -96,6 +96,7 @@ class BaselineTrialManager(Node):
         self._contact_messages_observed = False
         self._physical_contact_observed = False
         self._contact_topics_seen: set[str] = set()
+        self._positive_contact_counts: dict[str, int] = {}
         self._contact_notes = "No contact metrics have been received yet."
         self._closed = False
 
@@ -264,9 +265,11 @@ class BaselineTrialManager(Node):
         )
         if contact_started:
             self._contact_events_count += 1
-            self._physical_contact_observed = True
+            if self._counts_as_physical_contact(source):
+                self._physical_contact_observed = True
         elif contact_count > 0:
-            self._physical_contact_observed = True
+            if self._counts_as_physical_contact(source):
+                self._physical_contact_observed = True
         self._contact_metrics_available = True
         if max_contact_force is not None:
             self._max_contact_force = (
@@ -306,6 +309,7 @@ class BaselineTrialManager(Node):
             metrics.get("physical_contact_observed", False)
         )
         self._update_contact_topics_seen(metrics.get("contact_topics_seen"))
+        self._update_positive_contact_counts(metrics.get("positive_contact_counts"))
         self._insertion_attempted = bool(
             metrics.get("insertion_attempted", self._insertion_attempted)
         )
@@ -336,7 +340,9 @@ class BaselineTrialManager(Node):
             self._physical_contact_observed = True
         if metrics_sample_count > 0:
             self._contact_messages_observed = True
-            self._physical_contact_observed = True
+            self._physical_contact_observed = self._physical_contact_observed or bool(
+                metrics.get("physical_contact_observed", False)
+            )
         metrics_max_force = self._coerce_optional_float(metrics.get("max_contact_force"))
         if metrics_max_force is not None:
             self._max_contact_force = (
@@ -367,6 +373,7 @@ class BaselineTrialManager(Node):
 
     def _build_metadata(self) -> dict[str, object]:
         is_contact_probe_validation = self._trial_mode == "contact_probe_validation"
+        is_robot_contact_validation = self._trial_mode == "robot_contact_validation"
         return {
             "trial_id": self._trial_id,
             "timestamp": self._timestamp,
@@ -380,20 +387,24 @@ class BaselineTrialManager(Node):
             "task": (
                 "passive contact probe validation"
                 if is_contact_probe_validation
+                else "robot-to-object contact validation"
+                if is_robot_contact_validation
                 else "peg-in-hole baseline"
             ),
             "controller": (
                 "none" if is_contact_probe_validation else "joint_trajectory_controller"
             ),
-            "framework_version": "v0.4",
+            "framework_version": "v0.5" if is_robot_contact_validation else "v0.4",
             "trial_mode": self._trial_mode,
             "notes": (
-                "Research Baseline v0.4 logs task events, safety events, trial "
+                "Research Baseline v0.4/v0.5 logs task events, safety events, trial "
                 "status, joint states, contact events, and insertion metrics. "
                 "Contact-force values remain null unless force extraction is "
                 "validated and enabled. The contact_probe_validation mode validates "
-                "instrumentation with a passive Gazebo probe and does not require "
-                "task sequence completion."
+                "instrumentation with a passive Gazebo probe. The "
+                "robot_contact_validation mode runs a separate scripted robot "
+                "approach toward a dedicated contact target; contact absence is "
+                "reported without failing the trial."
             ),
             "topics": {
                 "joint_states": self._joint_states_topic,
@@ -436,6 +447,7 @@ class BaselineTrialManager(Node):
             "contact_messages_observed": self._contact_messages_observed,
             "physical_contact_observed": self._physical_contact_observed,
             "contact_topics_seen": sorted(self._contact_topics_seen),
+            "positive_contact_counts": self._positive_contact_counts,
             "contact_metrics_available": self._contact_metrics_available,
             "notes": self._summary_notes(),
         }
@@ -508,6 +520,21 @@ class BaselineTrialManager(Node):
                 "contact_probe_validation validates Gazebo contact instrumentation "
                 "only; task_completed is not required."
             )
+        elif self._trial_mode == "robot_contact_validation":
+            robot_validation_count = self._positive_contact_counts.get(
+                "robot_validation", 0
+            )
+            if robot_validation_count > 0:
+                notes.append(
+                    "robot_contact_validation observed positive robot_validation "
+                    "contact samples."
+                )
+            else:
+                notes.append(
+                    "robot_contact_validation completed without robot_validation "
+                    "contact; tune the joint-space contact pose after Gazebo "
+                    "observation if needed."
+                )
         if self._contact_metrics_available and not self._physical_contact_observed:
             notes.append(
                 "Contact instrumentation is connected; zero physical contact events "
@@ -534,12 +561,23 @@ class BaselineTrialManager(Node):
             if self._safety_status_observed:
                 return True
             return None
+        if self._trial_mode == "robot_contact_validation":
+            return self._task_completed and self._safety_violations_count == 0
         return self._task_completed and self._safety_violations_count == 0
+
+    def _counts_as_physical_contact(self, source: str) -> bool:
+        if self._trial_mode == "robot_contact_validation":
+            return source == "robot_validation"
+        return True
 
     @staticmethod
     def _normalize_trial_mode(value: str) -> str:
         mode = str(value).strip()
-        if mode in {"baseline_task", "contact_probe_validation"}:
+        if mode in {
+            "baseline_task",
+            "contact_probe_validation",
+            "robot_contact_validation",
+        }:
             return mode
         return "baseline_task"
 
@@ -630,6 +668,18 @@ class BaselineTrialManager(Node):
             }
             if configured:
                 self._contact_topics_configured = configured
+
+    def _update_positive_contact_counts(self, value: Any) -> None:
+        if not isinstance(value, dict):
+            return
+        for source, count in value.items():
+            source_name = str(source).strip()
+            if not source_name:
+                continue
+            self._positive_contact_counts[source_name] = max(
+                self._positive_contact_counts.get(source_name, 0),
+                self._coerce_int(count, default=0),
+            )
 
     @staticmethod
     def _coerce_string_set(value: Any, default: set[str]) -> set[str]:
