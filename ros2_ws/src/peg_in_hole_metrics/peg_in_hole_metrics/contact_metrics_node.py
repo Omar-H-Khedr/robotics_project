@@ -1,4 +1,4 @@
-"""Contact and insertion metrics publisher for Research Baseline v0.5."""
+"""Contact and insertion metrics publisher for Research Baseline v0.7."""
 
 from __future__ import annotations
 
@@ -129,9 +129,11 @@ class ContactMetricsNode(Node):
         self.declare_parameter("max_contact_force_available", True)
         self.declare_parameter("zero_contact_event_throttle_sec", 2.0)
         self.declare_parameter("contact_event_debounce_sec", 0.25)
-        self.declare_parameter("positive_contact_event_throttle_sec", 1.0)
+        self.declare_parameter("positive_contact_event_throttle_sec", 0.2)
         self.declare_parameter("contact_force_update_epsilon", 1.0e-6)
         self.declare_parameter("physical_contact_sources", [""])
+        self.declare_parameter("robot_validation_warning_force_n", 50.0)
+        self.declare_parameter("robot_validation_violation_force_n", 100.0)
 
         self._contact_topics = self._load_contact_topics()
         self._insertion_phase_name = (
@@ -173,6 +175,18 @@ class ContactMetricsNode(Node):
             .double_value,
         )
         self._physical_contact_sources = self._load_physical_contact_sources()
+        self._robot_validation_warning_force_n = max(
+            0.0,
+            self.get_parameter("robot_validation_warning_force_n")
+            .get_parameter_value()
+            .double_value,
+        )
+        self._robot_validation_violation_force_n = max(
+            0.0,
+            self.get_parameter("robot_validation_violation_force_n")
+            .get_parameter_value()
+            .double_value,
+        )
 
         self._current_phase = "uninitialized"
         self._trial_status = "idle"
@@ -180,6 +194,7 @@ class ContactMetricsNode(Node):
         self._insertion_attempted = False
         self._insertion_hold_reached = False
         self._contact_events_count = 0
+        self._contact_episode_count = 0
         self._contact_samples_count = 0
         self._max_contact_force: float | None = None
         self._force_extraction_available = False
@@ -343,9 +358,10 @@ class ContactMetricsNode(Node):
                 self._physical_contact_observed = True
             if not self._previous_in_contact.get(source, False):
                 self._previous_in_contact[source] = True
+                if self._counts_as_physical_contact(source):
+                    self._contact_episode_count += 1
+                    self._contact_events_count = self._contact_episode_count
                 if self._should_publish_transition_event(source):
-                    if self._counts_as_physical_contact(source):
-                        self._contact_events_count += 1
                     self._record_positive_contact_event(source, max_force)
                     self._publish_contact_event(
                         self._contact_event_payload(
@@ -359,8 +375,6 @@ class ContactMetricsNode(Node):
             else:
                 self._previous_in_contact[source] = True
                 if self._should_publish_positive_contact_event(source, max_force):
-                    if self._counts_as_physical_contact(source):
-                        self._contact_events_count += 1
                     self._publish_contact_event(
                         self._contact_event_payload(
                             event_type="contact_updated",
@@ -465,19 +479,11 @@ class ContactMetricsNode(Node):
     ) -> bool:
         now_sec = self._now_sec()
         last_event_sec = self._last_positive_contact_event_sec.get(source)
-        last_force = self._last_reported_contact_force.get(source)
-        force_increased = (
-            max_force is not None
-            and (
-                last_force is None
-                or max_force > last_force + self._contact_force_update_epsilon
-            )
-        )
         throttle_elapsed = (
             last_event_sec is None
             or now_sec - last_event_sec >= self._positive_contact_event_throttle_sec
         )
-        if not force_increased and not throttle_elapsed:
+        if not throttle_elapsed:
             return False
         self._record_positive_contact_event(source, max_force)
         return True
@@ -521,6 +527,16 @@ class ContactMetricsNode(Node):
                 "Force extraction is enabled, but no Contacts.wrenches force vector "
                 "has been observed yet."
             )
+        if self._force_threshold_violation():
+            notes.append(
+                "Robot validation contact force exceeded the configured simulation "
+                "violation threshold."
+            )
+        elif self._force_threshold_warning():
+            notes.append(
+                "Robot validation contact force exceeded the configured simulation "
+                "warning threshold."
+            )
         notes.append(
             "insertion_success remains null until a validated success rule is "
             "implemented."
@@ -543,8 +559,15 @@ class ContactMetricsNode(Node):
             "contact_topics_seen": contact_topics_seen,
             "positive_contact_counts": self._positive_contact_counts,
             "contact_events_count": self._contact_events_count,
+            "contact_episode_count": self._contact_episode_count,
             "contact_samples_count": self._contact_samples_count,
             "max_contact_force": self._max_contact_force,
+            "robot_validation_warning_force_n": self._robot_validation_warning_force_n,
+            "robot_validation_violation_force_n": (
+                self._robot_validation_violation_force_n
+            ),
+            "force_threshold_warning": self._force_threshold_warning(),
+            "force_threshold_violation": self._force_threshold_violation(),
             "force_extraction_available": self._force_extraction_available,
             "force_extraction_method": FORCE_EXTRACTION_METHOD,
             "insertion_success": None,
@@ -589,6 +612,18 @@ class ContactMetricsNode(Node):
         if not self._physical_contact_sources:
             return True
         return source in self._physical_contact_sources
+
+    def _force_threshold_warning(self) -> bool:
+        return (
+            self._max_contact_force is not None
+            and self._max_contact_force > self._robot_validation_warning_force_n
+        )
+
+    def _force_threshold_violation(self) -> bool:
+        return (
+            self._max_contact_force is not None
+            and self._max_contact_force > self._robot_validation_violation_force_n
+        )
 
     @staticmethod
     def _source_from_topic(topic: str, index: int) -> str:
