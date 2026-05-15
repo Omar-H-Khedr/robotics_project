@@ -7,10 +7,16 @@ contact_metrics_node:
         topic: /gazebo/contacts/hole
       - name: target
         topic: /gazebo/contacts/target
+      - name: validation_sensor
+        topic: /world/minimal_contact_validation_world/model/contact_validation_pad/link/pad_link/sensor/contact_validation_sensor/contact
       - name: validation
         topic: /gazebo/contacts/validation
+      - name: robot_validation
+        topic: /gazebo/contacts/robot_validation
     insertion_phase_name: insertion_hold
     contact_enabled: true
     publish_rate_hz: 2.0
     max_contact_force_available: false
     zero_contact_event_throttle_sec: 2.0
+    physical_contact_sources:
+      - ""

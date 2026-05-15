@@ -18,6 +18,7 @@ DEFAULT_CONTACT_TOPICS = (
     {"name": "hole", "topic": "/gazebo/contacts/hole"},
     {"name": "target", "topic": "/gazebo/contacts/target"},
     {"name": "validation", "topic": "/gazebo/contacts/validation"},
+    {"name": "robot_validation", "topic": "/gazebo/contacts/robot_validation"},
 )
 
 
@@ -36,6 +37,7 @@ class ContactMetricsNode(Node):
         self.declare_parameter("max_contact_force_available", False)
         self.declare_parameter("zero_contact_event_throttle_sec", 2.0)
         self.declare_parameter("contact_event_debounce_sec", 0.25)
+        self.declare_parameter("physical_contact_sources", [""])
 
         self._contact_topics = self._load_contact_topics()
         self._insertion_phase_name = (
@@ -64,6 +66,7 @@ class ContactMetricsNode(Node):
             .get_parameter_value()
             .double_value,
         )
+        self._physical_contact_sources = self._load_physical_contact_sources()
 
         self._current_phase = "uninitialized"
         self._trial_status = "idle"
@@ -76,6 +79,7 @@ class ContactMetricsNode(Node):
         self._contact_message_type_available = False
         self._contact_messages_observed = False
         self._physical_contact_observed = False
+        self._positive_contact_counts = {name: 0 for name in self._contact_topics}
         self._contact_topic_seen = {name: False for name in self._contact_topics}
         self._previous_in_contact = {name: False for name in self._contact_topics}
         self._last_contact_transition_event_sec = {
@@ -144,6 +148,14 @@ class ContactMetricsNode(Node):
         source = self._source_from_topic(stripped, index)
         return source, stripped
 
+    def _load_physical_contact_sources(self) -> set[str]:
+        values = list(
+            self.get_parameter("physical_contact_sources")
+            .get_parameter_value()
+            .string_array_value
+        )
+        return {str(value).strip() for value in values if str(value).strip()}
+
     def _create_contact_subscriptions(self) -> None:
         if not self._contact_enabled:
             self.get_logger().warning(
@@ -210,7 +222,11 @@ class ContactMetricsNode(Node):
 
         if contact_count > 0:
             self._contact_samples_count += 1
-            self._physical_contact_observed = True
+            self._positive_contact_counts[source] = (
+                self._positive_contact_counts.get(source, 0) + 1
+            )
+            if self._counts_as_physical_contact(source):
+                self._physical_contact_observed = True
             if not self._previous_in_contact.get(source, False):
                 self._previous_in_contact[source] = True
                 if self._should_publish_transition_event(source):
@@ -438,6 +454,7 @@ class ContactMetricsNode(Node):
             "contact_messages_observed": self._contact_messages_observed,
             "physical_contact_observed": self._physical_contact_observed,
             "contact_topics_seen": contact_topics_seen,
+            "positive_contact_counts": self._positive_contact_counts,
             "contact_events_count": self._contact_events_count,
             "contact_samples_count": self._contact_samples_count,
             "max_contact_force": self._max_contact_force,
@@ -479,9 +496,14 @@ class ContactMetricsNode(Node):
             return True
         return None
 
+    def _counts_as_physical_contact(self, source: str) -> bool:
+        if not self._physical_contact_sources:
+            return True
+        return source in self._physical_contact_sources
+
     @staticmethod
     def _source_from_topic(topic: str, index: int) -> str:
-        for source in ("peg", "hole", "target", "validation"):
+        for source in ("robot_validation", "peg", "hole", "target", "validation"):
             if re.search(rf"(^|/){source}($|/)", topic):
                 return source
         return f"contact_{index}"
