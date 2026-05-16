@@ -112,6 +112,7 @@ class BaselineTrialManager(Node):
         self._early_contact_guard_trigger_force: float | None = None
         self._early_contact_guard_source: str | None = None
         self._guarded_contact_stop = False
+        self._segment_count_executed = 0
         self._force_violation_threshold_n: float | None = 100.0
         self._force_extraction_available = False
         self._force_extraction_method = FORCE_EXTRACTION_METHOD
@@ -233,6 +234,12 @@ class BaselineTrialManager(Node):
         self._total_task_events += 1
         if event_type in {"sequence_started", "phase_started"}:
             self._task_started = True
+        segment_count = self._coerce_int(
+            event.get("segment_count_executed"), default=self._segment_count_executed
+        )
+        self._segment_count_executed = max(
+            self._segment_count_executed, segment_count
+        )
         if event_type == "phase_succeeded":
             self._completed_phases_count += 1
         elif event_type == "sequence_completed":
@@ -507,7 +514,10 @@ class BaselineTrialManager(Node):
 
     def _build_metadata(self) -> dict[str, object]:
         is_contact_probe_validation = self._trial_mode == "contact_probe_validation"
-        is_robot_contact_validation = self._trial_mode == "robot_contact_validation"
+        is_contact_validation = self._trial_mode in {
+            "robot_contact_validation",
+            "segmented_guarded_contact",
+        }
         return {
             "trial_id": self._trial_id,
             "timestamp": self._timestamp,
@@ -521,15 +531,21 @@ class BaselineTrialManager(Node):
             "task": (
                 "passive contact probe validation"
                 if is_contact_probe_validation
+                else "segmented guarded robot-to-object contact validation"
+                if self._trial_mode == "segmented_guarded_contact"
                 else "robot-to-object contact validation"
-                if is_robot_contact_validation
+                if self._trial_mode == "robot_contact_validation"
                 else "peg-in-hole baseline"
             ),
             "controller": (
                 "none" if is_contact_probe_validation else "joint_trajectory_controller"
             ),
             "framework_version": (
-                "v0.9" if is_robot_contact_validation else "v0.5"
+                "v1.0"
+                if self._trial_mode == "segmented_guarded_contact"
+                else "v0.9"
+                if is_contact_validation
+                else "v0.5"
             ),
             "trial_mode": self._trial_mode,
             "notes": (
@@ -541,7 +557,10 @@ class BaselineTrialManager(Node):
                 "passive Gazebo probe. The "
                 "robot_contact_validation mode runs a separate scripted robot "
                 "approach toward a dedicated contact target; contact absence is "
-                "reported without failing the trial."
+                "reported without failing the trial. The "
+                "segmented_guarded_contact mode replaces the long contact approach "
+                "with short checked joint-space segments and stops before sending "
+                "additional approach motion after contact is observed."
             ),
             "topics": {
                 "joint_states": self._joint_states_topic,
@@ -559,6 +578,9 @@ class BaselineTrialManager(Node):
         execution_time_sec = self._elapsed_sec()
         safe_success = self._safe_success()
         robot_contact_validation_success = self._robot_contact_validation_success()
+        segmented_guarded_contact_success = (
+            self._segmented_guarded_contact_success()
+        )
         return {
             "trial_id": self._trial_id,
             "trial_mode": self._trial_mode,
@@ -575,6 +597,10 @@ class BaselineTrialManager(Node):
             "execution_time_sec": execution_time_sec,
             "safe_success": safe_success,
             "robot_contact_validation_success": robot_contact_validation_success,
+            "segmented_guarded_contact_success": (
+                segmented_guarded_contact_success
+            ),
+            "segment_count_executed": self._segment_count_executed,
             "contact_events_count": self._contact_events_count,
             "contact_episode_count": self._contact_episode_count,
             "contact_samples_count": self._contact_samples_count,
@@ -711,6 +737,22 @@ class BaselineTrialManager(Node):
                     "threshold; inspect max_contact_force before treating the run as "
                     "low-force validation."
                 )
+        elif self._trial_mode == "segmented_guarded_contact":
+            notes.append(
+                "segmented_guarded_contact uses short checked approach moves and "
+                "requires guarded_contact_stop with max_contact_force below 100 N "
+                "for v1.0 success."
+            )
+            if self._guarded_contact_stop:
+                notes.append(
+                    "Segmented guard reported a controlled contact stop before "
+                    "continuing the approach."
+                )
+            if self._force_threshold_violation:
+                notes.append(
+                    "Contact force exceeded the configured v1.0 violation threshold; "
+                    "segmented_guarded_contact_success is false."
+                )
         if self._contact_metrics_available and not self._physical_contact_observed:
             notes.append(
                 "Contact instrumentation is connected; zero physical contact events "
@@ -764,13 +806,27 @@ class BaselineTrialManager(Node):
             and self._safety_violations_count == 0
         )
 
+    def _segmented_guarded_contact_success(self) -> bool | None:
+        if self._trial_mode != "segmented_guarded_contact":
+            return None
+        below_force_limit = (
+            self._max_contact_force is not None and self._max_contact_force < 100.0
+        )
+        return (
+            self._physical_contact_observed
+            and self._guarded_contact_stop
+            and not self._force_threshold_violation
+            and self._safety_violations_count == 0
+            and below_force_limit
+        )
+
     def _effective_task_started(self) -> bool:
         return self._task_started or (
             self._task_completed and self._total_task_events > 0
         )
 
     def _counts_as_physical_contact(self, source: str) -> bool:
-        if self._trial_mode == "robot_contact_validation":
+        if self._trial_mode in {"robot_contact_validation", "segmented_guarded_contact"}:
             return source == "robot_validation"
         return True
 
@@ -781,6 +837,7 @@ class BaselineTrialManager(Node):
             "baseline_task",
             "contact_probe_validation",
             "robot_contact_validation",
+            "segmented_guarded_contact",
         }:
             return mode
         return "baseline_task"

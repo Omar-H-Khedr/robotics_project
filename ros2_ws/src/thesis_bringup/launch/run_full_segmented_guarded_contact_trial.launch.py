@@ -4,14 +4,12 @@ import yaml
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (
-    EmitEvent,
     IncludeLaunchDescription,
     LogInfo,
     RegisterEventHandler,
     TimerAction,
 )
 from launch.event_handlers import OnProcessExit
-from launch.events import Shutdown
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
@@ -61,32 +59,6 @@ def _contact_metrics_parameters() -> dict[str, object]:
 def generate_launch_description():
     results_root = _workspace_results_root()
 
-    task_trajectory_executor_node = Node(
-        package="kuka_task_control",
-        executable="task_trajectory_executor",
-        name="task_trajectory_executor",
-        output="screen",
-        parameters=[
-            {
-                "task_sequence_file": PathJoinSubstitution(
-                    [
-                        FindPackageShare("kuka_task_control"),
-                        "config",
-                        "robot_contact_validation_sequence.yaml",
-                    ]
-                ),
-                "force_guard_enabled": True,
-                "force_warning_threshold_n": 50.0,
-                "force_violation_threshold_n": 100.0,
-                "force_guard_topic": "/insertion_metrics",
-                "early_contact_guard_enabled": True,
-                "stop_on_first_contact": True,
-                "early_contact_force_threshold_n": 20.0,
-                "early_contact_guard_topic": "/force_guard_status",
-            }
-        ],
-    )
-
     readiness_gate_node = Node(
         package="thesis_bringup",
         executable="controller_readiness_gate",
@@ -100,57 +72,37 @@ def generate_launch_description():
         ],
     )
 
-    def start_robot_contact_sequence_when_ready(event, _context):
+    segmented_contact_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            PathJoinSubstitution(
+                [
+                    FindPackageShare("kuka_task_control"),
+                    "launch",
+                    "run_segmented_guarded_contact.launch.py",
+                ]
+            )
+        )
+    )
+
+    def start_segmented_contact_when_ready(event, _context):
         if event.returncode == 0:
             return [
                 LogInfo(
                     msg=(
-                        "Controller readiness confirmed; starting robot contact "
-                        "validation sequence automatically."
+                        "Controller readiness confirmed; starting segmented "
+                        "guarded contact executor."
                     )
                 ),
-                task_trajectory_executor_node,
+                segmented_contact_launch,
             ]
 
         return [
             LogInfo(
                 msg=(
-                    "Controller readiness gate failed; robot contact validation "
-                    "sequence will not be started automatically."
+                    "Controller readiness gate failed; segmented guarded contact "
+                    "executor will not be started automatically."
                 )
             )
-        ]
-
-    def finish_trial_when_task_executor_exits(event, _context):
-        if event.returncode == 0:
-            exit_message = (
-                "Robot contact validation task executor exited cleanly; "
-                "completed or controlled terminal state reached."
-            )
-        else:
-            exit_message = (
-                "Robot contact validation task executor exited with return code "
-                f"{event.returncode}; final logs will be flushed before shutdown."
-            )
-
-        return [
-            LogInfo(msg=exit_message),
-            TimerAction(
-                period=2.0,
-                actions=[
-                    LogInfo(
-                        msg=(
-                            "Stopping robot contact validation launch after terminal "
-                            "task executor exit."
-                        )
-                    ),
-                    EmitEvent(
-                        event=Shutdown(
-                            reason="robot contact validation task executor exited"
-                        )
-                    ),
-                ],
-            ),
         ]
 
     robot_validation_contact_bridge = Node(
@@ -168,11 +120,10 @@ def generate_launch_description():
         [
             LogInfo(
                 msg=(
-                    "Starting Research Baseline v0.6 robot-to-object contact "
-                    "validation trial."
+                    "Starting Research Baseline v1.0 segmented guarded robot "
+                    "contact validation trial."
                 )
             ),
-            LogInfo(msg="Spawning exactly one KUKA robot entity: kuka_lbr_iisy"),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
                     PathJoinSubstitution(
@@ -185,15 +136,13 @@ def generate_launch_description():
                 ),
                 launch_arguments={
                     "world_file": ROBOT_CONTACT_VALIDATION_WORLD,
-                    "robot_model": "kuka_lbr_iisy",
-                    "allow_robot_renaming": "false",
                 }.items(),
             ),
             robot_validation_contact_bridge,
             TimerAction(
                 period=5.0,
                 actions=[
-                    LogInfo(msg="Starting safety monitor for robot contact validation."),
+                    LogInfo(msg="Starting safety monitor for segmented contact trial."),
                     Node(
                         package="safety_layer",
                         executable="safety_monitor",
@@ -216,7 +165,7 @@ def generate_launch_description():
             TimerAction(
                 period=6.0,
                 actions=[
-                    LogInfo(msg="Starting robot contact validation trial manager."),
+                    LogInfo(msg="Starting segmented guarded contact trial manager."),
                     Node(
                         package="experiment_manager",
                         executable="baseline_trial_manager",
@@ -225,7 +174,7 @@ def generate_launch_description():
                         parameters=[
                             {
                                 "results_root": str(results_root),
-                                "trial_mode": "robot_contact_validation",
+                                "trial_mode": "segmented_guarded_contact",
                             }
                         ],
                     ),
@@ -234,7 +183,7 @@ def generate_launch_description():
             TimerAction(
                 period=7.0,
                 actions=[
-                    LogInfo(msg="Starting contact metrics for robot validation."),
+                    LogInfo(msg="Starting contact metrics for segmented contact."),
                     Node(
                         package="peg_in_hole_metrics",
                         executable="contact_metrics_node",
@@ -254,13 +203,7 @@ def generate_launch_description():
             RegisterEventHandler(
                 OnProcessExit(
                     target_action=readiness_gate_node,
-                    on_exit=start_robot_contact_sequence_when_ready,
-                )
-            ),
-            RegisterEventHandler(
-                OnProcessExit(
-                    target_action=task_trajectory_executor_node,
-                    on_exit=finish_trial_when_task_executor_exits,
+                    on_exit=start_segmented_contact_when_ready,
                 )
             ),
         ]

@@ -13,6 +13,10 @@ validation pad remains in the separate
 `peg_in_hole_robot_contact_validation_world.sdf` scene and is positioned to
 avoid deep penetration by the gripper geometry. The baseline task sequence and
 full research trial launch are unchanged.
+The robot contact validation world contains no robot model; the KUKA is spawned
+by launch as the single `kuka_lbr_iisy` entity. The validation pad is placed on
+a dedicated static stand to avoid ambiguous tabletop coordinates and prevent a
+floating/off-table contact target.
 
 `max_contact_force` is now a validation metric, not just a recorded diagnostic.
 The metrics node still extracts force from every contact sample, but positive

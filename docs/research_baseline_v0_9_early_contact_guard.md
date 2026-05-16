@@ -17,6 +17,11 @@ v0.9 adds an event-driven contact response layer:
 - No synthetic force values are generated; force remains `null` when no parsed
   wrench force vector exists in the contact message.
 
+The robot contact validation world contains no robot model; the KUKA is spawned
+by launch as the single `kuka_lbr_iisy` entity. The validation pad is placed on
+a dedicated static stand to avoid ambiguous tabletop coordinates and prevent a
+floating/off-table contact target.
+
 For robot contact validation, `kuka_task_control/task_trajectory_executor.py`
 can optionally subscribe to `/force_guard_status`. With
 `early_contact_guard_enabled=true` and `stop_on_first_contact=true`, the

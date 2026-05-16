@@ -11,6 +11,10 @@ workflow. The KUKA runs a slow, controlled joint-space sequence toward a
 dedicated `robot_contact_validation_pad` in
 `peg_in_hole_robot_contact_validation_world.sdf`. The validation pad is separate
 from the baseline peg, hole, target, table, and pedestal layout.
+The robot contact validation world contains no robot model; the KUKA is spawned
+by launch as the single `kuka_lbr_iisy` entity. The validation pad is placed on
+a dedicated static stand to avoid ambiguous tabletop coordinates and prevent a
+floating/off-table contact target.
 
 This is still not final peg insertion. It is a controlled contact validation
 step before an insertion policy. The baseline task sequence and stable full
