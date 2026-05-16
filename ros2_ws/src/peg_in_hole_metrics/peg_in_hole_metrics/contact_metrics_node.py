@@ -219,6 +219,9 @@ class ContactMetricsNode(Node):
         self._warned_missing_publishers = False
 
         self._contact_event_pub = self.create_publisher(String, "/contact_event", 100)
+        self._force_guard_status_pub = self.create_publisher(
+            String, "/force_guard_status", 100
+        )
         self._insertion_metrics_pub = self.create_publisher(
             String, "/insertion_metrics", 10
         )
@@ -232,7 +235,8 @@ class ContactMetricsNode(Node):
         self.create_timer(10.0, self._warn_if_contact_topics_missing)
 
         self.get_logger().info(
-            "Contact metrics node publishing /contact_event and /insertion_metrics."
+            "Contact metrics node publishing /contact_event, /force_guard_status, "
+            "and /insertion_metrics."
         )
 
     def _load_contact_topics(self) -> dict[str, str]:
@@ -329,6 +333,7 @@ class ContactMetricsNode(Node):
             "aborted",
             "canceled",
             "cancelled",
+            "guarded_stop",
             "timeout",
             "timed_out",
         }:
@@ -341,6 +346,7 @@ class ContactMetricsNode(Node):
         self._contact_topic_seen[source] = True
 
         max_force = self._extract_max_force(message)
+        previous_max_force = self._max_contact_force
         if max_force is not None:
             self._force_extraction_available = True
             self._max_contact_force = (
@@ -348,6 +354,13 @@ class ContactMetricsNode(Node):
                 if self._max_contact_force is None
                 else max(self._max_contact_force, max_force)
             )
+        new_force_peak = (
+            max_force is not None
+            and (
+                previous_max_force is None
+                or max_force > previous_max_force + self._contact_force_update_epsilon
+            )
+        )
 
         if contact_count > 0:
             self._contact_samples_count += 1
@@ -356,6 +369,7 @@ class ContactMetricsNode(Node):
             )
             if self._counts_as_physical_contact(source):
                 self._physical_contact_observed = True
+            self._publish_force_guard_status(source, contact_count, max_force)
             if not self._previous_in_contact.get(source, False):
                 self._previous_in_contact[source] = True
                 if self._counts_as_physical_contact(source):
@@ -384,7 +398,11 @@ class ContactMetricsNode(Node):
                             message=self._contact_note(contact_count, max_force),
                         )
                     )
+            if new_force_peak:
+                self._publish_metrics()
             return
+
+        self._publish_force_guard_status(source, contact_count, max_force)
 
         if self._previous_in_contact.get(source, False):
             if self._should_publish_transition_event(source):
@@ -498,6 +516,28 @@ class ContactMetricsNode(Node):
         message.data = json.dumps(payload, sort_keys=True)
         self._contact_event_pub.publish(message)
 
+    def _publish_force_guard_status(
+        self,
+        source: str,
+        contact_count: int,
+        max_force: float | None,
+    ) -> None:
+        payload = {
+            "timestamp_ros_sec": self._now_sec(),
+            "source": source,
+            "contact_count": contact_count,
+            "physical_contact_observed": (
+                contact_count > 0 and self._counts_as_physical_contact(source)
+            ),
+            "max_contact_force": max_force,
+            "force_extraction_available": max_force is not None,
+            "force_threshold_warning": self._force_threshold_warning(max_force),
+            "force_threshold_violation": self._force_threshold_violation(max_force),
+        }
+        message = String()
+        message.data = json.dumps(payload, sort_keys=True)
+        self._force_guard_status_pub.publish(message)
+
     def _publish_metrics(self) -> None:
         notes = []
         contact_topics_connected = self._contact_topics_connected()
@@ -527,12 +567,12 @@ class ContactMetricsNode(Node):
                 "Force extraction is enabled, but no Contacts.wrenches force vector "
                 "has been observed yet."
             )
-        if self._force_threshold_violation():
+        if self._force_threshold_violation(self._max_contact_force):
             notes.append(
                 "Robot validation contact force exceeded the configured simulation "
                 "violation threshold."
             )
-        elif self._force_threshold_warning():
+        elif self._force_threshold_warning(self._max_contact_force):
             notes.append(
                 "Robot validation contact force exceeded the configured simulation "
                 "warning threshold."
@@ -566,8 +606,12 @@ class ContactMetricsNode(Node):
             "robot_validation_violation_force_n": (
                 self._robot_validation_violation_force_n
             ),
-            "force_threshold_warning": self._force_threshold_warning(),
-            "force_threshold_violation": self._force_threshold_violation(),
+            "force_threshold_warning": self._force_threshold_warning(
+                self._max_contact_force
+            ),
+            "force_threshold_violation": self._force_threshold_violation(
+                self._max_contact_force
+            ),
             "force_extraction_available": self._force_extraction_available,
             "force_extraction_method": FORCE_EXTRACTION_METHOD,
             "insertion_success": None,
@@ -613,16 +657,16 @@ class ContactMetricsNode(Node):
             return True
         return source in self._physical_contact_sources
 
-    def _force_threshold_warning(self) -> bool:
+    def _force_threshold_warning(self, max_force: float | None) -> bool:
         return (
-            self._max_contact_force is not None
-            and self._max_contact_force > self._robot_validation_warning_force_n
+            max_force is not None
+            and max_force > self._robot_validation_warning_force_n
         )
 
-    def _force_threshold_violation(self) -> bool:
+    def _force_threshold_violation(self, max_force: float | None) -> bool:
         return (
-            self._max_contact_force is not None
-            and self._max_contact_force > self._robot_validation_violation_force_n
+            max_force is not None
+            and max_force > self._robot_validation_violation_force_n
         )
 
     @staticmethod

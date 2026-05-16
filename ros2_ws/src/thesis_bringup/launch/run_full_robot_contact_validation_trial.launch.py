@@ -3,8 +3,15 @@ from pathlib import Path
 import yaml
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, LogInfo, RegisterEventHandler, TimerAction
+from launch.actions import (
+    EmitEvent,
+    IncludeLaunchDescription,
+    LogInfo,
+    RegisterEventHandler,
+    TimerAction,
+)
 from launch.event_handlers import OnProcessExit
+from launch.events import Shutdown
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
@@ -54,16 +61,30 @@ def _contact_metrics_parameters() -> dict[str, object]:
 def generate_launch_description():
     results_root = _workspace_results_root()
 
-    robot_contact_validation_sequence = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            PathJoinSubstitution(
-                [
-                    FindPackageShare("kuka_task_control"),
-                    "launch",
-                    "run_robot_contact_validation_sequence.launch.py",
-                ]
-            )
-        )
+    task_trajectory_executor_node = Node(
+        package="kuka_task_control",
+        executable="task_trajectory_executor",
+        name="task_trajectory_executor",
+        output="screen",
+        parameters=[
+            {
+                "task_sequence_file": PathJoinSubstitution(
+                    [
+                        FindPackageShare("kuka_task_control"),
+                        "config",
+                        "robot_contact_validation_sequence.yaml",
+                    ]
+                ),
+                "force_guard_enabled": True,
+                "force_warning_threshold_n": 50.0,
+                "force_violation_threshold_n": 100.0,
+                "force_guard_topic": "/insertion_metrics",
+                "early_contact_guard_enabled": True,
+                "stop_on_first_contact": True,
+                "early_contact_force_threshold_n": 20.0,
+                "early_contact_guard_topic": "/force_guard_status",
+            }
+        ],
     )
 
     readiness_gate_node = Node(
@@ -88,7 +109,7 @@ def generate_launch_description():
                         "validation sequence automatically."
                     )
                 ),
-                robot_contact_validation_sequence,
+                task_trajectory_executor_node,
             ]
 
         return [
@@ -98,6 +119,38 @@ def generate_launch_description():
                     "sequence will not be started automatically."
                 )
             )
+        ]
+
+    def finish_trial_when_task_executor_exits(event, _context):
+        if event.returncode == 0:
+            exit_message = (
+                "Robot contact validation task executor exited cleanly; "
+                "completed or controlled terminal state reached."
+            )
+        else:
+            exit_message = (
+                "Robot contact validation task executor exited with return code "
+                f"{event.returncode}; final logs will be flushed before shutdown."
+            )
+
+        return [
+            LogInfo(msg=exit_message),
+            TimerAction(
+                period=2.0,
+                actions=[
+                    LogInfo(
+                        msg=(
+                            "Stopping robot contact validation launch after terminal "
+                            "task executor exit."
+                        )
+                    ),
+                    EmitEvent(
+                        event=Shutdown(
+                            reason="robot contact validation task executor exited"
+                        )
+                    ),
+                ],
+            ),
         ]
 
     robot_validation_contact_bridge = Node(
@@ -199,6 +252,12 @@ def generate_launch_description():
                 OnProcessExit(
                     target_action=readiness_gate_node,
                     on_exit=start_robot_contact_sequence_when_ready,
+                )
+            ),
+            RegisterEventHandler(
+                OnProcessExit(
+                    target_action=task_trajectory_executor_node,
+                    on_exit=finish_trial_when_task_executor_exits,
                 )
             ),
         ]
