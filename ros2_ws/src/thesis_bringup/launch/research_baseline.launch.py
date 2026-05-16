@@ -64,6 +64,10 @@ def launch_setup(context, *args, **kwargs):
 
     robot_model = LaunchConfiguration("robot_model").perform(context)
     robot_family = LaunchConfiguration("robot_family").perform(context)
+    allow_robot_renaming = (
+        LaunchConfiguration("allow_robot_renaming").perform(context).strip().lower()
+        in ("1", "true", "yes", "on")
+    )
     controller_stack = "joint_state_broadcaster + joint_trajectory_controller"
     safe_home_pose = _safe_home_pose(robot)
     namespace = LaunchConfiguration("namespace")
@@ -186,28 +190,31 @@ def launch_setup(context, *args, **kwargs):
         }.items(),
     )
 
+    spawn_robot_arguments = [
+        "-topic",
+        "robot_description",
+        "-name",
+        robot_model,
+        "-x",
+        "0.0",
+        "-y",
+        "0.0",
+        "-z",
+        "0.0",
+        "-R",
+        "0.0",
+        "-P",
+        "0.0",
+        "-Y",
+        "0.0",
+    ]
+    if allow_robot_renaming:
+        spawn_robot_arguments.insert(4, "-allow_renaming")
+
     spawn_robot = Node(
         package="ros_gz_sim",
         executable="create",
-        arguments=[
-            "-topic",
-            "robot_description",
-            "-name",
-            robot_model,
-            "-allow_renaming",
-            "-x",
-            "0.0",
-            "-y",
-            "0.0",
-            "-z",
-            "0.0",
-            "-R",
-            "0.0",
-            "-P",
-            "0.0",
-            "-Y",
-            "0.0",
-        ],
+        arguments=spawn_robot_arguments,
         output="screen",
     )
 
@@ -278,7 +285,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 "robot_model",
                 default_value="lbr_iisy3_r760",
-                description="KUKA robot model passed through to kuka_gazebo.",
+                description="Gazebo entity name used when spawning the KUKA robot.",
             ),
             DeclareLaunchArgument(
                 "robot_family",
@@ -307,6 +314,14 @@ def generate_launch_description():
                 "use_gui",
                 default_value="true",
                 description="If true, launch gz_sim GUI. If false, launch gz_server only.",
+            ),
+            DeclareLaunchArgument(
+                "allow_robot_renaming",
+                default_value="true",
+                description=(
+                    "If true, allow ros_gz_sim create to rename duplicate robot "
+                    "entities instead of failing."
+                ),
             ),
             OpaqueFunction(function=launch_setup),
         ]
