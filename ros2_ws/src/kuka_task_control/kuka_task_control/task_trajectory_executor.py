@@ -21,6 +21,13 @@ from trajectory_msgs.msg import JointTrajectoryPoint
 class TaskTrajectoryExecutor(Node):
     """Execute named KUKA task poses through the ros2_control action interface."""
 
+    TERMINAL_STATUSES = {
+        "completed",
+        "failed",
+        "guarded_stop",
+        "guarded_contact_stop",
+    }
+
     JOINT_NAMES = (
         "joint_1",
         "joint_2",
@@ -59,6 +66,21 @@ class TaskTrajectoryExecutor(Node):
         self.declare_parameter("task_phase_topic", self.TASK_PHASE_TOPIC)
         self.declare_parameter("task_event_topic", self.TASK_EVENT_TOPIC)
         self.declare_parameter("trial_status_topic", self.TRIAL_STATUS_TOPIC)
+        self.declare_parameter("force_guard_enabled", False)
+        self.declare_parameter("force_guard_topic", "/insertion_metrics")
+        self.declare_parameter("force_warning_threshold_n", 50.0)
+        self.declare_parameter("force_violation_threshold_n", 100.0)
+        self.declare_parameter("force_guard_retreat_phase", "robot_contact_retreat")
+        self.declare_parameter("early_contact_guard_enabled", False)
+        self.declare_parameter("early_contact_guard_topic", "/force_guard_status")
+        self.declare_parameter("stop_on_first_contact", False)
+        self.declare_parameter("early_contact_force_threshold_n", 20.0)
+        self.declare_parameter(
+            "guarded_contact_retreat_phase", "robot_contact_retreat"
+        )
+        self.declare_parameter(
+            "guarded_contact_success_status", "guarded_contact_stop"
+        )
 
         self._config_path = self._resolve_config_path()
         self._action_server = (
@@ -72,6 +94,55 @@ class TaskTrajectoryExecutor(Node):
         )
         self._trial_status_topic = (
             self.get_parameter("trial_status_topic").get_parameter_value().string_value
+        )
+        self._force_guard_enabled = (
+            self.get_parameter("force_guard_enabled").get_parameter_value().bool_value
+        )
+        self._force_guard_topic = (
+            self.get_parameter("force_guard_topic").get_parameter_value().string_value
+        )
+        self._force_warning_threshold_n = (
+            self.get_parameter("force_warning_threshold_n")
+            .get_parameter_value()
+            .double_value
+        )
+        self._force_violation_threshold_n = (
+            self.get_parameter("force_violation_threshold_n")
+            .get_parameter_value()
+            .double_value
+        )
+        self._force_guard_retreat_phase = (
+            self.get_parameter("force_guard_retreat_phase")
+            .get_parameter_value()
+            .string_value
+        )
+        self._early_contact_guard_enabled = (
+            self.get_parameter("early_contact_guard_enabled")
+            .get_parameter_value()
+            .bool_value
+        )
+        self._early_contact_guard_topic = (
+            self.get_parameter("early_contact_guard_topic")
+            .get_parameter_value()
+            .string_value
+        )
+        self._stop_on_first_contact = (
+            self.get_parameter("stop_on_first_contact").get_parameter_value().bool_value
+        )
+        self._early_contact_force_threshold_n = (
+            self.get_parameter("early_contact_force_threshold_n")
+            .get_parameter_value()
+            .double_value
+        )
+        self._guarded_contact_retreat_phase = (
+            self.get_parameter("guarded_contact_retreat_phase")
+            .get_parameter_value()
+            .string_value
+        )
+        self._guarded_contact_success_status = (
+            self.get_parameter("guarded_contact_success_status")
+            .get_parameter_value()
+            .string_value
         )
         self._config = self._load_config(self._config_path)
         self._pose_order = self._load_pose_order(self._config)
@@ -90,7 +161,32 @@ class TaskTrajectoryExecutor(Node):
         )
         self._current_phase = "idle"
         self._current_status = "idle"
+        self._active_trajectory = False
+        self._force_guard_triggered = False
+        self._force_guard_trigger_force: float | None = None
+        self._latest_max_contact_force: float | None = None
+        self._force_warning_published = False
+        self._early_contact_guard_triggered = False
+        self._early_contact_guard_trigger_force: float | None = None
+        self._latest_early_contact_force: float | None = None
+        self._latest_early_contact_source = "unknown"
+        self._latest_early_contact_count = 0
+        self._latest_physical_contact_observed = False
         self.create_timer(self.PHASE_PUBLISH_PERIOD_SEC, self._publish_current_phase)
+        if self._force_guard_enabled:
+            self.create_subscription(
+                String,
+                self._force_guard_topic,
+                self._on_force_guard_metrics,
+                10,
+            )
+        if self._early_contact_guard_enabled:
+            self.create_subscription(
+                String,
+                self._early_contact_guard_topic,
+                self._on_early_contact_guard_status,
+                100,
+            )
         self._publish_trial_status("idle")
 
         metadata = self._config.get("metadata", {})
@@ -108,6 +204,21 @@ class TaskTrajectoryExecutor(Node):
             f"Publishing task events on {self._task_event_topic} and trial status on "
             f"{self._trial_status_topic}"
         )
+        if self._force_guard_enabled:
+            self.get_logger().info(
+                "Force guard enabled on "
+                f"{self._force_guard_topic}: warning={self._force_warning_threshold_n:.2f}N, "
+                f"violation={self._force_violation_threshold_n:.2f}N, "
+                f"retreat={self._force_guard_retreat_phase}"
+            )
+        if self._early_contact_guard_enabled:
+            self.get_logger().info(
+                "Early contact guard enabled on "
+                f"{self._early_contact_guard_topic}: "
+                f"stop_on_first_contact={self._stop_on_first_contact}, "
+                f"threshold={self._early_contact_force_threshold_n:.2f}N, "
+                f"retreat={self._guarded_contact_retreat_phase}"
+            )
 
     def execute(self) -> bool:
         """Run the configured named poses in order, stopping at the first failure."""
@@ -142,19 +253,36 @@ class TaskTrajectoryExecutor(Node):
             )
 
             if not self._execute_pose(pose_name, pose, index):
-                self.get_logger().error(
-                    f"Stopping task sequence after failed pose '{pose_name}'."
-                )
-                self._publish_phase(f"failed:{pose_name}")
+                guard_triggered = self._guard_triggered()
+                if guard_triggered:
+                    self.get_logger().warning(
+                        f"Stopping task sequence after guarded pose '{pose_name}'."
+                    )
+                else:
+                    self.get_logger().error(
+                        f"Stopping task sequence after failed pose '{pose_name}'."
+                    )
+                if not guard_triggered:
+                    self._publish_phase(f"failed:{pose_name}")
                 self._publish_event(
-                    "sequence_failed",
+                    "sequence_guarded_stop" if guard_triggered else "sequence_failed",
                     phase=pose_name,
                     pose_index=index,
                     safety_tag=safety_tag,
-                    message=f"Task sequence failed at pose '{pose_name}'.",
+                    message=(
+                        f"Task sequence stopped by guard at pose '{pose_name}'."
+                        if guard_triggered
+                        else f"Task sequence failed at pose '{pose_name}'."
+                    ),
                 )
-                self._publish_trial_status("failed")
-                return False
+                if self._early_contact_guard_triggered:
+                    terminal_status = self._guarded_contact_success_status
+                elif self._force_guard_triggered:
+                    terminal_status = "guarded_stop"
+                else:
+                    terminal_status = "failed"
+                self._publish_terminal_state(terminal_status, pose_name)
+                return guard_triggered
 
         self.get_logger().info("Task pose sequence completed successfully.")
         self._publish_phase("sequence_complete")
@@ -250,11 +378,30 @@ class TaskTrajectoryExecutor(Node):
         result_timeout_sec = (
             float(pose["duration_sec"]) + self.RESULT_TIMEOUT_MARGIN_SEC
         )
-        if not self._wait_for_result(
+        wait_status = self._wait_for_result(
             result_future,
+            goal_handle=goal_handle,
             pose_name=pose_name,
+            pose_index=pose_index,
+            safety_tag=safety_tag,
             timeout_sec=result_timeout_sec,
-        ):
+        )
+        if wait_status == "force_guarded":
+            retreat_ok = self._execute_force_guard_retreat(pose_name, pose_index)
+            if not retreat_ok:
+                self.get_logger().error("Force-guard retreat failed or was unavailable.")
+            self._publish_terminal_state("guarded_stop", pose_name)
+            return False
+        if wait_status == "early_contact_guarded":
+            retreat_ok = self._execute_guarded_contact_retreat(pose_name, pose_index)
+            if not retreat_ok:
+                self.get_logger().error(
+                    "Early-contact guarded retreat failed or was unavailable."
+                )
+            self._publish_terminal_state(self._guarded_contact_success_status, pose_name)
+            return False
+
+        if wait_status == "timeout":
             self.get_logger().error(
                 f"Timed out waiting for controller result for pose '{pose_name}' "
                 f"after {result_timeout_sec:.2f}s; requesting goal cancel and "
@@ -333,26 +480,101 @@ class TaskTrajectoryExecutor(Node):
         self,
         result_future: Future,
         *,
+        goal_handle: Any,
         pose_name: str,
+        pose_index: int,
+        safety_tag: str,
         timeout_sec: float,
-    ) -> bool:
+    ) -> str:
         start_time = time.monotonic()
         deadline = start_time + timeout_sec
         next_log_time = start_time + self.RESULT_WAIT_LOG_PERIOD_SEC
+        self._active_trajectory = True
 
-        while not result_future.done():
-            now = time.monotonic()
-            if now >= deadline:
-                return False
+        try:
+            while not result_future.done():
+                now = time.monotonic()
+                if now >= deadline:
+                    return "timeout"
 
-            if now >= next_log_time:
-                self.get_logger().info(f"Waiting for result for phase {pose_name}...")
-                next_log_time = now + self.RESULT_WAIT_LOG_PERIOD_SEC
+                if self._force_guard_should_trigger():
+                    force = self._latest_max_contact_force
+                    threshold = self._force_violation_threshold_n
+                    self._force_guard_triggered = True
+                    self._force_guard_trigger_force = force
+                    self.get_logger().error(
+                        f"Force guard triggered during '{pose_name}': "
+                        f"max_contact_force={force:.3f}N >= {threshold:.3f}N."
+                    )
+                    self._publish_event(
+                        "force_guard_triggered",
+                        phase=pose_name,
+                        pose_index=pose_index,
+                        safety_tag=safety_tag,
+                        message=(
+                            f"Force guard triggered at max_contact_force={force:.3f}N "
+                            f">= threshold={threshold:.3f}N; canceling active goal."
+                        ),
+                        extra_fields={
+                            "force_guard_trigger_force": force,
+                            "force_guard_threshold": threshold,
+                        },
+                    )
+                    self._publish_terminal_state("guarded_stop", pose_name)
+                    self._cancel_goal_for_force_guard(goal_handle, pose_name)
+                    return "force_guarded"
 
-            spin_timeout = min(self.RESULT_WAIT_SPIN_PERIOD_SEC, deadline - now)
-            rclpy.spin_once(self, timeout_sec=spin_timeout)
+                if self._early_contact_guard_should_trigger():
+                    force = self._latest_early_contact_force
+                    threshold = self._early_contact_force_threshold_n
+                    source = self._latest_early_contact_source
+                    contact_count = self._latest_early_contact_count
+                    self._early_contact_guard_triggered = True
+                    self._early_contact_guard_trigger_force = force
+                    force_text = (
+                        "unavailable" if force is None else f"{force:.3f}N"
+                    )
+                    self.get_logger().warning(
+                        f"Early contact guard triggered during '{pose_name}': "
+                        f"source={source}, contact_count={contact_count}, "
+                        f"max_contact_force={force_text}."
+                    )
+                    self._publish_event(
+                        "early_contact_guard_triggered",
+                        phase=pose_name,
+                        pose_index=pose_index,
+                        safety_tag=safety_tag,
+                        message=(
+                            "Early contact guard triggered; "
+                            f"source={source}, contact_count={contact_count}, "
+                            f"max_contact_force={force_text}, "
+                            f"threshold={threshold:.3f}N; canceling active goal."
+                        ),
+                        extra_fields={
+                            "early_contact_guard_trigger_force": force,
+                            "early_contact_guard_threshold": threshold,
+                            "early_contact_guard_source": source,
+                            "early_contact_guard_contact_count": contact_count,
+                            "stop_on_first_contact": self._stop_on_first_contact,
+                        },
+                    )
+                    self._publish_terminal_state(
+                        self._guarded_contact_success_status,
+                        pose_name,
+                    )
+                    self._cancel_goal_for_force_guard(goal_handle, pose_name)
+                    return "early_contact_guarded"
 
-        return True
+                if now >= next_log_time:
+                    self.get_logger().info(f"Waiting for result for phase {pose_name}...")
+                    next_log_time = now + self.RESULT_WAIT_LOG_PERIOD_SEC
+
+                spin_timeout = min(self.RESULT_WAIT_SPIN_PERIOD_SEC, deadline - now)
+                rclpy.spin_once(self, timeout_sec=spin_timeout)
+
+            return "completed"
+        finally:
+            self._active_trajectory = False
 
     def _cancel_goal_after_timeout(self, goal_handle: Any, pose_name: str) -> None:
         cancel_future = goal_handle.cancel_goal_async()
@@ -371,6 +593,198 @@ class TaskTrajectoryExecutor(Node):
             f"Cancel request for timed-out pose '{pose_name}' did not complete "
             f"within {self.CANCEL_WAIT_TIMEOUT_SEC:.2f}s."
         )
+
+    def _cancel_goal_for_force_guard(self, goal_handle: Any, pose_name: str) -> None:
+        cancel_future = goal_handle.cancel_goal_async()
+        cancel_deadline = time.monotonic() + self.CANCEL_WAIT_TIMEOUT_SEC
+
+        while not cancel_future.done() and time.monotonic() < cancel_deadline:
+            rclpy.spin_once(self, timeout_sec=self.RESULT_WAIT_SPIN_PERIOD_SEC)
+
+        if cancel_future.done():
+            self.get_logger().info(
+                f"Cancel request completed for force-guarded pose '{pose_name}'."
+            )
+            return
+
+        self.get_logger().warning(
+            f"Cancel request for force-guarded pose '{pose_name}' did not complete "
+            f"within {self.CANCEL_WAIT_TIMEOUT_SEC:.2f}s."
+        )
+
+    def _execute_force_guard_retreat(
+        self,
+        interrupted_pose_name: str,
+        interrupted_pose_index: int,
+    ) -> bool:
+        retreat_name = self._force_guard_retreat_phase
+        if interrupted_pose_name == retreat_name:
+            self.get_logger().warning(
+                "Force guard triggered during retreat; no additional retreat goal sent."
+            )
+            return False
+        if retreat_name not in self._poses:
+            self.get_logger().warning(
+                f"Force guard retreat phase '{retreat_name}' is not available."
+            )
+            return False
+
+        try:
+            retreat_index = self._pose_order.index(retreat_name) + 1
+        except ValueError:
+            retreat_index = interrupted_pose_index
+
+        self._publish_phase(retreat_name)
+        self._publish_event(
+            "force_guard_retreat_started",
+            phase=retreat_name,
+            pose_index=retreat_index,
+            safety_tag=self._poses[retreat_name]["safety_tag"],
+            message=(
+                f"Executing force-guard retreat after interrupting "
+                f"'{interrupted_pose_name}'."
+            ),
+        )
+
+        previous_force_guard_enabled = self._force_guard_enabled
+        previous_early_guard_enabled = self._early_contact_guard_enabled
+        self._force_guard_enabled = False
+        self._early_contact_guard_enabled = False
+        try:
+            return self._execute_pose(
+                retreat_name,
+                self._poses[retreat_name],
+                retreat_index,
+            )
+        finally:
+            self._force_guard_enabled = previous_force_guard_enabled
+            self._early_contact_guard_enabled = previous_early_guard_enabled
+
+    def _execute_guarded_contact_retreat(
+        self,
+        interrupted_pose_name: str,
+        interrupted_pose_index: int,
+    ) -> bool:
+        retreat_name = self._guarded_contact_retreat_phase
+        if interrupted_pose_name == retreat_name:
+            self.get_logger().warning(
+                "Early contact guard triggered during retreat; no additional retreat "
+                "goal sent."
+            )
+            return False
+        if retreat_name not in self._poses:
+            self.get_logger().warning(
+                f"Guarded contact retreat phase '{retreat_name}' is not available."
+            )
+            return False
+
+        try:
+            retreat_index = self._pose_order.index(retreat_name) + 1
+        except ValueError:
+            retreat_index = interrupted_pose_index
+
+        self._publish_phase(retreat_name)
+        self._publish_event(
+            "early_contact_guard_retreat_started",
+            phase=retreat_name,
+            pose_index=retreat_index,
+            safety_tag=self._poses[retreat_name]["safety_tag"],
+            message=(
+                f"Executing early-contact guarded retreat after interrupting "
+                f"'{interrupted_pose_name}'."
+            ),
+        )
+
+        previous_early_guard_enabled = self._early_contact_guard_enabled
+        previous_force_guard_enabled = self._force_guard_enabled
+        self._early_contact_guard_enabled = False
+        self._force_guard_enabled = False
+        try:
+            return self._execute_pose(
+                retreat_name,
+                self._poses[retreat_name],
+                retreat_index,
+            )
+        finally:
+            self._early_contact_guard_enabled = previous_early_guard_enabled
+            self._force_guard_enabled = previous_force_guard_enabled
+
+    def _on_force_guard_metrics(self, message: String) -> None:
+        try:
+            payload = json.loads(message.data)
+        except json.JSONDecodeError as exc:
+            self.get_logger().warning(
+                f"Ignoring malformed force guard metrics JSON: {exc}"
+            )
+            return
+        if not isinstance(payload, dict):
+            return
+
+        force = self._coerce_optional_float(payload.get("max_contact_force"))
+        if force is None:
+            return
+        self._latest_max_contact_force = force
+
+        if (
+            self._force_guard_enabled
+            and self._active_trajectory
+            and not self._force_warning_published
+            and force >= self._force_warning_threshold_n
+        ):
+            self._force_warning_published = True
+            self.get_logger().warning(
+                f"Force guard warning: max_contact_force={force:.3f}N >= "
+                f"{self._force_warning_threshold_n:.3f}N."
+            )
+
+    def _on_early_contact_guard_status(self, message: String) -> None:
+        try:
+            payload = json.loads(message.data)
+        except json.JSONDecodeError as exc:
+            self.get_logger().warning(
+                f"Ignoring malformed early contact guard JSON: {exc}"
+            )
+            return
+        if not isinstance(payload, dict):
+            return
+
+        self._latest_early_contact_force = self._coerce_optional_float(
+            payload.get("max_contact_force")
+        )
+        self._latest_early_contact_source = str(payload.get("source", "unknown"))
+        self._latest_early_contact_count = self._coerce_int(
+            payload.get("contact_count"), default=0
+        )
+        self._latest_physical_contact_observed = bool(
+            payload.get("physical_contact_observed", False)
+        )
+
+    def _force_guard_should_trigger(self) -> bool:
+        return (
+            self._force_guard_enabled
+            and self._active_trajectory
+            and not self._force_guard_triggered
+            and self._latest_max_contact_force is not None
+            and self._latest_max_contact_force >= self._force_violation_threshold_n
+        )
+
+    def _early_contact_guard_should_trigger(self) -> bool:
+        if (
+            not self._early_contact_guard_enabled
+            or not self._active_trajectory
+            or self._early_contact_guard_triggered
+        ):
+            return False
+        if self._stop_on_first_contact and self._latest_physical_contact_observed:
+            return True
+        return (
+            self._latest_early_contact_force is not None
+            and self._latest_early_contact_force
+            >= self._early_contact_force_threshold_n
+        )
+
+    def _guard_triggered(self) -> bool:
+        return self._force_guard_triggered or self._early_contact_guard_triggered
 
     def _build_goal(self, pose: dict[str, Any]) -> FollowJointTrajectory.Goal:
         goal_msg = FollowJointTrajectory.Goal()
@@ -406,6 +820,11 @@ class TaskTrajectoryExecutor(Node):
         self.get_logger().info(f"trial_status={status}")
         rclpy.spin_once(self, timeout_sec=0.05)
 
+    def _publish_terminal_state(self, status: str, phase: str) -> None:
+        terminal_status = status if status in self.TERMINAL_STATUSES else "failed"
+        self._publish_phase(f"{terminal_status}:{phase}")
+        self._publish_trial_status(terminal_status)
+
     def _publish_event(
         self,
         event_type: str,
@@ -414,6 +833,7 @@ class TaskTrajectoryExecutor(Node):
         pose_index: int,
         safety_tag: str,
         message: str,
+        extra_fields: dict[str, Any] | None = None,
     ) -> None:
         payload = {
             "timestamp_ros_sec": self._now_sec(),
@@ -424,6 +844,8 @@ class TaskTrajectoryExecutor(Node):
             "safety_tag": safety_tag,
             "message": message,
         }
+        if extra_fields:
+            payload.update(extra_fields)
         ros_message = String()
         ros_message.data = json.dumps(payload, sort_keys=True)
         self._event_publisher.publish(ros_message)
@@ -577,6 +999,22 @@ class TaskTrajectoryExecutor(Node):
                 "GOAL_TOLERANCE_VIOLATED",
         }
         return names.get(error_code, "UNKNOWN_ERROR")
+
+    @staticmethod
+    def _coerce_optional_float(value: Any) -> float | None:
+        if value is None:
+            return None
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
+
+    @staticmethod
+    def _coerce_int(value: Any, default: int) -> int:
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return default
 
 
 def main(args: list[str] | None = None) -> None:

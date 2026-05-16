@@ -21,6 +21,13 @@ FORCE_EXTRACTION_METHOD = "ros_gz_interfaces Contacts.wrenches force magnitude"
 class BaselineTrialManager(Node):
     """Record reproducible metadata, task events, safety events, and summaries."""
 
+    TERMINAL_STATUSES = {
+        "completed",
+        "failed",
+        "guarded_stop",
+        "guarded_contact_stop",
+    }
+
     JOINT_NAMES = (
         "joint_1",
         "joint_2",
@@ -41,6 +48,7 @@ class BaselineTrialManager(Node):
         self.declare_parameter("safety_status_topic", "/safety_status")
         self.declare_parameter("contact_event_topic", "/contact_event")
         self.declare_parameter("insertion_metrics_topic", "/insertion_metrics")
+        self.declare_parameter("force_guard_status_topic", "/force_guard_status")
         self.declare_parameter("trial_mode", "baseline_task")
 
         results_root_parameter = (
@@ -68,6 +76,11 @@ class BaselineTrialManager(Node):
         self._insertion_metrics_topic = (
             self.get_parameter("insertion_metrics_topic").get_parameter_value().string_value
         )
+        self._force_guard_status_topic = (
+            self.get_parameter("force_guard_status_topic")
+            .get_parameter_value()
+            .string_value
+        )
         self._trial_mode = self._normalize_trial_mode(
             self.get_parameter("trial_mode").get_parameter_value().string_value
         )
@@ -92,6 +105,14 @@ class BaselineTrialManager(Node):
         self._max_contact_force: float | None = None
         self._force_threshold_warning = False
         self._force_threshold_violation = False
+        self._force_guard_triggered = False
+        self._force_guard_trigger_force: float | None = None
+        self._force_guard_threshold: float | None = None
+        self._early_contact_guard_triggered = False
+        self._early_contact_guard_trigger_force: float | None = None
+        self._early_contact_guard_source: str | None = None
+        self._guarded_contact_stop = False
+        self._force_violation_threshold_n: float | None = 100.0
         self._force_extraction_available = False
         self._force_extraction_method = FORCE_EXTRACTION_METHOD
         self._insertion_attempted = False
@@ -107,6 +128,7 @@ class BaselineTrialManager(Node):
         self._positive_contact_counts: dict[str, int] = {}
         self._contact_notes = "No contact metrics have been received yet."
         self._closed = False
+        self._terminal_status_observed = False
 
         self._metadata_path = self._trial_dir / "trial_metadata.json"
         self._summary_path = self._trial_dir / "trial_summary.json"
@@ -165,6 +187,12 @@ class BaselineTrialManager(Node):
             self._on_insertion_metrics,
             100,
         )
+        self.create_subscription(
+            String,
+            self._force_guard_status_topic,
+            self._on_force_guard_status,
+            100,
+        )
         self.create_timer(2.0, self._flush_logs)
 
         self.get_logger().info(f"Started baseline trial logging: {self._trial_dir}")
@@ -173,7 +201,8 @@ class BaselineTrialManager(Node):
             f"{self._joint_states_topic}, {self._task_phase_topic}, "
             f"{self._task_event_topic}, {self._trial_status_topic}, and "
             f"{self._safety_status_topic}; contact metrics from "
-            f"{self._contact_event_topic} and {self._insertion_metrics_topic}"
+            f"{self._contact_event_topic}, {self._insertion_metrics_topic}, and "
+            f"{self._force_guard_status_topic}"
         )
 
     def _on_joint_state(self, message: JointState) -> None:
@@ -211,6 +240,28 @@ class BaselineTrialManager(Node):
             self._task_completed = True
         elif event_type == "sequence_failed":
             self._trial_failed = True
+        elif event_type == "force_guard_triggered":
+            self._force_guard_triggered = True
+            self._trial_failed = True
+            trigger_force = self._coerce_optional_float(
+                event.get("force_guard_trigger_force")
+            )
+            threshold = self._coerce_optional_float(event.get("force_guard_threshold"))
+            if trigger_force is not None:
+                self._force_guard_trigger_force = trigger_force
+            if threshold is not None:
+                self._force_guard_threshold = threshold
+        elif event_type == "early_contact_guard_triggered":
+            self._early_contact_guard_triggered = True
+            self._guarded_contact_stop = True
+            trigger_force = self._coerce_optional_float(
+                event.get("early_contact_guard_trigger_force")
+            )
+            source = str(event.get("early_contact_guard_source", "")).strip()
+            if trigger_force is not None:
+                self._early_contact_guard_trigger_force = trigger_force
+            if source:
+                self._early_contact_guard_source = source
 
         self._task_events_writer.writerow(
             [
@@ -231,9 +282,17 @@ class BaselineTrialManager(Node):
         self._final_trial_status = status
         if status == "completed":
             self._task_completed = True
-        elif status == "failed":
+        elif status == "guarded_contact_stop":
+            self._guarded_contact_stop = True
+        elif status in {"failed", "guarded_stop"}:
             self._trial_failed = True
         self._write_summary()
+        if status in self.TERMINAL_STATUSES:
+            self._terminal_status_observed = True
+            self._flush_logs()
+            self.get_logger().info(
+                f"Observed terminal trial status '{status}'; final summary flushed."
+            )
 
     def _on_safety_status(self, message: String) -> None:
         event = self._parse_json_message(message.data, "safety_status")
@@ -387,7 +446,45 @@ class BaselineTrialManager(Node):
         self._force_threshold_violation = self._force_threshold_violation or bool(
             metrics.get("force_threshold_violation", False)
         )
+        violation_threshold = self._coerce_optional_float(
+            metrics.get("robot_validation_violation_force_n")
+        )
+        if violation_threshold is not None:
+            self._force_violation_threshold_n = violation_threshold
         self._contact_notes = str(metrics.get("notes", self._contact_notes))
+        self._write_summary()
+
+    def _on_force_guard_status(self, message: String) -> None:
+        status = self._parse_json_message(message.data, "force_guard_status")
+        source = str(status.get("source", "")).strip()
+        contact_count = self._coerce_int(status.get("contact_count"), default=0)
+        max_contact_force = self._coerce_optional_float(
+            status.get("max_contact_force")
+        )
+
+        if source:
+            self._contact_topics_seen.add(source)
+            self._contact_topics_connected.add(source)
+        self._contact_messages_observed = True
+        if contact_count > 0 and self._counts_as_physical_contact(source):
+            self._physical_contact_observed = True
+        if max_contact_force is not None:
+            self._force_extraction_available = True
+            self._max_contact_force = (
+                max_contact_force
+                if self._max_contact_force is None
+                else max(self._max_contact_force, max_contact_force)
+            )
+        self._force_extraction_available = self._force_extraction_available or bool(
+            status.get("force_extraction_available", False)
+        )
+        self._force_threshold_warning = self._force_threshold_warning or bool(
+            status.get("force_threshold_warning", False)
+        )
+        self._force_threshold_violation = self._force_threshold_violation or bool(
+            status.get("force_threshold_violation", False)
+        )
+        self._contact_metrics_available = True
         self._write_summary()
 
     def close(self) -> None:
@@ -432,7 +529,7 @@ class BaselineTrialManager(Node):
                 "none" if is_contact_probe_validation else "joint_trajectory_controller"
             ),
             "framework_version": (
-                "v0.7" if is_robot_contact_validation else "v0.5"
+                "v0.9" if is_robot_contact_validation else "v0.5"
             ),
             "trial_mode": self._trial_mode,
             "notes": (
@@ -454,6 +551,7 @@ class BaselineTrialManager(Node):
                 "safety_status": self._safety_status_topic,
                 "contact_event": self._contact_event_topic,
                 "insertion_metrics": self._insertion_metrics_topic,
+                "force_guard_status": self._force_guard_status_topic,
             },
         }
 
@@ -483,6 +581,15 @@ class BaselineTrialManager(Node):
             "max_contact_force": self._max_contact_force,
             "force_threshold_warning": self._force_threshold_warning,
             "force_threshold_violation": self._force_threshold_violation,
+            "force_guard_triggered": self._force_guard_triggered,
+            "force_guard_trigger_force": self._force_guard_trigger_force,
+            "force_guard_threshold": self._force_guard_threshold,
+            "early_contact_guard_triggered": self._early_contact_guard_triggered,
+            "early_contact_guard_trigger_force": (
+                self._early_contact_guard_trigger_force
+            ),
+            "early_contact_guard_source": self._early_contact_guard_source,
+            "guarded_contact_stop": self._guarded_contact_stop,
             "force_extraction_available": self._force_extraction_available,
             "force_extraction_method": self._force_extraction_method,
             "insertion_attempted": self._insertion_attempted,
@@ -587,6 +694,17 @@ class BaselineTrialManager(Node):
                     "High contact force exceeded the configured simulation "
                     "violation threshold; robot_contact_validation_success is false."
                 )
+            if self._force_guard_triggered:
+                notes.append(
+                    "Force guard triggered and canceled the active robot trajectory; "
+                    "robot_contact_validation_success requires the lower-latency "
+                    "early contact guard for v0.9 validation."
+                )
+            if self._early_contact_guard_triggered or self._guarded_contact_stop:
+                notes.append(
+                    "Early contact guard stopped the approach as the intended v0.9 "
+                    "low-force response."
+                )
             elif self._force_threshold_warning:
                 notes.append(
                     "Contact force exceeded the configured simulation warning "
@@ -620,16 +738,29 @@ class BaselineTrialManager(Node):
             if self._safety_status_observed:
                 return True
             return None
+        if self._final_trial_status == "guarded_contact_stop":
+            return (
+                self._safety_violations_count == 0
+                and not self._force_threshold_violation
+            )
         return self._task_completed and self._safety_violations_count == 0
 
     def _robot_contact_validation_success(self) -> bool | None:
         if self._trial_mode != "robot_contact_validation":
             return None
+        below_force_limit = (
+            self._max_contact_force is not None
+            and self._force_violation_threshold_n is not None
+            and self._max_contact_force < self._force_violation_threshold_n
+        )
         return (
-            self._task_completed
-            and self._physical_contact_observed
+            self._physical_contact_observed
             and self._force_extraction_available
-            and not self._force_threshold_violation
+            and (
+                self._early_contact_guard_triggered
+                or self._final_trial_status == "guarded_contact_stop"
+            )
+            and below_force_limit
             and self._safety_violations_count == 0
         )
 

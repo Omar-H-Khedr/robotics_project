@@ -17,6 +17,13 @@ from std_msgs.msg import String
 class SafetyMonitor(Node):
     """Publish safety status from joint-state validity, soft limits, and timing."""
 
+    TERMINAL_TRIAL_STATUSES = {
+        "completed",
+        "failed",
+        "guarded_stop",
+        "guarded_contact_stop",
+    }
+
     JOINT_NAMES = (
         "joint_1",
         "joint_2",
@@ -68,6 +75,8 @@ class SafetyMonitor(Node):
         self._last_phase_time = None
         self._current_phase = "uninitialized"
         self._trial_status = "idle"
+        self._terminal_trial_status: str | None = None
+        self._terminal_status_published = False
         self._last_log_status = ""
         self._last_publish_by_key: dict[tuple[str, str, str], rclpy.time.Time] = {}
 
@@ -105,6 +114,8 @@ class SafetyMonitor(Node):
 
     def _on_joint_state(self, message: JointState) -> None:
         self._last_joint_state_time = self.get_clock().now()
+        if self._terminal_trial_status is not None:
+            return
         if not self._safety_enabled:
             self._publish_status(
                 "OK",
@@ -178,20 +189,15 @@ class SafetyMonitor(Node):
     def _on_trial_status(self, message: String) -> None:
         status = message.data.strip() or "empty_status"
         self._trial_status = status
-        if status == "completed":
-            self._publish_status(
-                "OK",
-                "trial_completed",
-                "trial status reported completed",
-            )
-        elif status == "failed":
-            self._publish_status(
-                "VIOLATION",
-                "trial_failed",
-                "trial status reported failed",
-            )
+        if status in self.TERMINAL_TRIAL_STATUSES:
+            self._terminal_trial_status = status
+            self._publish_terminal_status(status)
 
     def _publish_monitor_status(self) -> None:
+        if self._terminal_trial_status is not None:
+            self._publish_terminal_status(self._terminal_trial_status)
+            return
+
         if not self._safety_enabled:
             self._publish_status(
                 "OK",
@@ -239,6 +245,18 @@ class SafetyMonitor(Node):
                 "phase timeout policy is monitor-only in v0.2",
                 throttle=True,
             )
+
+    def _publish_terminal_status(self, status: str) -> None:
+        if self._terminal_status_published:
+            return
+
+        level = "OK" if status in {"completed", "guarded_contact_stop"} else "WARNING"
+        self._publish_status(
+            level,
+            "trial_terminal",
+            f"trial reached terminal status {status}",
+        )
+        self._terminal_status_published = True
 
     def _publish_status(
         self,

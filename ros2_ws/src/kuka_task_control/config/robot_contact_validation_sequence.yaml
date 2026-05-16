@@ -1,22 +1,25 @@
 metadata:
-  experiment_name: research_baseline_v0_7_controlled_robot_contact_validation_sequence
-  description: Controlled low-force joint-space sequence for robot-to-object contact validation.
+  experiment_name: research_baseline_v0_9_early_contact_guard_validation_sequence
+  description: Early-contact-guarded low-force joint-space sequence for robot-to-object contact validation.
   controller_action_name: /joint_trajectory_controller/follow_joint_trajectory
   task_phase_topic: /task_phase
   notes: >
-    The contact approach pose is intentionally conservative and very slow. The
-    dedicated robot_contact_validation_pad in the separate validation world is
-    tuned near the current robot_contact_hold gripper envelope with minimal
-    expected penetration so this sequence can produce a real robot_validation
-    contact event without disturbing the baseline task scene. If the robot model
-    or gripper geometry changes, retune the pad from Gazebo observation before
-    changing baseline task poses.
+    The contact approach is intentionally conservative, staged, shallow, and
+    early-contact guarded. The dedicated robot_contact_validation_pad in the
+    separate validation world is tuned near the current gripper envelope with
+    minimal expected penetration so this sequence can produce a real
+    robot_validation contact event without disturbing the baseline task scene.
+    The launch enables an event-driven contact guard that cancels the active
+    trajectory on first detected physical contact, with the v0.8 force guard kept
+    as a high-force fallback.
 
 sequence:
   - safe_home
   - observe_scene
   - robot_contact_pre_approach
+  - robot_contact_mid_approach
   - robot_contact_near_pad
+  - robot_contact_final_approach
   - robot_contact_touch_candidate
   - robot_contact_hold
   - robot_contact_retreat
@@ -36,32 +39,44 @@ poses:
     safety_tag: observation_clearance
 
   robot_contact_pre_approach:
-    positions: [0.36, -1.04, 1.28, 0.0, 0.52, 0.0]
-    duration_sec: 8.0
-    description: Slow staged posture outside the dedicated robot validation target.
+    positions: [0.32, -0.99, 1.25, 0.0, 0.57, 0.0]
+    duration_sec: 10.0
+    description: Slow staged posture well outside the dedicated robot validation target.
+    safety_tag: robot_validation_approach_region
+
+  robot_contact_mid_approach:
+    positions: [0.37, -1.08, 1.32, 0.0, 0.47, 0.0]
+    duration_sec: 11.0
+    description: Intermediate approach step toward the dedicated validation pad.
     safety_tag: robot_validation_approach_region
 
   robot_contact_near_pad:
-    positions: [0.43, -1.20, 1.42, 0.0, 0.34, 0.0]
-    duration_sec: 10.0
-    description: Very slow near-pad approach that remains conservative before the contact candidate pose.
+    positions: [0.405, -1.15, 1.375, 0.0, 0.39, 0.0]
+    duration_sec: 12.0
+    description: Very slow near-pad approach that remains clear before the final candidate poses.
+    safety_tag: robot_validation_near_pad_region
+
+  robot_contact_final_approach:
+    positions: [0.428, -1.205, 1.425, 0.0, 0.315, 0.0]
+    duration_sec: 12.0
+    description: Final shallow approach just outside the expected contact envelope.
     safety_tag: robot_validation_near_pad_region
 
   robot_contact_touch_candidate:
-    positions: [0.465, -1.29, 1.50, 0.0, 0.22, 0.0]
+    positions: [0.438, -1.230, 1.442, 0.0, 0.285, 0.0]
     duration_sec: 12.0
-    description: Low-aggression touch candidate with reduced depth into the validation pad envelope.
+    description: Barely-touching low-aggression candidate at the edge of the validation pad envelope.
     safety_tag: robot_validation_contact_region
 
   robot_contact_hold:
-    positions: [0.465, -1.29, 1.50, 0.0, 0.22, 0.0]
-    duration_sec: 2.0
-    description: Brief hold at the low-force candidate pose to allow robot_validation contact messages to be recorded.
+    positions: [0.438, -1.230, 1.442, 0.0, 0.285, 0.0]
+    duration_sec: 1.0
+    description: Very brief hold at the shallow candidate pose to allow robot_validation contact messages to be recorded.
     safety_tag: robot_validation_contact_hold
 
   robot_contact_retreat:
-    positions: [0.30, -1.06, 1.30, 0.0, 0.50, 0.0]
-    duration_sec: 8.0
+    positions: [0.22, -0.94, 1.23, 0.0, 0.62, 0.0]
+    duration_sec: 10.0
     description: Slow retreat from the dedicated validation contact target.
     safety_tag: robot_validation_retreat_clearance
 
