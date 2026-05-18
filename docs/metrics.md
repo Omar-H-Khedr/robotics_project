@@ -16,7 +16,9 @@ Initial definition: the peg tip reaches the configured insertion depth along the
 
 Research Baseline v0.3 status: `insertion_success` remains `null`. Contact observation and task phase progress are not sufficient proof of insertion depth or alignment. `insertion_success_estimate` is a heuristic that can be true only when `insertion_hold_reached` is true, `trial_status` is `completed`, and no explicit failure status was observed.
 
-Research Baseline v2.0/v2.1 status: `insertion_success` remains `null` for peg/hole insertion validation until a validated depth and alignment rule is implemented. v2.0 validated the instrumentation path. v2.1 corrects contact semantics so `insertion_success_estimate` may become true only when the insertion hold phase is reached, an actual peg-hole collision pair is observed, no force threshold violation is present, and the final trial status is `completed` or the accepted guarded-contact stop status.
+Research Baseline v2.0-v2.2 status: `insertion_success` remains `null` for peg/hole insertion validation until a validated depth and alignment rule is implemented. v2.0 validated the instrumentation path. v2.1 corrects contact semantics so `insertion_success_estimate` may become true only when the insertion hold phase is reached, an actual peg-hole collision pair is observed, no force threshold violation is present, and the final trial status is `completed` or the accepted guarded-contact stop status. v2.2 cleans the initial world state so the peg/hole validation scene should start without uninitialized physical contact. v2.2b uses a suspended/static peg to avoid peg-table contact during instrumentation validation; this is not final grasped peg insertion. Later versions will attach the peg to, or otherwise represent it at, the robot/tool side.
+
+Research Baseline v2.4 status: `insertion_success` remains `null`. v2.4 adds explicit object-frame TF publication for coordinate-based diagnostics: Cartesian target poses, insertion axis marker, current tool pose if available from TF, and distances from `tool0` to `hole_center` and `pre_insertion_pose`. These diagnostics are planning prerequisites, not proof of insertion and not robot motion.
 
 ## Collision Events
 
@@ -113,11 +115,14 @@ Research Baseline v0.5 preserves the v0.3 contact fields and adds validated forc
 
 The minimal contact validation world is the validation source for v0.5. A 0.1 kg passive probe should report approximately `0.1 * 9.81 = 0.981 N`, matching the observed Gazebo contact wrench before applying the same extraction path to KUKA insertion experiments.
 
-## Baseline v2.0/v2.1 Peg/Hole Insertion Fields
+## Baseline v2.0-v2.2 Peg/Hole Insertion Fields
 
 Research Baseline v2.0 preserves existing contact and force fields and adds
 peg/hole instrumentation. Research Baseline v2.1 tightens these fields so broad
-peg contact is not treated as insertion contact:
+peg contact is not treated as insertion contact. Research Baseline v2.2 adds
+explicit initial-contact accounting. v2.2b cleans the validation world with a
+suspended/static peg so instrumentation validation starts from zero physical
+contact:
 
 - `peg_contact_observed`: true once any collision pair includes the peg.
 - `hole_contact_observed`: true once any collision pair includes the hole or hole block.
@@ -129,10 +134,41 @@ peg contact is not treated as insertion contact:
 - `first_peg_table_contact_phase`: first task phase where a peg-table collision pair was observed, or `null`.
 - `peg_hole_collision_pairs`: unique collision-pair diagnostics classified as insertion contact.
 - `non_insertion_contact_pairs`: unique collision-pair diagnostics that were not peg-hole insertion contact, including peg-table contact.
+- `initial_contact_detected`: true when physical contact is observed while the task phase is still `uninitialized`.
+- `initial_contact_pairs`: unique collision-pair diagnostics observed during the `uninitialized` phase.
+- `uninitialized_contact_count`: count of collision-pair classifications observed before task execution.
+- `clean_initial_state`: true when no contact was observed during the `uninitialized` phase.
 - `max_peg_contact_force`: maximum extracted force on peg contact topics, or `null`.
 - `max_hole_contact_force`: maximum extracted force on hole contact topics, or `null`.
 - `insertion_depth_available`: false until a validated geometry or TF depth source exists.
 - `insertion_depth_estimate`: null unless `insertion_depth_available=true`.
-- `peg_hole_instrumentation_success`: true for v2.0 when contact topics are connected, `/insertion_metrics` is received, the trial summary is generated, and no safety violations are recorded.
+- `peg_hole_instrumentation_success`: true for peg/hole insertion validation when contact topics are connected, `/insertion_metrics` is received, the trial summary is generated, and no safety violations are recorded.
+- `clean_scene_success`: true for peg/hole insertion validation only when `clean_initial_state=true`, no safety violations are recorded, contact topics are connected, and `/insertion_metrics` is received.
 
-These fields validate instrumentation and logging first. They do not prove final insertion success. Peg-table contact is a non-insertion contact: it can set `peg_contact_observed=true` and `peg_table_contact_observed=true`, but it must leave `peg_hole_contact_observed=false` and `insertion_success_estimate=false`.
+These fields validate instrumentation and logging first. They do not prove final insertion success. Peg-table contact is a non-insertion contact: it can set `peg_contact_observed=true` and `peg_table_contact_observed=true`, but it must leave `peg_hole_contact_observed=false` and `insertion_success_estimate=false`. Contact during `uninitialized` is not insertion contact; a valid insertion-contact trial should not start with `initial_contact_detected=true`.
+
+## Baseline v2.4 Cartesian Diagnostic Fields
+
+The `cartesian_insertion_diagnostics` node publishes JSON on
+`/cartesian_insertion_diagnostics` with:
+
+- `status`: always `diagnostic_only_no_motion`.
+- `current_tool_pose_world`: current `tool0` pose in `world` when TF is available.
+- `current_tool_pose_base`: current `tool0` pose in `base_link` when TF is available.
+- `available_object_frames_world`: resolved object target TF frames.
+- `frame_source`: `tf` or `yaml_fallback` for each object pose target.
+- `hole_center_world`: hole-center Cartesian target from TF or YAML fallback.
+- `pre_insertion_pose_world`: pre-insertion Cartesian target from TF or YAML fallback.
+- `insertion_touch_pose_world`: touch pose target from TF or YAML fallback.
+- `insertion_hold_pose_world`: hold pose target from TF or YAML fallback.
+- `final_insertion_pose_world`: final insertion target from TF or YAML fallback.
+- `insertion_axis_world`: configured insertion-axis direction.
+- `distance_tool_to_hole`: Euclidean distance from current tool pose to hole center when available.
+- `distance_tool_to_pre_insertion`: Euclidean distance from current tool pose to pre-insertion pose when available.
+
+The `peg_hole_frame_publisher` node publishes JSON on `/peg_hole_frame_status`
+with `status=object_frames_published`, `world_frame`, `published_frames`, and
+`target_count`.
+
+These fields are frame-validation diagnostics only. They do not command motion,
+infer insertion depth, or mark task success.
