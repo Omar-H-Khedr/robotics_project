@@ -1,4 +1,4 @@
-# ros2_ws/src
+# Visuomotor Context-Based Meta-RL with Virtual-Force Safety for Peg-in-Hole Assembly
 
 This folder contains ROS 2 packages for the KUKA peg-in-hole thesis framework.
 
