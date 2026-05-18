@@ -1,3 +1,69 @@
+# Visuomotor Context-Based Meta-RL with Virtual-Force Safety for Peg-in-Hole Assembly
+
+This repository documents the technical development of my doctoral research project on safe and adaptable robotic peg-in-hole assembly for smart manufacturing.
+
+## Project Status
+
+The current implementation focuses on a ROS 2 Jazzy and Gazebo-based research framework for:
+
+- KUKA LBR iisy simulation workcell
+- Peg-in-hole task environment
+- Joint-space task execution baseline
+- Safety monitoring layer
+- Experiment logging and trial summaries
+- Gazebo contact sensing and contact-force extraction
+- Robot-generated contact validation with force guard logic
+
+## Current Stable Milestones
+
+| Version | Description | Status |
+|---|---|---|
+| v0.1 | Stable Gazebo KUKA workcell baseline | Completed |
+| v0.2 | Full task sequence with logging and safety monitor | Completed |
+| v0.3 | Contact metrics infrastructure and diagnostics | Completed |
+| v0.4 | Minimal Gazebo contact validation world | Completed |
+| v0.5 | Contact force extraction from Gazebo Contacts messages | Completed |
+| v0.6 | Robot-generated contact validation | Completed |
+| v0.7 | Force-threshold diagnostics | Completed |
+| v0.8/v0.9 | Force-guarded and early-contact guard experiments | In progress |
+| v1.8 | Low-force segmented robot contact validation | Completed |
+| v2.0 | Peg/hole insertion validation instrumentation | In progress |
+| v2.3 | Coordinate-based insertion diagnostics | In progress |
+| v2.4 | Object-frame publisher for insertion targets | In progress |
+
+## Recommended Launch Commands
+
+### Full research baseline trial
+
+```bash
+cd ~/code/robotics_project/ros2_ws
+source /opt/ros/jazzy/setup.bash
+source install/setup.bash
+ros2 launch thesis_bringup run_full_research_trial.launch.py
+```
+
+### Peg/hole insertion validation trial
+
+```bash
+cd ~/code/robotics_project/ros2_ws
+source /opt/ros/jazzy/setup.bash
+source install/setup.bash
+ros2 launch thesis_bringup run_full_peg_hole_insertion_validation_trial.launch.py
+```
+
+### Coordinate-based insertion diagnostics
+
+```bash
+cd ~/code/robotics_project/ros2_ws
+source /opt/ros/jazzy/setup.bash
+source install/setup.bash
+ros2 launch thesis_bringup run_full_cartesian_insertion_diagnostics.launch.py
+```
+
+This diagnostic launch publishes named peg/hole target frames and reports
+Cartesian distances only. It does not start `task_trajectory_executor` and does
+not command robot motion.
+
 # Robotics Project
 
 This repository is being developed as the main PhD robotics project, focused on

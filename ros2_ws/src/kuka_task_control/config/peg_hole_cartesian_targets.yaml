@@ -1,0 +1,38 @@
+world_frame: world
+robot_base_frame: base_link
+tool_frame: tool0
+
+targets:
+  hole_center:
+    frame: world
+    position_xyz: [0.52, -0.20, 0.845]
+    orientation_xyzw: [0.0, 0.0, 0.0, 1.0]
+
+  pre_insertion_pose:
+    frame: world
+    position_xyz: [0.64, -0.12, 0.92]
+    orientation_xyzw: [0.0, 0.0, 0.0, 1.0]
+
+  insertion_axis:
+    frame: world
+    direction_xyz: [0.0, 0.0, -1.0]
+
+  insertion_axis_marker:
+    frame: world
+    position_xyz: [0.52, -0.20, 0.845]
+    orientation_xyzw: [0.0, 0.0, 0.0, 1.0]
+
+  insertion_touch_pose:
+    frame: world
+    position_xyz: [0.52, -0.20, 0.865]
+    orientation_xyzw: [0.0, 0.0, 0.0, 1.0]
+
+  insertion_hold_pose:
+    frame: world
+    position_xyz: [0.52, -0.20, 0.845]
+    orientation_xyzw: [0.0, 0.0, 0.0, 1.0]
+
+  final_insertion_pose:
+    frame: world
+    position_xyz: [0.52, -0.20, 0.825]
+    orientation_xyzw: [0.0, 0.0, 0.0, 1.0]

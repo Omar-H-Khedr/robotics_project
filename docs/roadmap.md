@@ -32,6 +32,8 @@ Baseline v0.5 status: validated contact force extraction is implemented for brid
 
 Baseline v2.0 status: peg/hole-specific insertion validation instrumentation is added in a separate world and launch path. It preserves the v1.8 low-force segmented robot contact validation flow while adding peg and hole contact topics, insertion metrics, a conservative validation sequence, and trial-summary fields. `insertion_success` remains `null` until a validated depth/alignment rule exists.
 
+Baseline v2.4 status: coordinate-based insertion diagnostics now publish explicit object frames before planning. Cartesian target definitions live in `kuka_task_control/config/peg_hole_cartesian_targets.yaml`; `peg_hole_frame_publisher` publishes named `world` TF frames for the hole, pre-insertion, touch, hold, final insertion, and insertion-axis marker targets; and `cartesian_insertion_diagnostics` resolves targets from TF first with YAML fallback. No trajectories are sent. IK and MoveIt-based motion generation remain future work after frame validation.
+
 ## Phase 4: Experiment Manager and Reproducible Trials
 
 - Define trial manifests, parameter sweeps, seeds, and metadata.
@@ -76,3 +78,5 @@ automatically. The old two-terminal workflow remains available for debugging.
 Near-term follow-up after v0.5: define a defensible insertion-success rule from peg/hole pose, insertion depth, contact state, or a documented combination of those signals. Until then, `task_completed`, `insertion_hold_reached`, heuristic `insertion_success_estimate`, and true `insertion_success` remain separate metrics.
 
 Near-term follow-up after v2.0: validate a real insertion-depth signal from geometry, TF, or Gazebo state before promoting `insertion_success` from `null` to a binary outcome.
+
+Near-term follow-up after v2.4: connect validated Cartesian target frames to an IK planner, then generate conservative pre-insertion and guarded insertion trajectories from object frames instead of hand-tuned joint values.
