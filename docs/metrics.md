@@ -172,3 +172,38 @@ with `status=object_frames_published`, `world_frame`, `published_frames`, and
 
 These fields are frame-validation diagnostics only. They do not command motion,
 infer insertion depth, or mark task success.
+
+## Baseline v2.5 IK Feasibility Diagnostic Fields
+
+The `ik_feasibility_diagnostics` node publishes JSON on
+`/ik_feasibility_diagnostics` with:
+
+- `status`: always `ik_feasibility_diagnostic_only_no_motion`.
+- `current_joint_names` and `current_joint_positions`: latest `/joint_states`
+  values observed by the diagnostic node.
+- `current_tool_pose_world`: current `tool0` pose in `world` when TF is
+  available.
+- `current_tool_pose_base`: current `tool0` pose in `base_link` when TF is
+  available.
+- `object_frames_used`: target frames evaluated by the diagnostic layer.
+- `targets`: per-target diagnostics for `hole_center`, `pre_insertion_pose`,
+  `insertion_touch_pose`, `insertion_hold_pose`, and `final_insertion_pose`.
+- `target_pose_world` and `target_pose_base`: resolved TF pose for each target.
+- `translational_distance_from_current_tool`: Euclidean distance from current
+  tool pose to each target.
+- `z_offset_from_hole_center`: target z offset relative to `hole_center`.
+- `approximate_workspace_feasible`: conservative radial workspace-envelope
+  result, not a solved IK result.
+- `requires_ik_solver`: always true for Cartesian target execution.
+- `ik_solver_available`: true only when a visible `compute_ik`/MoveIt-style
+  service is detected.
+- `ik_solution_available`: `null` in v2.5 because no IK solver is called.
+- `feasibility_status`: diagnostic status string distinguishing geometric
+  infeasibility, geometric feasibility without a called IK solver, and future
+  IK-solver outcomes.
+- `all_targets_geometrically_feasible`: true only when all evaluated targets are
+  inside the configured approximate workspace envelope.
+- `motion_execution_enabled`: always false.
+
+These fields are planning diagnostics only. They do not prove insertion success,
+do not execute trajectories, and must not be used as contact validation.

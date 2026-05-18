@@ -227,6 +227,10 @@ class ContactMetricsNode(Node):
         self._peg_hole_collision_pair_set: set[str] = set()
         self._non_insertion_contact_pairs: list[str] = []
         self._non_insertion_contact_pair_set: set[str] = set()
+        self._initial_contact_detected = False
+        self._initial_contact_pairs: list[str] = []
+        self._initial_contact_pair_set: set[str] = set()
+        self._uninitialized_contact_count = 0
         self._first_peg_hole_contact_phase: str | None = None
         self._first_peg_table_contact_phase: str | None = None
         self._positive_contact_counts = {name: 0 for name in self._contact_topics}
@@ -407,6 +411,9 @@ class ContactMetricsNode(Node):
             self._positive_contact_counts[source] = (
                 self._positive_contact_counts.get(source, 0) + 1
             )
+            if self._current_phase == "uninitialized" and not collision_pairs:
+                self._initial_contact_detected = True
+                self._uninitialized_contact_count += contact_count
             self._classify_collision_pairs(collision_pairs)
             if self._counts_as_physical_contact(source):
                 self._physical_contact_observed = True
@@ -573,12 +580,28 @@ class ContactMetricsNode(Node):
             table1 = self._is_table_collision(collision1)
             table2 = self._is_table_collision(collision2)
 
+            if self._current_phase == "uninitialized":
+                self._initial_contact_detected = True
+                self._uninitialized_contact_count += 1
+                self._record_unique_pair(
+                    key,
+                    self._initial_contact_pair_set,
+                    self._initial_contact_pairs,
+                )
+
             if peg1 or peg2:
                 self._peg_contact_observed = True
             if hole1 or hole2:
                 self._hole_contact_observed = True
 
             if (peg1 and hole2) or (peg2 and hole1):
+                if self._current_phase == "uninitialized":
+                    self._record_unique_pair(
+                        key,
+                        self._non_insertion_contact_pair_set,
+                        self._non_insertion_contact_pairs,
+                    )
+                    continue
                 self._peg_hole_contact_count += 1
                 self._record_unique_pair(
                     key,
@@ -747,6 +770,11 @@ class ContactMetricsNode(Node):
                 "Peg contact was observed against the table, not the hole; "
                 "insertion contact was not validated."
             )
+        if self._initial_contact_detected:
+            notes.append(
+                "Initial contact was observed during the uninitialized phase; "
+                "clean_initial_state is false."
+            )
         if not self._max_contact_force_available:
             notes.append(
                 "max_contact_force is null because force extraction is "
@@ -806,6 +834,10 @@ class ContactMetricsNode(Node):
             "first_peg_table_contact_phase": self._first_peg_table_contact_phase,
             "peg_hole_collision_pairs": list(self._peg_hole_collision_pairs),
             "non_insertion_contact_pairs": list(self._non_insertion_contact_pairs),
+            "initial_contact_detected": self._initial_contact_detected,
+            "initial_contact_pairs": list(self._initial_contact_pairs),
+            "uninitialized_contact_count": self._uninitialized_contact_count,
+            "clean_initial_state": not self._initial_contact_detected,
             "max_peg_contact_force": self._max_force_for_sources(
                 self._peg_contact_sources()
             ),

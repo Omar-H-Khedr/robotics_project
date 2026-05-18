@@ -24,3 +24,25 @@ tool_frame
 .vscode/
 .idea/
 .DS_Store
+
+# ROS 2 build artifacts
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+
+# Experiment outputs
+ros2_ws/results/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Editor/system files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+*~

@@ -30,6 +30,7 @@ The current implementation focuses on a ROS 2 Jazzy and Gazebo-based research fr
 | v2.0 | Peg/hole insertion validation instrumentation | In progress |
 | v2.3 | Coordinate-based insertion diagnostics | In progress |
 | v2.4 | Object-frame publisher for insertion targets | In progress |
+| v2.5 | IK feasibility diagnostics before motion | In progress |
 
 ## Recommended Launch Commands
 
@@ -61,8 +62,9 @@ ros2 launch thesis_bringup run_full_cartesian_insertion_diagnostics.launch.py
 ```
 
 This diagnostic launch publishes named peg/hole target frames and reports
-Cartesian distances only. It does not start `task_trajectory_executor` and does
-not command robot motion.
+Cartesian distances plus conservative IK feasibility diagnostics. It does not
+start `task_trajectory_executor`, does not send trajectory goals, and does not
+command robot motion.
 
 # Robotics Project
 
