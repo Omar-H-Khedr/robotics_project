@@ -26,6 +26,7 @@ setup(
             "baseline_joint_sequence_executor = kuka_task_control.baseline_joint_sequence_executor:main",
             "task_trajectory_executor = kuka_task_control.task_trajectory_executor:main",
             "segmented_guarded_contact_executor = kuka_task_control.segmented_guarded_contact_executor:main",
+            "segmented_contact_executor = kuka_task_control.segmented_contact_executor:main",
         ]
     },
 )
