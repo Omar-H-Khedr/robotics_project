@@ -34,6 +34,8 @@ Baseline v2.0 status: peg/hole-specific insertion validation instrumentation is 
 
 Baseline v2.4 status: coordinate-based insertion diagnostics now publish explicit object frames before planning. Cartesian target definitions live in `kuka_task_control/config/peg_hole_cartesian_targets.yaml`; `peg_hole_frame_publisher` publishes named `world` TF frames for the hole, pre-insertion, touch, hold, final insertion, and insertion-axis marker targets; and `cartesian_insertion_diagnostics` resolves targets from TF first with YAML fallback. No trajectories are sent. IK and MoveIt-based motion generation remain future work after frame validation.
 
+Baseline v2.5 status: IK feasibility diagnostics are added as a diagnostic-only layer before motion. `ik_feasibility_diagnostics` reads the v2.4 TF target frames, `/joint_states`, current `tool0`, and `base_link`, then reports conservative radial workspace feasibility on `/ik_feasibility_diagnostics`. It detects visible MoveIt/IK services but does not call an IK solver, send trajectory goals, or execute robot motion.
+
 ## Phase 4: Experiment Manager and Reproducible Trials
 
 - Define trial manifests, parameter sweeps, seeds, and metadata.
@@ -79,4 +81,4 @@ Near-term follow-up after v0.5: define a defensible insertion-success rule from 
 
 Near-term follow-up after v2.0: validate a real insertion-depth signal from geometry, TF, or Gazebo state before promoting `insertion_success` from `null` to a binary outcome.
 
-Near-term follow-up after v2.4: connect validated Cartesian target frames to an IK planner, then generate conservative pre-insertion and guarded insertion trajectories from object frames instead of hand-tuned joint values.
+Near-term follow-up after v2.5: connect validated Cartesian target frames to an actual IK solver or MoveIt `compute_ik` service, then generate conservative pre-insertion and guarded insertion trajectories from object frames instead of hand-tuned joint values.

@@ -81,8 +81,9 @@ def generate_launch_description():
         [
             LogInfo(
                 msg=(
-                    "Starting Research Baseline v2.4 coordinate-based insertion "
-                    "diagnostics. This launch performs no task trajectory execution."
+                    "Starting Research Baseline v2.5 coordinate-based insertion "
+                    "and IK feasibility diagnostics. This launch performs no task "
+                    "trajectory execution."
                 )
             ),
             LogInfo(msg="Spawning exactly one KUKA robot entity: kuka_lbr_iisy"),
@@ -174,6 +175,29 @@ def generate_launch_description():
                         package="kuka_task_control",
                         executable="cartesian_insertion_diagnostics",
                         name="cartesian_insertion_diagnostics",
+                        output="screen",
+                        parameters=[
+                            {
+                                "config_path": PathJoinSubstitution(
+                                    [
+                                        FindPackageShare("kuka_task_control"),
+                                        "config",
+                                        "peg_hole_cartesian_targets.yaml",
+                                    ]
+                                )
+                            }
+                        ],
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=7.5,
+                actions=[
+                    LogInfo(msg="Starting IK feasibility diagnostics node."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="ik_feasibility_diagnostics",
+                        name="ik_feasibility_diagnostics",
                         output="screen",
                         parameters=[
                             {

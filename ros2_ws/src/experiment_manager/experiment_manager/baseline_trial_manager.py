@@ -133,6 +133,11 @@ class BaselineTrialManager(Node):
         self._peg_hole_collision_pair_set: set[str] = set()
         self._non_insertion_contact_pairs: list[str] = []
         self._non_insertion_contact_pair_set: set[str] = set()
+        self._initial_contact_detected = False
+        self._initial_contact_pairs: list[str] = []
+        self._initial_contact_pair_set: set[str] = set()
+        self._uninitialized_contact_count = 0
+        self._clean_initial_state = True
         self._max_peg_contact_force: float | None = None
         self._max_hole_contact_force: float | None = None
         self._insertion_depth_available = False
@@ -412,6 +417,10 @@ class BaselineTrialManager(Node):
             self._contact_topics_seen.add(source)
             self._contact_topics_connected.add(source)
         self._contact_messages_observed = True
+        if phase == "uninitialized" and contact_count > 0 and not collision_pairs:
+            self._initial_contact_detected = True
+            self._clean_initial_state = False
+            self._uninitialized_contact_count += contact_count
         positive_physical_contact = (
             contact_count > 0 and self._counts_as_physical_contact(source)
         )
@@ -534,6 +543,33 @@ class BaselineTrialManager(Node):
             self._non_insertion_contact_pair_set,
             self._non_insertion_contact_pairs,
         )
+        metrics_initial_contact_detected = bool(
+            metrics.get("initial_contact_detected", False)
+        )
+        self._initial_contact_detected = (
+            self._initial_contact_detected or metrics_initial_contact_detected
+        )
+        if metrics_initial_contact_detected:
+            self._clean_initial_state = False
+        self._merge_unique_pairs(
+            self._coerce_collision_pairs(metrics.get("initial_contact_pairs")),
+            self._initial_contact_pair_set,
+            self._initial_contact_pairs,
+        )
+        self._uninitialized_contact_count = max(
+            self._uninitialized_contact_count,
+            self._coerce_int(
+                metrics.get("uninitialized_contact_count"),
+                default=self._uninitialized_contact_count,
+            ),
+        )
+        metrics_clean_initial_state = self._coerce_optional_bool(
+            metrics.get("clean_initial_state")
+        )
+        if metrics_clean_initial_state is not None:
+            self._clean_initial_state = (
+                self._clean_initial_state and metrics_clean_initial_state
+            )
         if self._first_peg_hole_contact_phase is None:
             self._first_peg_hole_contact_phase = self._coerce_optional_string(
                 metrics.get("first_peg_hole_contact_phase")
@@ -772,6 +808,7 @@ class BaselineTrialManager(Node):
         peg_hole_instrumentation_success = (
             self._peg_hole_instrumentation_success()
         )
+        clean_scene_success = self._clean_scene_success()
         insertion_success_estimate = self._summary_insertion_success_estimate()
         return {
             "trial_id": self._trial_id,
@@ -830,11 +867,16 @@ class BaselineTrialManager(Node):
             "first_peg_table_contact_phase": self._first_peg_table_contact_phase,
             "peg_hole_collision_pairs": list(self._peg_hole_collision_pairs),
             "non_insertion_contact_pairs": list(self._non_insertion_contact_pairs),
+            "initial_contact_detected": self._initial_contact_detected,
+            "initial_contact_pairs": list(self._initial_contact_pairs),
+            "uninitialized_contact_count": self._uninitialized_contact_count,
+            "clean_initial_state": self._clean_initial_state,
             "max_peg_contact_force": self._max_peg_contact_force,
             "max_hole_contact_force": self._max_hole_contact_force,
             "insertion_depth_available": self._insertion_depth_available,
             "insertion_depth_estimate": self._insertion_depth_estimate,
             "peg_hole_instrumentation_success": peg_hole_instrumentation_success,
+            "clean_scene_success": clean_scene_success,
             "contact_topics_configured": self._contact_topics_configured,
             "contact_topics_connected": sorted(self._contact_topics_connected),
             "contact_messages_observed": self._contact_messages_observed,
@@ -996,6 +1038,17 @@ class BaselineTrialManager(Node):
                     "Peg contact was observed against the table, not the hole; "
                     "insertion contact was not validated."
                 )
+            if self._initial_contact_detected:
+                notes.append(
+                    "Initial contact was observed before task execution; insertion "
+                    "validation scene requires further cleanup and clean_scene_success "
+                    "is false."
+                )
+            else:
+                notes.append(
+                    "No initial contact was observed; peg/hole validation scene "
+                    "starts cleanly."
+                )
             if not self._insertion_depth_available:
                 notes.append(
                     "insertion_depth_estimate is null because no validated geometry "
@@ -1087,6 +1140,16 @@ class BaselineTrialManager(Node):
             and self._insertion_metrics_received
             and self._summary_path.exists()
             and self._safety_violations_count == 0
+        )
+
+    def _clean_scene_success(self) -> bool | None:
+        if self._trial_mode != "peg_hole_insertion_validation":
+            return None
+        return (
+            self._clean_initial_state
+            and self._safety_violations_count == 0
+            and bool(self._contact_topics_connected)
+            and self._insertion_metrics_received
         )
 
     def _summary_insertion_success_estimate(self) -> bool | None:
@@ -1255,6 +1318,15 @@ class BaselineTrialManager(Node):
         first_collision2: str | None,
         phase: str,
     ) -> None:
+        if phase == "uninitialized" and collision_pairs:
+            self._initial_contact_detected = True
+            self._clean_initial_state = False
+            self._uninitialized_contact_count += len(collision_pairs)
+            self._merge_unique_pairs(
+                collision_pairs,
+                self._initial_contact_pair_set,
+                self._initial_contact_pairs,
+            )
         for pair in collision_pairs:
             if pair in self._collision_pair_set:
                 continue

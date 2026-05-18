@@ -58,14 +58,18 @@
     </include>
 
     <model name="peg">
-      <static>false</static>
+      <static>true</static>
       <!--
-        Keep the free validation peg clear of the work_table at spawn. The contact
-        classifier still treats any later peg-table contact as non-insertion
-        contact.
+        v2.2b suspended peg: no initial contact expected.
+        Keep the instrumented validation peg clear of the work_table at spawn and
+        during the uninitialized phase. Table top is z=0.75 m; the 110 mm peg is
+        centered at z=1.000 m, leaving 195 mm clearance below the peg. The peg is
+        static only for this instrumentation validation so it cannot fall onto the
+        table before the task starts; collision and contact sensors remain active.
       -->
-      <pose>0.72 -0.05 0.835 0 0 0</pose>
+      <pose>1.05 0.20 1.000 0 0 0</pose>
       <link name="peg_link">
+        <gravity>false</gravity>
         <inertial>
           <mass>0.08</mass>
           <inertia>
@@ -308,6 +312,27 @@
         </visual>
       </link>
     </model>
+
+    <!--
+      v2.3 coordinate diagnostics frames. These are fixed world/object anchors
+      for validating Cartesian insertion targets before any IK or trajectory
+      generation is attempted.
+    -->
+    <frame name="hole_center" attached_to="hole_center_marker">
+      <pose relative_to="hole_center_marker">0 0 0 0 0 0</pose>
+    </frame>
+
+    <frame name="insertion_axis" attached_to="insertion_axis_marker">
+      <pose relative_to="insertion_axis_marker">0 0 0 0 0 0</pose>
+    </frame>
+
+    <frame name="pre_insertion_pose" attached_to="pre_insertion_pose_marker">
+      <pose relative_to="pre_insertion_pose_marker">0 0 0 0 0 0</pose>
+    </frame>
+
+    <frame name="final_insertion_pose" attached_to="final_insertion_pose_marker">
+      <pose relative_to="final_insertion_pose_marker">0 0 0 0 0 0</pose>
+    </frame>
 
     <light name="key_area_light" type="point">
       <pose>0.20 -0.60 1.80 0 0 0</pose>
