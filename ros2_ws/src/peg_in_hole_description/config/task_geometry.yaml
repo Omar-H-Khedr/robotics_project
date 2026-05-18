@@ -1,0 +1,19 @@
+peg_in_hole_geometry:
+  ros__parameters:
+    peg_radius_m: 0.0125
+    peg_length_m: 0.11
+    hole_radius_m: 0.0135
+    radial_clearance_m: 0.001
+    plate_thickness_m: 0.02
+    table_height_m: 0.75
+    nominal_insertion_depth_m: 0.08
+    insertion_axis:
+      frame_id: target_hole_frame
+      vector: [0.0, 0.0, -1.0]
+    target_frame:
+      frame_id: target_hole_frame
+      parent_frame_id: world
+      xyz: [0.52, -0.20, 0.81]
+      rpy: [0.0, 0.0, 0.0]
+    peg_frame: peg_tip
+    hole_frame: hole_center

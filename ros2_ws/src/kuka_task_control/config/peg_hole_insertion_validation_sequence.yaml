@@ -1,0 +1,83 @@
+metadata:
+  experiment_name: research_baseline_v2_0_peg_hole_insertion_validation_sequence
+  description: Conservative peg/hole instrumentation validation sequence.
+  controller_action_name: /joint_trajectory_controller/follow_joint_trajectory
+  task_phase_topic: /task_phase
+  notes: >
+    This sequence is intentionally conservative. It validates v2.0 peg/hole
+    contact instrumentation, insertion metrics, trial logging, and guarded
+    response behavior before any learned or aggressive insertion policy is used.
+    The first version may not physically insert the peg.
+
+sequence:
+  - safe_home
+  - observe_scene
+  - insertion_pre_approach
+  - insertion_axis_align
+  - insertion_approach_segment_01
+  - insertion_approach_segment_02
+  - insertion_touch_candidate
+  - insertion_hold
+  - insertion_retreat
+  - return_home
+
+poses:
+  safe_home:
+    positions: [0.0, -0.8, 1.2, 0.0, 0.8, 0.0]
+    duration_sec: 6.0
+    description: Raised parked configuration used as the insertion validation start.
+    safety_tag: nominal_clearance
+
+  observe_scene:
+    positions: [0.18, -0.92, 1.26, 0.0, 0.66, 0.0]
+    duration_sec: 6.0
+    description: Slow observation posture before peg/hole instrumentation validation.
+    safety_tag: observation_clearance
+
+  insertion_pre_approach:
+    positions: [0.24, -0.98, 1.30, 0.0, 0.58, 0.0]
+    duration_sec: 10.0
+    description: Conservative pre-approach outside the hole-block region.
+    safety_tag: insertion_pre_approach_clearance
+
+  insertion_axis_align:
+    positions: [0.30, -1.03, 1.34, 0.0, 0.52, 0.0]
+    duration_sec: 10.0
+    description: Slow joint-space alignment candidate for the marked insertion axis.
+    safety_tag: insertion_axis_alignment
+
+  insertion_approach_segment_01:
+    positions: [0.34, -1.08, 1.37, 0.0, 0.47, 0.0]
+    duration_sec: 12.0
+    description: First shallow insertion validation approach segment.
+    safety_tag: insertion_approach_region
+
+  insertion_approach_segment_02:
+    positions: [0.37, -1.12, 1.40, 0.0, 0.42, 0.0]
+    duration_sec: 12.0
+    description: Second shallow approach segment for contact instrumentation.
+    safety_tag: insertion_approach_region
+
+  insertion_touch_candidate:
+    positions: [0.39, -1.15, 1.42, 0.0, 0.38, 0.0]
+    duration_sec: 12.0
+    description: Very shallow contact candidate, not a deep insertion command.
+    safety_tag: insertion_touch_candidate
+
+  insertion_hold:
+    positions: [0.39, -1.15, 1.42, 0.0, 0.38, 0.0]
+    duration_sec: 2.0
+    description: Brief hold for peg/hole contact and insertion metrics publication.
+    safety_tag: insertion_hold_logging
+
+  insertion_retreat:
+    positions: [0.24, -0.98, 1.30, 0.0, 0.58, 0.0]
+    duration_sec: 10.0
+    description: Slow retreat from the peg/hole validation region.
+    safety_tag: insertion_retreat_clearance
+
+  return_home:
+    positions: [0.0, -0.8, 1.2, 0.0, 0.8, 0.0]
+    duration_sec: 6.0
+    description: Return to the raised parked home configuration.
+    safety_tag: nominal_clearance

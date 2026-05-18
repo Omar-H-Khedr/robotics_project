@@ -1,0 +1,360 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <world name="peg_in_hole_insertion_validation_world">
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+
+    <plugin name="gz::sim::systems::Physics" filename="ignition-gazebo-physics-system"/>
+    <plugin name="gz::sim::systems::UserCommands" filename="ignition-gazebo-user-commands-system"/>
+    <plugin name="gz::sim::systems::SceneBroadcaster" filename="ignition-gazebo-scene-broadcaster-system"/>
+    <plugin name="gz::sim::systems::Contact" filename="ignition-gazebo-contact-system"/>
+
+    <gravity>0 0 -9.81</gravity>
+    <magnetic_field>6.0e-6 2.3e-5 -4.2e-5</magnetic_field>
+    <atmosphere type="adiabatic"/>
+
+    <scene>
+      <ambient>0.45 0.45 0.45 1</ambient>
+      <background>0.72 0.74 0.76 1</background>
+      <shadows>true</shadows>
+    </scene>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><plane><normal>0 0 1</normal><size>20 20</size></plane></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>20 20</size></plane></geometry>
+          <material>
+            <ambient>0.55 0.57 0.58 1</ambient>
+            <diffuse>0.62 0.64 0.65 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!--
+      v2.0 peg/hole insertion validation world.
+      The KUKA is intentionally not embedded here; thesis_bringup spawns exactly
+      one robot entity at the stable pedestal pose. The peg and hole block are
+      instrumented separately so v2.0 can validate contact logging before any
+      aggressive insertion behavior is introduced.
+    -->
+    <include>
+      <name>work_table</name>
+      <uri>model://work_table</uri>
+      <pose>0.80 0 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>robot_pedestal</name>
+      <uri>model://robot_pedestal</uri>
+      <pose>0.80 -0.75 0.0 0 0 0</pose>
+    </include>
+
+    <model name="peg">
+      <static>true</static>
+      <!--
+        v2.2b suspended peg: no initial contact expected.
+        Keep the instrumented validation peg clear of the work_table at spawn and
+        during the uninitialized phase. Table top is z=0.75 m; the 110 mm peg is
+        centered at z=1.000 m, leaving 195 mm clearance below the peg. The peg is
+        static only for this instrumentation validation so it cannot fall onto the
+        table before the task starts; collision and contact sensors remain active.
+      -->
+      <pose>1.05 0.20 1.000 0 0 0</pose>
+      <link name="peg_link">
+        <gravity>false</gravity>
+        <inertial>
+          <mass>0.08</mass>
+          <inertia>
+            <ixx>8.466667e-05</ixx>
+            <iyy>8.466667e-05</iyy>
+            <izz>9.000000e-06</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="peg_collision">
+          <geometry>
+            <cylinder>
+              <radius>0.015</radius>
+              <length>0.110</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>3000</kp>
+                <kd>40</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode>
+                <mu>0.8</mu>
+                <mu2>0.8</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="peg_visual">
+          <geometry>
+            <cylinder>
+              <radius>0.015</radius>
+              <length>0.110</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.80 0.68 0.20 1</ambient>
+            <diffuse>0.95 0.78 0.24 1</diffuse>
+            <specular>0.35 0.30 0.12 1</specular>
+          </material>
+        </visual>
+        <sensor name="peg_contact_sensor" type="contact">
+          <always_on>true</always_on>
+          <update_rate>100.0</update_rate>
+          <topic>/world/peg_in_hole_insertion_validation_world/model/peg/link/peg_link/sensor/peg_contact_sensor/contact</topic>
+          <contact>
+            <collision>peg_collision</collision>
+          </contact>
+        </sensor>
+        <sensor name="peg_compat_contact_sensor" type="contact">
+          <always_on>true</always_on>
+          <update_rate>100.0</update_rate>
+          <topic>/gazebo/contacts/peg</topic>
+          <contact>
+            <collision>peg_collision</collision>
+          </contact>
+        </sensor>
+      </link>
+    </model>
+
+    <model name="hole_block">
+      <static>true</static>
+      <pose>0.52 -0.20 0.78 0 0 0</pose>
+      <link name="hole_block_link">
+        <collision name="hole_block_front_collision">
+          <pose>0 -0.0525 0 0 0 0</pose>
+          <geometry><box><size>0.140 0.035 0.060</size></box></geometry>
+        </collision>
+        <collision name="hole_block_back_collision">
+          <pose>0 0.0525 0 0 0 0</pose>
+          <geometry><box><size>0.140 0.035 0.060</size></box></geometry>
+        </collision>
+        <collision name="hole_block_left_collision">
+          <pose>-0.0525 0 0 0 0 0</pose>
+          <geometry><box><size>0.035 0.070 0.060</size></box></geometry>
+        </collision>
+        <collision name="hole_block_right_collision">
+          <pose>0.0525 0 0 0 0 0</pose>
+          <geometry><box><size>0.035 0.070 0.060</size></box></geometry>
+        </collision>
+        <visual name="hole_block_front_visual">
+          <pose>0 -0.0525 0 0 0 0</pose>
+          <geometry><box><size>0.140 0.035 0.060</size></box></geometry>
+          <material>
+            <ambient>0.16 0.28 0.35 1</ambient>
+            <diffuse>0.24 0.42 0.50 1</diffuse>
+          </material>
+        </visual>
+        <visual name="hole_block_back_visual">
+          <pose>0 0.0525 0 0 0 0</pose>
+          <geometry><box><size>0.140 0.035 0.060</size></box></geometry>
+          <material>
+            <ambient>0.16 0.28 0.35 1</ambient>
+            <diffuse>0.24 0.42 0.50 1</diffuse>
+          </material>
+        </visual>
+        <visual name="hole_block_left_visual">
+          <pose>-0.0525 0 0 0 0 0</pose>
+          <geometry><box><size>0.035 0.070 0.060</size></box></geometry>
+          <material>
+            <ambient>0.16 0.28 0.35 1</ambient>
+            <diffuse>0.24 0.42 0.50 1</diffuse>
+          </material>
+        </visual>
+        <visual name="hole_block_right_visual">
+          <pose>0.0525 0 0 0 0 0</pose>
+          <geometry><box><size>0.035 0.070 0.060</size></box></geometry>
+          <material>
+            <ambient>0.16 0.28 0.35 1</ambient>
+            <diffuse>0.24 0.42 0.50 1</diffuse>
+          </material>
+        </visual>
+        <sensor name="hole_contact_sensor" type="contact">
+          <always_on>true</always_on>
+          <update_rate>100.0</update_rate>
+          <topic>/world/peg_in_hole_insertion_validation_world/model/hole_block/link/hole_block_link/sensor/hole_contact_sensor/contact</topic>
+          <contact>
+            <collision>hole_block_front_collision</collision>
+            <collision>hole_block_back_collision</collision>
+            <collision>hole_block_left_collision</collision>
+            <collision>hole_block_right_collision</collision>
+          </contact>
+        </sensor>
+        <sensor name="hole_compat_contact_sensor" type="contact">
+          <always_on>true</always_on>
+          <update_rate>100.0</update_rate>
+          <topic>/gazebo/contacts/hole</topic>
+          <contact>
+            <collision>hole_block_front_collision</collision>
+            <collision>hole_block_back_collision</collision>
+            <collision>hole_block_left_collision</collision>
+            <collision>hole_block_right_collision</collision>
+          </contact>
+        </sensor>
+      </link>
+    </model>
+
+    <model name="insertion_target_region">
+      <static>true</static>
+      <pose>0.52 -0.20 0.815 0 0 0</pose>
+      <link name="insertion_target_region_link">
+        <collision name="target_region_collision">
+          <geometry>
+            <cylinder>
+              <radius>0.012</radius>
+              <length>0.006</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="target_region_visual">
+          <geometry>
+            <cylinder>
+              <radius>0.020</radius>
+              <length>0.004</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.10 0.80 0.30 0.45</ambient>
+            <diffuse>0.10 0.95 0.35 0.45</diffuse>
+            <emissive>0.02 0.22 0.08 1</emissive>
+          </material>
+        </visual>
+        <sensor name="target_contact_sensor" type="contact">
+          <always_on>true</always_on>
+          <update_rate>100.0</update_rate>
+          <topic>/gazebo/contacts/target</topic>
+          <contact>
+            <collision>target_region_collision</collision>
+          </contact>
+        </sensor>
+      </link>
+    </model>
+
+    <model name="insertion_axis_marker">
+      <static>true</static>
+      <pose>0.52 -0.20 0.90 0 0 0</pose>
+      <link name="insertion_axis_marker_link">
+        <visual name="insertion_axis_marker_visual">
+          <geometry>
+            <cylinder>
+              <radius>0.004</radius>
+              <length>0.180</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.95 0.95 0.05 1</ambient>
+            <diffuse>1.00 1.00 0.10 1</diffuse>
+            <emissive>0.25 0.25 0.02 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="hole_center_marker">
+      <static>true</static>
+      <pose>0.52 -0.20 0.845 0 0 0</pose>
+      <link name="hole_center_marker_link">
+        <visual name="hole_center_marker_visual">
+          <geometry><sphere><radius>0.018</radius></sphere></geometry>
+          <material>
+            <ambient>0.05 0.65 0.95 1</ambient>
+            <diffuse>0.08 0.85 1.00 1</diffuse>
+            <emissive>0.01 0.18 0.28 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="pre_insertion_pose_marker">
+      <static>true</static>
+      <pose>0.64 -0.12 0.92 0 0 0</pose>
+      <link name="pre_insertion_pose_marker_link">
+        <visual name="pre_insertion_pose_marker_visual">
+          <geometry><sphere><radius>0.022</radius></sphere></geometry>
+          <material>
+            <ambient>0.05 0.25 0.95 1</ambient>
+            <diffuse>0.10 0.40 1.00 1</diffuse>
+            <emissive>0.01 0.08 0.35 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="final_insertion_pose_marker">
+      <static>true</static>
+      <pose>0.52 -0.20 0.835 0 0 0</pose>
+      <link name="final_insertion_pose_marker_link">
+        <visual name="final_insertion_pose_marker_visual">
+          <geometry><sphere><radius>0.018</radius></sphere></geometry>
+          <material>
+            <ambient>0.00 0.90 0.20 1</ambient>
+            <diffuse>0.00 1.00 0.25 1</diffuse>
+            <emissive>0.00 0.35 0.08 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!--
+      v2.3 coordinate diagnostics frames. These are fixed world/object anchors
+      for validating Cartesian insertion targets before any IK or trajectory
+      generation is attempted.
+    -->
+    <frame name="hole_center" attached_to="hole_center_marker">
+      <pose relative_to="hole_center_marker">0 0 0 0 0 0</pose>
+    </frame>
+
+    <frame name="insertion_axis" attached_to="insertion_axis_marker">
+      <pose relative_to="insertion_axis_marker">0 0 0 0 0 0</pose>
+    </frame>
+
+    <frame name="pre_insertion_pose" attached_to="pre_insertion_pose_marker">
+      <pose relative_to="pre_insertion_pose_marker">0 0 0 0 0 0</pose>
+    </frame>
+
+    <frame name="final_insertion_pose" attached_to="final_insertion_pose_marker">
+      <pose relative_to="final_insertion_pose_marker">0 0 0 0 0 0</pose>
+    </frame>
+
+    <light name="key_area_light" type="point">
+      <pose>0.20 -0.60 1.80 0 0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <intensity>1.4</intensity>
+      <diffuse>0.95 0.95 0.90 1</diffuse>
+      <specular>0.35 0.35 0.35 1</specular>
+      <attenuation>
+        <range>5.0</range>
+        <constant>0.6</constant>
+        <linear>0.15</linear>
+        <quadratic>0.02</quadratic>
+      </attenuation>
+    </light>
+
+    <light name="sun" type="directional">
+      <pose>0 0 10 0 0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <intensity>0.8</intensity>
+      <direction>-0.4 0.2 -0.9</direction>
+      <diffuse>0.80 0.82 0.85 1</diffuse>
+      <specular>0.20 0.20 0.20 1</specular>
+    </light>
+  </world>
+</sdf>

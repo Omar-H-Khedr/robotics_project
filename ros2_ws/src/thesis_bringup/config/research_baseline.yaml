@@ -1,0 +1,45 @@
+research_baseline:
+  ros__parameters:
+    experiment_id: research_baseline_v0_1
+    simulator: Gazebo
+    robot_name: KUKA LBR iisy 3 R760
+    controller_action: /joint_trajectory_controller/follow_joint_trajectory
+    task_sequence_config: package://kuka_task_control/config/baseline_task_sequence.yaml
+    safety_config: package://safety_layer/config/safety_limits.yaml
+    logging_enabled: true
+    notes: Baseline v0.1 launches Gazebo, monitor-only safety, and reproducible logging; task execution is started separately.
+    simulation:
+      world_package: peg_in_hole_description
+      world_file: peg_in_hole_world.sdf
+      use_sim_time: true
+    task:
+      name: peg_in_hole
+      table_frame: work_table
+      target_frame: hole_center
+      insertion_axis: z
+    robot:
+      name: kuka_lbr_iisy
+      joints:
+        - joint_1
+        - joint_2
+        - joint_3
+        - joint_4
+        - joint_5
+        - joint_6
+      # Keep robot base placement separate from arm posture. The launch
+      # x/y/z/rpy arguments place the robot in the cell; these joint-space
+      # poses keep the arm clear of the approximately 0.75 m table surface.
+      home_pose: [0.0, -0.8, 1.2, 0.0, 0.8, 0.0]
+      named_poses:
+        home: [0.0, -0.8, 1.2, 0.0, 0.8, 0.0]
+        safe_home: [0.0, -0.8, 1.2, 0.0, 0.8, 0.0]
+        safe_above_table: [0.0, -0.6, 1.0, 0.0, 0.9, 0.0]
+    robot_joint_names:
+      - joint_1
+      - joint_2
+      - joint_3
+      - joint_4
+      - joint_5
+      - joint_6
+    simulator_key: gazebo
+    controller: joint_trajectory_controller

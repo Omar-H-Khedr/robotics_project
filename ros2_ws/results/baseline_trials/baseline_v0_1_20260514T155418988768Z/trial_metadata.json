@@ -1,0 +1,13 @@
+{
+  "controller": "joint_trajectory_controller",
+  "robot": "KUKA LBR iisy 3 R760",
+  "simulator": "Gazebo",
+  "task": "peg-in-hole baseline",
+  "timestamp": "20260514T155418988768Z",
+  "topics": {
+    "joint_states": "/joint_states",
+    "safety_status": "/safety_status",
+    "task_phase": "/task_phase"
+  },
+  "trial_id": "baseline_v0_1_20260514T155418988768Z"
+}

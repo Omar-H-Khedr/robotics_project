@@ -1,0 +1,209 @@
+# Initial Research Metrics
+
+This file defines the initial metrics for KUKA peg-in-hole assembly experiments. Metric definitions should become stricter as the simulator, contact instrumentation, safety layer, and experiment manager mature.
+
+## Task Success
+
+Binary trial-level outcome indicating whether the full assembly task completed within the trial constraints.
+
+Initial definition: the robot completes the planned insertion procedure without timeout, fatal controller error, or unrecoverable safety stop.
+
+## Insertion Success
+
+Binary trial-level outcome indicating whether the peg reached the target insertion depth and final alignment tolerance.
+
+Initial definition: the peg tip reaches the configured insertion depth along the task insertion axis while remaining within the configured lateral and angular tolerance.
+
+Research Baseline v0.3 status: `insertion_success` remains `null`. Contact observation and task phase progress are not sufficient proof of insertion depth or alignment. `insertion_success_estimate` is a heuristic that can be true only when `insertion_hold_reached` is true, `trial_status` is `completed`, and no explicit failure status was observed.
+
+Research Baseline v2.0-v2.2 status: `insertion_success` remains `null` for peg/hole insertion validation until a validated depth and alignment rule is implemented. v2.0 validated the instrumentation path. v2.1 corrects contact semantics so `insertion_success_estimate` may become true only when the insertion hold phase is reached, an actual peg-hole collision pair is observed, no force threshold violation is present, and the final trial status is `completed` or the accepted guarded-contact stop status. v2.2 cleans the initial world state so the peg/hole validation scene should start without uninitialized physical contact. v2.2b uses a suspended/static peg to avoid peg-table contact during instrumentation validation; this is not final grasped peg insertion. Later versions will attach the peg to, or otherwise represent it at, the robot/tool side.
+
+Research Baseline v2.4 status: `insertion_success` remains `null`. v2.4 adds explicit object-frame TF publication for coordinate-based diagnostics: Cartesian target poses, insertion axis marker, current tool pose if available from TF, and distances from `tool0` to `hole_center` and `pre_insertion_pose`. These diagnostics are planning prerequisites, not proof of insertion and not robot motion.
+
+## Collision Events
+
+Count of collision or contact events that are outside the expected peg-hole interaction.
+
+Initial definition: number of unexpected contacts reported during a trial. The exact Gazebo contact topic and filtering rule will be finalized when contact instrumentation is added.
+
+Research Baseline v0.3 status: Gazebo contact sensors are configured for `/gazebo/contacts/peg`, `/gazebo/contacts/hole`, and `/gazebo/contacts/target`. The metrics node publishes `/contact_event` JSON and the experiment manager records `contact_events.csv`. `contact_metrics_available` means contact instrumentation is connected: at least one configured ROS contact topic has a visible ROS publisher. `contact_messages_observed` means at least one ROS `Contacts` message was received. `physical_contact_observed` means at least one received message contained `contact_count > 0`. `contact_events_count` is the number of positive physical contact events. It can remain zero if the scripted trajectory completes without physically touching the peg, hole, or target contact sensors.
+
+Research Baseline v0.5 status: `contact_events_count` is counted only for positive physical contact events where `contact_count > 0`. Continuous contact is rate controlled with start and update events so `/contact_event` does not flood while still recording meaningful positive contact observations.
+
+Zero contact events are expected for the current scripted joint-space sequence unless that sequence physically touches instrumented objects.
+
+## Maximum Contact Force Placeholder
+
+Maximum measured or estimated contact force during a trial.
+
+Initial status: placeholder metric. The value should remain explicitly marked as unavailable until contact wrench estimation or Gazebo contact-force extraction is implemented and validated.
+
+Research Baseline v0.3 status: `max_contact_force` remains `null` by default because force extraction is disabled/unvalidated. The metrics node does not fake force values.
+
+Research Baseline v0.5 status: `max_contact_force` is extracted from `ros_gz_interfaces/msg/Contacts.wrenches` force vectors. For each available `body_1_wrench.force` and `body_2_wrench.force`, the node computes `sqrt(x^2 + y^2 + z^2)` and tracks the maximum across all contacts and wrenches. If no force vector exists in a message, the value remains `null`; no force values are faked. `force_extraction_available` becomes true after a valid force vector is parsed, and `force_extraction_method` is `ros_gz_interfaces Contacts.wrenches force magnitude`.
+
+## Trajectory Execution Time
+
+Elapsed time from accepted trajectory start to trajectory completion, abort, timeout, or safety stop.
+
+Initial definition: wall-clock ROS time between trial command start and terminal trial state.
+
+## Safety Violations
+
+Count and type of safety constraints violated during a trial.
+
+Initial definition: number of safety events reported by `safety_layer`, grouped by constraint category such as joint limit, velocity limit, workspace limit, contact limit, or command validity.
+
+## Repeatability Over N Trials
+
+Consistency of outcomes and trajectories over a fixed number of repeated trials under the same configuration.
+
+Initial definition: report success statistics, execution-time statistics, final pose error statistics, and safety-violation statistics over N repeated trials.
+
+## Safe Success Rate
+
+Fraction of trials that succeed without safety violations.
+
+Initial definition:
+
+```text
+safe_success_rate = successful_trials_without_safety_violations / total_trials
+```
+
+This metric should be reported with the trial count, scene configuration, controller configuration, and safety-layer configuration.
+
+## Baseline v0.1 Logged Fields
+
+Research Baseline v0.1 writes the following trial summary fields:
+
+- `task_success`: placeholder, not inferred yet.
+- `insertion_success`: placeholder, not inferred yet.
+- `collision_events`: placeholder until Gazebo contact filtering is added.
+- `max_contact_force`: placeholder until contact-force extraction is validated.
+- `safety_violations`: counted from `/safety_status` messages whose level is `VIOLATION`.
+- `execution_time_sec`: elapsed logger runtime for the trial process.
+- `safe_success`: placeholder until task success and safety violation semantics are combined.
+
+## Baseline v0.3 Contact Fields
+
+Research Baseline v0.3 preserves the v0.2 summary fields and adds:
+
+- `contact_events_count`: number of non-empty contact observations reported through `/contact_event`.
+- `max_contact_force`: maximum validated contact force, or `null` when unavailable.
+- `insertion_attempted`: true once an insertion phase is observed.
+- `insertion_hold_reached`: true once `insertion_hold` is observed.
+- `insertion_success`: true/false only after a validated rule exists; currently `null`.
+- `insertion_success_estimate`: heuristic based on insertion hold, completed trial status, and absence of explicit failure.
+- `contact_topics_configured`: configured contact source names and ROS topic names.
+- `contact_topics_connected`: configured contact sources whose ROS topics currently have publishers.
+- `contact_messages_observed`: true once at least one ROS `Contacts` message callback is received.
+- `physical_contact_observed`: true once at least one received contact message has `contact_count > 0`.
+- `contact_metrics_available`: true when at least one configured ROS contact topic has a visible publisher.
+- `contact_topics_seen`: contact sources that have produced at least one message.
+- `notes`: explanation of unavailable contact force or success semantics.
+
+`task_completed`, `insertion_hold_reached`, `insertion_success_estimate`, and true `insertion_success` are intentionally separate. A trial can complete the scripted trajectory and reach insertion hold without proving the peg reached a validated insertion depth or alignment tolerance.
+
+## Baseline v0.5 Contact Force Fields
+
+Research Baseline v0.5 preserves the v0.3 contact fields and adds validated force extraction:
+
+- `max_contact_force`: maximum extracted contact force magnitude in newtons, or `null` until a force vector is observed.
+- `force_extraction_available`: true once a valid force vector has been extracted.
+- `force_extraction_method`: extraction method string for reproducibility.
+- `contact_events.csv`: includes `ros_time_sec`, `phase`, `source`, `contact_count`, `max_contact_force`, and `message` for each logged contact event.
+
+The minimal contact validation world is the validation source for v0.5. A 0.1 kg passive probe should report approximately `0.1 * 9.81 = 0.981 N`, matching the observed Gazebo contact wrench before applying the same extraction path to KUKA insertion experiments.
+
+## Baseline v2.0-v2.2 Peg/Hole Insertion Fields
+
+Research Baseline v2.0 preserves existing contact and force fields and adds
+peg/hole instrumentation. Research Baseline v2.1 tightens these fields so broad
+peg contact is not treated as insertion contact. Research Baseline v2.2 adds
+explicit initial-contact accounting. v2.2b cleans the validation world with a
+suspended/static peg so instrumentation validation starts from zero physical
+contact:
+
+- `peg_contact_observed`: true once any collision pair includes the peg.
+- `hole_contact_observed`: true once any collision pair includes the hole or hole block.
+- `peg_table_contact_observed`: true when a peg collision pair includes the work table or table collision.
+- `peg_table_contact_count`: count of observed peg-table collision-pair classifications.
+- `peg_hole_contact_observed`: true only when the same collision pair contains one peg collision and one hole or hole-block collision.
+- `peg_hole_contact_count`: count of observed peg-hole collision-pair classifications.
+- `first_peg_hole_contact_phase`: first task phase where a peg-hole collision pair was observed, or `null`.
+- `first_peg_table_contact_phase`: first task phase where a peg-table collision pair was observed, or `null`.
+- `peg_hole_collision_pairs`: unique collision-pair diagnostics classified as insertion contact.
+- `non_insertion_contact_pairs`: unique collision-pair diagnostics that were not peg-hole insertion contact, including peg-table contact.
+- `initial_contact_detected`: true when physical contact is observed while the task phase is still `uninitialized`.
+- `initial_contact_pairs`: unique collision-pair diagnostics observed during the `uninitialized` phase.
+- `uninitialized_contact_count`: count of collision-pair classifications observed before task execution.
+- `clean_initial_state`: true when no contact was observed during the `uninitialized` phase.
+- `max_peg_contact_force`: maximum extracted force on peg contact topics, or `null`.
+- `max_hole_contact_force`: maximum extracted force on hole contact topics, or `null`.
+- `insertion_depth_available`: false until a validated geometry or TF depth source exists.
+- `insertion_depth_estimate`: null unless `insertion_depth_available=true`.
+- `peg_hole_instrumentation_success`: true for peg/hole insertion validation when contact topics are connected, `/insertion_metrics` is received, the trial summary is generated, and no safety violations are recorded.
+- `clean_scene_success`: true for peg/hole insertion validation only when `clean_initial_state=true`, no safety violations are recorded, contact topics are connected, and `/insertion_metrics` is received.
+
+These fields validate instrumentation and logging first. They do not prove final insertion success. Peg-table contact is a non-insertion contact: it can set `peg_contact_observed=true` and `peg_table_contact_observed=true`, but it must leave `peg_hole_contact_observed=false` and `insertion_success_estimate=false`. Contact during `uninitialized` is not insertion contact; a valid insertion-contact trial should not start with `initial_contact_detected=true`.
+
+## Baseline v2.4 Cartesian Diagnostic Fields
+
+The `cartesian_insertion_diagnostics` node publishes JSON on
+`/cartesian_insertion_diagnostics` with:
+
+- `status`: always `diagnostic_only_no_motion`.
+- `current_tool_pose_world`: current `tool0` pose in `world` when TF is available.
+- `current_tool_pose_base`: current `tool0` pose in `base_link` when TF is available.
+- `available_object_frames_world`: resolved object target TF frames.
+- `frame_source`: `tf` or `yaml_fallback` for each object pose target.
+- `hole_center_world`: hole-center Cartesian target from TF or YAML fallback.
+- `pre_insertion_pose_world`: pre-insertion Cartesian target from TF or YAML fallback.
+- `insertion_touch_pose_world`: touch pose target from TF or YAML fallback.
+- `insertion_hold_pose_world`: hold pose target from TF or YAML fallback.
+- `final_insertion_pose_world`: final insertion target from TF or YAML fallback.
+- `insertion_axis_world`: configured insertion-axis direction.
+- `distance_tool_to_hole`: Euclidean distance from current tool pose to hole center when available.
+- `distance_tool_to_pre_insertion`: Euclidean distance from current tool pose to pre-insertion pose when available.
+
+The `peg_hole_frame_publisher` node publishes JSON on `/peg_hole_frame_status`
+with `status=object_frames_published`, `world_frame`, `published_frames`, and
+`target_count`.
+
+These fields are frame-validation diagnostics only. They do not command motion,
+infer insertion depth, or mark task success.
+
+## Baseline v2.5 IK Feasibility Diagnostic Fields
+
+The `ik_feasibility_diagnostics` node publishes JSON on
+`/ik_feasibility_diagnostics` with:
+
+- `status`: always `ik_feasibility_diagnostic_only_no_motion`.
+- `current_joint_names` and `current_joint_positions`: latest `/joint_states`
+  values observed by the diagnostic node.
+- `current_tool_pose_world`: current `tool0` pose in `world` when TF is
+  available.
+- `current_tool_pose_base`: current `tool0` pose in `base_link` when TF is
+  available.
+- `object_frames_used`: target frames evaluated by the diagnostic layer.
+- `targets`: per-target diagnostics for `hole_center`, `pre_insertion_pose`,
+  `insertion_touch_pose`, `insertion_hold_pose`, and `final_insertion_pose`.
+- `target_pose_world` and `target_pose_base`: resolved TF pose for each target.
+- `translational_distance_from_current_tool`: Euclidean distance from current
+  tool pose to each target.
+- `z_offset_from_hole_center`: target z offset relative to `hole_center`.
+- `approximate_workspace_feasible`: conservative radial workspace-envelope
+  result, not a solved IK result.
+- `requires_ik_solver`: always true for Cartesian target execution.
+- `ik_solver_available`: true only when a visible `compute_ik`/MoveIt-style
+  service is detected.
+- `ik_solution_available`: `null` in v2.5 because no IK solver is called.
+- `feasibility_status`: diagnostic status string distinguishing geometric
+  infeasibility, geometric feasibility without a called IK solver, and future
+  IK-solver outcomes.
+- `all_targets_geometrically_feasible`: true only when all evaluated targets are
+  inside the configured approximate workspace envelope.
+- `motion_execution_enabled`: always false.
+
+These fields are planning diagnostics only. They do not prove insertion success,
+do not execute trajectories, and must not be used as contact validation.

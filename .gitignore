@@ -1,24 +1,48 @@
-# ROS 2 / colcon generated folders
+# ROS 2 build artifacts
 ros2_ws/build/
 ros2_ws/install/
 ros2_ws/log/
+
+# Experiment outputs
+ros2_ws/results/
 
 # Python cache
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-*.egg-info/
 
-# Virtual environments
-.venv/
-venv/
+# Temporary/editor files
+*.swp
+*.swo
+*~
+README.md.save*
+0.
+tool_frame
 
-# OS / editor files
+# OS/editor folders
 .vscode/
+.idea/
 .DS_Store
-Thumbs.db
 
-# Secrets
-.env
-*.key
+# ROS 2 build artifacts
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+
+# Experiment outputs
+ros2_ws/results/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Editor/system files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+*~

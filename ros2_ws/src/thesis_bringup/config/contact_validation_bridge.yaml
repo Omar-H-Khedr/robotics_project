@@ -1,0 +1,29 @@
+- ros_topic_name: /clock
+  gz_topic_name: /clock
+  ros_type_name: rosgraph_msgs/msg/Clock
+  gz_type_name: gz.msgs.Clock
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /gazebo/contacts/validation
+  gz_topic_name: /world/peg_in_hole_contact_validation_world/model/contact_validation_pad/link/contact_validation_pad_link/sensor/contact_validation_sensor/contact
+  ros_type_name: ros_gz_interfaces/msg/Contacts
+  gz_type_name: gz.msgs.Contacts
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /gazebo/contacts/peg
+  gz_topic_name: /world/peg_in_hole_contact_validation_world/model/cylindrical_peg/link/peg_link/sensor/peg_contact_sensor/contact
+  ros_type_name: ros_gz_interfaces/msg/Contacts
+  gz_type_name: gz.msgs.Contacts
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /gazebo/contacts/hole
+  gz_topic_name: /world/peg_in_hole_contact_validation_world/model/hole_fixture/link/fixture_link/sensor/hole_contact_sensor/contact
+  ros_type_name: ros_gz_interfaces/msg/Contacts
+  gz_type_name: gz.msgs.Contacts
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /gazebo/contacts/target
+  gz_topic_name: /world/peg_in_hole_contact_validation_world/model/target_plate/link/plate_link/sensor/target_contact_sensor/contact
+  ros_type_name: ros_gz_interfaces/msg/Contacts
+  gz_type_name: gz.msgs.Contacts
+  direction: GZ_TO_ROS

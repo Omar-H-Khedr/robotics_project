@@ -1,38 +1,28 @@
 # Visuomotor Context-Based Meta-RL with Virtual-Force Safety for Peg-in-Hole Assembly
 
-This repository documents the technical development of my doctoral research project on safe and adaptable robotic peg-in-hole assembly for smart manufacturing.
+This folder contains ROS 2 packages for the KUKA peg-in-hole thesis framework.
 
-## Project Status
+## Research Packages
 
-The current implementation focuses on a ROS 2 Jazzy and Gazebo-based research framework for:
+- `thesis_bringup`: top-level launch and experiment bringup.
+- `peg_in_hole_description`: task scene, geometry, frames, worlds, and assets.
+- `kuka_task_control`: task-level KUKA command interfaces targeting `joint_trajectory_controller`.
+- `safety_layer`: command filtering, safety monitoring, and violation reporting.
+- `experiment_manager`: reproducible trial orchestration, metadata, logging, and result labeling.
+- `perception_pipeline`: future Gazebo RGB-D and task-state estimation pipeline.
+- `learning_interface`: future adaptive control and reinforcement-learning interface.
 
-- KUKA LBR iisy simulation workcell
-- Peg-in-hole task environment
-- Joint-space task execution baseline
-- Safety monitoring layer
-- Experiment logging and trial summaries
-- Gazebo contact sensing and contact-force extraction
-- Robot-generated contact validation with force guard logic
+## External Packages
 
-## Current Stable Milestones
+- `external/kuka_robot_descriptions`: upstream KUKA robot description and Gazebo resources.
 
-| Version | Description | Status |
-|---|---|---|
-| v0.1 | Stable Gazebo KUKA workcell baseline | Completed |
-| v0.2 | Full task sequence with logging and safety monitor | Completed |
-| v0.3 | Contact metrics infrastructure and diagnostics | Completed |
-| v0.4 | Minimal Gazebo contact validation world | Completed |
-| v0.5 | Contact force extraction from Gazebo Contacts messages | Completed |
-| v0.6 | Robot-generated contact validation | Completed |
-| v0.7 | Force-threshold diagnostics | Completed |
-| v0.8/v0.9 | Force-guarded and early-contact guard experiments | In progress |
+## Legacy/Demo Packages
 
-## Recommended Launch Commands
+The existing demo-oriented packages are kept for reference and should not be deleted:
 
-### Full research baseline trial
+- `first_robot_demo`
+- `kuka_description`
+- `robot_description`
+- `robot_simulation`
 
-```bash
-cd ~/code/robotics_project/ros2_ws
-source /opt/ros/jazzy/setup.bash
-source install/setup.bash
-ros2 launch thesis_bringup run_full_research_trial.launch.py
+New thesis development should use the research packages above as the primary architecture.

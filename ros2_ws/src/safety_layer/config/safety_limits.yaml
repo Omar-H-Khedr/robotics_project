@@ -1,0 +1,24 @@
+safety_monitor:
+  ros__parameters:
+    safety_enabled: true
+    joint_state_timeout_sec: 2.0
+    max_phase_duration_sec: 20.0
+    joint_soft_limits:
+      joint_1:
+        min: -2.80
+        max: 2.80
+      joint_2:
+        min: -2.00
+        max: 2.00
+      joint_3:
+        min: -2.70
+        max: 2.70
+      joint_4:
+        min: -2.80
+        max: 2.80
+      joint_5:
+        min: -2.10
+        max: 2.10
+      joint_6:
+        min: -3.00
+        max: 3.00
