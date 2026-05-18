@@ -30,6 +30,8 @@ Baseline v0.3 status: contact sensors and contact metric logging are added as in
 
 Baseline v0.5 status: validated contact force extraction is implemented for bridged `ros_gz_interfaces/msg/Contacts` messages. `max_contact_force` is computed from `Contacts.wrenches` force-vector magnitudes and was validated first in the minimal passive contact world, where a 0.1 kg probe produces approximately 0.981 N under gravity. This remains metrics instrumentation only and does not modify KUKA task control.
 
+Baseline v2.0 status: peg/hole-specific insertion validation instrumentation is added in a separate world and launch path. It preserves the v1.8 low-force segmented robot contact validation flow while adding peg and hole contact topics, insertion metrics, a conservative validation sequence, and trial-summary fields. `insertion_success` remains `null` until a validated depth/alignment rule exists.
+
 ## Phase 4: Experiment Manager and Reproducible Trials
 
 - Define trial manifests, parameter sweeps, seeds, and metadata.
@@ -72,3 +74,5 @@ automatically. The old two-terminal workflow remains available for debugging.
 - Document simulator assumptions and limitations.
 
 Near-term follow-up after v0.5: define a defensible insertion-success rule from peg/hole pose, insertion depth, contact state, or a documented combination of those signals. Until then, `task_completed`, `insertion_hold_reached`, heuristic `insertion_success_estimate`, and true `insertion_success` remain separate metrics.
+
+Near-term follow-up after v2.0: validate a real insertion-depth signal from geometry, TF, or Gazebo state before promoting `insertion_success` from `null` to a binary outcome.

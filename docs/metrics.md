@@ -16,6 +16,8 @@ Initial definition: the peg tip reaches the configured insertion depth along the
 
 Research Baseline v0.3 status: `insertion_success` remains `null`. Contact observation and task phase progress are not sufficient proof of insertion depth or alignment. `insertion_success_estimate` is a heuristic that can be true only when `insertion_hold_reached` is true, `trial_status` is `completed`, and no explicit failure status was observed.
 
+Research Baseline v2.0/v2.1 status: `insertion_success` remains `null` for peg/hole insertion validation until a validated depth and alignment rule is implemented. v2.0 validated the instrumentation path. v2.1 corrects contact semantics so `insertion_success_estimate` may become true only when the insertion hold phase is reached, an actual peg-hole collision pair is observed, no force threshold violation is present, and the final trial status is `completed` or the accepted guarded-contact stop status.
+
 ## Collision Events
 
 Count of collision or contact events that are outside the expected peg-hole interaction.
@@ -110,3 +112,27 @@ Research Baseline v0.5 preserves the v0.3 contact fields and adds validated forc
 - `contact_events.csv`: includes `ros_time_sec`, `phase`, `source`, `contact_count`, `max_contact_force`, and `message` for each logged contact event.
 
 The minimal contact validation world is the validation source for v0.5. A 0.1 kg passive probe should report approximately `0.1 * 9.81 = 0.981 N`, matching the observed Gazebo contact wrench before applying the same extraction path to KUKA insertion experiments.
+
+## Baseline v2.0/v2.1 Peg/Hole Insertion Fields
+
+Research Baseline v2.0 preserves existing contact and force fields and adds
+peg/hole instrumentation. Research Baseline v2.1 tightens these fields so broad
+peg contact is not treated as insertion contact:
+
+- `peg_contact_observed`: true once any collision pair includes the peg.
+- `hole_contact_observed`: true once any collision pair includes the hole or hole block.
+- `peg_table_contact_observed`: true when a peg collision pair includes the work table or table collision.
+- `peg_table_contact_count`: count of observed peg-table collision-pair classifications.
+- `peg_hole_contact_observed`: true only when the same collision pair contains one peg collision and one hole or hole-block collision.
+- `peg_hole_contact_count`: count of observed peg-hole collision-pair classifications.
+- `first_peg_hole_contact_phase`: first task phase where a peg-hole collision pair was observed, or `null`.
+- `first_peg_table_contact_phase`: first task phase where a peg-table collision pair was observed, or `null`.
+- `peg_hole_collision_pairs`: unique collision-pair diagnostics classified as insertion contact.
+- `non_insertion_contact_pairs`: unique collision-pair diagnostics that were not peg-hole insertion contact, including peg-table contact.
+- `max_peg_contact_force`: maximum extracted force on peg contact topics, or `null`.
+- `max_hole_contact_force`: maximum extracted force on hole contact topics, or `null`.
+- `insertion_depth_available`: false until a validated geometry or TF depth source exists.
+- `insertion_depth_estimate`: null unless `insertion_depth_available=true`.
+- `peg_hole_instrumentation_success`: true for v2.0 when contact topics are connected, `/insertion_metrics` is received, the trial summary is generated, and no safety violations are recorded.
+
+These fields validate instrumentation and logging first. They do not prove final insertion success. Peg-table contact is a non-insertion contact: it can set `peg_contact_observed=true` and `peg_table_contact_observed=true`, but it must leave `peg_hole_contact_observed=false` and `insertion_success_estimate=false`.
