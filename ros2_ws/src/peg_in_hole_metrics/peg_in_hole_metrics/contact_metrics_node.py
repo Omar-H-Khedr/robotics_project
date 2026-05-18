@@ -201,6 +201,10 @@ class ContactMetricsNode(Node):
         self._contact_message_type_available = False
         self._contact_messages_observed = False
         self._physical_contact_observed = False
+        self._collision_pairs: list[str] = []
+        self._collision_pair_set: set[str] = set()
+        self._first_collision1: str | None = None
+        self._first_collision2: str | None = None
         self._positive_contact_counts = {name: 0 for name in self._contact_topics}
         self._contact_topic_seen = {name: False for name in self._contact_topics}
         self._previous_in_contact = {name: False for name in self._contact_topics}
@@ -330,6 +334,7 @@ class ContactMetricsNode(Node):
         self._trial_status = message.data.strip() or "empty_status"
         if self._trial_status.lower() in {
             "failed",
+            "failed_pre_contact",
             "aborted",
             "canceled",
             "cancelled",
@@ -342,6 +347,10 @@ class ContactMetricsNode(Node):
     def _on_contacts(self, source: str, message: Any) -> None:
         contacts = self._extract_contacts(message)
         contact_count = len(contacts)
+        collision_pairs = self._extract_collision_pairs(contacts)
+        first_collision1, first_collision2 = (
+            collision_pairs[0] if collision_pairs else (None, None)
+        )
         self._contact_messages_observed = True
         self._contact_topic_seen[source] = True
 
@@ -369,6 +378,7 @@ class ContactMetricsNode(Node):
             )
             if self._counts_as_physical_contact(source):
                 self._physical_contact_observed = True
+                self._record_collision_pairs(collision_pairs)
             self._publish_force_guard_status(source, contact_count, max_force)
             if not self._previous_in_contact.get(source, False):
                 self._previous_in_contact[source] = True
@@ -383,6 +393,9 @@ class ContactMetricsNode(Node):
                             source=source,
                             contact_count=contact_count,
                             max_force=max_force,
+                            collision_pairs=collision_pairs,
+                            first_collision1=first_collision1,
+                            first_collision2=first_collision2,
                             message=self._contact_note(contact_count, max_force),
                         )
                     )
@@ -395,6 +408,9 @@ class ContactMetricsNode(Node):
                             source=source,
                             contact_count=contact_count,
                             max_force=max_force,
+                            collision_pairs=collision_pairs,
+                            first_collision1=first_collision1,
+                            first_collision2=first_collision2,
                             message=self._contact_note(contact_count, max_force),
                         )
                     )
@@ -413,6 +429,9 @@ class ContactMetricsNode(Node):
                         source=source,
                         contact_count=contact_count,
                         max_force=max_force,
+                        collision_pairs=collision_pairs,
+                        first_collision1=first_collision1,
+                        first_collision2=first_collision2,
                         message="Contact ended; no contacts detected.",
                     )
                 )
@@ -425,6 +444,9 @@ class ContactMetricsNode(Node):
                     source=source,
                     contact_count=contact_count,
                     max_force=max_force,
+                    collision_pairs=collision_pairs,
+                    first_collision1=first_collision1,
+                    first_collision2=first_collision2,
                     message="Contact topic message received; no contacts detected.",
                 )
             )
@@ -448,6 +470,9 @@ class ContactMetricsNode(Node):
         source: str,
         contact_count: int,
         max_force: float | None,
+        collision_pairs: list[tuple[str, str]],
+        first_collision1: str | None,
+        first_collision2: str | None,
         message: str,
     ) -> dict[str, Any]:
         return {
@@ -457,11 +482,59 @@ class ContactMetricsNode(Node):
             "source": source,
             "contact_count": contact_count,
             "max_contact_force": max_force,
+            "collision_pairs": self._format_collision_pairs(collision_pairs),
+            "first_collision1": first_collision1,
+            "first_collision2": first_collision2,
             "message": message,
         }
 
     def _extract_contacts(self, message: Any) -> list[Any]:
         return _extract_contacts_from_message(message)
+
+    def _extract_collision_pairs(self, contacts: list[Any]) -> list[tuple[str, str]]:
+        pairs: list[tuple[str, str]] = []
+        seen: set[str] = set()
+        for contact in contacts:
+            collision1 = self._collision_name(contact, "collision1")
+            collision2 = self._collision_name(contact, "collision2")
+            if not collision1 and not collision2:
+                continue
+            key = self._collision_pair_key(collision1, collision2)
+            if key in seen:
+                continue
+            seen.add(key)
+            pairs.append((collision1, collision2))
+        return pairs
+
+    @staticmethod
+    def _collision_name(contact: Any, field_name: str) -> str:
+        collision = getattr(contact, field_name, None)
+        name = getattr(collision, "name", None)
+        if name is None:
+            return ""
+        return str(name)
+
+    @staticmethod
+    def _collision_pair_key(collision1: str, collision2: str) -> str:
+        return f"{collision1}|{collision2}"
+
+    def _record_collision_pairs(self, collision_pairs: list[tuple[str, str]]) -> None:
+        for collision1, collision2 in collision_pairs:
+            key = self._collision_pair_key(collision1, collision2)
+            if key in self._collision_pair_set:
+                continue
+            self._collision_pair_set.add(key)
+            self._collision_pairs.append(key)
+            if self._first_collision1 is None and self._first_collision2 is None:
+                self._first_collision1 = collision1
+                self._first_collision2 = collision2
+
+    @classmethod
+    def _format_collision_pairs(cls, collision_pairs: list[tuple[str, str]]) -> list[str]:
+        return [
+            cls._collision_pair_key(collision1, collision2)
+            for collision1, collision2 in collision_pairs
+        ]
 
     def _should_publish_zero_contact_event(self, source: str) -> bool:
         now_sec = self._now_sec()
@@ -530,6 +603,9 @@ class ContactMetricsNode(Node):
                 contact_count > 0 and self._counts_as_physical_contact(source)
             ),
             "max_contact_force": max_force,
+            "collision_pairs": list(self._collision_pairs),
+            "first_collision1": self._first_collision1,
+            "first_collision2": self._first_collision2,
             "force_extraction_available": max_force is not None,
             "force_threshold_warning": self._force_threshold_warning(max_force),
             "force_threshold_violation": self._force_threshold_violation(max_force),
@@ -596,6 +672,9 @@ class ContactMetricsNode(Node):
             "contact_topics_connected": contact_topics_connected,
             "contact_messages_observed": self._contact_messages_observed,
             "physical_contact_observed": self._physical_contact_observed,
+            "collision_pairs": list(self._collision_pairs),
+            "first_collision1": self._first_collision1,
+            "first_collision2": self._first_collision2,
             "contact_topics_seen": contact_topics_seen,
             "positive_contact_counts": self._positive_contact_counts,
             "contact_events_count": self._contact_events_count,

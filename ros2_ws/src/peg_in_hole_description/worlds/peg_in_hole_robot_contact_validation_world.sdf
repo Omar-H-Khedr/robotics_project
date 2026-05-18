@@ -78,34 +78,18 @@
     <model name="robot_contact_validation_stand">
       <static>true</static>
       <!--
-        Dedicated validation stand near the robot side of the workcell.
-        The stand is outside the table footprint (table y=-0.30..0.30) and
-        outside the pedestal top plate (pedestal x=0.57..1.03, y=-0.98..-0.52).
-        Its top surface is z=0.78 m, close to the tabletop height.
+        Dedicated validation stand near the measured final tool0 endpoint.
+        The KUKA itself is not included in this world; launch spawns exactly one
+        robot at the baseline pose. The stand is visual-only so the robot
+        contact sensor sees only robot_contact_validation_pad_collision.
       -->
-      <pose>1.23 -0.50 0 0 0 0</pose>
+      <pose>1.03 -0.42 0 0 0 0</pose>
       <link name="robot_contact_validation_stand_link">
-        <collision name="robot_contact_validation_stand_collision">
-          <pose>0 0 0.39 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>0.30 0.30 0.78</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>0.9</mu>
-                <mu2>0.9</mu2>
-              </ode>
-            </friction>
-          </surface>
-        </collision>
         <visual name="robot_contact_validation_stand_visual">
-          <pose>0 0 0.39 0 0 0</pose>
+          <pose>0 0 0.48 0 0 0</pose>
           <geometry>
             <box>
-              <size>0.30 0.30 0.78</size>
+              <size>0.10 0.10 0.96</size>
             </box>
           </geometry>
           <material>
@@ -114,36 +98,64 @@
             <specular>0.15 0.15 0.15 1</specular>
           </material>
         </visual>
+        <visual name="robot_contact_validation_stand_mount_visual">
+          <pose>0 0.075 0.98 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.06 0.20 0.06</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.30 0.31 0.32 1</ambient>
+            <diffuse>0.48 0.49 0.50 1</diffuse>
+            <specular>0.12 0.12 0.12 1</specular>
+          </material>
+        </visual>
       </link>
     </model>
 
     <model name="robot_contact_validation_pad">
-      <static>true</static>
+      <static>false</static>
       <!--
-        Validation-only contact target.
+        Validation-only compliant contact bumper for v1.8 low-force endpoint
+        validation.
 
-        The baseline robot spawn is [0.80, -0.75, 0.75] with yaw=1.5708.
-        The pad center is z=0.82 with 0.08 m pad height, placing the pad bottom
-        directly on the validation stand top at z=0.78. The stand/pad center is
-        near the robot for validation approach while remaining clear of the
-        table and pedestal geometry.
+        The measured final tool0 endpoint is approximately
+        world [1.027, -0.267, 1.108]. The measured pre-approach tool0 pose is
+        approximately world [0.963, -0.212, 1.011]. This lightweight dynamic
+        bumper is centered slightly beyond the measured final endpoint and kept
+        clear of the pre-approach pose so the existing segmented approach
+        reaches the target only in the final segments. It can move when touched,
+        reducing peak force compared with the earlier static rigid patch.
 
         Expected Gazebo contact topic:
         /world/peg_in_hole_robot_contact_validation_world/model/robot_contact_validation_pad/link/robot_contact_validation_pad_link/sensor/robot_contact_validation_sensor/contact
       -->
-      <pose>1.23 -0.50 0.82 0 0 0</pose>
+      <pose>1.060 -0.295 1.140 0 0 0</pose>
       <link name="robot_contact_validation_pad_link">
+        <gravity>false</gravity>
+        <inertial>
+          <mass>0.05</mass>
+          <inertia>
+            <ixx>2.083333e-05</ixx>
+            <iyy>1.302083e-05</iyy>
+            <izz>1.302083e-05</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
         <collision name="robot_contact_validation_pad_collision">
           <geometry>
             <box>
-              <size>0.25 0.25 0.08</size>
+              <size>0.025 0.05 0.05</size>
             </box>
           </geometry>
           <surface>
             <contact>
               <ode>
-                <kp>50000</kp>
-                <kd>80</kd>
+                <kp>2500</kp>
+                <kd>35</kd>
               </ode>
             </contact>
             <friction>
@@ -167,18 +179,18 @@
         <visual name="robot_contact_validation_pad_visual">
           <geometry>
             <box>
-              <size>0.25 0.25 0.08</size>
+              <size>0.025 0.05 0.05</size>
             </box>
           </geometry>
           <material>
-            <ambient>0.65 0.05 0.10 1</ambient>
-            <diffuse>0.95 0.10 0.18 1</diffuse>
-            <specular>0.25 0.20 0.20 1</specular>
+            <ambient>0.80 0.18 0.04 1</ambient>
+            <diffuse>1.00 0.32 0.06 1</diffuse>
+            <specular>0.30 0.18 0.12 1</specular>
           </material>
         </visual>
 
         <visual name="robot_contact_validation_pad_center_marker">
-          <pose>0 0 0.065 0 0 0</pose>
+          <pose>-0.017 0 0 0 0 0</pose>
           <geometry>
             <sphere>
               <radius>0.018</radius>
@@ -188,6 +200,53 @@
             <ambient>0.02 0.65 0.85 1</ambient>
             <diffuse>0.05 0.90 1.00 1</diffuse>
             <emissive>0.01 0.20 0.25 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="measured_pre_approach_tool0_marker">
+      <static>true</static>
+      <!--
+        Visual-only marker at the measured robot_contact_pre_approach tool0
+        pose. This model intentionally has no collision and is not a contact
+        object.
+      -->
+      <pose>0.963 -0.212 1.011 0 0 0</pose>
+      <link name="measured_pre_approach_tool0_marker_link">
+        <visual name="measured_pre_approach_tool0_marker_visual">
+          <geometry>
+            <sphere>
+              <radius>0.025</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.02 0.20 1.00 1</ambient>
+            <diffuse>0.05 0.35 1.00 1</diffuse>
+            <emissive>0.01 0.08 0.45 1</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="measured_final_tool0_marker">
+      <static>true</static>
+      <!--
+        Visual-only marker at the measured v1.5 final tool0 endpoint. This
+        model intentionally has no collision and is not a contact object.
+      -->
+      <pose>1.027 -0.267 1.108 0 0 0</pose>
+      <link name="measured_final_tool0_marker_link">
+        <visual name="measured_final_tool0_marker_visual">
+          <geometry>
+            <sphere>
+              <radius>0.025</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.00 1.00 0.10 1</ambient>
+            <diffuse>0.00 1.00 0.10 1</diffuse>
+            <emissive>0.00 0.60 0.06 1</emissive>
           </material>
         </visual>
       </link>

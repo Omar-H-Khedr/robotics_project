@@ -24,6 +24,7 @@ class BaselineTrialManager(Node):
     TERMINAL_STATUSES = {
         "completed",
         "failed",
+        "failed_pre_contact",
         "guarded_stop",
         "guarded_contact_stop",
     }
@@ -125,6 +126,12 @@ class BaselineTrialManager(Node):
         self._contact_topics_connected: set[str] = set()
         self._contact_messages_observed = False
         self._physical_contact_observed = False
+        self._collision_pairs: list[str] = []
+        self._collision_pair_set: set[str] = set()
+        self._first_contact_collision1: str | None = None
+        self._first_contact_collision2: str | None = None
+        self._first_contact_phase: str | None = None
+        self._pre_approach_contact_detected = False
         self._contact_topics_seen: set[str] = set()
         self._positive_contact_counts: dict[str, int] = {}
         self._contact_notes = "No contact metrics have been received yet."
@@ -232,7 +239,12 @@ class BaselineTrialManager(Node):
 
         self._final_task_phase = phase
         self._total_task_events += 1
-        if event_type in {"sequence_started", "phase_started"}:
+        if event_type in {
+            "sequence_started",
+            "phase_started",
+            "segmented_sequence_started",
+            "segment_started",
+        }:
             self._task_started = True
         segment_count = self._coerce_int(
             event.get("segment_count_executed"), default=self._segment_count_executed
@@ -240,13 +252,40 @@ class BaselineTrialManager(Node):
         self._segment_count_executed = max(
             self._segment_count_executed, segment_count
         )
-        if event_type == "phase_succeeded":
+        event_max_force = self._coerce_optional_float(event.get("max_contact_force"))
+        if event_max_force is not None:
+            self._max_contact_force = (
+                event_max_force
+                if self._max_contact_force is None
+                else max(self._max_contact_force, event_max_force)
+            )
+        self._physical_contact_observed = self._physical_contact_observed or bool(
+            event.get("physical_contact_observed", False)
+        )
+        if (
+            event.get("physical_contact_observed", False)
+            or event_type == "unexpected_pre_approach_contact"
+        ):
+            self._record_contact_diagnostics(
+                self._coerce_collision_pairs(event.get("collision_pairs")),
+                self._coerce_optional_string(event.get("first_collision1")),
+                self._coerce_optional_string(event.get("first_collision2")),
+                phase,
+            )
+        self._force_threshold_violation = self._force_threshold_violation or bool(
+            event.get("force_threshold_violation", False)
+        )
+        if event_type in {"phase_succeeded", "segment_succeeded"}:
             self._completed_phases_count += 1
-        elif event_type == "sequence_completed":
+        elif event_type in {"sequence_completed", "segmented_sequence_completed"}:
             self._task_started = True
             self._task_completed = True
-        elif event_type == "sequence_failed":
+        elif event_type in {"sequence_failed", "segmented_sequence_failed"}:
             self._trial_failed = True
+        elif event_type == "unexpected_pre_approach_contact":
+            self._pre_approach_contact_detected = True
+            self._trial_failed = True
+            self._guarded_contact_stop = False
         elif event_type == "force_guard_triggered":
             self._force_guard_triggered = True
             self._trial_failed = True
@@ -258,7 +297,7 @@ class BaselineTrialManager(Node):
                 self._force_guard_trigger_force = trigger_force
             if threshold is not None:
                 self._force_guard_threshold = threshold
-        elif event_type == "early_contact_guard_triggered":
+        elif event_type in {"early_contact_guard_triggered", "early_contact_detected"}:
             self._early_contact_guard_triggered = True
             self._guarded_contact_stop = True
             trigger_force = self._coerce_optional_float(
@@ -269,6 +308,8 @@ class BaselineTrialManager(Node):
                 self._early_contact_guard_trigger_force = trigger_force
             if source:
                 self._early_contact_guard_source = source
+        elif event_type == "guarded_contact_stop":
+            self._guarded_contact_stop = True
 
         self._task_events_writer.writerow(
             [
@@ -279,6 +320,14 @@ class BaselineTrialManager(Node):
                 event.get("total_poses", ""),
                 event.get("safety_tag", ""),
                 event.get("message", ""),
+                event.get("segment_name", ""),
+                self._json_csv_value(event.get("target_joint_positions")),
+                self._json_csv_value(event.get("reached_joint_positions")),
+                self._json_csv_value(event.get("joint_position_error")),
+                event.get("end_effector_base_frame", ""),
+                event.get("end_effector_tool_frame", ""),
+                self._json_csv_value(event.get("end_effector_position_xyz")),
+                self._json_csv_value(event.get("end_effector_orientation_xyzw")),
             ]
         )
         self._task_events_file.flush()
@@ -291,6 +340,12 @@ class BaselineTrialManager(Node):
             self._task_completed = True
         elif status == "guarded_contact_stop":
             self._guarded_contact_stop = True
+            if self._trial_mode == "segmented_robot_contact_validation":
+                self._task_completed = True
+        elif status == "failed_pre_contact":
+            self._trial_failed = True
+            self._pre_approach_contact_detected = True
+            self._task_completed = False
         elif status in {"failed", "guarded_stop"}:
             self._trial_failed = True
         self._write_summary()
@@ -329,6 +384,9 @@ class BaselineTrialManager(Node):
         source = str(event.get("source", "unknown"))
         contact_count = self._coerce_int(event.get("contact_count"), default=0)
         max_contact_force = self._coerce_optional_float(event.get("max_contact_force"))
+        collision_pairs = self._coerce_collision_pairs(event.get("collision_pairs"))
+        first_collision1 = self._coerce_optional_string(event.get("first_collision1"))
+        first_collision2 = self._coerce_optional_string(event.get("first_collision2"))
         detail = str(event.get("message", message.data))
 
         if source:
@@ -342,8 +400,20 @@ class BaselineTrialManager(Node):
             self._contact_episode_count += 1
             self._contact_events_count = self._contact_episode_count
             self._physical_contact_observed = True
+            self._record_contact_diagnostics(
+                collision_pairs,
+                first_collision1,
+                first_collision2,
+                phase,
+            )
         elif positive_physical_contact:
             self._physical_contact_observed = True
+            self._record_contact_diagnostics(
+                collision_pairs,
+                first_collision1,
+                first_collision2,
+                phase,
+            )
         self._contact_metrics_available = True
         if max_contact_force is not None:
             self._force_extraction_available = True
@@ -361,6 +431,9 @@ class BaselineTrialManager(Node):
                 source,
                 contact_count,
                 self._format_optional_float(max_contact_force),
+                self._json_csv_value(collision_pairs),
+                first_collision1 or "",
+                first_collision2 or "",
                 detail,
             ]
         )
@@ -439,6 +512,12 @@ class BaselineTrialManager(Node):
             self._physical_contact_observed = self._physical_contact_observed or bool(
                 metrics.get("physical_contact_observed", False)
             )
+        self._record_contact_diagnostics(
+            self._coerce_collision_pairs(metrics.get("collision_pairs")),
+            self._coerce_optional_string(metrics.get("first_collision1")),
+            self._coerce_optional_string(metrics.get("first_collision2")),
+            self._final_task_phase,
+        )
         metrics_max_force = self._coerce_optional_float(metrics.get("max_contact_force"))
         if metrics_max_force is not None:
             self._force_extraction_available = True
@@ -475,6 +554,12 @@ class BaselineTrialManager(Node):
         self._contact_messages_observed = True
         if contact_count > 0 and self._counts_as_physical_contact(source):
             self._physical_contact_observed = True
+            self._record_contact_diagnostics(
+                self._coerce_collision_pairs(status.get("collision_pairs")),
+                self._coerce_optional_string(status.get("first_collision1")),
+                self._coerce_optional_string(status.get("first_collision2")),
+                self._final_task_phase,
+            )
         if max_contact_force is not None:
             self._force_extraction_available = True
             self._max_contact_force = (
@@ -517,6 +602,7 @@ class BaselineTrialManager(Node):
         is_contact_validation = self._trial_mode in {
             "robot_contact_validation",
             "segmented_guarded_contact",
+            "segmented_robot_contact_validation",
         }
         return {
             "trial_id": self._trial_id,
@@ -532,7 +618,7 @@ class BaselineTrialManager(Node):
                 "passive contact probe validation"
                 if is_contact_probe_validation
                 else "segmented guarded robot-to-object contact validation"
-                if self._trial_mode == "segmented_guarded_contact"
+                if self._is_segmented_contact_mode()
                 else "robot-to-object contact validation"
                 if self._trial_mode == "robot_contact_validation"
                 else "peg-in-hole baseline"
@@ -542,7 +628,7 @@ class BaselineTrialManager(Node):
             ),
             "framework_version": (
                 "v1.0"
-                if self._trial_mode == "segmented_guarded_contact"
+                if self._is_segmented_contact_mode()
                 else "v0.9"
                 if is_contact_validation
                 else "v0.5"
@@ -558,9 +644,9 @@ class BaselineTrialManager(Node):
                 "robot_contact_validation mode runs a separate scripted robot "
                 "approach toward a dedicated contact target; contact absence is "
                 "reported without failing the trial. The "
-                "segmented_guarded_contact mode replaces the long contact approach "
-                "with short checked joint-space segments and stops before sending "
-                "additional approach motion after contact is observed."
+                "segmented_robot_contact_validation mode replaces the long contact "
+                "approach with short checked joint-space segments and stops before "
+                "sending additional approach motion after contact is observed."
             ),
             "topics": {
                 "joint_states": self._joint_states_topic,
@@ -581,6 +667,7 @@ class BaselineTrialManager(Node):
         segmented_guarded_contact_success = (
             self._segmented_guarded_contact_success()
         )
+        segmented_contact_success = self._segmented_contact_success()
         return {
             "trial_id": self._trial_id,
             "trial_mode": self._trial_mode,
@@ -600,6 +687,7 @@ class BaselineTrialManager(Node):
             "segmented_guarded_contact_success": (
                 segmented_guarded_contact_success
             ),
+            "segmented_contact_success": segmented_contact_success,
             "segment_count_executed": self._segment_count_executed,
             "contact_events_count": self._contact_events_count,
             "contact_episode_count": self._contact_episode_count,
@@ -610,6 +698,11 @@ class BaselineTrialManager(Node):
             "force_guard_triggered": self._force_guard_triggered,
             "force_guard_trigger_force": self._force_guard_trigger_force,
             "force_guard_threshold": self._force_guard_threshold,
+            "pre_approach_contact_detected": self._pre_approach_contact_detected,
+            "first_contact_collision1": self._first_contact_collision1,
+            "first_contact_collision2": self._first_contact_collision2,
+            "first_contact_phase": self._first_contact_phase,
+            "collision_pairs": list(self._collision_pairs),
             "early_contact_guard_triggered": self._early_contact_guard_triggered,
             "early_contact_guard_trigger_force": (
                 self._early_contact_guard_trigger_force
@@ -643,6 +736,14 @@ class BaselineTrialManager(Node):
                 "total_poses",
                 "safety_tag",
                 "message",
+                "segment_name",
+                "target_joint_positions",
+                "reached_joint_positions",
+                "joint_position_error",
+                "end_effector_base_frame",
+                "end_effector_tool_frame",
+                "end_effector_position_xyz",
+                "end_effector_orientation_xyzw",
             ]
         )
         self._safety_events_writer.writerow(
@@ -656,6 +757,9 @@ class BaselineTrialManager(Node):
                 "source",
                 "contact_count",
                 "max_contact_force",
+                "collision_pairs",
+                "first_collision1",
+                "first_collision2",
                 "message",
             ]
         )
@@ -737,10 +841,10 @@ class BaselineTrialManager(Node):
                     "threshold; inspect max_contact_force before treating the run as "
                     "low-force validation."
                 )
-        elif self._trial_mode == "segmented_guarded_contact":
+        elif self._is_segmented_contact_mode():
             notes.append(
-                "segmented_guarded_contact uses short checked approach moves and "
-                "requires guarded_contact_stop with max_contact_force below 100 N "
+                "segmented_robot_contact_validation uses short checked approach moves and "
+                "requires guarded_contact_stop without a force threshold violation "
                 "for v1.0 success."
             )
             if self._guarded_contact_stop:
@@ -751,7 +855,12 @@ class BaselineTrialManager(Node):
             if self._force_threshold_violation:
                 notes.append(
                     "Contact force exceeded the configured v1.0 violation threshold; "
-                    "segmented_guarded_contact_success is false."
+                    "segmented_contact_success is false."
+                )
+            if self._pre_approach_contact_detected:
+                notes.append(
+                    "Unexpected contact was detected before contact_segment_01; "
+                    "segmented_contact_success is false."
                 )
         if self._contact_metrics_available and not self._physical_contact_observed:
             notes.append(
@@ -820,13 +929,34 @@ class BaselineTrialManager(Node):
             and below_force_limit
         )
 
+    def _segmented_contact_success(self) -> bool | None:
+        if self._trial_mode != "segmented_robot_contact_validation":
+            return None
+        return (
+            self._physical_contact_observed
+            and self._final_trial_status == "guarded_contact_stop"
+            and not self._pre_approach_contact_detected
+            and not self._force_threshold_violation
+            and self._safety_violations_count == 0
+        )
+
     def _effective_task_started(self) -> bool:
         return self._task_started or (
             self._task_completed and self._total_task_events > 0
         )
 
+    def _is_segmented_contact_mode(self) -> bool:
+        return self._trial_mode in {
+            "segmented_guarded_contact",
+            "segmented_robot_contact_validation",
+        }
+
     def _counts_as_physical_contact(self, source: str) -> bool:
-        if self._trial_mode in {"robot_contact_validation", "segmented_guarded_contact"}:
+        if self._trial_mode in {
+            "robot_contact_validation",
+            "segmented_guarded_contact",
+            "segmented_robot_contact_validation",
+        }:
             return source == "robot_validation"
         return True
 
@@ -838,6 +968,7 @@ class BaselineTrialManager(Node):
             "contact_probe_validation",
             "robot_contact_validation",
             "segmented_guarded_contact",
+            "segmented_robot_contact_validation",
         }:
             return mode
         return "baseline_task"
@@ -885,6 +1016,12 @@ class BaselineTrialManager(Node):
             return int(value)
         except (TypeError, ValueError):
             return default
+
+    @staticmethod
+    def _json_csv_value(value: Any) -> str:
+        if value in (None, ""):
+            return ""
+        return json.dumps(value, sort_keys=True)
 
     @staticmethod
     def _coerce_optional_float(value: Any) -> float | None:
@@ -941,6 +1078,49 @@ class BaselineTrialManager(Node):
                 self._positive_contact_counts.get(source_name, 0),
                 self._coerce_int(count, default=0),
             )
+
+    def _record_contact_diagnostics(
+        self,
+        collision_pairs: list[str],
+        first_collision1: str | None,
+        first_collision2: str | None,
+        phase: str,
+    ) -> None:
+        for pair in collision_pairs:
+            if pair in self._collision_pair_set:
+                continue
+            self._collision_pair_set.add(pair)
+            self._collision_pairs.append(pair)
+        if (
+            self._first_contact_collision1 is None
+            and (first_collision1 or first_collision2)
+        ):
+            self._first_contact_collision1 = first_collision1
+            self._first_contact_collision2 = first_collision2
+            self._first_contact_phase = phase
+
+    @staticmethod
+    def _coerce_collision_pairs(value: Any) -> list[str]:
+        if isinstance(value, list):
+            return [str(item) for item in value if str(item)]
+        if isinstance(value, str):
+            stripped = value.strip()
+            if not stripped:
+                return []
+            try:
+                parsed = json.loads(stripped)
+            except json.JSONDecodeError:
+                return [stripped]
+            if isinstance(parsed, list):
+                return [str(item) for item in parsed if str(item)]
+            return [stripped]
+        return []
+
+    @staticmethod
+    def _coerce_optional_string(value: Any) -> str | None:
+        if value in (None, ""):
+            return None
+        return str(value)
 
     @staticmethod
     def _coerce_string_set(value: Any, default: set[str]) -> set[str]:

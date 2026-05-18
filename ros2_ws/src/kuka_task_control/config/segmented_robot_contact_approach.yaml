@@ -1,0 +1,110 @@
+metadata:
+  experiment_name: research_baseline_v1_2_segmented_robot_contact_approach
+  description: >
+    v1.2 segmented guarded robot contact validation. Each approach increment is
+    sent as a separate short FollowJointTrajectory goal, followed by a guard
+    telemetry check before any further contact motion is commanded. v1.2 keeps
+    the stable v1.1 approach and adds four shallow final tuning segments to seek
+    gentle first contact with the validation pad.
+  controller_action_name: /joint_trajectory_controller/follow_joint_trajectory
+  task_phase_topic: /task_phase
+
+thresholds:
+  early_contact_force_threshold_n: 20.0
+  force_violation_threshold_n: 100.0
+
+post_segment_guard_wait_sec: 0.35
+
+safe_home:
+  name: safe_home
+  positions: [0.0, -0.8, 1.2, 0.0, 0.8, 0.0]
+  duration_sec: 3.0
+  description: Raised parked configuration used as the robot contact validation start.
+  safety_tag: nominal_clearance
+
+pre_approach:
+  name: robot_contact_pre_approach
+  positions: [0.32, -0.99, 1.25, 0.0, 0.57, 0.0]
+  duration_sec: 3.0
+  description: Clear pre-approach posture outside the validation target.
+  safety_tag: robot_validation_approach_region
+
+approach_segments:
+  - name: contact_segment_01
+    positions: [0.345, -1.035, 1.285, 0.0, 0.520, 0.0]
+    duration_sec: 2.5
+    description: First guarded joint-space contact increment.
+    safety_tag: robot_validation_approach_region
+
+  - name: contact_segment_02
+    positions: [0.370, -1.080, 1.320, 0.0, 0.470, 0.0]
+    duration_sec: 2.5
+    description: Second guarded joint-space contact increment.
+    safety_tag: robot_validation_approach_region
+
+  - name: contact_segment_03
+    positions: [0.388, -1.115, 1.348, 0.0, 0.430, 0.0]
+    duration_sec: 2.5
+    description: Third guarded joint-space contact increment.
+    safety_tag: robot_validation_near_pad_region
+
+  - name: contact_segment_04
+    positions: [0.405, -1.150, 1.375, 0.0, 0.390, 0.0]
+    duration_sec: 2.5
+    description: Fourth guarded joint-space contact increment near the pad.
+    safety_tag: robot_validation_near_pad_region
+
+  - name: contact_segment_05
+    positions: [0.416, -1.178, 1.400, 0.0, 0.352, 0.0]
+    duration_sec: 2.5
+    description: Fifth guarded joint-space contact increment near the pad.
+    safety_tag: robot_validation_near_pad_region
+
+  - name: contact_segment_06
+    positions: [0.425, -1.198, 1.418, 0.0, 0.325, 0.0]
+    duration_sec: 2.5
+    description: Final shallow guarded increment, shallower than the prior high-force touch pose.
+    safety_tag: robot_validation_contact_region
+
+  - name: contact_segment_07
+    positions: [0.428, -1.205, 1.425, 0.0, 0.315, 0.0]
+    duration_sec: 4.0
+    description: First v1.1 shallow tuning increment beyond the stable no-contact v1.0 endpoint.
+    safety_tag: robot_validation_contact_region
+
+  - name: contact_segment_08
+    positions: [0.432, -1.214, 1.432, 0.0, 0.303, 0.0]
+    duration_sec: 4.0
+    description: Second v1.1 shallow tuning increment, still short of the prior touch candidate.
+    safety_tag: robot_validation_contact_region
+
+  - name: contact_segment_09
+    positions: [0.434, -1.219, 1.436, 0.0, 0.297, 0.0]
+    duration_sec: 5.0
+    description: First v1.2 tiny tuning increment beyond the safe v1.1 no-contact endpoint.
+    safety_tag: robot_validation_contact_region
+
+  - name: contact_segment_10
+    positions: [0.436, -1.224, 1.440, 0.0, 0.291, 0.0]
+    duration_sec: 5.0
+    description: Second v1.2 tiny tuning increment toward gentle first pad contact.
+    safety_tag: robot_validation_contact_region
+
+  - name: contact_segment_11
+    positions: [0.438, -1.229, 1.444, 0.0, 0.285, 0.0]
+    duration_sec: 5.0
+    description: Third v1.2 tiny tuning increment with slow guarded motion near the pad.
+    safety_tag: robot_validation_contact_region
+
+  - name: contact_segment_12
+    positions: [0.440, -1.234, 1.448, 0.0, 0.279, 0.0]
+    duration_sec: 5.0
+    description: Fourth v1.2 tiny tuning increment, avoiding deep validation pad penetration.
+    safety_tag: robot_validation_contact_region
+
+retreat:
+  name: robot_contact_retreat
+  positions: [0.22, -0.94, 1.23, 0.0, 0.62, 0.0]
+  duration_sec: 3.0
+  description: Retreat from the dedicated validation contact target.
+  safety_tag: robot_validation_retreat_clearance
