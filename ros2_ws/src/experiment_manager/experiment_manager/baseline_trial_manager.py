@@ -121,6 +121,23 @@ class BaselineTrialManager(Node):
         self._insertion_hold_reached = False
         self._insertion_success: bool | None = None
         self._insertion_success_estimate: bool | None = None
+        self._peg_contact_observed = False
+        self._hole_contact_observed = False
+        self._peg_table_contact_observed = False
+        self._peg_table_contact_count = 0
+        self._peg_hole_contact_observed = False
+        self._peg_hole_contact_count = 0
+        self._first_peg_hole_contact_phase: str | None = None
+        self._first_peg_table_contact_phase: str | None = None
+        self._peg_hole_collision_pairs: list[str] = []
+        self._peg_hole_collision_pair_set: set[str] = set()
+        self._non_insertion_contact_pairs: list[str] = []
+        self._non_insertion_contact_pair_set: set[str] = set()
+        self._max_peg_contact_force: float | None = None
+        self._max_hole_contact_force: float | None = None
+        self._insertion_depth_available = False
+        self._insertion_depth_estimate: float | None = None
+        self._insertion_metrics_received = False
         self._contact_metrics_available = False
         self._contact_topics_configured: dict[str, str] = {}
         self._contact_topics_connected: set[str] = set()
@@ -342,6 +359,8 @@ class BaselineTrialManager(Node):
             self._guarded_contact_stop = True
             if self._trial_mode == "segmented_robot_contact_validation":
                 self._task_completed = True
+            elif self._trial_mode == "peg_hole_insertion_validation":
+                self._task_completed = True
         elif status == "failed_pre_contact":
             self._trial_failed = True
             self._pre_approach_contact_detected = True
@@ -478,6 +497,77 @@ class BaselineTrialManager(Node):
         self._insertion_success_estimate = self._coerce_optional_bool(
             metrics.get("insertion_success_estimate")
         )
+        self._insertion_metrics_received = True
+        self._peg_contact_observed = self._peg_contact_observed or bool(
+            metrics.get("peg_contact_observed", False)
+        )
+        self._hole_contact_observed = self._hole_contact_observed or bool(
+            metrics.get("hole_contact_observed", False)
+        )
+        self._peg_table_contact_observed = self._peg_table_contact_observed or bool(
+            metrics.get("peg_table_contact_observed", False)
+        )
+        self._peg_table_contact_count = max(
+            self._peg_table_contact_count,
+            self._coerce_int(
+                metrics.get("peg_table_contact_count"),
+                default=self._peg_table_contact_count,
+            ),
+        )
+        self._peg_hole_contact_observed = self._peg_hole_contact_observed or bool(
+            metrics.get("peg_hole_contact_observed", False)
+        )
+        self._peg_hole_contact_count = max(
+            self._peg_hole_contact_count,
+            self._coerce_int(
+                metrics.get("peg_hole_contact_count"),
+                default=self._peg_hole_contact_count,
+            ),
+        )
+        self._merge_unique_pairs(
+            self._coerce_collision_pairs(metrics.get("peg_hole_collision_pairs")),
+            self._peg_hole_collision_pair_set,
+            self._peg_hole_collision_pairs,
+        )
+        self._merge_unique_pairs(
+            self._coerce_collision_pairs(metrics.get("non_insertion_contact_pairs")),
+            self._non_insertion_contact_pair_set,
+            self._non_insertion_contact_pairs,
+        )
+        if self._first_peg_hole_contact_phase is None:
+            self._first_peg_hole_contact_phase = self._coerce_optional_string(
+                metrics.get("first_peg_hole_contact_phase")
+            )
+        if self._first_peg_table_contact_phase is None:
+            self._first_peg_table_contact_phase = self._coerce_optional_string(
+                metrics.get("first_peg_table_contact_phase")
+            )
+        metrics_peg_force = self._coerce_optional_float(
+            metrics.get("max_peg_contact_force")
+        )
+        if metrics_peg_force is not None:
+            self._max_peg_contact_force = (
+                metrics_peg_force
+                if self._max_peg_contact_force is None
+                else max(self._max_peg_contact_force, metrics_peg_force)
+            )
+        metrics_hole_force = self._coerce_optional_float(
+            metrics.get("max_hole_contact_force")
+        )
+        if metrics_hole_force is not None:
+            self._max_hole_contact_force = (
+                metrics_hole_force
+                if self._max_hole_contact_force is None
+                else max(self._max_hole_contact_force, metrics_hole_force)
+            )
+        self._insertion_depth_available = self._insertion_depth_available or bool(
+            metrics.get("insertion_depth_available", False)
+        )
+        metrics_depth = self._coerce_optional_float(
+            metrics.get("insertion_depth_estimate")
+        )
+        if metrics_depth is not None:
+            self._insertion_depth_estimate = metrics_depth
 
         metrics_contact_count = self._coerce_int(
             metrics.get("contact_events_count"), default=self._contact_events_count
@@ -599,10 +689,14 @@ class BaselineTrialManager(Node):
 
     def _build_metadata(self) -> dict[str, object]:
         is_contact_probe_validation = self._trial_mode == "contact_probe_validation"
+        is_peg_hole_insertion_validation = (
+            self._trial_mode == "peg_hole_insertion_validation"
+        )
         is_contact_validation = self._trial_mode in {
             "robot_contact_validation",
             "segmented_guarded_contact",
             "segmented_robot_contact_validation",
+            "peg_hole_insertion_validation",
         }
         return {
             "trial_id": self._trial_id,
@@ -617,6 +711,8 @@ class BaselineTrialManager(Node):
             "task": (
                 "passive contact probe validation"
                 if is_contact_probe_validation
+                else "peg/hole insertion instrumentation validation"
+                if is_peg_hole_insertion_validation
                 else "segmented guarded robot-to-object contact validation"
                 if self._is_segmented_contact_mode()
                 else "robot-to-object contact validation"
@@ -627,7 +723,9 @@ class BaselineTrialManager(Node):
                 "none" if is_contact_probe_validation else "joint_trajectory_controller"
             ),
             "framework_version": (
-                "v1.0"
+                "v2.0"
+                if is_peg_hole_insertion_validation
+                else "v1.0"
                 if self._is_segmented_contact_mode()
                 else "v0.9"
                 if is_contact_validation
@@ -646,7 +744,10 @@ class BaselineTrialManager(Node):
                 "reported without failing the trial. The "
                 "segmented_robot_contact_validation mode replaces the long contact "
                 "approach with short checked joint-space segments and stops before "
-                "sending additional approach motion after contact is observed."
+                "sending additional approach motion after contact is observed. The "
+                "peg_hole_insertion_validation mode starts peg/hole-specific "
+                "instrumentation without treating null insertion_success as a trial "
+                "failure."
             ),
             "topics": {
                 "joint_states": self._joint_states_topic,
@@ -668,6 +769,10 @@ class BaselineTrialManager(Node):
             self._segmented_guarded_contact_success()
         )
         segmented_contact_success = self._segmented_contact_success()
+        peg_hole_instrumentation_success = (
+            self._peg_hole_instrumentation_success()
+        )
+        insertion_success_estimate = self._summary_insertion_success_estimate()
         return {
             "trial_id": self._trial_id,
             "trial_mode": self._trial_mode,
@@ -714,7 +819,22 @@ class BaselineTrialManager(Node):
             "insertion_attempted": self._insertion_attempted,
             "insertion_hold_reached": self._insertion_hold_reached,
             "insertion_success": self._insertion_success,
-            "insertion_success_estimate": self._insertion_success_estimate,
+            "insertion_success_estimate": insertion_success_estimate,
+            "peg_contact_observed": self._peg_contact_observed,
+            "hole_contact_observed": self._hole_contact_observed,
+            "peg_table_contact_observed": self._peg_table_contact_observed,
+            "peg_table_contact_count": self._peg_table_contact_count,
+            "peg_hole_contact_observed": self._peg_hole_contact_observed,
+            "peg_hole_contact_count": self._peg_hole_contact_count,
+            "first_peg_hole_contact_phase": self._first_peg_hole_contact_phase,
+            "first_peg_table_contact_phase": self._first_peg_table_contact_phase,
+            "peg_hole_collision_pairs": list(self._peg_hole_collision_pairs),
+            "non_insertion_contact_pairs": list(self._non_insertion_contact_pairs),
+            "max_peg_contact_force": self._max_peg_contact_force,
+            "max_hole_contact_force": self._max_hole_contact_force,
+            "insertion_depth_available": self._insertion_depth_available,
+            "insertion_depth_estimate": self._insertion_depth_estimate,
+            "peg_hole_instrumentation_success": peg_hole_instrumentation_success,
             "contact_topics_configured": self._contact_topics_configured,
             "contact_topics_connected": sorted(self._contact_topics_connected),
             "contact_messages_observed": self._contact_messages_observed,
@@ -862,6 +982,25 @@ class BaselineTrialManager(Node):
                     "Unexpected contact was detected before contact_segment_01; "
                     "segmented_contact_success is false."
                 )
+        elif self._trial_mode == "peg_hole_insertion_validation":
+            notes.append(
+                "peg_hole_insertion_validation validates v2.0 instrumentation and "
+                "logging; v2.1 requires an actual peg-hole collision pair for "
+                "insertion contact."
+            )
+            if (
+                self._peg_table_contact_observed
+                and not self._peg_hole_contact_observed
+            ):
+                notes.append(
+                    "Peg contact was observed against the table, not the hole; "
+                    "insertion contact was not validated."
+                )
+            if not self._insertion_depth_available:
+                notes.append(
+                    "insertion_depth_estimate is null because no validated geometry "
+                    "or TF depth rule is available."
+                )
         if self._contact_metrics_available and not self._physical_contact_observed:
             notes.append(
                 "Contact instrumentation is connected; zero physical contact events "
@@ -940,6 +1079,27 @@ class BaselineTrialManager(Node):
             and self._safety_violations_count == 0
         )
 
+    def _peg_hole_instrumentation_success(self) -> bool | None:
+        if self._trial_mode != "peg_hole_insertion_validation":
+            return None
+        return (
+            bool(self._contact_topics_connected)
+            and self._insertion_metrics_received
+            and self._summary_path.exists()
+            and self._safety_violations_count == 0
+        )
+
+    def _summary_insertion_success_estimate(self) -> bool | None:
+        if self._trial_mode != "peg_hole_insertion_validation":
+            return self._insertion_success_estimate
+        if not self._peg_hole_contact_observed:
+            return False
+        return (
+            self._insertion_hold_reached
+            and not self._force_threshold_violation
+            and self._final_trial_status in {"completed", "guarded_contact_stop"}
+        )
+
     def _effective_task_started(self) -> bool:
         return self._task_started or (
             self._task_completed and self._total_task_events > 0
@@ -958,6 +1118,14 @@ class BaselineTrialManager(Node):
             "segmented_robot_contact_validation",
         }:
             return source == "robot_validation"
+        if self._trial_mode == "peg_hole_insertion_validation":
+            return source in {
+                "peg_validation",
+                "hole_validation",
+                "peg",
+                "hole",
+                "target",
+            }
         return True
 
     @staticmethod
@@ -969,6 +1137,7 @@ class BaselineTrialManager(Node):
             "robot_contact_validation",
             "segmented_guarded_contact",
             "segmented_robot_contact_validation",
+            "peg_hole_insertion_validation",
         }:
             return mode
         return "baseline_task"
@@ -1098,6 +1267,16 @@ class BaselineTrialManager(Node):
             self._first_contact_collision1 = first_collision1
             self._first_contact_collision2 = first_collision2
             self._first_contact_phase = phase
+
+    @staticmethod
+    def _merge_unique_pairs(
+        pairs: list[str], seen: set[str], destination: list[str]
+    ) -> None:
+        for pair in pairs:
+            if pair in seen:
+                continue
+            seen.add(pair)
+            destination.append(pair)
 
     @staticmethod
     def _coerce_collision_pairs(value: Any) -> list[str]:

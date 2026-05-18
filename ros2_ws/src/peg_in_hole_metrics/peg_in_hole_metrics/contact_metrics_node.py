@@ -26,6 +26,20 @@ DEFAULT_CONTACT_TOPICS = (
             "sensor/robot_contact_validation_sensor/contact"
         ),
     },
+    {
+        "name": "peg_validation",
+        "topic": (
+            "/world/peg_in_hole_insertion_validation_world/model/peg/link/"
+            "peg_link/sensor/peg_contact_sensor/contact"
+        ),
+    },
+    {
+        "name": "hole_validation",
+        "topic": (
+            "/world/peg_in_hole_insertion_validation_world/model/hole_block/link/"
+            "hole_block_link/sensor/hole_contact_sensor/contact"
+        ),
+    },
 )
 
 FORCE_EXTRACTION_METHOD = "ros_gz_interfaces Contacts.wrenches force magnitude"
@@ -205,7 +219,20 @@ class ContactMetricsNode(Node):
         self._collision_pair_set: set[str] = set()
         self._first_collision1: str | None = None
         self._first_collision2: str | None = None
+        self._peg_contact_observed = False
+        self._hole_contact_observed = False
+        self._peg_table_contact_count = 0
+        self._peg_hole_contact_count = 0
+        self._peg_hole_collision_pairs: list[str] = []
+        self._peg_hole_collision_pair_set: set[str] = set()
+        self._non_insertion_contact_pairs: list[str] = []
+        self._non_insertion_contact_pair_set: set[str] = set()
+        self._first_peg_hole_contact_phase: str | None = None
+        self._first_peg_table_contact_phase: str | None = None
         self._positive_contact_counts = {name: 0 for name in self._contact_topics}
+        self._max_contact_force_by_source: dict[str, float | None] = {
+            name: None for name in self._contact_topics
+        }
         self._contact_topic_seen = {name: False for name in self._contact_topics}
         self._previous_in_contact = {name: False for name in self._contact_topics}
         self._last_contact_transition_event_sec = {
@@ -363,6 +390,10 @@ class ContactMetricsNode(Node):
                 if self._max_contact_force is None
                 else max(self._max_contact_force, max_force)
             )
+            source_force = self._max_contact_force_by_source.get(source)
+            self._max_contact_force_by_source[source] = (
+                max_force if source_force is None else max(source_force, max_force)
+            )
         new_force_peak = (
             max_force is not None
             and (
@@ -376,6 +407,7 @@ class ContactMetricsNode(Node):
             self._positive_contact_counts[source] = (
                 self._positive_contact_counts.get(source, 0) + 1
             )
+            self._classify_collision_pairs(collision_pairs)
             if self._counts_as_physical_contact(source):
                 self._physical_contact_observed = True
                 self._record_collision_pairs(collision_pairs)
@@ -529,6 +561,76 @@ class ContactMetricsNode(Node):
                 self._first_collision1 = collision1
                 self._first_collision2 = collision2
 
+    def _classify_collision_pairs(
+        self, collision_pairs: list[tuple[str, str]]
+    ) -> None:
+        for collision1, collision2 in collision_pairs:
+            key = self._collision_pair_key(collision1, collision2)
+            peg1 = self._is_peg_collision(collision1)
+            peg2 = self._is_peg_collision(collision2)
+            hole1 = self._is_hole_collision(collision1)
+            hole2 = self._is_hole_collision(collision2)
+            table1 = self._is_table_collision(collision1)
+            table2 = self._is_table_collision(collision2)
+
+            if peg1 or peg2:
+                self._peg_contact_observed = True
+            if hole1 or hole2:
+                self._hole_contact_observed = True
+
+            if (peg1 and hole2) or (peg2 and hole1):
+                self._peg_hole_contact_count += 1
+                self._record_unique_pair(
+                    key,
+                    self._peg_hole_collision_pair_set,
+                    self._peg_hole_collision_pairs,
+                )
+                if self._first_peg_hole_contact_phase is None:
+                    self._first_peg_hole_contact_phase = self._current_phase
+                continue
+
+            if (peg1 and table2) or (peg2 and table1):
+                self._peg_table_contact_count += 1
+                if self._first_peg_table_contact_phase is None:
+                    self._first_peg_table_contact_phase = self._current_phase
+
+            self._record_unique_pair(
+                key,
+                self._non_insertion_contact_pair_set,
+                self._non_insertion_contact_pairs,
+            )
+
+    @staticmethod
+    def _record_unique_pair(key: str, seen: set[str], pairs: list[str]) -> None:
+        if key in seen:
+            return
+        seen.add(key)
+        pairs.append(key)
+
+    @staticmethod
+    def _is_peg_collision(collision: str) -> bool:
+        normalized = collision.lower()
+        return (
+            "peg::" in normalized
+            or "peg_link" in normalized
+            or "peg_collision" in normalized
+        )
+
+    @staticmethod
+    def _is_hole_collision(collision: str) -> bool:
+        normalized = collision.lower()
+        return (
+            "hole_block::" in normalized
+            or "hole_block" in normalized
+            or "hole_contact" in normalized
+            or "hole_collision" in normalized
+        )
+
+    @staticmethod
+    def _is_table_collision(collision: str) -> bool:
+        normalized = collision.lower()
+        return "work_table" in normalized or "table_collision" in normalized
+
     @classmethod
     def _format_collision_pairs(cls, collision_pairs: list[tuple[str, str]]) -> list[str]:
         return [
@@ -621,6 +723,13 @@ class ContactMetricsNode(Node):
         contact_topics_seen = [
             source for source, seen in self._contact_topic_seen.items() if seen
         ]
+        peg_contact_observed = self._peg_contact_observed
+        hole_contact_observed = self._hole_contact_observed
+        peg_hole_contact_observed = self._peg_hole_contact_count > 0
+        peg_table_contact_observed = self._peg_table_contact_count > 0
+        force_threshold_violation = self._force_threshold_violation(
+            self._max_contact_force
+        )
         if not self._contact_message_type_available:
             notes.append("Contact message type unavailable; no contact subscriptions active.")
         if not contact_topics_connected:
@@ -633,6 +742,11 @@ class ContactMetricsNode(Node):
             notes.append("Contact messages observed but no physical contacts.")
         else:
             notes.append("Physical contacts observed.")
+        if peg_table_contact_observed and not peg_hole_contact_observed:
+            notes.append(
+                "Peg contact was observed against the table, not the hole; "
+                "insertion contact was not validated."
+            )
         if not self._max_contact_force_available:
             notes.append(
                 "max_contact_force is null because force extraction is "
@@ -659,7 +773,8 @@ class ContactMetricsNode(Node):
         )
         notes.append(
             "insertion_success_estimate is a heuristic based on insertion_hold, "
-            "completed trial status, and absence of explicit failure."
+            "peg/hole contact observation, accepted final trial status, and absence "
+            "of force threshold violation."
         )
 
         payload = {
@@ -681,6 +796,25 @@ class ContactMetricsNode(Node):
             "contact_episode_count": self._contact_episode_count,
             "contact_samples_count": self._contact_samples_count,
             "max_contact_force": self._max_contact_force,
+            "peg_contact_observed": peg_contact_observed,
+            "hole_contact_observed": hole_contact_observed,
+            "peg_table_contact_observed": peg_table_contact_observed,
+            "peg_hole_contact_observed": peg_hole_contact_observed,
+            "peg_hole_contact_count": self._peg_hole_contact_count,
+            "peg_table_contact_count": self._peg_table_contact_count,
+            "first_peg_hole_contact_phase": self._first_peg_hole_contact_phase,
+            "first_peg_table_contact_phase": self._first_peg_table_contact_phase,
+            "peg_hole_collision_pairs": list(self._peg_hole_collision_pairs),
+            "non_insertion_contact_pairs": list(self._non_insertion_contact_pairs),
+            "max_peg_contact_force": self._max_force_for_sources(
+                self._peg_contact_sources()
+            ),
+            "max_hole_contact_force": self._max_force_for_sources(
+                self._hole_contact_sources()
+            ),
+            "insertion_depth_estimate": None,
+            "insertion_depth_available": False,
+            "insertion_phase": self._current_phase,
             "robot_validation_warning_force_n": self._robot_validation_warning_force_n,
             "robot_validation_violation_force_n": (
                 self._robot_validation_violation_force_n
@@ -688,13 +822,14 @@ class ContactMetricsNode(Node):
             "force_threshold_warning": self._force_threshold_warning(
                 self._max_contact_force
             ),
-            "force_threshold_violation": self._force_threshold_violation(
-                self._max_contact_force
-            ),
+            "force_threshold_violation": force_threshold_violation,
             "force_extraction_available": self._force_extraction_available,
             "force_extraction_method": FORCE_EXTRACTION_METHOD,
             "insertion_success": None,
-            "insertion_success_estimate": self._insertion_success_estimate(),
+            "insertion_success_estimate": self._insertion_success_estimate(
+                peg_hole_contact_observed=peg_hole_contact_observed,
+                force_threshold_violation=force_threshold_violation,
+            ),
             "contact_metrics_available": contact_metrics_available,
             "notes": " ".join(notes),
         }
@@ -724,12 +859,43 @@ class ContactMetricsNode(Node):
             )
             self._warned_missing_publishers = True
 
-    def _insertion_success_estimate(self) -> bool | None:
+    def _insertion_success_estimate(
+        self,
+        *,
+        peg_hole_contact_observed: bool,
+        force_threshold_violation: bool,
+    ) -> bool | None:
         if self._explicit_failure:
             return False
-        if self._insertion_hold_reached and self._trial_status == "completed":
+        if (
+            self._insertion_hold_reached
+            and peg_hole_contact_observed
+            and not force_threshold_violation
+            and self._trial_status in {"completed", "guarded_contact_stop"}
+        ):
             return True
-        return None
+        return False
+
+    @staticmethod
+    def _peg_contact_sources() -> set[str]:
+        return {"peg", "peg_validation"}
+
+    @staticmethod
+    def _hole_contact_sources() -> set[str]:
+        return {"hole", "hole_validation"}
+
+    def _contact_observed_for_sources(self, sources: set[str]) -> bool:
+        return any(
+            self._positive_contact_counts.get(source, 0) > 0 for source in sources
+        )
+
+    def _max_force_for_sources(self, sources: set[str]) -> float | None:
+        forces = [
+            force
+            for source, force in self._max_contact_force_by_source.items()
+            if source in sources and force is not None
+        ]
+        return max(forces) if forces else None
 
     def _counts_as_physical_contact(self, source: str) -> bool:
         if not self._physical_contact_sources:
@@ -750,7 +916,15 @@ class ContactMetricsNode(Node):
 
     @staticmethod
     def _source_from_topic(topic: str, index: int) -> str:
-        for source in ("robot_validation", "peg", "hole", "target", "validation"):
+        for source in (
+            "robot_validation",
+            "peg_validation",
+            "hole_validation",
+            "peg",
+            "hole",
+            "target",
+            "validation",
+        ):
             if re.search(rf"(^|/){source}($|/)", topic):
                 return source
         return f"contact_{index}"
