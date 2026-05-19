@@ -83,6 +83,8 @@ class MoveItLaunchReadinessAudit(Node):
             if self._robot_description_semantic_available
             else None
         )
+        self._moveit_diagnostic_inputs_report: dict[str, Any] | None = None
+        self._moveit_diagnostic_inputs_parse_error = False
         self._semantic_diagnostics_report: dict[str, Any] | None = None
         self._tool_link_validation_report: dict[str, Any] | None = None
         self._tool_link_validation_parse_error = False
@@ -98,6 +100,12 @@ class MoveItLaunchReadinessAudit(Node):
             JointState,
             "/joint_states",
             self._on_joint_states,
+            10,
+        )
+        self.create_subscription(
+            String,
+            "/moveit_diagnostic_inputs",
+            self._on_moveit_diagnostic_inputs,
             10,
         )
         self.create_subscription(
@@ -161,6 +169,22 @@ class MoveItLaunchReadinessAudit(Node):
         compute_ik_service_available = bool(services["compute_ik_service_available"])
         moveit_launch_ready = False
         compute_ik_expected_after_launch = False
+        moveit_diagnostic_inputs_available = (
+            self._moveit_diagnostic_inputs_report is not None
+        )
+        moveit_diagnostic_inputs_ready = bool(
+            self._moveit_diagnostic_inputs_report
+            and self._moveit_diagnostic_inputs_report.get(
+                "moveit_diagnostic_inputs_ready"
+            )
+        )
+        move_group_launch_inputs_ready = bool(
+            self._moveit_diagnostic_inputs_report
+            and self._moveit_diagnostic_inputs_report.get(
+                "move_group_launch_inputs_ready",
+                moveit_diagnostic_inputs_ready,
+            )
+        )
         semantic_diagnostics_available = self._semantic_diagnostics_report is not None
         semantic_diagnostics_status = (
             self._semantic_diagnostics_report.get("semantic_model_validation_status")
@@ -190,6 +214,13 @@ class MoveItLaunchReadinessAudit(Node):
         payload = {
             "status": "moveit_launch_readiness_audit_diagnostic_only_no_motion",
             "moveit_launch_ready": moveit_launch_ready,
+            "moveit_diagnostic_inputs_available": moveit_diagnostic_inputs_available,
+            "moveit_diagnostic_inputs_ready": moveit_diagnostic_inputs_ready,
+            "moveit_diagnostic_inputs_parse_error": (
+                self._moveit_diagnostic_inputs_parse_error
+            ),
+            "move_group_launch_inputs_ready": move_group_launch_inputs_ready,
+            "move_group_launch_allowed": False,
             "compute_ik_expected_after_launch": compute_ik_expected_after_launch,
             "exact_robot_semantic_match": exact_robot_semantic_match,
             "same_family_srdf_available": report["same_family_srdf_available"],
@@ -281,7 +312,7 @@ class MoveItLaunchReadinessAudit(Node):
             "trajectory_execution_allowed": False,
             "motion_execution_enabled": False,
             "trajectory_execution_requested": False,
-            "recommended_next_step": self._recommended_next_step(
+            "recommended_next_step": self._moveit_diagnostic_recommended_next_step(
                 exact_robot_semantic_match=exact_robot_semantic_match,
                 same_family_srdf_available=report["same_family_srdf_available"],
                 semantic_candidate_complete=semantic_candidate_complete,
@@ -322,6 +353,18 @@ class MoveItLaunchReadinessAudit(Node):
 
     def _on_joint_states(self, message: JointState) -> None:
         self._joint_names_from_joint_states = list(message.name)
+
+    def _on_moveit_diagnostic_inputs(self, message: String) -> None:
+        try:
+            payload = json.loads(message.data)
+        except json.JSONDecodeError:
+            self._moveit_diagnostic_inputs_parse_error = True
+            return
+        if not isinstance(payload, dict):
+            self._moveit_diagnostic_inputs_parse_error = True
+            return
+        self._moveit_diagnostic_inputs_parse_error = False
+        self._moveit_diagnostic_inputs_report = payload
 
     def _on_semantic_diagnostics(self, message: String) -> None:
         try:
@@ -946,6 +989,37 @@ class MoveItLaunchReadinessAudit(Node):
         if not compute_ik_service_available:
             return "launch_move_group_diagnostic_only"
         return "test_compute_ik_service_no_motion"
+
+    def _moveit_diagnostic_recommended_next_step(
+        self,
+        *,
+        exact_robot_semantic_match: bool,
+        same_family_srdf_available: bool,
+        semantic_candidate_complete: bool,
+        semantic_candidate_structurally_valid: bool,
+        tool_link_requires_validation: bool,
+        tool_link_candidate_valid_for_diagnostics: bool,
+        move_group_launch_found: bool,
+        compute_ik_service_available: bool,
+    ) -> str:
+        if self._moveit_diagnostic_inputs_report is not None:
+            if self._moveit_diagnostic_inputs_report.get(
+                "moveit_diagnostic_inputs_ready"
+            ):
+                return (
+                    "create_move_group_diagnostic_launch_with_trajectory_execution_"
+                    "disabled"
+                )
+            recommended = self._moveit_diagnostic_inputs_report.get(
+                "recommended_next_step"
+            )
+            if recommended:
+                return str(recommended)
+            return "complete_missing_moveit_diagnostic_input"
+
+        if self._moveit_diagnostic_inputs_parse_error:
+            return "invalid_moveit_diagnostic_inputs_json"
+        return "missing_moveit_diagnostic_inputs"
 
     @staticmethod
     def _decision_reason(

@@ -36,6 +36,12 @@ infrastructure and a recommended next step, but `insertion_success` remains
 not a trajectory, and not evidence of insertion depth, contact state, or
 assembly success.
 
+Research Baseline v2.13 status: the MoveIt diagnostic input bundle is a launch
+preparation artifact only. `moveit_diagnostic_inputs_ready=true` means the
+future no-motion `move_group` diagnostic launch inputs are available; it is not
+an IK solution, not a `/compute_ik` result, not a trajectory, and not evidence
+of insertion depth, contact state, or assembly success.
+
 ## Collision Events
 
 Count of collision or contact events that are outside the expected peg-hole interaction.

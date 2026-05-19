@@ -41,6 +41,7 @@ The current implementation focuses on a ROS 2 Jazzy and Gazebo-based research fr
 | v2.10 | LBR iisy 6 R1300 semantic candidate for MoveIt IK diagnostics | In progress |
 | v2.11 | robot_description_semantic diagnostics and MoveIt readiness gating | In progress |
 | v2.12 | Diagnostic tool-link validation for MoveIt IK readiness | In progress |
+| v2.13 | MoveIt diagnostic input bundle preparation | In progress |
 
 ## Recommended Launch Commands
 
@@ -78,8 +79,9 @@ orientations for all planned waypoints, including `staging_pose`, on
 plan on `/cartesian_insertion_dry_run_plan`, combines the execution gates on
 `/execution_gate_status`, and publishes the IK backend decision report on
 `/ik_backend_audit` plus the MoveIt configuration and launch readiness audits
-on `/moveit_config_audit` and `/moveit_launch_readiness_audit`, plus the
-semantic candidate validation reports on `/semantic_model_validation` and
+on `/moveit_config_audit` and `/moveit_launch_readiness_audit`, the MoveIt
+diagnostic input bundle on `/moveit_diagnostic_inputs`, plus the semantic
+candidate validation reports on `/semantic_model_validation` and
 `/robot_description_semantic_diagnostics`. It does not
 start `task_trajectory_executor`, does not send trajectory goals, and does not
 command robot motion. Controller execution remains blocked until geometry, IK,
@@ -105,9 +107,10 @@ source install/setup.bash
 ros2 launch thesis_bringup run_move_group_ik_diagnostic.launch.py
 ```
 
-This launch starts only `robot_description_semantic_diagnostics`,
-`semantic_model_validator`, `tool_link_validator`, `moveit_launch_readiness_audit`,
-`moveit_config_audit`, and `ik_backend_audit`. It does not launch `move_group`,
+This launch starts only `moveit_diagnostic_input_builder`,
+`robot_description_semantic_diagnostics`, `semantic_model_validator`,
+`tool_link_validator`, `moveit_launch_readiness_audit`, `moveit_config_audit`,
+and `ik_backend_audit`. It does not launch `move_group`,
 `task_trajectory_executor`, Gazebo, or any trajectory client. `move_group`
 remains blocked unless the exact LBR iisy 6 R1300 semantic model, tool-link
 validation, and safe launch inputs are confirmed.
@@ -128,6 +131,13 @@ as a diagnostic tool/planning link candidate using TF, `robot_description` URDF
 links, the project-local SRDF candidate, and optional tool-axis/orientation
 diagnostics. A valid result prepares move-group diagnostic launch inputs only;
 motion approval remains false.
+
+v2.13 adds `moveit_diagnostic_input_builder` on `/moveit_diagnostic_inputs` to
+assemble the future diagnostic `move_group` input bundle without launching
+`move_group` or calling `/compute_ik`. It reports `robot_description`, SRDF,
+MoveIt YAML, planning-frame, tool-link, and safety readiness while keeping
+`approved_for_motion=false`, `move_group_launch_allowed=false`,
+`controller_motion_allowed=false`, and `trajectory_execution_allowed=false`.
 
 # Robotics Project
 
