@@ -36,6 +36,7 @@ The current implementation focuses on a ROS 2 Jazzy and Gazebo-based research fr
 | v2.5e/v2.5f | Orientation-aware IK diagnostics and full-pose waypoint policy | In progress |
 | v2.6 | Diagnostic-only Cartesian dry-run insertion plan | In progress |
 | v2.7 | Diagnostic-only IK backend audit and decision report | In progress |
+| v2.8 | MoveIt configuration audit and non-motion IK launch preparation | In progress |
 
 ## Recommended Launch Commands
 
@@ -72,10 +73,25 @@ orientations for all planned waypoints, including `staging_pose`, on
 `/cartesian_orientation_targets`, assembles the full no-motion Cartesian dry-run
 plan on `/cartesian_insertion_dry_run_plan`, combines the execution gates on
 `/execution_gate_status`, and publishes the IK backend decision report on
-`/ik_backend_audit`. It does not start `task_trajectory_executor`, does not send
-trajectory goals, and does not command robot motion. Controller execution
+`/ik_backend_audit` plus the MoveIt configuration audit on
+`/moveit_config_audit`. It does not start `task_trajectory_executor`, does not
+send trajectory goals, and does not command robot motion. Controller execution
 remains blocked until geometry, IK, real IK solutions for every waypoint,
-tool-axis validation, safety, and force/contact gates all pass.
+MoveIt configuration readiness, tool-axis validation, safety, and force/contact
+gates all pass.
+
+### MoveIt IK diagnostic preparation
+
+```bash
+cd ~/code/robotics_project/ros2_ws
+source /opt/ros/jazzy/setup.bash
+source install/setup.bash
+ros2 launch thesis_bringup run_moveit_ik_diagnostic.launch.py
+```
+
+This launch starts only the MoveIt config and IK backend audit nodes. It does
+not launch `move_group`, `task_trajectory_executor`, Gazebo, or any trajectory
+client.
 
 # Robotics Project
 
