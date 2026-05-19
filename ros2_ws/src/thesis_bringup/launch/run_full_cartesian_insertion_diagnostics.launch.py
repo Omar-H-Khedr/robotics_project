@@ -313,6 +313,20 @@ def generate_launch_description():
             TimerAction(
                 period=11.5,
                 actions=[
+                    LogInfo(
+                        msg="Starting robot_description_semantic diagnostics node."
+                    ),
+                    Node(
+                        package="kuka_task_control",
+                        executable="robot_description_semantic_diagnostics",
+                        name="robot_description_semantic_diagnostics",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=12.0,
+                actions=[
                     LogInfo(msg="Starting semantic model validator node."),
                     Node(
                         package="kuka_task_control",

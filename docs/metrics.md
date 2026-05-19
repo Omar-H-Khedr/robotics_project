@@ -451,3 +451,31 @@ The `semantic_model_validator` node publishes JSON on
 v2.10 prepares a semantic model candidate only. It does not launch
 `move_group`, call IK, fake IK solutions, send `FollowJointTrajectory` goals,
 start Gazebo, or unblock controller execution.
+
+## Baseline v2.11 robot_description_semantic Diagnostic Fields
+
+The `robot_description_semantic_diagnostics` node publishes JSON on
+`/robot_description_semantic_diagnostics` with:
+
+- `srdf_file_path`, `srdf_file_exists`, and `srdf_parse_success`: the resolved
+  project-local or installed SRDF candidate and parse state.
+- `robot_description_semantic_available` and
+  `robot_description_semantic_length`: whether file-backed semantic XML is
+  available for a future parameter path, and its character length.
+- `arm_group_found`, `arm_group_joints`, and `required_joints_present`: static
+  `arm` group checks for `joint_1` through `joint_6`.
+- `semantic_model_validation_status`: diagnostic candidate status only.
+- `approved_for_motion`, `controller_motion_allowed`, and
+  `trajectory_execution_allowed`: always false.
+
+`moveit_launch_readiness_audit` now also reports
+`robot_description_semantic_candidate_available`,
+`robot_description_semantic_source`, `semantic_diagnostics_available`, and
+`semantic_diagnostics_status`. If the SRDF candidate is structurally valid but
+tool-link validation is still required, `moveit_launch_ready` remains false and
+the recommended next step is
+`validate_tool_link_and_prepare_move_group_diagnostic_launch`.
+
+v2.11 prepares semantic diagnostics only. It does not launch `move_group`, call
+`/compute_ik`, fake IK solutions, send `FollowJointTrajectory` goals, start
+Gazebo, or unblock controller execution.

@@ -66,6 +66,12 @@ class MoveItLaunchReadinessAudit(Node):
         self._robot_description_xml: str | None = (
             local_robot_description if local_robot_description else None
         )
+        self._robot_description_semantic_source: str | None = (
+            "/moveit_launch_readiness_audit parameter"
+            if self._robot_description_semantic_available
+            else None
+        )
+        self._semantic_diagnostics_report: dict[str, Any] | None = None
         self._parameter_clients: dict[str, Any] = {}
         self._parameter_futures: dict[str, Any] = {}
         self._parameter_request_attempts: dict[str, int] = {}
@@ -76,6 +82,12 @@ class MoveItLaunchReadinessAudit(Node):
             JointState,
             "/joint_states",
             self._on_joint_states,
+            10,
+        )
+        self.create_subscription(
+            String,
+            "/robot_description_semantic_diagnostics",
+            self._on_semantic_diagnostics,
             10,
         )
         self.create_timer(
@@ -102,6 +114,16 @@ class MoveItLaunchReadinessAudit(Node):
             and semantic_validation["required_joints_present"]
             and semantic_validation["joint_states_match_srdf"]
         )
+        semantic_candidate_structurally_valid = bool(
+            semantic_validation["semantic_model_exact_candidate"]
+            and semantic_validation["srdf_file_exists"]
+            and semantic_validation["srdf_parse_success"]
+            and semantic_validation["arm_group_found"]
+            and semantic_validation["required_joints_present"]
+        )
+        tool_link_requires_validation = bool(
+            semantic_validation["tool_link_requires_validation"]
+        )
         move_group_launch_found = bool(report["move_group_launch_files"])
         kinematics_yaml_found = bool(report["kinematics_yaml_file"])
         ompl_planning_yaml_found = bool(report["ompl_planning_yaml_file"])
@@ -110,14 +132,38 @@ class MoveItLaunchReadinessAudit(Node):
         moveit_launch_ready = bool(
             exact_robot_semantic_match
             and semantic_candidate_complete
+            and not tool_link_requires_validation
             and kinematics_yaml_found
             and ompl_planning_yaml_found
             and move_group_launch_found
             and self._robot_description_semantic_available
         )
-        compute_ik_expected_after_launch = bool(
-            moveit_launch_ready and not compute_ik_service_available
+        compute_ik_expected_after_launch = False
+        semantic_diagnostics_available = self._semantic_diagnostics_report is not None
+        semantic_diagnostics_status = (
+            self._semantic_diagnostics_report.get("semantic_model_validation_status")
+            or self._semantic_diagnostics_report.get("status")
+            if self._semantic_diagnostics_report
+            else "not_observed"
         )
+        robot_description_semantic_candidate_available = bool(
+            semantic_candidate_structurally_valid
+            or (
+                self._semantic_diagnostics_report
+                and self._semantic_diagnostics_report.get(
+                    "robot_description_semantic_available"
+                )
+            )
+        )
+        robot_description_semantic_source = self._robot_description_semantic_source
+        if self._semantic_diagnostics_report and self._semantic_diagnostics_report.get(
+            "srdf_file_path"
+        ):
+            robot_description_semantic_source = str(
+                self._semantic_diagnostics_report["srdf_file_path"]
+            )
+        elif not robot_description_semantic_source and report["selected_srdf"]:
+            robot_description_semantic_source = report["selected_srdf"]
 
         payload = {
             "status": "moveit_launch_readiness_audit_diagnostic_only_no_motion",
@@ -148,6 +194,12 @@ class MoveItLaunchReadinessAudit(Node):
             "robot_description_semantic_available": (
                 self._robot_description_semantic_available
             ),
+            "robot_description_semantic_candidate_available": (
+                robot_description_semantic_candidate_available
+            ),
+            "robot_description_semantic_source": robot_description_semantic_source,
+            "semantic_diagnostics_available": semantic_diagnostics_available,
+            "semantic_diagnostics_status": semantic_diagnostics_status,
             "robot_description_source_node": self._robot_description_source_node,
             "robot_description_check_reason": self._robot_description_check_reason,
             "robot_joint_names_from_joint_states": list(
@@ -165,12 +217,20 @@ class MoveItLaunchReadinessAudit(Node):
                 exact_robot_semantic_match=exact_robot_semantic_match,
                 same_family_srdf_available=report["same_family_srdf_available"],
                 semantic_candidate_complete=semantic_candidate_complete,
+                semantic_candidate_structurally_valid=(
+                    semantic_candidate_structurally_valid
+                ),
+                tool_link_requires_validation=tool_link_requires_validation,
                 move_group_launch_found=move_group_launch_found,
                 compute_ik_service_available=compute_ik_service_available,
             ),
             "decision_reason": self._decision_reason(
                 exact_robot_semantic_match=exact_robot_semantic_match,
                 semantic_candidate_complete=semantic_candidate_complete,
+                semantic_candidate_structurally_valid=(
+                    semantic_candidate_structurally_valid
+                ),
+                tool_link_requires_validation=tool_link_requires_validation,
                 move_group_launch_found=move_group_launch_found,
                 moveit_launch_ready=moveit_launch_ready,
                 compute_ik_service_available=compute_ik_service_available,
@@ -188,6 +248,22 @@ class MoveItLaunchReadinessAudit(Node):
 
     def _on_joint_states(self, message: JointState) -> None:
         self._joint_names_from_joint_states = list(message.name)
+
+    def _on_semantic_diagnostics(self, message: String) -> None:
+        try:
+            payload = json.loads(message.data)
+        except json.JSONDecodeError:
+            self._semantic_diagnostics_report = {
+                "status": "invalid_robot_description_semantic_diagnostics_json"
+            }
+            return
+        self._semantic_diagnostics_report = payload
+        if payload.get("robot_description_semantic_available"):
+            self._robot_description_semantic_available = True
+            self._robot_description_semantic_source = str(
+                payload.get("srdf_file_path")
+                or "/robot_description_semantic_diagnostics"
+            )
 
     def _service_report(self) -> dict[str, Any]:
         all_services = []
@@ -630,6 +706,9 @@ class MoveItLaunchReadinessAudit(Node):
                     )
                 if name == "robot_description_semantic" and bool(value.string_value):
                     self._robot_description_semantic_available = True
+                    self._robot_description_semantic_source = service_name.rsplit(
+                        "/get_parameters", 1
+                    )[0]
 
         for service_name in completed:
             self._parameter_futures.pop(service_name, None)
@@ -682,6 +761,8 @@ class MoveItLaunchReadinessAudit(Node):
         exact_robot_semantic_match: bool,
         same_family_srdf_available: bool,
         semantic_candidate_complete: bool,
+        semantic_candidate_structurally_valid: bool,
+        tool_link_requires_validation: bool,
         move_group_launch_found: bool,
         compute_ik_service_available: bool,
     ) -> str:
@@ -689,6 +770,8 @@ class MoveItLaunchReadinessAudit(Node):
             if same_family_srdf_available:
                 return "create_lbr_iisy6_r1300_srdf_from_same_family_template"
             return "create_or_select_matching_srdf_for_lbr_iisy6_r1300"
+        if semantic_candidate_structurally_valid and tool_link_requires_validation:
+            return "validate_tool_link_and_prepare_move_group_diagnostic_launch"
         if not semantic_candidate_complete:
             return "complete_semantic_model_validation"
         if not move_group_launch_found:
@@ -702,6 +785,8 @@ class MoveItLaunchReadinessAudit(Node):
         *,
         exact_robot_semantic_match: bool,
         semantic_candidate_complete: bool,
+        semantic_candidate_structurally_valid: bool,
+        tool_link_requires_validation: bool,
         move_group_launch_found: bool,
         moveit_launch_ready: bool,
         compute_ik_service_available: bool,
@@ -710,6 +795,11 @@ class MoveItLaunchReadinessAudit(Node):
             return (
                 "No exact LBR iisy 6 R1300 semantic model was found; move_group "
                 "launch remains blocked."
+            )
+        if semantic_candidate_structurally_valid and tool_link_requires_validation:
+            return (
+                "The exact SRDF candidate is structurally valid, but the tool "
+                "link and end-effector assumptions still require validation."
             )
         if not semantic_candidate_complete:
             return (
