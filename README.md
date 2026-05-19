@@ -31,6 +31,7 @@ The current implementation focuses on a ROS 2 Jazzy and Gazebo-based research fr
 | v2.3 | Coordinate-based insertion diagnostics | In progress |
 | v2.4 | Object-frame publisher for insertion targets | In progress |
 | v2.5 | IK feasibility diagnostics before motion | In progress |
+| v2.5c | Unified execution gates and tool-axis audit | In progress |
 
 ## Recommended Launch Commands
 
@@ -61,10 +62,12 @@ source install/setup.bash
 ros2 launch thesis_bringup run_full_cartesian_insertion_diagnostics.launch.py
 ```
 
-This diagnostic launch publishes named peg/hole target frames and reports
-Cartesian distances plus conservative IK feasibility diagnostics. It does not
-start `task_trajectory_executor`, does not send trajectory goals, and does not
-command robot motion.
+This diagnostic launch publishes named peg/hole target frames, reports
+Cartesian distances, audits tool-axis alignment, and combines the execution
+gates on `/execution_gate_status`. It does not start
+`task_trajectory_executor`, does not send trajectory goals, and does not command
+robot motion. Controller execution remains blocked until geometry, IK, real IK
+solutions, tool-axis validation, safety, and force/contact gates all pass.
 
 # Robotics Project
 
