@@ -392,3 +392,62 @@ The `moveit_config_audit` node publishes JSON on `/moveit_config_audit` with:
 
 The audit is preparation only. It does not launch `move_group`, call IK, invent
 joint targets, send trajectory goals, or enable controller execution.
+
+## Baseline v2.9 MoveIt Launch Readiness Audit Fields
+
+The `moveit_launch_readiness_audit` node publishes JSON on
+`/moveit_launch_readiness_audit` with:
+
+- `moveit_launch_ready`: true only when an exact semantic model, IK config,
+  OMPL config, and a move-group launch path are present.
+- `compute_ik_expected_after_launch`: true when the readiness inputs indicate a
+  diagnostic move-group launch should provide `/compute_ik`, or when
+  `/compute_ik` is already visible.
+- `exact_robot_semantic_match`: true only for the exact `lbr_iisy6_r1300`
+  semantic model.
+- `selected_srdf`: the exact matching SRDF path, or null when no exact match
+  exists.
+- `available_srdf_variants`: discovered SRDF and SRDF xacro resources.
+- `kinematics_yaml_found`, `kinematics_yaml_file`,
+  `ompl_planning_yaml_found`, `ompl_planning_yaml_file`,
+  `joint_limits_yaml_found`, and `joint_limits_yaml_file`: launch input
+  resource checks.
+- `robot_description_available` and `robot_description_semantic_available`:
+  observed description parameters when visible.
+- `move_group_launch_found` and `move_group_launch_files`: launch files that
+  appear to start `moveit_ros_move_group`/`move_group`.
+- `controller_motion_allowed` and `trajectory_execution_allowed`: always false.
+- `recommended_next_step`: one of
+  `create_or_select_matching_srdf_for_lbr_iisy6_r1300`,
+  `create_move_group_diagnostic_launch`, `launch_move_group_diagnostic_only`,
+  or `test_compute_ik_service_no_motion`.
+
+v2.9 is launch preparation only. It does not launch `move_group`, call IK,
+fake IK solutions, send `FollowJointTrajectory` goals, start Gazebo, or unblock
+controller execution.
+
+## Baseline v2.10 Semantic Model Validation Fields
+
+The `semantic_model_validator` node publishes JSON on
+`/semantic_model_validation` with:
+
+- `target_robot_model`: `lbr_iisy6_r1300`.
+- `selected_moveit_config_package`: `project_local_lbr_iisy6_r1300_overlay`.
+- `selected_srdf`: the project-local `lbr_iisy6_r1300.srdf` path.
+- `srdf_exists`, `srdf_contains_group_arm`, and
+  `srdf_references_required_joints`: static SRDF checks for the `arm` group and
+  `joint_1` through `joint_6`.
+- `joint_states_available`, `joint_state_names`, and
+  `joint_states_contain_required_joints`: live `/joint_states` compatibility
+  checks when robot state is present.
+- `tool_link_requires_validation` and `tool_link_validation_status`: explicit
+  marker that end-effector/tool semantics are not yet validated.
+- `semantic_model_exact_candidate`: true only when the candidate SRDF names the
+  target robot, defines group `arm`, and references all required joints.
+- `semantic_model_validation_status`: `candidate_requires_validation`.
+- `approved_for_motion`, `controller_motion_allowed`, and
+  `trajectory_execution_allowed`: always false.
+
+v2.10 prepares a semantic model candidate only. It does not launch
+`move_group`, call IK, fake IK solutions, send `FollowJointTrajectory` goals,
+start Gazebo, or unblock controller execution.

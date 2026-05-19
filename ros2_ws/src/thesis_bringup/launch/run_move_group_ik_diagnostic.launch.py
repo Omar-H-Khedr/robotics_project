@@ -4,7 +4,7 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    # v2.9 diagnostic-only preparation for MoveIt IK availability.
+    # v2.9 diagnostic-only preparation for a future MoveIt/move_group IK path.
     # This launch intentionally does not start task_trajectory_executor, does not
     # send FollowJointTrajectory goals, and does not launch move_group. A future
     # move_group action must remain blocked until moveit_launch_readiness_audit
@@ -13,9 +13,9 @@ def generate_launch_description():
         [
             LogInfo(
                 msg=(
-                    "Starting v2.9 MoveIt IK diagnostic launch preparation only. "
-                    "This launch starts audits only and does not start move_group "
-                    "or any trajectory executor."
+                    "Starting v2.9 MoveIt/move_group IK diagnostic launch "
+                    "preparation only. This launch starts audits only and does "
+                    "not start move_group or any trajectory executor."
                 )
             ),
             Node(

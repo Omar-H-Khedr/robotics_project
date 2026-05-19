@@ -93,6 +93,27 @@ service is actually visible. The optional
 not launch `move_group`, `task_trajectory_executor`, Gazebo, or any controller
 client.
 
+Baseline v2.9 status: `moveit_launch_readiness_audit` publishes
+`/moveit_launch_readiness_audit` as a diagnostic-only gate before any future
+MoveIt/move_group IK launch. It requires an exact `lbr_iisy6_r1300` semantic
+model before `moveit_launch_ready` can become true. If only the currently known
+SRDF variants are present, it recommends
+`create_or_select_matching_srdf_for_lbr_iisy6_r1300` and keeps `selected_srdf`
+null. The v2.9 `run_move_group_ik_diagnostic.launch.py` starts only
+`moveit_launch_readiness_audit`, `moveit_config_audit`, and `ik_backend_audit`;
+it does not launch `move_group`, `task_trajectory_executor`, Gazebo, or any
+controller client.
+
+Baseline v2.10 status: a project-local semantic candidate for
+`lbr_iisy6_r1300` exists under
+`kuka_task_control/config/moveit_lbr_iisy6_r1300`. It is derived from the
+same-family `lbr_iisy11_r1300_arm.srdf.xacro` template, selected by the MoveIt
+audits as `project_local_lbr_iisy6_r1300_overlay`, and marked
+`semantic_model_validation_status="candidate_requires_validation"`. The new
+`semantic_model_validator` publishes `/semantic_model_validation` and always
+keeps `approved_for_motion=false`, `controller_motion_allowed=false`, and
+`trajectory_execution_allowed=false`.
+
 ## Phase 4: Experiment Manager and Reproducible Trials
 
 - Define trial manifests, parameter sweeps, seeds, and metadata.
@@ -137,6 +158,13 @@ automatically. The old two-terminal workflow remains available for debugging.
 Near-term follow-up after v0.5: define a defensible insertion-success rule from peg/hole pose, insertion depth, contact state, or a documented combination of those signals. Until then, `task_completed`, `insertion_hold_reached`, heuristic `insertion_success_estimate`, and true `insertion_success` remain separate metrics.
 
 Near-term follow-up after v2.0: validate a real insertion-depth signal from geometry, TF, or Gazebo state before promoting `insertion_success` from `null` to a binary outcome.
+
+Near-term follow-up after v2.10: validate the project-local LBR iisy 6 R1300
+semantic candidate against the exact URDF, including tool link and collision
+matrix assumptions, before preparing a real diagnostic `move_group` launch.
+Keep trajectory execution disabled and continue to block controller motion
+until `/compute_ik` is available and only no-motion IK service tests have
+passed.
 
 Near-term follow-up after v2.7: act on the `/ik_backend_audit` decision report.
 If a real `/compute_ik` service is present, add diagnostic IK requests for the
