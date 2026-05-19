@@ -84,7 +84,8 @@ def generate_launch_description():
                     "Starting Research Baseline v2.7 coordinate-based insertion "
                     "diagnostics, orientation target calculation, execution gates, "
                     "tool-axis audit, Cartesian dry-run planning, and IK backend "
-                    "audit. This launch performs no task trajectory execution."
+                    "and MoveIt config audits. This launch performs no task "
+                    "trajectory execution."
                 )
             ),
             LogInfo(msg="Spawning exactly one KUKA robot entity: kuka_lbr_iisy"),
@@ -281,6 +282,18 @@ def generate_launch_description():
                         package="kuka_task_control",
                         executable="ik_backend_audit",
                         name="ik_backend_audit",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=10.5,
+                actions=[
+                    LogInfo(msg="Starting MoveIt config audit node."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="moveit_config_audit",
+                        name="moveit_config_audit",
                         output="screen",
                     ),
                 ],
