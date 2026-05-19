@@ -45,6 +45,8 @@ setup(
             "execution_gate_monitor = kuka_task_control.execution_gate_monitor:main",
             "ik_backend_audit = kuka_task_control.ik_backend_audit:main",
             "moveit_config_audit = kuka_task_control.moveit_config_audit:main",
+            "move_group_diagnostic_config_builder = kuka_task_control.move_group_diagnostic_config_builder:main",
+            "move_group_runtime_audit = kuka_task_control.move_group_runtime_audit:main",
             "moveit_diagnostic_input_builder = kuka_task_control.moveit_diagnostic_input_builder:main",
             "moveit_launch_readiness_audit = kuka_task_control.moveit_launch_readiness_audit:main",
             "semantic_model_validator = kuka_task_control.semantic_model_validator:main",

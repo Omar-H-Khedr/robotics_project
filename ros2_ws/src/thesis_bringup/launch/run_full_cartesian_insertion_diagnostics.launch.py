@@ -323,6 +323,23 @@ def generate_launch_description():
                 ],
             ),
             TimerAction(
+                period=11.85,
+                actions=[
+                    LogInfo(
+                        msg=(
+                            "Starting move_group diagnostic config builder "
+                            "without launching move_group."
+                        )
+                    ),
+                    Node(
+                        package="kuka_task_control",
+                        executable="move_group_diagnostic_config_builder",
+                        name="move_group_diagnostic_config_builder",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
                 period=11.9,
                 actions=[
                     LogInfo(msg="Starting MoveIt diagnostic input builder node."),
@@ -344,6 +361,23 @@ def generate_launch_description():
                         package="kuka_task_control",
                         executable="robot_description_semantic_diagnostics",
                         name="robot_description_semantic_diagnostics",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=12.25,
+                actions=[
+                    LogInfo(
+                        msg=(
+                            "Starting move_group runtime audit without launching "
+                            "move_group."
+                        )
+                    ),
+                    Node(
+                        package="kuka_task_control",
+                        executable="move_group_runtime_audit",
+                        name="move_group_runtime_audit",
                         output="screen",
                     ),
                 ],

@@ -42,6 +42,12 @@ future no-motion `move_group` diagnostic launch inputs are available; it is not
 an IK solution, not a `/compute_ik` result, not a trajectory, and not evidence
 of insertion depth, contact state, or assembly success.
 
+Research Baseline v2.14 status: the diagnostic `move_group` path is still
+no-motion. `move_group_diagnostic_config_builder` reports the planned
+diagnostic inputs and `move_group_runtime_audit` reports whether `move_group`
+and `/compute_ik` are visible. These fields are service-availability diagnostics
+only; they are not IK solutions, not trajectories, and not approval to execute.
+
 ## Collision Events
 
 Count of collision or contact events that are outside the expected peg-hole interaction.
@@ -423,10 +429,19 @@ The `moveit_launch_readiness_audit` node publishes JSON on
 - `move_group_launch_found` and `move_group_launch_files`: launch files that
   appear to start `moveit_ros_move_group`/`move_group`.
 - `controller_motion_allowed` and `trajectory_execution_allowed`: always false.
+- `move_group_diagnostic_config_available`: true when
+  `/move_group_diagnostic_config` has been observed.
+- `move_group_runtime_audit_available`: true when `/move_group_runtime_audit`
+  has been observed.
+- `move_group_node_detected`: true when a `move_group` node is visible.
+- `compute_ik_services`: visible services whose name or type suggests
+  `compute_ik`.
+- `allow_trajectory_execution`: always false.
 - `recommended_next_step`: one of
   `create_or_select_matching_srdf_for_lbr_iisy6_r1300`,
-  `create_move_group_diagnostic_launch`, `launch_move_group_diagnostic_only`,
-  or `test_compute_ik_service_no_motion`.
+  `launch_move_group_diagnostic_only_with_execution_disabled`,
+  `fix_move_group_diagnostic_launch_parameters`, or
+  `test_compute_ik_service_no_motion`.
 
 v2.9 is launch preparation only. It does not launch `move_group`, call IK,
 fake IK solutions, send `FollowJointTrajectory` goals, start Gazebo, or unblock
@@ -517,3 +532,35 @@ reports `tool_link_validation_available`, `tool_link_candidate`,
 `tool_link_validation_status`. A valid diagnostic tool link changes the
 recommended next step to `prepare_move_group_diagnostic_launch_inputs`; it does
 not make `moveit_launch_ready` true and does not enable `/compute_ik` or motion.
+
+## Baseline v2.14 Move Group Diagnostic Runtime Fields
+
+`move_group_diagnostic_config_builder` publishes JSON on
+`/move_group_diagnostic_config` with:
+
+- `status`: `move_group_diagnostic_config_prepared`.
+- `robot_description_available`, `robot_description_length`,
+  `robot_description_semantic_available`, and
+  `robot_description_semantic_length`.
+- `kinematics_yaml_found`, `kinematics_yaml_file`,
+  `ompl_planning_yaml_found`, and `ompl_planning_yaml_file`.
+- `planning_group="arm"`, `planning_frame="base_link"`, and
+  `tool_link="tool0"`.
+- `allow_trajectory_execution`, `trajectory_execution_allowed`,
+  `controller_motion_allowed`, `move_group_launch_allowed`, and
+  `approved_for_motion`: always false.
+
+`move_group_runtime_audit` publishes JSON on `/move_group_runtime_audit` with:
+
+- `move_group_node_detected`.
+- `compute_ik_service_available` and `compute_ik_services`.
+- `trajectory_execution_disabled_expected=true`.
+- `compute_ik_test_allowed=false` until a later reviewed diagnostic step.
+- `motion_execution_allowed=false`.
+- `status`: `move_group_not_launched_diagnostic_only`,
+  `move_group_detected_compute_ik_available_no_motion`, or
+  `move_group_detected_compute_ik_missing`.
+
+v2.14 does not call `/compute_ik`, fake IK solutions, execute a MoveIt plan,
+send `FollowJointTrajectory` goals, launch `task_trajectory_executor`, start
+Gazebo, or approve robot motion.

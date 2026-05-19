@@ -42,6 +42,7 @@ The current implementation focuses on a ROS 2 Jazzy and Gazebo-based research fr
 | v2.11 | robot_description_semantic diagnostics and MoveIt readiness gating | In progress |
 | v2.12 | Diagnostic tool-link validation for MoveIt IK readiness | In progress |
 | v2.13 | MoveIt diagnostic input bundle preparation | In progress |
+| v2.14 | Diagnostic-only move_group launch path with execution disabled | In progress |
 
 ## Recommended Launch Commands
 
@@ -98,7 +99,7 @@ source install/setup.bash
 ros2 launch thesis_bringup run_moveit_ik_diagnostic.launch.py
 ```
 
-For the v2.9 move-group readiness skeleton:
+For the v2.14 move-group diagnostic path:
 
 ```bash
 cd ~/code/robotics_project/ros2_ws
@@ -107,13 +108,15 @@ source install/setup.bash
 ros2 launch thesis_bringup run_move_group_ik_diagnostic.launch.py
 ```
 
-This launch starts only `moveit_diagnostic_input_builder`,
+By default this launch starts only diagnostics:
+`move_group_diagnostic_config_builder`, `moveit_diagnostic_input_builder`,
 `robot_description_semantic_diagnostics`, `semantic_model_validator`,
 `tool_link_validator`, `moveit_launch_readiness_audit`, `moveit_config_audit`,
-and `ik_backend_audit`. It does not launch `move_group`,
-`task_trajectory_executor`, Gazebo, or any trajectory client. `move_group`
-remains blocked unless the exact LBR iisy 6 R1300 semantic model, tool-link
-validation, and safe launch inputs are confirmed.
+`ik_backend_audit`, and `move_group_runtime_audit`. It does not launch
+`move_group`, `task_trajectory_executor`, Gazebo, or any trajectory client.
+The optional `launch_move_group:=true` path is diagnostic-only and sets
+`allow_trajectory_execution=false`; it must not execute plans or send
+controller goals.
 
 v2.10 adds a project-local semantic candidate for `lbr_iisy6_r1300` under
 `ros2_ws/src/kuka_task_control/config/moveit_lbr_iisy6_r1300/`. It is derived
@@ -138,6 +141,12 @@ assemble the future diagnostic `move_group` input bundle without launching
 MoveIt YAML, planning-frame, tool-link, and safety readiness while keeping
 `approved_for_motion=false`, `move_group_launch_allowed=false`,
 `controller_motion_allowed=false`, and `trajectory_execution_allowed=false`.
+
+v2.14 adds `move_group_diagnostic_config_builder` on
+`/move_group_diagnostic_config` and `move_group_runtime_audit` on
+`/move_group_runtime_audit`. The default move-group diagnostic launch remains
+blocked. If explicitly enabled, `move_group` is launched only to expose service
+availability, with trajectory execution disabled and motion still disallowed.
 
 # Robotics Project
 

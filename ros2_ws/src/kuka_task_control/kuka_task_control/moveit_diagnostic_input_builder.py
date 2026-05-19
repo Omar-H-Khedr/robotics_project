@@ -12,9 +12,15 @@ from ament_index_python.packages import (
     PackageNotFoundError,
     get_package_share_directory,
 )
-from rcl_interfaces.srv import GetParameters
+from rcl_interfaces.srv import GetParameters, ListParameters
 from rclpy.node import Node
 from std_msgs.msg import String
+
+from kuka_task_control.diagnostic_robot_description import (
+    REQUIRED_JOINTS as DIAGNOSTIC_REQUIRED_JOINTS,
+    robot_description_content_report,
+    robot_description_file_fallback,
+)
 
 try:
     import yaml
@@ -26,10 +32,10 @@ class MoveItDiagnosticInputBuilder(Node):
     """Publish a no-motion bundle of inputs for a future diagnostic move_group."""
 
     TOPIC = "/moveit_diagnostic_inputs"
-    REQUIRED_JOINTS = ("joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6")
-    ROBOT_DESCRIPTION_SERVICE_NAMES = (
-        "/robot_state_publisher/get_parameters",
-        "/moveit_diagnostic_input_builder/get_parameters",
+    REQUIRED_JOINTS = DIAGNOSTIC_REQUIRED_JOINTS
+    ROBOT_DESCRIPTION_LIST_SERVICE_NAMES = (
+        "/robot_state_publisher/list_parameters",
+        "/move_group/list_parameters",
     )
 
     def __init__(self) -> None:
@@ -47,8 +53,14 @@ class MoveItDiagnosticInputBuilder(Node):
             if self._robot_description_xml
             else None
         )
-        self._parameter_clients: dict[str, Any] = {}
-        self._parameter_futures: dict[str, Any] = {}
+        self._robot_description_source = (
+            "local_parameter" if self._robot_description_xml else "unavailable"
+        )
+        self._robot_description_error: str | None = None
+        self._parameter_list_clients: dict[str, Any] = {}
+        self._parameter_list_futures: dict[str, Any] = {}
+        self._parameter_get_clients: dict[str, Any] = {}
+        self._parameter_get_futures: dict[str, Any] = {}
         self._parameter_request_attempts: dict[str, int] = {}
         self._tool_link_validation_report: dict[str, Any] | None = None
         self._tool_link_validation_parse_error = False
@@ -71,6 +83,7 @@ class MoveItDiagnosticInputBuilder(Node):
     def _publish_inputs(self) -> None:
         self._request_robot_description_if_visible()
         self._collect_robot_description_results()
+        self._apply_robot_description_file_fallback_if_needed()
 
         srdf_path = self._semantic_srdf_path()
         config_dir = self._moveit_config_directory()
@@ -98,6 +111,7 @@ class MoveItDiagnosticInputBuilder(Node):
                 "robot_description_available"
             ],
             "robot_description_source_node": self._robot_description_source_node,
+            "robot_description_source": self._robot_description_source,
             "robot_description_length": robot_description["robot_description_length"],
             "robot_description_contains_required_joints": robot_description[
                 "robot_description_contains_required_joints"
@@ -105,6 +119,7 @@ class MoveItDiagnosticInputBuilder(Node):
             "robot_description_contains_tool0": robot_description[
                 "robot_description_contains_tool0"
             ],
+            "robot_description_error": robot_description["robot_description_error"],
             "semantic_srdf_file_path": str(srdf_path),
             "semantic_srdf_file_exists": semantic["semantic_srdf_file_exists"],
             "semantic_srdf_parse_success": semantic["semantic_srdf_parse_success"],
@@ -176,90 +191,140 @@ class MoveItDiagnosticInputBuilder(Node):
         self._tool_link_validation_report = payload
 
     def _request_robot_description_if_visible(self) -> None:
-        if self._robot_description_xml:
+        if (
+            self._robot_description_xml
+            and self._robot_description_source != "file_fallback"
+        ):
             return
 
         visible_services = {
             name
             for name, _types in self.get_service_names_and_types()
-            if name.endswith("/get_parameters")
+            if name.endswith("/list_parameters")
         }
-        likely_services = list(self.ROBOT_DESCRIPTION_SERVICE_NAMES)
+        likely_services = list(self.ROBOT_DESCRIPTION_LIST_SERVICE_NAMES)
         likely_services.extend(
             service_name
             for service_name in visible_services
-            if "robot_state_publisher" in service_name
+            if "robot_state_publisher" in service_name or "move_group" in service_name
+        )
+        likely_services.extend(
+            service_name
+            for service_name in visible_services
+            if service_name not in likely_services
         )
 
         for service_name in sorted(set(likely_services)):
-            if service_name in self._parameter_futures:
+            if service_name in self._parameter_list_futures:
                 continue
             attempts = self._parameter_request_attempts.get(service_name, 0)
             if attempts >= 5:
                 continue
-            client = self._parameter_clients.get(service_name)
+            client = self._parameter_list_clients.get(service_name)
             if client is None:
-                client = self.create_client(GetParameters, service_name)
-                self._parameter_clients[service_name] = client
+                client = self.create_client(ListParameters, service_name)
+                self._parameter_list_clients[service_name] = client
             if not client.service_is_ready():
                 self._parameter_request_attempts[service_name] = attempts + 1
                 continue
-            request = GetParameters.Request()
-            request.names = ["robot_description"]
-            self._parameter_futures[service_name] = client.call_async(request)
+            request = ListParameters.Request()
+            request.prefixes = []
+            request.depth = 0
+            self._parameter_list_futures[service_name] = client.call_async(request)
             self._parameter_request_attempts[service_name] = attempts + 1
 
     def _collect_robot_description_results(self) -> None:
-        completed = []
-        for service_name, future in self._parameter_futures.items():
+        completed_lists = []
+        for service_name, future in self._parameter_list_futures.items():
             if not future.done():
                 continue
-            completed.append(service_name)
+            completed_lists.append(service_name)
             try:
                 response = future.result()
             except Exception as exc:  # pragma: no cover - defensive ROS callback path
                 self.get_logger().debug(
+                    f"Failed to list parameters from {service_name}: {exc}"
+                )
+                continue
+            if "robot_description" in set(response.result.names):
+                self._request_listed_robot_description(service_name)
+
+        for service_name in completed_lists:
+            self._parameter_list_futures.pop(service_name, None)
+
+        completed_gets = []
+        for service_name, future in self._parameter_get_futures.items():
+            if not future.done():
+                continue
+            completed_gets.append(service_name)
+            try:
+                response = future.result()
+            except Exception as exc:  # pragma: no cover - defensive ROS callback path
+                self._robot_description_error = (
                     f"Failed to read robot_description from {service_name}: {exc}"
                 )
+                self.get_logger().debug(self._robot_description_error)
                 continue
             if response.values and response.values[0].string_value:
                 self._robot_description_xml = response.values[0].string_value
+                self._robot_description_source = "parameter_service"
                 self._robot_description_source_node = service_name.rsplit(
                     "/get_parameters",
                     1,
                 )[0]
+                self._robot_description_error = None
 
-        for service_name in completed:
-            self._parameter_futures.pop(service_name, None)
+        for service_name in completed_gets:
+            self._parameter_get_futures.pop(service_name, None)
+
+    def _request_listed_robot_description(self, list_service_name: str) -> None:
+        get_service_name = list_service_name.rsplit("/list_parameters", 1)[0]
+        get_service_name += "/get_parameters"
+        if get_service_name in self._parameter_get_futures:
+            return
+        client = self._parameter_get_clients.get(get_service_name)
+        if client is None:
+            client = self.create_client(GetParameters, get_service_name)
+            self._parameter_get_clients[get_service_name] = client
+        if not client.service_is_ready():
+            return
+        request = GetParameters.Request()
+        request.names = ["robot_description"]
+        self._parameter_get_futures[get_service_name] = client.call_async(request)
+
+    def _apply_robot_description_file_fallback_if_needed(self) -> None:
+        if self._robot_description_xml:
+            return
+        robot_description, error = robot_description_file_fallback()
+        if robot_description:
+            self._robot_description_xml = robot_description
+            self._robot_description_source = "file_fallback"
+            self._robot_description_source_node = None
+            self._robot_description_error = None
+            return
+        self._robot_description_source = "unavailable"
+        self._robot_description_source_node = None
+        self._robot_description_error = error
 
     def _robot_description_report(self) -> dict[str, Any]:
         robot_description = self._robot_description_xml or ""
-        joint_names: list[str] = []
-        link_names: list[str] = []
-        if robot_description:
-            try:
-                root = ElementTree.fromstring(robot_description)
-            except ElementTree.ParseError:
-                root = None
-            if root is not None:
-                joint_names = [
-                    joint.attrib["name"]
-                    for joint in root.findall("joint")
-                    if joint.attrib.get("name")
-                ]
-                link_names = [
-                    link.attrib["name"]
-                    for link in root.findall("link")
-                    if link.attrib.get("name")
-                ]
-        joint_set = set(joint_names)
+        report = robot_description_content_report(
+            robot_description,
+            self.REQUIRED_JOINTS,
+        )
         return {
-            "robot_description_available": bool(robot_description),
-            "robot_description_length": len(robot_description),
-            "robot_description_contains_required_joints": all(
-                joint in joint_set for joint in self.REQUIRED_JOINTS
+            "robot_description_available": report["robot_description_available"],
+            "robot_description_length": report["robot_description_length"],
+            "robot_description_contains_required_joints": report[
+                "robot_description_contains_required_joints"
+            ],
+            "robot_description_contains_tool0": report[
+                "robot_description_contains_tool0"
+            ],
+            "robot_description_error": (
+                self._robot_description_error
+                or report["robot_description_parse_error"]
             ),
-            "robot_description_contains_tool0": "tool0" in set(link_names),
         }
 
     def _semantic_report(self, srdf_path: Path) -> dict[str, Any]:

@@ -85,6 +85,10 @@ class MoveItLaunchReadinessAudit(Node):
         )
         self._moveit_diagnostic_inputs_report: dict[str, Any] | None = None
         self._moveit_diagnostic_inputs_parse_error = False
+        self._move_group_diagnostic_config_report: dict[str, Any] | None = None
+        self._move_group_diagnostic_config_parse_error = False
+        self._move_group_runtime_audit_report: dict[str, Any] | None = None
+        self._move_group_runtime_audit_parse_error = False
         self._semantic_diagnostics_report: dict[str, Any] | None = None
         self._tool_link_validation_report: dict[str, Any] | None = None
         self._tool_link_validation_parse_error = False
@@ -106,6 +110,18 @@ class MoveItLaunchReadinessAudit(Node):
             String,
             "/moveit_diagnostic_inputs",
             self._on_moveit_diagnostic_inputs,
+            10,
+        )
+        self.create_subscription(
+            String,
+            "/move_group_diagnostic_config",
+            self._on_move_group_diagnostic_config,
+            10,
+        )
+        self.create_subscription(
+            String,
+            "/move_group_runtime_audit",
+            self._on_move_group_runtime_audit,
             10,
         )
         self.create_subscription(
@@ -167,6 +183,29 @@ class MoveItLaunchReadinessAudit(Node):
         ompl_planning_yaml_found = bool(report["ompl_planning_yaml_file"])
         joint_limits_yaml_found = bool(report["joint_limits_yaml_file"])
         compute_ik_service_available = bool(services["compute_ik_service_available"])
+        move_group_node_detected = bool(services["move_group_node_detected"])
+        runtime_move_group_node_detected = bool(
+            self._move_group_runtime_audit_report
+            and self._move_group_runtime_audit_report.get("move_group_node_detected")
+        )
+        runtime_compute_ik_service_available = bool(
+            self._move_group_runtime_audit_report
+            and self._move_group_runtime_audit_report.get(
+                "compute_ik_service_available"
+            )
+        )
+        effective_move_group_node_detected = bool(
+            move_group_node_detected or runtime_move_group_node_detected
+        )
+        effective_compute_ik_service_available = bool(
+            compute_ik_service_available or runtime_compute_ik_service_available
+        )
+        compute_ik_services = self._compute_ik_services(
+            services["compute_ik_services"],
+            (
+                self._move_group_runtime_audit_report or {}
+            ).get("compute_ik_services", []),
+        )
         moveit_launch_ready = False
         compute_ik_expected_after_launch = False
         moveit_diagnostic_inputs_available = (
@@ -220,6 +259,18 @@ class MoveItLaunchReadinessAudit(Node):
                 self._moveit_diagnostic_inputs_parse_error
             ),
             "move_group_launch_inputs_ready": move_group_launch_inputs_ready,
+            "move_group_diagnostic_config_available": (
+                self._move_group_diagnostic_config_report is not None
+            ),
+            "move_group_diagnostic_config_parse_error": (
+                self._move_group_diagnostic_config_parse_error
+            ),
+            "move_group_runtime_audit_available": (
+                self._move_group_runtime_audit_report is not None
+            ),
+            "move_group_runtime_audit_parse_error": (
+                self._move_group_runtime_audit_parse_error
+            ),
             "move_group_launch_allowed": False,
             "compute_ik_expected_after_launch": compute_ik_expected_after_launch,
             "exact_robot_semantic_match": exact_robot_semantic_match,
@@ -307,7 +358,10 @@ class MoveItLaunchReadinessAudit(Node):
             "robot_joint_names_from_urdf": self._joint_names_from_urdf(),
             "move_group_launch_found": move_group_launch_found,
             "move_group_launch_files": report["move_group_launch_files"],
-            "compute_ik_service_available": compute_ik_service_available,
+            "move_group_node_detected": effective_move_group_node_detected,
+            "compute_ik_service_available": effective_compute_ik_service_available,
+            "compute_ik_services": compute_ik_services,
+            "allow_trajectory_execution": False,
             "controller_motion_allowed": False,
             "trajectory_execution_allowed": False,
             "motion_execution_enabled": False,
@@ -324,7 +378,10 @@ class MoveItLaunchReadinessAudit(Node):
                     tool_link_candidate_valid_for_diagnostics
                 ),
                 move_group_launch_found=move_group_launch_found,
-                compute_ik_service_available=compute_ik_service_available,
+                compute_ik_service_available=(
+                    effective_compute_ik_service_available
+                ),
+                move_group_node_detected=effective_move_group_node_detected,
             ),
             "decision_reason": self._decision_reason(
                 exact_robot_semantic_match=exact_robot_semantic_match,
@@ -338,7 +395,9 @@ class MoveItLaunchReadinessAudit(Node):
                 ),
                 move_group_launch_found=move_group_launch_found,
                 moveit_launch_ready=moveit_launch_ready,
-                compute_ik_service_available=compute_ik_service_available,
+                compute_ik_service_available=(
+                    effective_compute_ik_service_available
+                ),
             ),
             "target_robot_model": self.TARGET_ROBOT_MODEL,
             "config_package_candidates": report["config_package_candidates"],
@@ -365,6 +424,38 @@ class MoveItLaunchReadinessAudit(Node):
             return
         self._moveit_diagnostic_inputs_parse_error = False
         self._moveit_diagnostic_inputs_report = payload
+        self._update_robot_description_from_diagnostic_payload(
+            payload,
+            default_source="/moveit_diagnostic_inputs",
+        )
+
+    def _on_move_group_diagnostic_config(self, message: String) -> None:
+        try:
+            payload = json.loads(message.data)
+        except json.JSONDecodeError:
+            self._move_group_diagnostic_config_parse_error = True
+            return
+        if not isinstance(payload, dict):
+            self._move_group_diagnostic_config_parse_error = True
+            return
+        self._move_group_diagnostic_config_parse_error = False
+        self._move_group_diagnostic_config_report = payload
+        self._update_robot_description_from_diagnostic_payload(
+            payload,
+            default_source="/move_group_diagnostic_config",
+        )
+
+    def _on_move_group_runtime_audit(self, message: String) -> None:
+        try:
+            payload = json.loads(message.data)
+        except json.JSONDecodeError:
+            self._move_group_runtime_audit_parse_error = True
+            return
+        if not isinstance(payload, dict):
+            self._move_group_runtime_audit_parse_error = True
+            return
+        self._move_group_runtime_audit_parse_error = False
+        self._move_group_runtime_audit_report = payload
 
     def _on_semantic_diagnostics(self, message: String) -> None:
         try:
@@ -393,6 +484,29 @@ class MoveItLaunchReadinessAudit(Node):
             return
         self._tool_link_validation_parse_error = False
         self._tool_link_validation_report = payload
+
+    def _update_robot_description_from_diagnostic_payload(
+        self,
+        payload: dict[str, Any],
+        *,
+        default_source: str,
+    ) -> None:
+        if not payload.get("robot_description_available"):
+            return
+        self._robot_description_available = True
+        source_node = payload.get("robot_description_source_node")
+        source = payload.get("robot_description_source")
+        self._robot_description_source_node = (
+            str(source_node) if source_node else default_source
+        )
+        if source:
+            self._robot_description_check_reason = (
+                f"robot_description reported by {default_source} via {source}"
+            )
+        else:
+            self._robot_description_check_reason = (
+                f"robot_description reported by {default_source}"
+            )
 
     def _startup_grace_period_elapsed(self) -> bool:
         grace_period = float(self.get_parameter("startup_grace_period_sec").value)
@@ -459,6 +573,10 @@ class MoveItLaunchReadinessAudit(Node):
         all_services = []
         compute_ik_services = []
         compute_ik_service_available = False
+        move_group_node_detected = any(
+            name.rsplit("/", 1)[-1] == "move_group"
+            for name in self.get_node_names()
+        )
 
         for service_name, service_types in self.get_service_names_and_types():
             service_types_list = list(service_types)
@@ -477,8 +595,29 @@ class MoveItLaunchReadinessAudit(Node):
                 compute_ik_services,
                 key=lambda entry: entry["name"],
             ),
+            "move_group_node_detected": move_group_node_detected,
             "all_services": sorted(all_services, key=lambda entry: entry["name"]),
         }
+
+    @staticmethod
+    def _compute_ik_services(
+        *service_lists: Any,
+    ) -> list[dict[str, Any]]:
+        merged: dict[str, dict[str, Any]] = {}
+        for service_list in service_lists:
+            if not isinstance(service_list, list):
+                continue
+            for entry in service_list:
+                if not isinstance(entry, dict):
+                    continue
+                name = str(entry.get("name", ""))
+                if not name:
+                    continue
+                merged[name] = {
+                    "name": name,
+                    "types": list(entry.get("types", [])),
+                }
+        return sorted(merged.values(), key=lambda entry: entry["name"])
 
     def _config_report(self) -> dict[str, Any]:
         candidates = self._package_candidates()
@@ -1001,14 +1140,20 @@ class MoveItLaunchReadinessAudit(Node):
         tool_link_candidate_valid_for_diagnostics: bool,
         move_group_launch_found: bool,
         compute_ik_service_available: bool,
+        move_group_node_detected: bool,
     ) -> str:
+        if move_group_node_detected and compute_ik_service_available:
+            return "test_compute_ik_service_no_motion"
+        if move_group_node_detected and not compute_ik_service_available:
+            return "fix_move_group_diagnostic_launch_parameters"
+        if not move_group_node_detected:
+            return "launch_move_group_diagnostic_only_with_execution_disabled"
         if self._moveit_diagnostic_inputs_report is not None:
             if self._moveit_diagnostic_inputs_report.get(
                 "moveit_diagnostic_inputs_ready"
             ):
                 return (
-                    "create_move_group_diagnostic_launch_with_trajectory_execution_"
-                    "disabled"
+                    "launch_move_group_diagnostic_only_with_execution_disabled"
                 )
             recommended = self._moveit_diagnostic_inputs_report.get(
                 "recommended_next_step"
