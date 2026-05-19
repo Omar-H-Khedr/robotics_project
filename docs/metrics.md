@@ -207,3 +207,33 @@ The `ik_feasibility_diagnostics` node publishes JSON on
 
 These fields are planning diagnostics only. They do not prove insertion success,
 do not execute trajectories, and must not be used as contact validation.
+
+## Baseline v2.5c Execution Gate and Tool-Axis Fields
+
+The `execution_gate_monitor` node publishes JSON on `/execution_gate_status`
+with:
+
+- `status`: always `execution_gates_diagnostic_only_no_motion`.
+- `motion_execution_enabled`: always false in v2.5c.
+- `trajectory_execution_requested`: always false in v2.5c.
+- `geometry_valid`: copied from
+  `/cartesian_insertion_diagnostics.cartesian_geometry_valid`.
+- `geometry_source`: the source used for the geometry gate.
+- `ik_available`: copied from IK solver detection.
+- `ik_solution_available`: true only after real IK solutions exist for all
+  targets.
+- `all_targets_geometrically_feasible`: approximate workspace diagnostic from
+  IK feasibility.
+- `tool_axis_orientation_validated`: false until manually validated.
+- `safety_guard_active`: true only after an observed OK `/safety_status`.
+- `force_guard_active`: false unless explicitly reported active.
+- `contact_metrics_available`: copied from `/insertion_metrics` when available.
+- `controller_execution_allowed`: true only when all required gates pass.
+- `block_reasons` and `primary_block_reason`: explicit reasons motion is
+  blocked.
+
+The `tool_axis_audit` node publishes JSON on `/tool_axis_audit` with the world
+directions of `tool0` `+X`, `-X`, `+Y`, `-Y`, `+Z`, and `-Z`, alignment scores
+against `[0.0, 0.0, -1.0]`, and the best candidate tool axis. It always reports
+`orientation_validated=false` until a human explicitly validates the insertion
+axis.

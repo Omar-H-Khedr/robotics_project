@@ -30,6 +30,8 @@ setup(
             "peg_hole_frame_publisher = kuka_task_control.peg_hole_frame_publisher:main",
             "cartesian_insertion_diagnostics = kuka_task_control.cartesian_insertion_diagnostics:main",
             "ik_feasibility_diagnostics = kuka_task_control.ik_feasibility_diagnostics:main",
+            "tool_axis_audit = kuka_task_control.tool_axis_audit:main",
+            "execution_gate_monitor = kuka_task_control.execution_gate_monitor:main",
         ]
     },
 )
