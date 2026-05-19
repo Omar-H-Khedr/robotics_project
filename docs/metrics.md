@@ -365,3 +365,30 @@ The `ik_backend_audit` node publishes JSON on `/ik_backend_audit` with:
 These fields are infrastructure diagnostics only. They do not solve IK, do not
 produce joint targets, do not send trajectory goals, and do not unblock
 controller execution.
+
+## Baseline v2.8 MoveIt Config Audit Fields
+
+The `moveit_config_audit` node publishes JSON on `/moveit_config_audit` with:
+
+- `status`: always `moveit_config_audit_diagnostic_only_no_motion`.
+- `controller_motion_allowed`: always false.
+- `trajectory_execution_allowed`: always false.
+- `packages`: availability of `moveit_ros_move_group`, `moveit_msgs`, and
+  `moveit_kinematics`.
+- `moveit_config_package_found`: true when a likely installed or source MoveIt
+  config package with relevant config resources is found.
+- `srdf_found`, `kinematics_yaml_found`, `joint_limits_yaml_found`,
+  `ompl_planning_yaml_found`, and `move_group_launch_found`: file-level config
+  readiness checks.
+- `robot_description_available`: observed `robot_description` parameter
+  availability from `robot_state_publisher` when visible.
+- `joint_states_available` and `joint_names_observed`: current robot state
+  visibility.
+- `compute_ik_service_available`: true only when `/compute_ik` is visible.
+- `moveit_ready_for_compute_ik`: true only when the MoveIt config resources,
+  move-group launch readiness, and `/compute_ik` visibility are all confirmed.
+- `recommended_next_step`: one of `create_moveit_config_package`,
+  `launch_move_group_diagnostic_only`, or `test_compute_ik_service_no_motion`.
+
+The audit is preparation only. It does not launch `move_group`, call IK, invent
+joint targets, send trajectory goals, or enable controller execution.

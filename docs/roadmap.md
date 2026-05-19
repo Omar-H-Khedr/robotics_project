@@ -81,6 +81,18 @@ motion execution, send trajectory goals, install packages, or run Gazebo.
 Controller execution remains blocked while the report decides between using a
 MoveIt `/compute_ik` backend, configuring MoveIt, or adding a custom IK service.
 
+Baseline v2.8 status: `moveit_config_audit` publishes `/moveit_config_audit`
+as a diagnostic-only readiness report for KUKA LBR iisy MoveIt configuration.
+It searches installed and source package shares for likely MoveIt config
+packages, SRDF files, `kinematics.yaml`, joint-limits, OMPL planning config,
+and move-group launch resources. MoveIt packages may be present while
+`/compute_ik` is still absent, so the report keeps
+`moveit_ready_for_compute_ik=false` until the config is confirmed and the
+service is actually visible. The optional
+`run_moveit_ik_diagnostic.launch.py` launch starts only the audit nodes and does
+not launch `move_group`, `task_trajectory_executor`, Gazebo, or any controller
+client.
+
 ## Phase 4: Experiment Manager and Reproducible Trials
 
 - Define trial manifests, parameter sweeps, seeds, and metadata.
