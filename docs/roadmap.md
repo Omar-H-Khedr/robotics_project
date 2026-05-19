@@ -71,6 +71,16 @@ published on `/cartesian_insertion_dry_run_plan` as diagnostics only with
 solutions exist for all planned waypoints and the execution gates are available.
 No controller command is sent.
 
+Baseline v2.7 status: `ik_backend_audit` publishes `/ik_backend_audit` as a
+diagnostic decision report for available IK infrastructure. It checks visible
+`compute_ik` and MoveIt-style services, package availability through
+`ament_index_python`, robot model resources, joint names, joint-limits file
+readability, KUKA LBR iisy URDF/xacro discovery, and observed project readiness
+from the v2.6 dry-run plan and execution gates. It does not solve IK, call
+motion execution, send trajectory goals, install packages, or run Gazebo.
+Controller execution remains blocked while the report decides between using a
+MoveIt `/compute_ik` backend, configuring MoveIt, or adding a custom IK service.
+
 ## Phase 4: Experiment Manager and Reproducible Trials
 
 - Define trial manifests, parameter sweeps, seeds, and metadata.
@@ -116,7 +126,9 @@ Near-term follow-up after v0.5: define a defensible insertion-success rule from 
 
 Near-term follow-up after v2.0: validate a real insertion-depth signal from geometry, TF, or Gazebo state before promoting `insertion_success` from `null` to a binary outcome.
 
-Near-term follow-up after v2.6: connect a real IK solver or MoveIt `compute_ik`
-service, populate real joint solutions for every full-pose Cartesian waypoint,
-and only then consider conservative staging and guarded insertion trajectories
-from object frames instead of hand-tuned joint values.
+Near-term follow-up after v2.7: act on the `/ik_backend_audit` decision report.
+If a real `/compute_ik` service is present, add diagnostic IK requests for the
+full-pose waypoints. If MoveIt resources exist but no service is running,
+configure and launch MoveIt. If no backend exists, add MoveIt integration or a
+custom IK service. Do not enable controller execution until real joint
+solutions exist for every waypoint and all gates pass.

@@ -81,10 +81,10 @@ def generate_launch_description():
         [
             LogInfo(
                 msg=(
-                    "Starting Research Baseline v2.6 coordinate-based insertion "
+                    "Starting Research Baseline v2.7 coordinate-based insertion "
                     "diagnostics, orientation target calculation, execution gates, "
-                    "tool-axis audit, and Cartesian dry-run planning. This launch "
-                    "performs no task trajectory execution."
+                    "tool-axis audit, Cartesian dry-run planning, and IK backend "
+                    "audit. This launch performs no task trajectory execution."
                 )
             ),
             LogInfo(msg="Spawning exactly one KUKA robot entity: kuka_lbr_iisy"),
@@ -269,6 +269,18 @@ def generate_launch_description():
                         package="kuka_task_control",
                         executable="execution_gate_monitor",
                         name="execution_gate_monitor",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=10.0,
+                actions=[
+                    LogInfo(msg="Starting IK backend audit node."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="ik_backend_audit",
+                        name="ik_backend_audit",
                         output="screen",
                     ),
                 ],
