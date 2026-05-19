@@ -81,10 +81,10 @@ def generate_launch_description():
         [
             LogInfo(
                 msg=(
-                    "Starting Research Baseline v2.5d coordinate-based insertion "
+                    "Starting Research Baseline v2.6 coordinate-based insertion "
                     "diagnostics, orientation target calculation, execution gates, "
-                    "and tool-axis audit. This launch performs no task trajectory "
-                    "execution."
+                    "tool-axis audit, and Cartesian dry-run planning. This launch "
+                    "performs no task trajectory execution."
                 )
             ),
             LogInfo(msg="Spawning exactly one KUKA robot entity: kuka_lbr_iisy"),
@@ -251,6 +251,18 @@ def generate_launch_description():
             ),
             TimerAction(
                 period=9.0,
+                actions=[
+                    LogInfo(msg="Starting Cartesian insertion dry-run planner."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="cartesian_insertion_dry_run_planner",
+                        name="cartesian_insertion_dry_run_planner",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=9.5,
                 actions=[
                     LogInfo(msg="Starting unified execution gate monitor."),
                     Node(

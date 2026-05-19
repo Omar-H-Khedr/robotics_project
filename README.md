@@ -34,6 +34,7 @@ The current implementation focuses on a ROS 2 Jazzy and Gazebo-based research fr
 | v2.5c | Unified execution gates and tool-axis audit | In progress |
 | v2.5d | Diagnostic Cartesian orientation target calculation | In progress |
 | v2.5e/v2.5f | Orientation-aware IK diagnostics and full-pose waypoint policy | In progress |
+| v2.6 | Diagnostic-only Cartesian dry-run insertion plan | In progress |
 
 ## Recommended Launch Commands
 
@@ -67,11 +68,12 @@ ros2 launch thesis_bringup run_full_cartesian_insertion_diagnostics.launch.py
 This diagnostic launch publishes named peg/hole target frames, reports
 Cartesian distances, audits tool-axis alignment, computes diagnostic target
 orientations for all planned waypoints, including `staging_pose`, on
-`/cartesian_orientation_targets`, and combines the execution gates on
-`/execution_gate_status`. It does not start
-`task_trajectory_executor`, does not send trajectory goals, and does not command
-robot motion. Controller execution remains blocked until geometry, IK, real IK
-solutions, tool-axis validation, safety, and force/contact gates all pass.
+`/cartesian_orientation_targets`, assembles the full no-motion Cartesian dry-run
+plan on `/cartesian_insertion_dry_run_plan`, and combines the execution gates on
+`/execution_gate_status`. It does not start `task_trajectory_executor`, does not
+send trajectory goals, and does not command robot motion. Controller execution
+remains blocked until geometry, IK, real IK solutions for every waypoint,
+tool-axis validation, safety, and force/contact gates all pass.
 
 # Robotics Project
 
