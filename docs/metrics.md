@@ -30,6 +30,12 @@ reported, but `insertion_success` remains `null`. A non-executable dry-run plan
 is still a planning diagnostic, not evidence of insertion depth, contact state,
 or assembly success.
 
+Research Baseline v2.7 status: the IK backend audit reports available IK
+infrastructure and a recommended next step, but `insertion_success` remains
+`null`. Backend availability or configuration readiness is not an IK solution,
+not a trajectory, and not evidence of insertion depth, contact state, or
+assembly success.
+
 ## Collision Events
 
 Count of collision or contact events that are outside the expected peg-hole interaction.
@@ -330,3 +336,32 @@ The execution gate monitor now also reports `dry_run_plan_available`,
 `dry_run_plan_executable`, and `dry_run_primary_block_reason`. Controller
 execution remains disabled in the diagnostic launch, and no controller command
 is sent.
+
+## Baseline v2.7 IK Backend Audit Fields
+
+The `ik_backend_audit` node publishes JSON on `/ik_backend_audit` with:
+
+- `status`: always `ik_backend_audit_diagnostic_only_no_motion`.
+- `motion_execution_enabled`: always false.
+- `trajectory_execution_requested`: always false.
+- `controller_motion_allowed`: always false.
+- `services`: visible `/compute_ik`, `compute_ik`-like, and MoveIt planning
+  service diagnostics.
+- `packages`: availability of `moveit_ros_move_group`, `moveit_msgs`,
+  `moveit_kinematics`, `trac_ik_kinematics_plugin`, `kdl_parser_py`, and
+  `urdf_parser_py` through `ament_index_python`.
+- `robot_model_resources`: `robot_description` visibility, `/joint_states`
+  joint names, joint-limits file availability/readability, and KUKA LBR iisy
+  URDF/xacro discovery from package share folders.
+- `existing_project_ik_readiness`: observed v2.6 dry-run plan, orientation
+  target, and execution-gate status.
+- `ik_backend_available`: true only when a callable compute-IK path is visible
+  with the required message support; otherwise false.
+- `recommended_backend`: one of `moveit_compute_ik`, `configure_moveit`, or
+  `add_moveit_or_custom_ik_service`.
+- `recommended_next_step` and `decision_reason`: diagnostic guidance for the
+  next implementation step.
+
+These fields are infrastructure diagnostics only. They do not solve IK, do not
+produce joint targets, do not send trajectory goals, and do not unblock
+controller execution.
