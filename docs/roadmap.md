@@ -147,6 +147,17 @@ the project-local SRDF, `kinematics.yaml`, `ompl_planning.yaml`, the missing
 `move_group`, `/compute_ik`, controller execution, and trajectory execution
 remain blocked.
 
+Baseline v2.14 status: `run_move_group_ik_diagnostic.launch.py` now has a
+`launch_move_group` argument that defaults to `false`. The default path starts
+diagnostics only, including `move_group_diagnostic_config_builder` on
+`/move_group_diagnostic_config` and `move_group_runtime_audit` on
+`/move_group_runtime_audit`. If `launch_move_group:=true` is explicitly used,
+the launch starts diagnostic-only `move_group` with
+`allow_trajectory_execution=false`; no trajectory executor, controller client,
+FollowJointTrajectory goal, MoveIt plan execution, or `/compute_ik` request is
+started by the launch. The intended outcome is only to observe whether
+`/compute_ik` becomes available.
+
 ## Phase 4: Experiment Manager and Reproducible Trials
 
 - Define trial manifests, parameter sweeps, seeds, and metadata.
@@ -192,11 +203,10 @@ Near-term follow-up after v0.5: define a defensible insertion-success rule from 
 
 Near-term follow-up after v2.0: validate a real insertion-depth signal from geometry, TF, or Gazebo state before promoting `insertion_success` from `null` to a binary outcome.
 
-Near-term follow-up after v2.13: create an explicitly guarded diagnostic
-`move_group` launch with trajectory execution disabled, using the prepared
-`/moveit_diagnostic_inputs` bundle. Keep controller motion blocked and do not
-call `/compute_ik` until that launch path exists and is reviewed as
-diagnostic-only.
+Near-term follow-up after v2.14: review the diagnostic-only move_group launch
+parameters, then perform a separate no-motion `/compute_ik` service test only
+after `/move_group_runtime_audit` reports the service visible. Keep controller
+motion and trajectory execution blocked.
 
 Near-term follow-up after v2.7: act on the `/ik_backend_audit` decision report.
 If a real `/compute_ik` service is present, add diagnostic IK requests for the
