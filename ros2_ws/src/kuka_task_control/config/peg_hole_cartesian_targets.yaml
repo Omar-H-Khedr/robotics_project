@@ -2,37 +2,66 @@ world_frame: world
 robot_base_frame: base_link
 tool_frame: tool0
 
+orientation_mode: align_tool_axis_to_insertion_axis
+insertion_axis_world: [0.0, 0.0, -1.0]
+tool_insertion_axis: unknown
+motion_execution_allowed: false
+motion_execution_block_reason: tool insertion axis not validated
+reason: tool insertion axis not validated
+
+orientation_planning:
+  selected_tool_axis_candidate: tool0_+Z
+  insertion_axis_world: [0.0, 0.0, -1.0]
+  validation_status: candidate_only_not_validated
+  yaw_reference_mode: keep_current_tool_yaw_if_possible
+  motion_execution_allowed: false
+
+waypoint_orientation_policy:
+  staging_pose:
+    mode: align_tool_axis_to_insertion_axis
+    rationale: "Orient the tool before lateral alignment so rotation does not occur close to the hole."
+  axis_align_pose:
+    mode: align_tool_axis_to_insertion_axis
+  insertion_touch_pose:
+    mode: align_tool_axis_to_insertion_axis
+  insertion_hold_pose:
+    mode: align_tool_axis_to_insertion_axis
+  final_insertion_pose:
+    mode: align_tool_axis_to_insertion_axis
+  retreat_pose:
+    mode: align_tool_axis_to_insertion_axis
+
+insertion_axis:
+  frame: world
+  direction_xyz: [0.0, 0.0, -1.0]
+
 targets:
   hole_center:
     frame: world
-    position_xyz: [0.52, -0.20, 0.845]
-    orientation_xyzw: [0.0, 0.0, 0.0, 1.0]
+    position_xyz: [0.520, -0.200, 0.845]
 
-  pre_insertion_pose:
+  staging_pose:
     frame: world
-    position_xyz: [0.64, -0.12, 0.92]
-    orientation_xyzw: [0.0, 0.0, 0.0, 1.0]
+    position_xyz: [0.640, -0.120, 0.920]
+    description: "Safe Cartesian staging waypoint, not insertion-aligned."
 
-  insertion_axis:
+  axis_align_pose:
     frame: world
-    direction_xyz: [0.0, 0.0, -1.0]
-
-  insertion_axis_marker:
-    frame: world
-    position_xyz: [0.52, -0.20, 0.845]
-    orientation_xyzw: [0.0, 0.0, 0.0, 1.0]
+    position_xyz: [0.520, -0.200, 0.920]
+    description: "Directly above hole center on insertion axis."
 
   insertion_touch_pose:
     frame: world
-    position_xyz: [0.52, -0.20, 0.865]
-    orientation_xyzw: [0.0, 0.0, 0.0, 1.0]
+    position_xyz: [0.520, -0.200, 0.865]
 
   insertion_hold_pose:
     frame: world
-    position_xyz: [0.52, -0.20, 0.845]
-    orientation_xyzw: [0.0, 0.0, 0.0, 1.0]
+    position_xyz: [0.520, -0.200, 0.845]
 
   final_insertion_pose:
     frame: world
-    position_xyz: [0.52, -0.20, 0.825]
-    orientation_xyzw: [0.0, 0.0, 0.0, 1.0]
+    position_xyz: [0.520, -0.200, 0.825]
+
+  retreat_pose:
+    frame: world
+    position_xyz: [0.520, -0.200, 0.920]

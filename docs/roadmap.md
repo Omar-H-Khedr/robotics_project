@@ -36,6 +36,63 @@ Baseline v2.4 status: coordinate-based insertion diagnostics now publish explici
 
 Baseline v2.5 status: IK feasibility diagnostics are added as a diagnostic-only layer before motion. `ik_feasibility_diagnostics` reads the v2.4 TF target frames, `/joint_states`, current `tool0`, and `base_link`, then reports conservative radial workspace feasibility on `/ik_feasibility_diagnostics`. It detects visible MoveIt/IK services but does not call an IK solver, send trajectory goals, or execute robot motion.
 
+Baseline v2.5c status: execution gates are unified in
+`execution_gate_monitor`, which publishes `/execution_gate_status` from
+Cartesian geometry, IK diagnostics, safety status, and optional insertion
+metrics. `tool_axis_audit` compares the six local `tool0` axes against the world
+insertion axis and reports the best candidate, but never auto-validates it.
+Controller execution remains blocked until Cartesian geometry, IK availability,
+real IK solutions, manual tool-axis validation, safety guard, and force/contact
+guard all pass.
+
+Baseline v2.5d status: `cartesian_orientation_target_calculator` computes
+diagnostic desired world-frame orientation quaternions for the insertion-aligned
+Cartesian targets. The selected candidate is `tool0_+Z`, aligned to the world
+insertion axis `[0.0, 0.0, -1.0]`, with current tool yaw used as the reference
+when resolvable. The node publishes `/cartesian_orientation_targets` and keeps
+`orientation_validated=false` and `motion_execution_allowed=false`; IK and a
+dry-run joint plan are still required before any controller execution can be
+considered.
+
+Baseline v2.5f status: the full-pose waypoint policy now covers every planned
+Cartesian waypoint, including `staging_pose`. `staging_pose` uses the same
+`align_tool_axis_to_insertion_axis` policy as the insertion and retreat
+waypoints so the tool is oriented before lateral alignment near the hole.
+This remains diagnostic-only: no controller motion is allowed without a real IK
+solver, real IK solutions for every waypoint, explicit orientation validation,
+and active safety and force/contact gates.
+
+Baseline v2.6 status: `cartesian_insertion_dry_run_planner` assembles the full
+Cartesian insertion waypoint sequence from the current tool pose through
+staging, axis alignment, touch, hold, final insertion, and retreat. The plan is
+published on `/cartesian_insertion_dry_run_plan` as diagnostics only with
+`motion_execution_enabled=false`, `trajectory_execution_requested=false`, and
+`controller_execution_allowed=false`. It remains non-executable until real IK
+solutions exist for all planned waypoints and the execution gates are available.
+No controller command is sent.
+
+Baseline v2.7 status: `ik_backend_audit` publishes `/ik_backend_audit` as a
+diagnostic decision report for available IK infrastructure. It checks visible
+`compute_ik` and MoveIt-style services, package availability through
+`ament_index_python`, robot model resources, joint names, joint-limits file
+readability, KUKA LBR iisy URDF/xacro discovery, and observed project readiness
+from the v2.6 dry-run plan and execution gates. It does not solve IK, call
+motion execution, send trajectory goals, install packages, or run Gazebo.
+Controller execution remains blocked while the report decides between using a
+MoveIt `/compute_ik` backend, configuring MoveIt, or adding a custom IK service.
+
+Baseline v2.8 status: `moveit_config_audit` publishes `/moveit_config_audit`
+as a diagnostic-only readiness report for KUKA LBR iisy MoveIt configuration.
+It searches installed and source package shares for likely MoveIt config
+packages, SRDF files, `kinematics.yaml`, joint-limits, OMPL planning config,
+and move-group launch resources. MoveIt packages may be present while
+`/compute_ik` is still absent, so the report keeps
+`moveit_ready_for_compute_ik=false` until the config is confirmed and the
+service is actually visible. The optional
+`run_moveit_ik_diagnostic.launch.py` launch starts only the audit nodes and does
+not launch `move_group`, `task_trajectory_executor`, Gazebo, or any controller
+client.
+
 ## Phase 4: Experiment Manager and Reproducible Trials
 
 - Define trial manifests, parameter sweeps, seeds, and metadata.
@@ -81,4 +138,9 @@ Near-term follow-up after v0.5: define a defensible insertion-success rule from 
 
 Near-term follow-up after v2.0: validate a real insertion-depth signal from geometry, TF, or Gazebo state before promoting `insertion_success` from `null` to a binary outcome.
 
-Near-term follow-up after v2.5: connect validated Cartesian target frames to an actual IK solver or MoveIt `compute_ik` service, then generate conservative pre-insertion and guarded insertion trajectories from object frames instead of hand-tuned joint values.
+Near-term follow-up after v2.7: act on the `/ik_backend_audit` decision report.
+If a real `/compute_ik` service is present, add diagnostic IK requests for the
+full-pose waypoints. If MoveIt resources exist but no service is running,
+configure and launch MoveIt. If no backend exists, add MoveIt integration or a
+custom IK service. Do not enable controller execution until real joint
+solutions exist for every waypoint and all gates pass.

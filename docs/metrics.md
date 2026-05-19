@@ -18,7 +18,23 @@ Research Baseline v0.3 status: `insertion_success` remains `null`. Contact obser
 
 Research Baseline v2.0-v2.2 status: `insertion_success` remains `null` for peg/hole insertion validation until a validated depth and alignment rule is implemented. v2.0 validated the instrumentation path. v2.1 corrects contact semantics so `insertion_success_estimate` may become true only when the insertion hold phase is reached, an actual peg-hole collision pair is observed, no force threshold violation is present, and the final trial status is `completed` or the accepted guarded-contact stop status. v2.2 cleans the initial world state so the peg/hole validation scene should start without uninitialized physical contact. v2.2b uses a suspended/static peg to avoid peg-table contact during instrumentation validation; this is not final grasped peg insertion. Later versions will attach the peg to, or otherwise represent it at, the robot/tool side.
 
-Research Baseline v2.4 status: `insertion_success` remains `null`. v2.4 adds explicit object-frame TF publication for coordinate-based diagnostics: Cartesian target poses, insertion axis marker, current tool pose if available from TF, and distances from `tool0` to `hole_center` and `pre_insertion_pose`. These diagnostics are planning prerequisites, not proof of insertion and not robot motion.
+Research Baseline v2.4 status: `insertion_success` remains `null`. v2.4 adds explicit object-frame TF publication for coordinate-based diagnostics: Cartesian target poses, insertion axis marker, current tool pose if available from TF, and distances from `tool0` to `hole_center` and the configured staging/pre-insertion waypoint. These diagnostics are planning prerequisites, not proof of insertion and not robot motion.
+
+Research Baseline v2.5f status: `staging_pose` is now a full-pose diagnostic
+waypoint with an orientation target, but `insertion_success` remains `null`.
+Full-pose target availability is a planning prerequisite only; it does not prove
+insertion depth, contact state, or successful assembly.
+
+Research Baseline v2.6 status: the Cartesian dry-run plan is assembled and
+reported, but `insertion_success` remains `null`. A non-executable dry-run plan
+is still a planning diagnostic, not evidence of insertion depth, contact state,
+or assembly success.
+
+Research Baseline v2.7 status: the IK backend audit reports available IK
+infrastructure and a recommended next step, but `insertion_success` remains
+`null`. Backend availability or configuration readiness is not an IK solution,
+not a trajectory, and not evidence of insertion depth, contact state, or
+assembly success.
 
 ## Collision Events
 
@@ -207,3 +223,172 @@ The `ik_feasibility_diagnostics` node publishes JSON on
 
 These fields are planning diagnostics only. They do not prove insertion success,
 do not execute trajectories, and must not be used as contact validation.
+
+## Baseline v2.5c Execution Gate and Tool-Axis Fields
+
+The `execution_gate_monitor` node publishes JSON on `/execution_gate_status`
+with:
+
+- `status`: always `execution_gates_diagnostic_only_no_motion`.
+- `motion_execution_enabled`: always false in v2.5c.
+- `trajectory_execution_requested`: always false in v2.5c.
+- `geometry_valid`: copied from
+  `/cartesian_insertion_diagnostics.cartesian_geometry_valid`.
+- `geometry_source`: the source used for the geometry gate.
+- `ik_available`: copied from IK solver detection.
+- `ik_solution_available`: true only after real IK solutions exist for all
+  targets.
+- `all_targets_geometrically_feasible`: approximate workspace diagnostic from
+  IK feasibility.
+- `tool_axis_orientation_validated`: false until manually validated.
+- `safety_guard_active`: true only after an observed OK `/safety_status`.
+- `force_guard_active`: false unless explicitly reported active.
+- `contact_metrics_available`: copied from `/insertion_metrics` when available.
+- `controller_execution_allowed`: true only when all required gates pass.
+- `block_reasons` and `primary_block_reason`: explicit reasons motion is
+  blocked.
+
+The `tool_axis_audit` node publishes JSON on `/tool_axis_audit` with the world
+directions of `tool0` `+X`, `-X`, `+Y`, `-Y`, `+Z`, and `-Z`, alignment scores
+against `[0.0, 0.0, -1.0]`, and the best candidate tool axis. It always reports
+`orientation_validated=false` until a human explicitly validates the insertion
+axis.
+
+## Baseline v2.5d Orientation Target Fields
+
+The `cartesian_orientation_target_calculator` node publishes JSON on
+`/cartesian_orientation_targets` with:
+
+- `status`: always `orientation_targets_diagnostic_only_no_motion`.
+- `selected_tool_axis_candidate`: configured candidate axis, currently
+  `tool0_+Z`.
+- `insertion_axis_world`: configured world insertion axis, currently
+  `[0.0, 0.0, -1.0]`.
+- `current_tool_orientation_world`: current `tool0` quaternion from TF when
+  available.
+- `current_tool_axes_world`: current world directions of the six local `tool0`
+  axes.
+- `desired_orientations_world`: desired quaternions for `staging_pose`,
+  `axis_align_pose`, `insertion_touch_pose`,
+  `insertion_hold_pose`, `final_insertion_pose`, and `retreat_pose`.
+- `expected_alignment_after_orientation`: predicted selected-axis alignment
+  after applying the computed orientation.
+- `yaw_reference_mode`: configured yaw policy.
+- `yaw_reference_unresolved`: true when yaw about the insertion axis cannot use
+  the current tool orientation as a reference.
+- `orientation_targets_available`: true when target orientations were computed.
+- `orientation_validated`: always false in v2.5d.
+- `motion_execution_allowed`: always false in v2.5d.
+- `validation_reason`: explanation that the orientation target is computed but
+  not validated by IK or motion.
+
+The `execution_gate_monitor` includes orientation target availability and the
+selected tool-axis candidate in `/execution_gate_status`, but
+`controller_execution_allowed` remains false until explicit IK and dry-run plan
+validation exists.
+
+## Baseline v2.5f Full-Pose Waypoint Fields
+
+In v2.5f, the planned full-pose waypoint set is `staging_pose`,
+`axis_align_pose`, `insertion_touch_pose`, `insertion_hold_pose`,
+`final_insertion_pose`, and `retreat_pose`.
+
+For each planned waypoint, `/cartesian_orientation_targets` reports
+`orientation_target_available=true` and
+`orientation_source="cartesian_orientation_targets"` when the target
+orientation calculation succeeds. `ik_feasibility_diagnostics` then reports
+`full_pose_feasibility_status="full_pose_ready_but_no_ik_solver"` for
+full-pose waypoints when no IK solver is available.
+
+`execution_gate_monitor.full_pose_targets_available` is true only when all
+planned waypoints have both position and orientation targets. It still keeps
+`controller_execution_allowed=false` without a real IK solver, real IK
+solutions, explicit orientation validation, and an active force/contact guard.
+
+## Baseline v2.6 Cartesian Dry-Run Plan Fields
+
+The `cartesian_insertion_dry_run_planner` node publishes JSON on
+`/cartesian_insertion_dry_run_plan` with:
+
+- `status`: always `cartesian_dry_run_no_motion`.
+- `motion_execution_enabled`: always false.
+- `trajectory_execution_requested`: always false.
+- `controller_execution_allowed`: always false.
+- `waypoint_order`: `current_tool_pose`, `staging_pose`, `axis_align_pose`,
+  `insertion_touch_pose`, `insertion_hold_pose`, `final_insertion_pose`, and
+  `retreat_pose`.
+- `waypoints`: per-waypoint pose, source, distance, approximate workspace,
+  orientation target, IK availability, IK solution, joint solution, and
+  executability diagnostics.
+- `joint_solution`: null unless a real IK result is present in the IK
+  diagnostics.
+- `all_waypoints_have_full_pose`: true only when every waypoint has position and
+  orientation data.
+- `all_waypoints_geometrically_feasible`: true only when Cartesian geometry and
+  approximate workspace diagnostics pass.
+- `all_waypoints_have_ik_solution`: true only when real IK solutions exist for
+  all planned Cartesian waypoints.
+- `plan_executable`: true only when full poses, geometry, and real IK solutions
+  are all available.
+- `block_reasons` and `primary_block_reason`: explicit no-motion block state.
+
+The execution gate monitor now also reports `dry_run_plan_available`,
+`dry_run_plan_executable`, and `dry_run_primary_block_reason`. Controller
+execution remains disabled in the diagnostic launch, and no controller command
+is sent.
+
+## Baseline v2.7 IK Backend Audit Fields
+
+The `ik_backend_audit` node publishes JSON on `/ik_backend_audit` with:
+
+- `status`: always `ik_backend_audit_diagnostic_only_no_motion`.
+- `motion_execution_enabled`: always false.
+- `trajectory_execution_requested`: always false.
+- `controller_motion_allowed`: always false.
+- `services`: visible `/compute_ik`, `compute_ik`-like, and MoveIt planning
+  service diagnostics.
+- `packages`: availability of `moveit_ros_move_group`, `moveit_msgs`,
+  `moveit_kinematics`, `trac_ik_kinematics_plugin`, `kdl_parser_py`, and
+  `urdf_parser_py` through `ament_index_python`.
+- `robot_model_resources`: `robot_description` visibility, `/joint_states`
+  joint names, joint-limits file availability/readability, and KUKA LBR iisy
+  URDF/xacro discovery from package share folders.
+- `existing_project_ik_readiness`: observed v2.6 dry-run plan, orientation
+  target, and execution-gate status.
+- `ik_backend_available`: true only when a callable compute-IK path is visible
+  with the required message support; otherwise false.
+- `recommended_backend`: one of `moveit_compute_ik`, `configure_moveit`, or
+  `add_moveit_or_custom_ik_service`.
+- `recommended_next_step` and `decision_reason`: diagnostic guidance for the
+  next implementation step.
+
+These fields are infrastructure diagnostics only. They do not solve IK, do not
+produce joint targets, do not send trajectory goals, and do not unblock
+controller execution.
+
+## Baseline v2.8 MoveIt Config Audit Fields
+
+The `moveit_config_audit` node publishes JSON on `/moveit_config_audit` with:
+
+- `status`: always `moveit_config_audit_diagnostic_only_no_motion`.
+- `controller_motion_allowed`: always false.
+- `trajectory_execution_allowed`: always false.
+- `packages`: availability of `moveit_ros_move_group`, `moveit_msgs`, and
+  `moveit_kinematics`.
+- `moveit_config_package_found`: true when a likely installed or source MoveIt
+  config package with relevant config resources is found.
+- `srdf_found`, `kinematics_yaml_found`, `joint_limits_yaml_found`,
+  `ompl_planning_yaml_found`, and `move_group_launch_found`: file-level config
+  readiness checks.
+- `robot_description_available`: observed `robot_description` parameter
+  availability from `robot_state_publisher` when visible.
+- `joint_states_available` and `joint_names_observed`: current robot state
+  visibility.
+- `compute_ik_service_available`: true only when `/compute_ik` is visible.
+- `moveit_ready_for_compute_ik`: true only when the MoveIt config resources,
+  move-group launch readiness, and `/compute_ik` visibility are all confirmed.
+- `recommended_next_step`: one of `create_moveit_config_package`,
+  `launch_move_group_diagnostic_only`, or `test_compute_ik_service_no_motion`.
+
+The audit is preparation only. It does not launch `move_group`, call IK, invent
+joint targets, send trajectory goals, or enable controller execution.

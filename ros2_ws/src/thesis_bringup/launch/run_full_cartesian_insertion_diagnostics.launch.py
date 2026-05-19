@@ -81,8 +81,10 @@ def generate_launch_description():
         [
             LogInfo(
                 msg=(
-                    "Starting Research Baseline v2.5 coordinate-based insertion "
-                    "and IK feasibility diagnostics. This launch performs no task "
+                    "Starting Research Baseline v2.7 coordinate-based insertion "
+                    "diagnostics, orientation target calculation, execution gates, "
+                    "tool-axis audit, Cartesian dry-run planning, and IK backend "
+                    "and MoveIt config audits. This launch performs no task "
                     "trajectory execution."
                 )
             ),
@@ -210,6 +212,89 @@ def generate_launch_description():
                                 )
                             }
                         ],
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=8.0,
+                actions=[
+                    LogInfo(msg="Starting tool-axis audit node."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="tool_axis_audit",
+                        name="tool_axis_audit",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=8.5,
+                actions=[
+                    LogInfo(msg="Starting Cartesian orientation target calculator."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="cartesian_orientation_target_calculator",
+                        name="cartesian_orientation_target_calculator",
+                        output="screen",
+                        parameters=[
+                            {
+                                "config_path": PathJoinSubstitution(
+                                    [
+                                        FindPackageShare("kuka_task_control"),
+                                        "config",
+                                        "peg_hole_cartesian_targets.yaml",
+                                    ]
+                                )
+                            }
+                        ],
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=9.0,
+                actions=[
+                    LogInfo(msg="Starting Cartesian insertion dry-run planner."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="cartesian_insertion_dry_run_planner",
+                        name="cartesian_insertion_dry_run_planner",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=9.5,
+                actions=[
+                    LogInfo(msg="Starting unified execution gate monitor."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="execution_gate_monitor",
+                        name="execution_gate_monitor",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=10.0,
+                actions=[
+                    LogInfo(msg="Starting IK backend audit node."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="ik_backend_audit",
+                        name="ik_backend_audit",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=10.5,
+                actions=[
+                    LogInfo(msg="Starting MoveIt config audit node."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="moveit_config_audit",
+                        name="moveit_config_audit",
+                        output="screen",
                     ),
                 ],
             ),
