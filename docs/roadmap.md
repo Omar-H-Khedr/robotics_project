@@ -114,6 +114,16 @@ audits as `project_local_lbr_iisy6_r1300_overlay`, and marked
 keeps `approved_for_motion=false`, `controller_motion_allowed=false`, and
 `trajectory_execution_allowed=false`.
 
+Baseline v2.11 status: `robot_description_semantic_diagnostics` publishes
+`/robot_description_semantic_diagnostics` from the project-local or installed
+`lbr_iisy6_r1300.srdf` candidate. `moveit_launch_readiness_audit` now reports
+the semantic candidate source, candidate availability, semantic diagnostics
+availability, and semantic diagnostics status. A structurally valid SRDF still
+keeps `moveit_launch_ready=false` while tool-link validation is required, with
+`recommended_next_step="validate_tool_link_and_prepare_move_group_diagnostic_launch"`.
+No `move_group` launch, `/compute_ik` call, trajectory goal, or controller
+motion is enabled.
+
 ## Phase 4: Experiment Manager and Reproducible Trials
 
 - Define trial manifests, parameter sweeps, seeds, and metadata.
@@ -159,9 +169,10 @@ Near-term follow-up after v0.5: define a defensible insertion-success rule from 
 
 Near-term follow-up after v2.0: validate a real insertion-depth signal from geometry, TF, or Gazebo state before promoting `insertion_success` from `null` to a binary outcome.
 
-Near-term follow-up after v2.10: validate the project-local LBR iisy 6 R1300
+Near-term follow-up after v2.11: validate the project-local LBR iisy 6 R1300
 semantic candidate against the exact URDF, including tool link and collision
-matrix assumptions, before preparing a real diagnostic `move_group` launch.
+matrix assumptions, before preparing an explicitly guarded diagnostic
+`move_group` launch.
 Keep trajectory execution disabled and continue to block controller motion
 until `/compute_ik` is available and only no-motion IK service tests have
 passed.
