@@ -34,6 +34,7 @@ setup(
             "cartesian_orientation_target_calculator = kuka_task_control.cartesian_orientation_target_calculator:main",
             "cartesian_insertion_dry_run_planner = kuka_task_control.cartesian_insertion_dry_run_planner:main",
             "execution_gate_monitor = kuka_task_control.execution_gate_monitor:main",
+            "ik_backend_audit = kuka_task_control.ik_backend_audit:main",
         ]
     },
 )
