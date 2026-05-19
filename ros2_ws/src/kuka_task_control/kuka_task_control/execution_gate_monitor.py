@@ -31,6 +31,7 @@ class ExecutionGateMonitor(Node):
         self._ik_payload: dict[str, Any] | None = None
         self._tool_axis_payload: dict[str, Any] | None = None
         self._orientation_targets_payload: dict[str, Any] | None = None
+        self._dry_run_plan_payload: dict[str, Any] | None = None
         self._safety_payload: dict[str, Any] | None = None
         self._safety_raw: str | None = None
         self._metrics_payload: dict[str, Any] | None = None
@@ -53,6 +54,12 @@ class ExecutionGateMonitor(Node):
             String,
             "/cartesian_orientation_targets",
             self._on_orientation_targets,
+            10,
+        )
+        self.create_subscription(
+            String,
+            "/cartesian_insertion_dry_run_plan",
+            self._on_dry_run_plan,
             10,
         )
         self.create_subscription(String, "/safety_status", self._on_safety_status, 10)
@@ -83,6 +90,9 @@ class ExecutionGateMonitor(Node):
     def _on_orientation_targets(self, message: String) -> None:
         self._orientation_targets_payload = self._parse_json(message.data)
 
+    def _on_dry_run_plan(self, message: String) -> None:
+        self._dry_run_plan_payload = self._parse_json(message.data)
+
     def _on_safety_status(self, message: String) -> None:
         self._safety_raw = message.data.strip()
         self._safety_payload = self._parse_json(message.data)
@@ -104,11 +114,15 @@ class ExecutionGateMonitor(Node):
         safety_guard_active = self._safety_guard_active()
         contact_metrics_available = self._contact_metrics_available()
         force_guard_active = self._force_guard_active()
+        dry_run_plan_available = self._dry_run_plan_available()
+        dry_run_plan_executable = self._dry_run_plan_executable()
+        dry_run_primary_block_reason = self._dry_run_primary_block_reason()
 
         execution_conditions_met = (
             geometry_valid
             and ik_available
             and ik_solution_available
+            and dry_run_plan_executable
             and tool_axis_orientation_validated
             and safety_guard_active
             and force_guard_active
@@ -121,6 +135,8 @@ class ExecutionGateMonitor(Node):
             tool_axis_orientation_validated=tool_axis_orientation_validated,
             safety_guard_active=safety_guard_active,
             force_guard_active=force_guard_active,
+            dry_run_plan_available=dry_run_plan_available,
+            dry_run_plan_executable=dry_run_plan_executable,
         )
         if execution_conditions_met:
             block_reasons.append("diagnostic-only launch keeps controller execution disabled")
@@ -138,6 +154,9 @@ class ExecutionGateMonitor(Node):
             "orientation_targets_available": orientation_targets_available,
             "orientation_aware_ik_checked": orientation_aware_ik_checked,
             "full_pose_targets_available": full_pose_targets_available,
+            "dry_run_plan_available": dry_run_plan_available,
+            "dry_run_plan_executable": dry_run_plan_executable,
+            "dry_run_primary_block_reason": dry_run_primary_block_reason,
             "selected_tool_axis_candidate": selected_tool_axis_candidate,
             "orientation_validated": orientation_validated,
             "tool_axis_orientation_validated": tool_axis_orientation_validated,
@@ -263,6 +282,20 @@ class ExecutionGateMonitor(Node):
             return False
         return bool(self._metrics_payload.get("contact_metrics_available", False))
 
+    def _dry_run_plan_available(self) -> bool:
+        return self._dry_run_plan_payload is not None
+
+    def _dry_run_plan_executable(self) -> bool:
+        if self._dry_run_plan_payload is None:
+            return False
+        return bool(self._dry_run_plan_payload.get("plan_executable", False))
+
+    def _dry_run_primary_block_reason(self) -> str | None:
+        if self._dry_run_plan_payload is None:
+            return None
+        reason = self._dry_run_plan_payload.get("primary_block_reason")
+        return str(reason) if reason is not None else None
+
     @staticmethod
     def _block_reasons(
         *,
@@ -272,6 +305,8 @@ class ExecutionGateMonitor(Node):
         tool_axis_orientation_validated: bool,
         safety_guard_active: bool,
         force_guard_active: bool,
+        dry_run_plan_available: bool,
+        dry_run_plan_executable: bool,
     ) -> list[str]:
         reasons = []
         if not geometry_valid:
@@ -280,6 +315,10 @@ class ExecutionGateMonitor(Node):
             reasons.append("IK solver not available")
         if not ik_solution_available:
             reasons.append("real IK solutions unavailable for all targets")
+        if not dry_run_plan_available:
+            reasons.append("Cartesian dry-run plan unavailable")
+        elif not dry_run_plan_executable:
+            reasons.append("Cartesian dry-run plan not executable")
         if not tool_axis_orientation_validated:
             reasons.append("tool insertion axis orientation not validated")
         if not safety_guard_active:
