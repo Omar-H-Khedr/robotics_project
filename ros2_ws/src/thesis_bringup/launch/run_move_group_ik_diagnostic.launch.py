@@ -4,19 +4,25 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    # v2.12 diagnostic-only preparation for a future MoveIt/move_group IK path.
+    # v2.13 diagnostic-only preparation for a future MoveIt/move_group IK path.
     # This launch intentionally does not start task_trajectory_executor, does not
     # send FollowJointTrajectory goals, and does not launch move_group. A future
     # move_group action must remain blocked until moveit_launch_readiness_audit
-    # confirms tool-link validation and safe launch inputs.
+    # confirms diagnostic launch inputs.
     return LaunchDescription(
         [
             LogInfo(
                 msg=(
-                    "Starting v2.12 MoveIt/move_group IK diagnostic launch "
+                    "Starting v2.13 MoveIt/move_group IK diagnostic launch "
                     "preparation only. This launch starts audits only and does "
                     "not start move_group or any trajectory executor."
                 )
+            ),
+            Node(
+                package="kuka_task_control",
+                executable="moveit_diagnostic_input_builder",
+                name="moveit_diagnostic_input_builder",
+                output="screen",
             ),
             Node(
                 package="kuka_task_control",

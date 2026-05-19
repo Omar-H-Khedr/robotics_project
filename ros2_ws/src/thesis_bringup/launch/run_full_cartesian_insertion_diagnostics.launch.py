@@ -323,6 +323,18 @@ def generate_launch_description():
                 ],
             ),
             TimerAction(
+                period=11.9,
+                actions=[
+                    LogInfo(msg="Starting MoveIt diagnostic input builder node."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="moveit_diagnostic_input_builder",
+                        name="moveit_diagnostic_input_builder",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
                 period=12.0,
                 actions=[
                     LogInfo(

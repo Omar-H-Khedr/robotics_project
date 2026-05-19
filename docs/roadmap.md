@@ -136,6 +136,17 @@ valid for diagnostics, `moveit_launch_readiness_audit` recommends
 `moveit_launch_ready=false`, `compute_ik_expected_after_launch=false`, and all
 controller/trajectory motion flags false.
 
+Baseline v2.13 status: `moveit_diagnostic_input_builder` publishes
+`/moveit_diagnostic_inputs` as the diagnostic-only input bundle for a future
+no-motion `move_group` `/compute_ik` test. It checks `robot_description`,
+the project-local SRDF, `kinematics.yaml`, `ompl_planning.yaml`, the missing
+`joint_limits.yaml` fallback source, `planning_frame="base_link"`,
+`tool_link="tool0"`, and the latest `/tool_link_validation` result. When ready,
+`moveit_launch_readiness_audit` recommends
+`create_move_group_diagnostic_launch_with_trajectory_execution_disabled`.
+`move_group`, `/compute_ik`, controller execution, and trajectory execution
+remain blocked.
+
 ## Phase 4: Experiment Manager and Reproducible Trials
 
 - Define trial manifests, parameter sweeps, seeds, and metadata.
@@ -181,13 +192,11 @@ Near-term follow-up after v0.5: define a defensible insertion-success rule from 
 
 Near-term follow-up after v2.0: validate a real insertion-depth signal from geometry, TF, or Gazebo state before promoting `insertion_success` from `null` to a binary outcome.
 
-Near-term follow-up after v2.11: validate the project-local LBR iisy 6 R1300
-semantic candidate against the exact URDF, including tool link and collision
-matrix assumptions, before preparing an explicitly guarded diagnostic
-`move_group` launch.
-Keep trajectory execution disabled and continue to block controller motion
-until `/compute_ik` is available and only no-motion IK service tests have
-passed.
+Near-term follow-up after v2.13: create an explicitly guarded diagnostic
+`move_group` launch with trajectory execution disabled, using the prepared
+`/moveit_diagnostic_inputs` bundle. Keep controller motion blocked and do not
+call `/compute_ik` until that launch path exists and is reviewed as
+diagnostic-only.
 
 Near-term follow-up after v2.7: act on the `/ik_backend_audit` decision report.
 If a real `/compute_ik` service is present, add diagnostic IK requests for the
