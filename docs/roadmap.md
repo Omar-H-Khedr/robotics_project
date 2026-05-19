@@ -36,6 +36,15 @@ Baseline v2.4 status: coordinate-based insertion diagnostics now publish explici
 
 Baseline v2.5 status: IK feasibility diagnostics are added as a diagnostic-only layer before motion. `ik_feasibility_diagnostics` reads the v2.4 TF target frames, `/joint_states`, current `tool0`, and `base_link`, then reports conservative radial workspace feasibility on `/ik_feasibility_diagnostics`. It detects visible MoveIt/IK services but does not call an IK solver, send trajectory goals, or execute robot motion.
 
+Baseline v2.5c status: execution gates are unified in
+`execution_gate_monitor`, which publishes `/execution_gate_status` from
+Cartesian geometry, IK diagnostics, safety status, and optional insertion
+metrics. `tool_axis_audit` compares the six local `tool0` axes against the world
+insertion axis and reports the best candidate, but never auto-validates it.
+Controller execution remains blocked until Cartesian geometry, IK availability,
+real IK solutions, manual tool-axis validation, safety guard, and force/contact
+guard all pass.
+
 ## Phase 4: Experiment Manager and Reproducible Trials
 
 - Define trial manifests, parameter sweeps, seeds, and metadata.
@@ -81,4 +90,8 @@ Near-term follow-up after v0.5: define a defensible insertion-success rule from 
 
 Near-term follow-up after v2.0: validate a real insertion-depth signal from geometry, TF, or Gazebo state before promoting `insertion_success` from `null` to a binary outcome.
 
-Near-term follow-up after v2.5: connect validated Cartesian target frames to an actual IK solver or MoveIt `compute_ik` service, then generate conservative pre-insertion and guarded insertion trajectories from object frames instead of hand-tuned joint values.
+Near-term follow-up after v2.5c: select and manually validate the tool insertion
+axis, connect validated Cartesian target frames to an actual IK solver or MoveIt
+`compute_ik` service, and only then generate conservative pre-insertion and
+guarded insertion trajectories from object frames instead of hand-tuned joint
+values.
