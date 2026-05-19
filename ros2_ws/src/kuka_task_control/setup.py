@@ -1,7 +1,12 @@
 from glob import glob
+from pathlib import Path
 from setuptools import find_packages, setup
 
 package_name = "kuka_task_control"
+top_level_config_files = [
+    path for path in glob("config/*") if Path(path).is_file()
+]
+moveit_overlay_files = glob("config/moveit_lbr_iisy6_r1300/*")
 
 setup(
     name=package_name,
@@ -11,7 +16,11 @@ setup(
         ("share/ament_index/resource_index/packages", ["resource/" + package_name]),
         ("share/" + package_name, ["package.xml", "README.md"]),
         ("share/" + package_name + "/launch", glob("launch/*.launch.py")),
-        ("share/" + package_name + "/config", glob("config/*")),
+        ("share/" + package_name + "/config", top_level_config_files),
+        (
+            "share/" + package_name + "/config/moveit_lbr_iisy6_r1300",
+            moveit_overlay_files,
+        ),
     ],
     install_requires=["setuptools"],
     zip_safe=True,
@@ -36,6 +45,8 @@ setup(
             "execution_gate_monitor = kuka_task_control.execution_gate_monitor:main",
             "ik_backend_audit = kuka_task_control.ik_backend_audit:main",
             "moveit_config_audit = kuka_task_control.moveit_config_audit:main",
+            "moveit_launch_readiness_audit = kuka_task_control.moveit_launch_readiness_audit:main",
+            "semantic_model_validator = kuka_task_control.semantic_model_validator:main",
         ]
     },
 )

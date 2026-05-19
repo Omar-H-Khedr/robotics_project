@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Derived semantic candidate for LBR iisy 6 R1300 -->
+<!-- Diagnostic-only; not approved for motion execution -->
+<!--
+  Source template reference:
+  - ros2_ws/src/external/kuka_robot_descriptions/kuka_lbr_iisy_moveit_config/srdf/lbr_iisy11_r1300_arm.srdf.xacro
+  - Installed generated SRDF reference: lbr_iisy11_r1300.srdf
+
+  This project-local candidate is derived from the same-family iisy11 R1300
+  semantic model because it shares the R1300 reach family. It requires
+  validation against the exact LBR iisy 6 R1300 URDF before any motion use.
+-->
+<robot name="lbr_iisy6_r1300">
+  <group name="arm">
+    <joint name="joint_1"/>
+    <joint name="joint_2"/>
+    <joint name="joint_3"/>
+    <joint name="joint_4"/>
+    <joint name="joint_5"/>
+    <joint name="joint_6"/>
+  </group>
+
+  <!-- Copied from same-family iisy11 R1300 template; collision matrix requires validation. -->
+  <disable_collisions link1="base_link" link2="link_1" reason="Adjacent"/>
+  <disable_collisions link1="link_1" link2="link_2" reason="Adjacent"/>
+  <disable_collisions link1="link_2" link2="link_3" reason="Adjacent"/>
+  <disable_collisions link1="link_3" link2="link_4" reason="Adjacent"/>
+  <disable_collisions link1="link_4" link2="link_5" reason="Adjacent"/>
+  <disable_collisions link1="link_5" link2="link_6" reason="Adjacent"/>
+</robot>

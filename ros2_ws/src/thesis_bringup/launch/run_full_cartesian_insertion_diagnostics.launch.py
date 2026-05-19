@@ -84,8 +84,8 @@ def generate_launch_description():
                     "Starting Research Baseline v2.7 coordinate-based insertion "
                     "diagnostics, orientation target calculation, execution gates, "
                     "tool-axis audit, Cartesian dry-run planning, and IK backend "
-                    "and MoveIt config audits. This launch performs no task "
-                    "trajectory execution."
+                    "plus MoveIt config and launch readiness audits. This launch "
+                    "performs no task trajectory execution."
                 )
             ),
             LogInfo(msg="Spawning exactly one KUKA robot entity: kuka_lbr_iisy"),
@@ -294,6 +294,30 @@ def generate_launch_description():
                         package="kuka_task_control",
                         executable="moveit_config_audit",
                         name="moveit_config_audit",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=11.0,
+                actions=[
+                    LogInfo(msg="Starting MoveIt launch readiness audit node."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="moveit_launch_readiness_audit",
+                        name="moveit_launch_readiness_audit",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=11.5,
+                actions=[
+                    LogInfo(msg="Starting semantic model validator node."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="semantic_model_validator",
+                        name="semantic_model_validator",
                         output="screen",
                     ),
                 ],

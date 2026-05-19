@@ -37,6 +37,8 @@ The current implementation focuses on a ROS 2 Jazzy and Gazebo-based research fr
 | v2.6 | Diagnostic-only Cartesian dry-run insertion plan | In progress |
 | v2.7 | Diagnostic-only IK backend audit and decision report | In progress |
 | v2.8 | MoveIt configuration audit and non-motion IK launch preparation | In progress |
+| v2.9 | MoveIt IK diagnostic launch readiness audit | In progress |
+| v2.10 | LBR iisy 6 R1300 semantic candidate for MoveIt IK diagnostics | In progress |
 
 ## Recommended Launch Commands
 
@@ -73,10 +75,12 @@ orientations for all planned waypoints, including `staging_pose`, on
 `/cartesian_orientation_targets`, assembles the full no-motion Cartesian dry-run
 plan on `/cartesian_insertion_dry_run_plan`, combines the execution gates on
 `/execution_gate_status`, and publishes the IK backend decision report on
-`/ik_backend_audit` plus the MoveIt configuration audit on
-`/moveit_config_audit`. It does not start `task_trajectory_executor`, does not
-send trajectory goals, and does not command robot motion. Controller execution
-remains blocked until geometry, IK, real IK solutions for every waypoint,
+`/ik_backend_audit` plus the MoveIt configuration and launch readiness audits
+on `/moveit_config_audit` and `/moveit_launch_readiness_audit`, plus the
+semantic candidate validation report on `/semantic_model_validation`. It does not
+start `task_trajectory_executor`, does not send trajectory goals, and does not
+command robot motion. Controller execution remains blocked until geometry, IK,
+real IK solutions for every waypoint, exact semantic model compatibility,
 MoveIt configuration readiness, tool-axis validation, safety, and force/contact
 gates all pass.
 
@@ -89,9 +93,25 @@ source install/setup.bash
 ros2 launch thesis_bringup run_moveit_ik_diagnostic.launch.py
 ```
 
-This launch starts only the MoveIt config and IK backend audit nodes. It does
-not launch `move_group`, `task_trajectory_executor`, Gazebo, or any trajectory
-client.
+For the v2.9 move-group readiness skeleton:
+
+```bash
+cd ~/code/robotics_project/ros2_ws
+source /opt/ros/jazzy/setup.bash
+source install/setup.bash
+ros2 launch thesis_bringup run_move_group_ik_diagnostic.launch.py
+```
+
+This launch starts only `moveit_launch_readiness_audit`,
+`moveit_config_audit`, and `ik_backend_audit`. It does not launch
+`move_group`, `task_trajectory_executor`, Gazebo, or any trajectory client.
+`move_group` remains blocked unless the exact LBR iisy 6 R1300 semantic model
+and safe launch inputs are confirmed.
+
+v2.10 adds a project-local semantic candidate for `lbr_iisy6_r1300` under
+`ros2_ws/src/kuka_task_control/config/moveit_lbr_iisy6_r1300/`. It is derived
+from the same-family iisy11 R1300 template, marked
+`candidate_requires_validation`, and is not approved for robot motion.
 
 # Robotics Project
 
