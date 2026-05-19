@@ -9,6 +9,28 @@ motion_execution_allowed: false
 motion_execution_block_reason: tool insertion axis not validated
 reason: tool insertion axis not validated
 
+orientation_planning:
+  selected_tool_axis_candidate: tool0_+Z
+  insertion_axis_world: [0.0, 0.0, -1.0]
+  validation_status: candidate_only_not_validated
+  yaw_reference_mode: keep_current_tool_yaw_if_possible
+  motion_execution_allowed: false
+
+waypoint_orientation_policy:
+  staging_pose:
+    mode: align_tool_axis_to_insertion_axis
+    rationale: "Orient the tool before lateral alignment so rotation does not occur close to the hole."
+  axis_align_pose:
+    mode: align_tool_axis_to_insertion_axis
+  insertion_touch_pose:
+    mode: align_tool_axis_to_insertion_axis
+  insertion_hold_pose:
+    mode: align_tool_axis_to_insertion_axis
+  final_insertion_pose:
+    mode: align_tool_axis_to_insertion_axis
+  retreat_pose:
+    mode: align_tool_axis_to_insertion_axis
+
 insertion_axis:
   frame: world
   direction_xyz: [0.0, 0.0, -1.0]

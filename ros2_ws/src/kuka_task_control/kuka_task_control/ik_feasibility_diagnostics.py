@@ -36,6 +36,22 @@ class IkFeasibilityDiagnostics(Node):
         "insertion_hold_pose",
         "final_insertion_pose",
     )
+    ORIENTATION_AWARE_TARGETS = (
+        "staging_pose",
+        "axis_align_pose",
+        "insertion_touch_pose",
+        "insertion_hold_pose",
+        "final_insertion_pose",
+        "retreat_pose",
+    )
+    TOOL_AXES_LOCAL = {
+        "tool0_+X": [1.0, 0.0, 0.0],
+        "tool0_-X": [-1.0, 0.0, 0.0],
+        "tool0_+Y": [0.0, 1.0, 0.0],
+        "tool0_-Y": [0.0, -1.0, 0.0],
+        "tool0_+Z": [0.0, 0.0, 1.0],
+        "tool0_-Z": [0.0, 0.0, -1.0],
+    }
     XY_TOLERANCE_M = 0.002
     FALLBACK_JOINT_LIMITS = {
         "joint_1": {"min_position": -2.8, "max_position": 2.8},
@@ -67,12 +83,19 @@ class IkFeasibilityDiagnostics(Node):
         self._current_joint_positions: list[float] = []
         self._last_safety_status: dict[str, Any] | None = None
         self._last_safety_status_raw: str | None = None
+        self._orientation_targets_payload: dict[str, Any] | None = None
 
         self._tf_buffer = Buffer()
         self._tf_listener = TransformListener(self._tf_buffer, self)
         self._publisher = self.create_publisher(String, self.DIAGNOSTIC_TOPIC, 10)
         self.create_subscription(JointState, "/joint_states", self._joint_state_callback, 10)
         self.create_subscription(String, "/safety_status", self._safety_status_callback, 10)
+        self.create_subscription(
+            String,
+            "/cartesian_orientation_targets",
+            self._orientation_targets_callback,
+            10,
+        )
         self.create_timer(
             float(self.get_parameter("publish_period_sec").value),
             self._publish_diagnostics,
@@ -149,6 +172,13 @@ class IkFeasibilityDiagnostics(Node):
             parsed = None
         self._last_safety_status = parsed if isinstance(parsed, dict) else None
 
+    def _orientation_targets_callback(self, message: String) -> None:
+        try:
+            parsed = json.loads(message.data)
+        except json.JSONDecodeError:
+            parsed = None
+        self._orientation_targets_payload = parsed if isinstance(parsed, dict) else None
+
     def _publish_diagnostics(self) -> None:
         current_base_pose_world = self._lookup_pose(self._world_frame, self._base_frame)
         current_tool_pose_world = self._lookup_pose(self._world_frame, self._tool_frame)
@@ -182,8 +212,11 @@ class IkFeasibilityDiagnostics(Node):
             for target in targets.values()
         )
         orientation_validated = self._tool_orientation_validated()
+        orientation_targets_available = self._orientation_targets_available()
+        full_pose_targets_available = self._full_pose_targets_available(targets)
         safety_guard_active = self._safety_guard_active()
-        ik_solution_available = False
+        ik_solution_available = None if not ik_solver_available else False
+        real_ik_solution_available = False
 
         payload = {
             "status": "ik_feasibility_diagnostic_only_no_motion",
@@ -207,14 +240,19 @@ class IkFeasibilityDiagnostics(Node):
             "cartesian_geometry_valid": geometry_validity["cartesian_geometry_valid"],
             "geometry_validity": geometry_validity,
             "all_targets_geometrically_feasible": all_geometrically_feasible,
+            "orientation_targets_available": orientation_targets_available,
+            "orientation_aware_ik_checked": full_pose_targets_available,
+            "full_pose_targets_available": full_pose_targets_available,
             "ik_solver_available": ik_solver_available,
             "ik_solver_services": ik_solver_services,
-            "real_ik_solution_available": ik_solution_available,
+            "real_ik_solution_available": real_ik_solution_available,
             "executable_plan_available": False,
             "execution_gates": {
                 "geometry_valid": geometry_validity["cartesian_geometry_valid"],
                 "ik_available": ik_solver_available,
                 "ik_solution_available": ik_solution_available,
+                "orientation_targets_available": orientation_targets_available,
+                "full_pose_targets_available": full_pose_targets_available,
                 "tool_axis_orientation_validated": orientation_validated,
                 "safety_guard_active": safety_guard_active,
             },
@@ -222,7 +260,7 @@ class IkFeasibilityDiagnostics(Node):
             "motion_execution_block_reason": self._motion_block_reason(
                 geometry_validity["cartesian_geometry_valid"],
                 ik_solver_available,
-                ik_solution_available,
+                real_ik_solution_available,
                 orientation_validated,
                 safety_guard_active,
             ),
@@ -250,21 +288,54 @@ class IkFeasibilityDiagnostics(Node):
             self._base_frame,
             target_name,
         )
+        target_position_world = self._position(target_pose_world)
+        target_orientation_world = self._target_orientation_from_orientation_targets(target_name)
+        orientation_target_available = target_orientation_world is not None
+        full_target_pose_world = self._full_target_pose(
+            target_pose_world,
+            target_orientation_world,
+        )
+        alignment_dot, alignment_angle_deg = self._desired_tool_axis_alignment(
+            target_orientation_world,
+        )
         radial_distance = self._radial_distance(target_pose_base)
         approximate_workspace_feasible = self._within_workspace(radial_distance)
 
+        if target_name not in self.ORIENTATION_AWARE_TARGETS:
+            full_pose_feasibility_status = "position_only_diagnostic_target"
+        elif full_target_pose_world is None:
+            full_pose_feasibility_status = "full_pose_target_unavailable"
+        elif not ik_solver_available:
+            full_pose_feasibility_status = "full_pose_ready_but_no_ik_solver"
+        else:
+            full_pose_feasibility_status = "full_pose_ready_real_ik_not_computed"
+
         if approximate_workspace_feasible is False:
             feasibility_status = "geometric_infeasible"
-        elif approximate_workspace_feasible is True and ik_solver_available:
-            feasibility_status = "approx_geometric_feasible_real_ik_not_computed"
+        elif full_pose_feasibility_status == "full_pose_ready_but_no_ik_solver":
+            feasibility_status = "full_pose_ready_but_no_ik_solver"
+        elif full_pose_feasibility_status == "full_pose_ready_real_ik_not_computed":
+            feasibility_status = "full_pose_ready_real_ik_not_computed"
         elif approximate_workspace_feasible is True:
-            feasibility_status = "approx_geometric_feasible_no_ik_solver"
+            feasibility_status = "approx_geometric_feasible_orientation_target_unavailable"
         else:
             feasibility_status = "target_pose_unavailable"
 
         return {
             "target_pose_world": target_pose_world,
             "target_pose_world_source": target_pose_world_source,
+            "target_position_world": target_position_world,
+            "target_orientation_world": target_orientation_world,
+            "full_target_pose_world": full_target_pose_world,
+            "orientation_source": "cartesian_orientation_targets"
+            if target_name in self.ORIENTATION_AWARE_TARGETS
+            and orientation_target_available
+            else None,
+            "desired_tool_axis_alignment_dot": alignment_dot,
+            "desired_tool_axis_alignment_angle_deg": alignment_angle_deg,
+            "orientation_target_available": orientation_target_available,
+            "orientation_validated": False,
+            "full_pose_feasibility_status": full_pose_feasibility_status,
             "target_pose_base": target_pose_base,
             "target_pose_base_source": target_pose_base_source,
             "current_tool_pose_world": current_tool_pose_world,
@@ -284,7 +355,7 @@ class IkFeasibilityDiagnostics(Node):
             "approximate_workspace_feasible": approximate_workspace_feasible,
             "requires_ik_solver": True,
             "ik_solver_available": ik_solver_available,
-            "ik_solution_available": None,
+            "ik_solution_available": None if not ik_solver_available else False,
             "executable_plan_available": False,
             "feasibility_status": feasibility_status,
         }
@@ -361,8 +432,117 @@ class IkFeasibilityDiagnostics(Node):
         return isinstance(value, list) and len(value) == length
 
     def _tool_orientation_validated(self) -> bool:
-        tool_axis = str(self._config.get("tool_insertion_axis", "unknown")).strip()
-        return bool(tool_axis) and tool_axis != "unknown"
+        if self._orientation_targets_payload is None:
+            return False
+        return bool(self._orientation_targets_payload.get("orientation_validated", False))
+
+    def _orientation_targets_available(self) -> bool:
+        if self._orientation_targets_payload is None:
+            return False
+        if self._orientation_targets_payload.get("orientation_targets_available") is True:
+            return True
+        desired = self._orientation_targets_payload.get("desired_orientations_world", {})
+        if not isinstance(desired, dict):
+            return False
+        return any(
+            self._target_orientation_from_orientation_targets(target_name) is not None
+            for target_name in self.ORIENTATION_AWARE_TARGETS
+        )
+
+    def _target_orientation_from_orientation_targets(
+        self,
+        target_name: str,
+    ) -> list[float] | None:
+        if self._orientation_targets_payload is None:
+            return None
+        desired = self._orientation_targets_payload.get("desired_orientations_world", {})
+        if not isinstance(desired, dict):
+            return None
+        target = desired.get(target_name)
+        if not isinstance(target, dict):
+            return None
+        orientation = target.get("orientation_xyzw")
+        if not self._is_vector(orientation, 4):
+            return None
+        return [float(value) for value in orientation]
+
+    def _full_pose_targets_available(self, targets: dict[str, dict[str, Any]]) -> bool:
+        for target_name in self.ORIENTATION_AWARE_TARGETS:
+            target = targets.get(target_name)
+            if not isinstance(target, dict):
+                return False
+            if target.get("target_position_world") is None:
+                return False
+            if target.get("target_orientation_world") is None:
+                return False
+        return True
+
+    def _full_target_pose(
+        self,
+        target_pose_world: dict[str, Any] | None,
+        target_orientation_world: list[float] | None,
+    ) -> dict[str, Any] | None:
+        if target_pose_world is None or target_orientation_world is None:
+            return None
+        position = self._position(target_pose_world)
+        if position is None:
+            return None
+        return {
+            "frame": self._world_frame,
+            "child_frame": target_pose_world.get("child_frame"),
+            "position_xyz": position,
+            "orientation_xyzw": target_orientation_world,
+            "position_source": target_pose_world.get("frame_source")
+            or "tf_or_yaml_fallback",
+            "orientation_source": "cartesian_orientation_targets",
+        }
+
+    def _desired_tool_axis_alignment(
+        self,
+        target_orientation_world: list[float] | None,
+    ) -> tuple[float | None, float | None]:
+        if target_orientation_world is None:
+            return None, None
+        selected_axis = self._selected_tool_axis_candidate()
+        local_axis = self.TOOL_AXES_LOCAL.get(selected_axis)
+        if local_axis is None:
+            return None, None
+        desired_axis_world = self._normalize(
+            self._rotate_vector(target_orientation_world, local_axis)
+        )
+        insertion_axis_world = self._insertion_axis_world()
+        dot = self._dot(desired_axis_world, insertion_axis_world)
+        clamped_dot = max(-1.0, min(1.0, dot))
+        alignment_dot = 1.0 if abs(clamped_dot - 1.0) < 1e-9 else clamped_dot
+        alignment_angle_deg = 0.0 if alignment_dot == 1.0 else math.degrees(
+            math.acos(alignment_dot)
+        )
+        return alignment_dot, alignment_angle_deg
+
+    def _selected_tool_axis_candidate(self) -> str:
+        if self._orientation_targets_payload is not None:
+            candidate = self._orientation_targets_payload.get("selected_tool_axis_candidate")
+            if candidate is not None:
+                return str(candidate)
+        orientation_config = self._config.get("orientation_planning", {})
+        if isinstance(orientation_config, dict):
+            return str(orientation_config.get("selected_tool_axis_candidate", "tool0_+Z"))
+        return "tool0_+Z"
+
+    def _insertion_axis_world(self) -> list[float]:
+        if self._orientation_targets_payload is not None:
+            axis = self._orientation_targets_payload.get("insertion_axis_world")
+            if self._is_vector(axis, 3):
+                return self._normalize([float(value) for value in axis])
+        orientation_config = self._config.get("orientation_planning", {})
+        if isinstance(orientation_config, dict):
+            axis = orientation_config.get("insertion_axis_world")
+            if self._is_vector(axis, 3):
+                return self._normalize([float(value) for value in axis])
+        axis = self._config.get("insertion_axis_world")
+        if self._is_vector(axis, 3):
+            return self._normalize([float(value) for value in axis])
+        return [0.0, 0.0, -1.0]
 
     def _safety_guard_active(self) -> bool:
         if self._last_safety_status is not None:
@@ -522,6 +702,30 @@ class IkFeasibilityDiagnostics(Node):
         if not isinstance(position, list) or len(position) != 3:
             return None
         return [float(value) for value in position]
+
+    @staticmethod
+    def _rotate_vector(quaternion_xyzw: list[float], vector: list[float]) -> list[float]:
+        qx, qy, qz, qw = quaternion_xyzw
+        vx, vy, vz = vector
+        tx = 2.0 * (qy * vz - qz * vy)
+        ty = 2.0 * (qz * vx - qx * vz)
+        tz = 2.0 * (qx * vy - qy * vx)
+        return [
+            vx + qw * tx + (qy * tz - qz * ty),
+            vy + qw * ty + (qz * tx - qx * tz),
+            vz + qw * tz + (qx * ty - qy * tx),
+        ]
+
+    @staticmethod
+    def _dot(first: list[float], second: list[float]) -> float:
+        return sum(first[index] * second[index] for index in range(3))
+
+    @staticmethod
+    def _normalize(vector: list[float]) -> list[float]:
+        norm = math.sqrt(sum(value * value for value in vector))
+        if norm == 0.0:
+            return [0.0 for _ in vector]
+        return [value / norm for value in vector]
 
     @staticmethod
     def _optional_float(value: Any) -> float | None:
