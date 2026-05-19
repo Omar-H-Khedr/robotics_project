@@ -11,8 +11,10 @@ import rclpy
 from ament_index_python.packages import get_packages_with_prefixes
 from rcl_interfaces.srv import GetParameters
 from rclpy.node import Node
+from rclpy.time import Time
 from sensor_msgs.msg import JointState
 from std_msgs.msg import String
+from tf2_ros import Buffer, TransformException, TransformListener
 
 
 class MoveItLaunchReadinessAudit(Node):
@@ -39,9 +41,19 @@ class MoveItLaunchReadinessAudit(Node):
         super().__init__("moveit_launch_readiness_audit")
         self.declare_parameter("publish_period_sec", 1.0)
         self.declare_parameter("source_search_roots", "")
+        self.declare_parameter("startup_grace_period_sec", 1.0)
+        self.declare_parameter("world_frame", "world")
+        self.declare_parameter("base_frame", "base_link")
+        self.declare_parameter("fallback_tool_link_candidate", "tool0")
         self.declare_parameter("robot_description", "")
         self.declare_parameter("robot_description_semantic", "")
 
+        self._started_at = self.get_clock().now()
+        self._world_frame = str(self.get_parameter("world_frame").value)
+        self._base_frame = str(self.get_parameter("base_frame").value)
+        self._fallback_tool_link_candidate = str(
+            self.get_parameter("fallback_tool_link_candidate").value
+        )
         self._joint_names_from_joint_states: list[str] = []
         local_robot_description = str(
             self.get_parameter("robot_description").value or ""
@@ -72,11 +84,15 @@ class MoveItLaunchReadinessAudit(Node):
             else None
         )
         self._semantic_diagnostics_report: dict[str, Any] | None = None
+        self._tool_link_validation_report: dict[str, Any] | None = None
+        self._tool_link_validation_parse_error = False
         self._parameter_clients: dict[str, Any] = {}
         self._parameter_futures: dict[str, Any] = {}
         self._parameter_request_attempts: dict[str, int] = {}
         self._config_report_cache = self._config_report()
 
+        self._tf_buffer = Buffer()
+        self._tf_listener = TransformListener(self._tf_buffer, self)
         self._publisher = self.create_publisher(String, self.AUDIT_TOPIC, 10)
         self.create_subscription(
             JointState,
@@ -88,6 +104,12 @@ class MoveItLaunchReadinessAudit(Node):
             String,
             "/robot_description_semantic_diagnostics",
             self._on_semantic_diagnostics,
+            10,
+        )
+        self.create_subscription(
+            String,
+            "/tool_link_validation",
+            self._on_tool_link_validation,
             10,
         )
         self.create_timer(
@@ -102,6 +124,8 @@ class MoveItLaunchReadinessAudit(Node):
         services = self._service_report()
         self._request_description_parameters_if_visible(services["all_services"])
         self._collect_description_parameter_results()
+        if not self._startup_grace_period_elapsed():
+            return
 
         report = self._config_report_cache
         semantic_validation = self._semantic_validation_report(report["selected_srdf"])
@@ -124,20 +148,18 @@ class MoveItLaunchReadinessAudit(Node):
         tool_link_requires_validation = bool(
             semantic_validation["tool_link_requires_validation"]
         )
+        tool_link_report = self._tool_link_report_for_readiness()
+        tool_link_validation_status = self._tool_link_validation_status(tool_link_report)
+        tool_link_candidate_valid_for_diagnostics = bool(
+            tool_link_validation_status
+            == "tool_link_candidate_valid_but_not_motion_approved"
+        )
         move_group_launch_found = bool(report["move_group_launch_files"])
         kinematics_yaml_found = bool(report["kinematics_yaml_file"])
         ompl_planning_yaml_found = bool(report["ompl_planning_yaml_file"])
         joint_limits_yaml_found = bool(report["joint_limits_yaml_file"])
         compute_ik_service_available = bool(services["compute_ik_service_available"])
-        moveit_launch_ready = bool(
-            exact_robot_semantic_match
-            and semantic_candidate_complete
-            and not tool_link_requires_validation
-            and kinematics_yaml_found
-            and ompl_planning_yaml_found
-            and move_group_launch_found
-            and self._robot_description_semantic_available
-        )
+        moveit_launch_ready = False
         compute_ik_expected_after_launch = False
         semantic_diagnostics_available = self._semantic_diagnostics_report is not None
         semantic_diagnostics_status = (
@@ -200,6 +222,52 @@ class MoveItLaunchReadinessAudit(Node):
             "robot_description_semantic_source": robot_description_semantic_source,
             "semantic_diagnostics_available": semantic_diagnostics_available,
             "semantic_diagnostics_status": semantic_diagnostics_status,
+            "tool_link_validation_available": (
+                self._tool_link_validation_report is not None
+            ),
+            "tool_link_validation_source": tool_link_report["source"],
+            "tool_link_candidate": self._tool_link_field(
+                tool_link_report,
+                "tool_link_candidate",
+            ),
+            "tool_link_exists_in_urdf": self._tool_link_field(
+                tool_link_report,
+                "tool_link_exists_in_urdf",
+                False,
+            ),
+            "tf_world_to_tool_available": self._tool_link_field(
+                tool_link_report,
+                "tf_world_to_tool_available",
+                False,
+            ),
+            "tf_base_to_tool_available": self._tool_link_field(
+                tool_link_report,
+                "tf_base_to_tool_available",
+                False,
+            ),
+            "selected_tool_axis_candidate": self._tool_link_field(
+                tool_link_report,
+                "selected_tool_axis_candidate",
+            ),
+            "tool_axis_candidate_available": self._tool_link_field(
+                tool_link_report,
+                "tool_axis_candidate_available",
+                False,
+            ),
+            "orientation_targets_available": self._tool_link_field(
+                tool_link_report,
+                "orientation_targets_available",
+                False,
+            ),
+            "tool_link_validation_status": tool_link_validation_status,
+            "tool_link_approved_for_motion": self._tool_link_field(
+                tool_link_report,
+                "approved_for_motion",
+                False,
+            ),
+            "tool_link_validation_parse_error": (
+                self._tool_link_validation_parse_error
+            ),
             "robot_description_source_node": self._robot_description_source_node,
             "robot_description_check_reason": self._robot_description_check_reason,
             "robot_joint_names_from_joint_states": list(
@@ -221,6 +289,9 @@ class MoveItLaunchReadinessAudit(Node):
                     semantic_candidate_structurally_valid
                 ),
                 tool_link_requires_validation=tool_link_requires_validation,
+                tool_link_candidate_valid_for_diagnostics=(
+                    tool_link_candidate_valid_for_diagnostics
+                ),
                 move_group_launch_found=move_group_launch_found,
                 compute_ik_service_available=compute_ik_service_available,
             ),
@@ -231,6 +302,9 @@ class MoveItLaunchReadinessAudit(Node):
                     semantic_candidate_structurally_valid
                 ),
                 tool_link_requires_validation=tool_link_requires_validation,
+                tool_link_candidate_valid_for_diagnostics=(
+                    tool_link_candidate_valid_for_diagnostics
+                ),
                 move_group_launch_found=move_group_launch_found,
                 moveit_launch_ready=moveit_launch_ready,
                 compute_ik_service_available=compute_ik_service_available,
@@ -264,6 +338,79 @@ class MoveItLaunchReadinessAudit(Node):
                 payload.get("srdf_file_path")
                 or "/robot_description_semantic_diagnostics"
             )
+
+    def _on_tool_link_validation(self, message: String) -> None:
+        try:
+            payload = json.loads(message.data)
+        except json.JSONDecodeError:
+            self._tool_link_validation_parse_error = True
+            return
+        if not isinstance(payload, dict):
+            self._tool_link_validation_parse_error = True
+            return
+        self._tool_link_validation_parse_error = False
+        self._tool_link_validation_report = payload
+
+    def _startup_grace_period_elapsed(self) -> bool:
+        grace_period = float(self.get_parameter("startup_grace_period_sec").value)
+        if grace_period <= 0.0:
+            return True
+        elapsed = (self.get_clock().now() - self._started_at).nanoseconds / 1.0e9
+        return elapsed >= grace_period
+
+    def _tool_link_report_for_readiness(self) -> dict[str, Any]:
+        if self._tool_link_validation_report is not None:
+            return {
+                **self._tool_link_validation_report,
+                "source": "/tool_link_validation",
+            }
+        return self._direct_tool_link_fallback_report()
+
+    def _direct_tool_link_fallback_report(self) -> dict[str, Any]:
+        tool_link_candidate = self._fallback_tool_link_candidate
+        links = self._link_names_from_urdf()
+        return {
+            "source": "direct_fallback",
+            "tool_link_candidate": tool_link_candidate,
+            "tool_link_exists_in_urdf": tool_link_candidate in set(links),
+            "tf_world_to_tool_available": self._lookup_transform_available(
+                self._world_frame,
+                tool_link_candidate,
+            ),
+            "tf_base_to_tool_available": self._lookup_transform_available(
+                self._base_frame,
+                tool_link_candidate,
+            ),
+            "selected_tool_axis_candidate": None,
+            "tool_axis_candidate_available": False,
+            "orientation_targets_available": False,
+            "tool_link_validation_status": "not_observed",
+            "approved_for_motion": False,
+        }
+
+    def _lookup_transform_available(self, target_frame: str, source_frame: str) -> bool:
+        try:
+            self._tf_buffer.lookup_transform(target_frame, source_frame, Time())
+        except TransformException as exc:
+            self.get_logger().debug(
+                f"TF lookup unavailable for {target_frame} -> {source_frame}: {exc}"
+            )
+            return False
+        return True
+
+    def _tool_link_validation_status(self, report: dict[str, Any]) -> str:
+        if self._tool_link_validation_report is None:
+            return "not_observed"
+        status = report.get("tool_link_validation_status")
+        return str(status) if status else "tool_link_candidate_incomplete"
+
+    @staticmethod
+    def _tool_link_field(
+        report: dict[str, Any],
+        key: str,
+        default: Any = None,
+    ) -> Any:
+        return report.get(key, default)
 
     def _service_report(self) -> dict[str, Any]:
         all_services = []
@@ -736,6 +883,19 @@ class MoveItLaunchReadinessAudit(Node):
                 joint_names.append(name)
         return sorted(joint_names)
 
+    def _link_names_from_urdf(self) -> list[str]:
+        if not self._robot_description_xml:
+            return []
+        try:
+            root = ElementTree.fromstring(self._robot_description_xml)
+        except ElementTree.ParseError:
+            return []
+        return sorted(
+            link.attrib["name"]
+            for link in root.findall("link")
+            if link.attrib.get("name")
+        )
+
     @classmethod
     def _is_likely_package_name(cls, package_name: str) -> bool:
         name = package_name.lower()
@@ -763,6 +923,7 @@ class MoveItLaunchReadinessAudit(Node):
         semantic_candidate_complete: bool,
         semantic_candidate_structurally_valid: bool,
         tool_link_requires_validation: bool,
+        tool_link_candidate_valid_for_diagnostics: bool,
         move_group_launch_found: bool,
         compute_ik_service_available: bool,
     ) -> str:
@@ -770,6 +931,12 @@ class MoveItLaunchReadinessAudit(Node):
             if same_family_srdf_available:
                 return "create_lbr_iisy6_r1300_srdf_from_same_family_template"
             return "create_or_select_matching_srdf_for_lbr_iisy6_r1300"
+        if (
+            semantic_candidate_structurally_valid
+            and tool_link_requires_validation
+            and tool_link_candidate_valid_for_diagnostics
+        ):
+            return "prepare_move_group_diagnostic_launch_inputs"
         if semantic_candidate_structurally_valid and tool_link_requires_validation:
             return "validate_tool_link_and_prepare_move_group_diagnostic_launch"
         if not semantic_candidate_complete:
@@ -787,6 +954,7 @@ class MoveItLaunchReadinessAudit(Node):
         semantic_candidate_complete: bool,
         semantic_candidate_structurally_valid: bool,
         tool_link_requires_validation: bool,
+        tool_link_candidate_valid_for_diagnostics: bool,
         move_group_launch_found: bool,
         moveit_launch_ready: bool,
         compute_ik_service_available: bool,
@@ -795,6 +963,17 @@ class MoveItLaunchReadinessAudit(Node):
             return (
                 "No exact LBR iisy 6 R1300 semantic model was found; move_group "
                 "launch remains blocked."
+            )
+        if (
+            semantic_candidate_structurally_valid
+            and tool_link_requires_validation
+            and tool_link_candidate_valid_for_diagnostics
+        ):
+            return (
+                "The exact SRDF candidate and diagnostic tool link candidate are "
+                "valid for launch preparation, but motion and compute_ik remain "
+                "blocked until a separate no-motion move_group diagnostic launch "
+                "is prepared."
             )
         if semantic_candidate_structurally_valid and tool_link_requires_validation:
             return (

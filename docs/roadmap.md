@@ -124,6 +124,18 @@ keeps `moveit_launch_ready=false` while tool-link validation is required, with
 No `move_group` launch, `/compute_ik` call, trajectory goal, or controller
 motion is enabled.
 
+Baseline v2.12 status: `tool_link_validator` publishes
+`/tool_link_validation` for the intended diagnostic tool/planning link
+candidate `tool0`. It checks TF availability for `world -> tool0`,
+`base_link -> tool0`, and `world -> base_link`, verifies that `tool0` exists in
+`robot_description` URDF links when `robot_description` is available, confirms
+the project-local SRDF `arm` group joints, and records optional
+`/tool_axis_audit` plus `/cartesian_orientation_targets` availability. When
+valid for diagnostics, `moveit_launch_readiness_audit` recommends
+`prepare_move_group_diagnostic_launch_inputs` while keeping
+`moveit_launch_ready=false`, `compute_ik_expected_after_launch=false`, and all
+controller/trajectory motion flags false.
+
 ## Phase 4: Experiment Manager and Reproducible Trials
 
 - Define trial manifests, parameter sweeps, seeds, and metadata.

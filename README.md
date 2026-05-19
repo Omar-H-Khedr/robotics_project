@@ -40,6 +40,7 @@ The current implementation focuses on a ROS 2 Jazzy and Gazebo-based research fr
 | v2.9 | MoveIt IK diagnostic launch readiness audit | In progress |
 | v2.10 | LBR iisy 6 R1300 semantic candidate for MoveIt IK diagnostics | In progress |
 | v2.11 | robot_description_semantic diagnostics and MoveIt readiness gating | In progress |
+| v2.12 | Diagnostic tool-link validation for MoveIt IK readiness | In progress |
 
 ## Recommended Launch Commands
 
@@ -83,8 +84,8 @@ semantic candidate validation reports on `/semantic_model_validation` and
 start `task_trajectory_executor`, does not send trajectory goals, and does not
 command robot motion. Controller execution remains blocked until geometry, IK,
 real IK solutions for every waypoint, exact semantic model compatibility,
-MoveIt configuration readiness, tool-axis validation, safety, and force/contact
-gates all pass.
+MoveIt configuration readiness, tool-axis validation, diagnostic tool-link
+validation, safety, and force/contact gates all pass.
 
 ### MoveIt IK diagnostic preparation
 
@@ -105,7 +106,7 @@ ros2 launch thesis_bringup run_move_group_ik_diagnostic.launch.py
 ```
 
 This launch starts only `robot_description_semantic_diagnostics`,
-`semantic_model_validator`, `moveit_launch_readiness_audit`,
+`semantic_model_validator`, `tool_link_validator`, `moveit_launch_readiness_audit`,
 `moveit_config_audit`, and `ik_backend_audit`. It does not launch `move_group`,
 `task_trajectory_executor`, Gazebo, or any trajectory client. `move_group`
 remains blocked unless the exact LBR iisy 6 R1300 semantic model, tool-link
@@ -121,6 +122,12 @@ v2.11 adds `robot_description_semantic_diagnostics` on
 future `robot_description_semantic` source. The SRDF can be structurally valid
 while still not approved for motion; `/compute_ik` is not called and controller
 execution remains blocked.
+
+v2.12 adds `tool_link_validator` on `/tool_link_validation` to validate `tool0`
+as a diagnostic tool/planning link candidate using TF, `robot_description` URDF
+links, the project-local SRDF candidate, and optional tool-axis/orientation
+diagnostics. A valid result prepares move-group diagnostic launch inputs only;
+motion approval remains false.
 
 # Robotics Project
 

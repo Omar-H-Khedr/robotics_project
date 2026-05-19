@@ -299,7 +299,19 @@ def generate_launch_description():
                 ],
             ),
             TimerAction(
-                period=11.0,
+                period=10.75,
+                actions=[
+                    LogInfo(msg="Starting tool-link validator node."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="tool_link_validator",
+                        name="tool_link_validator",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=11.75,
                 actions=[
                     LogInfo(msg="Starting MoveIt launch readiness audit node."),
                     Node(
@@ -311,7 +323,7 @@ def generate_launch_description():
                 ],
             ),
             TimerAction(
-                period=11.5,
+                period=12.0,
                 actions=[
                     LogInfo(
                         msg="Starting robot_description_semantic diagnostics node."
@@ -325,7 +337,7 @@ def generate_launch_description():
                 ],
             ),
             TimerAction(
-                period=12.0,
+                period=12.5,
                 actions=[
                     LogInfo(msg="Starting semantic model validator node."),
                     Node(
