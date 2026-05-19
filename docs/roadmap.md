@@ -45,6 +45,23 @@ Controller execution remains blocked until Cartesian geometry, IK availability,
 real IK solutions, manual tool-axis validation, safety guard, and force/contact
 guard all pass.
 
+Baseline v2.5d status: `cartesian_orientation_target_calculator` computes
+diagnostic desired world-frame orientation quaternions for the insertion-aligned
+Cartesian targets. The selected candidate is `tool0_+Z`, aligned to the world
+insertion axis `[0.0, 0.0, -1.0]`, with current tool yaw used as the reference
+when resolvable. The node publishes `/cartesian_orientation_targets` and keeps
+`orientation_validated=false` and `motion_execution_allowed=false`; IK and a
+dry-run joint plan are still required before any controller execution can be
+considered.
+
+Baseline v2.5f status: the full-pose waypoint policy now covers every planned
+Cartesian waypoint, including `staging_pose`. `staging_pose` uses the same
+`align_tool_axis_to_insertion_axis` policy as the insertion and retreat
+waypoints so the tool is oriented before lateral alignment near the hole.
+This remains diagnostic-only: no controller motion is allowed without a real IK
+solver, real IK solutions for every waypoint, explicit orientation validation,
+and active safety and force/contact gates.
+
 ## Phase 4: Experiment Manager and Reproducible Trials
 
 - Define trial manifests, parameter sweeps, seeds, and metadata.
@@ -90,8 +107,8 @@ Near-term follow-up after v0.5: define a defensible insertion-success rule from 
 
 Near-term follow-up after v2.0: validate a real insertion-depth signal from geometry, TF, or Gazebo state before promoting `insertion_success` from `null` to a binary outcome.
 
-Near-term follow-up after v2.5c: select and manually validate the tool insertion
-axis, connect validated Cartesian target frames to an actual IK solver or MoveIt
-`compute_ik` service, and only then generate conservative pre-insertion and
-guarded insertion trajectories from object frames instead of hand-tuned joint
-values.
+Near-term follow-up after v2.5f: validate the computed target orientations with
+an actual IK solver or MoveIt `compute_ik` service, require a dry-run joint plan
+for every full-pose Cartesian waypoint, and only then consider conservative
+staging and guarded insertion trajectories from object frames instead of
+hand-tuned joint values.

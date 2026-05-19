@@ -18,7 +18,12 @@ Research Baseline v0.3 status: `insertion_success` remains `null`. Contact obser
 
 Research Baseline v2.0-v2.2 status: `insertion_success` remains `null` for peg/hole insertion validation until a validated depth and alignment rule is implemented. v2.0 validated the instrumentation path. v2.1 corrects contact semantics so `insertion_success_estimate` may become true only when the insertion hold phase is reached, an actual peg-hole collision pair is observed, no force threshold violation is present, and the final trial status is `completed` or the accepted guarded-contact stop status. v2.2 cleans the initial world state so the peg/hole validation scene should start without uninitialized physical contact. v2.2b uses a suspended/static peg to avoid peg-table contact during instrumentation validation; this is not final grasped peg insertion. Later versions will attach the peg to, or otherwise represent it at, the robot/tool side.
 
-Research Baseline v2.4 status: `insertion_success` remains `null`. v2.4 adds explicit object-frame TF publication for coordinate-based diagnostics: Cartesian target poses, insertion axis marker, current tool pose if available from TF, and distances from `tool0` to `hole_center` and `pre_insertion_pose`. These diagnostics are planning prerequisites, not proof of insertion and not robot motion.
+Research Baseline v2.4 status: `insertion_success` remains `null`. v2.4 adds explicit object-frame TF publication for coordinate-based diagnostics: Cartesian target poses, insertion axis marker, current tool pose if available from TF, and distances from `tool0` to `hole_center` and the configured staging/pre-insertion waypoint. These diagnostics are planning prerequisites, not proof of insertion and not robot motion.
+
+Research Baseline v2.5f status: `staging_pose` is now a full-pose diagnostic
+waypoint with an orientation target, but `insertion_success` remains `null`.
+Full-pose target availability is a planning prerequisite only; it does not prove
+insertion depth, contact state, or successful assembly.
 
 ## Collision Events
 
@@ -237,3 +242,54 @@ directions of `tool0` `+X`, `-X`, `+Y`, `-Y`, `+Z`, and `-Z`, alignment scores
 against `[0.0, 0.0, -1.0]`, and the best candidate tool axis. It always reports
 `orientation_validated=false` until a human explicitly validates the insertion
 axis.
+
+## Baseline v2.5d Orientation Target Fields
+
+The `cartesian_orientation_target_calculator` node publishes JSON on
+`/cartesian_orientation_targets` with:
+
+- `status`: always `orientation_targets_diagnostic_only_no_motion`.
+- `selected_tool_axis_candidate`: configured candidate axis, currently
+  `tool0_+Z`.
+- `insertion_axis_world`: configured world insertion axis, currently
+  `[0.0, 0.0, -1.0]`.
+- `current_tool_orientation_world`: current `tool0` quaternion from TF when
+  available.
+- `current_tool_axes_world`: current world directions of the six local `tool0`
+  axes.
+- `desired_orientations_world`: desired quaternions for `staging_pose`,
+  `axis_align_pose`, `insertion_touch_pose`,
+  `insertion_hold_pose`, `final_insertion_pose`, and `retreat_pose`.
+- `expected_alignment_after_orientation`: predicted selected-axis alignment
+  after applying the computed orientation.
+- `yaw_reference_mode`: configured yaw policy.
+- `yaw_reference_unresolved`: true when yaw about the insertion axis cannot use
+  the current tool orientation as a reference.
+- `orientation_targets_available`: true when target orientations were computed.
+- `orientation_validated`: always false in v2.5d.
+- `motion_execution_allowed`: always false in v2.5d.
+- `validation_reason`: explanation that the orientation target is computed but
+  not validated by IK or motion.
+
+The `execution_gate_monitor` includes orientation target availability and the
+selected tool-axis candidate in `/execution_gate_status`, but
+`controller_execution_allowed` remains false until explicit IK and dry-run plan
+validation exists.
+
+## Baseline v2.5f Full-Pose Waypoint Fields
+
+In v2.5f, the planned full-pose waypoint set is `staging_pose`,
+`axis_align_pose`, `insertion_touch_pose`, `insertion_hold_pose`,
+`final_insertion_pose`, and `retreat_pose`.
+
+For each planned waypoint, `/cartesian_orientation_targets` reports
+`orientation_target_available=true` and
+`orientation_source="cartesian_orientation_targets"` when the target
+orientation calculation succeeds. `ik_feasibility_diagnostics` then reports
+`full_pose_feasibility_status="full_pose_ready_but_no_ik_solver"` for
+full-pose waypoints when no IK solver is available.
+
+`execution_gate_monitor.full_pose_targets_available` is true only when all
+planned waypoints have both position and orientation targets. It still keeps
+`controller_execution_allowed=false` without a real IK solver, real IK
+solutions, explicit orientation validation, and an active force/contact guard.

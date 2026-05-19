@@ -14,6 +14,14 @@ class ExecutionGateMonitor(Node):
     """Publish the combined no-motion execution gate state."""
 
     STATUS_TOPIC = "/execution_gate_status"
+    PLANNED_WAYPOINTS = (
+        "staging_pose",
+        "axis_align_pose",
+        "insertion_touch_pose",
+        "insertion_hold_pose",
+        "final_insertion_pose",
+        "retreat_pose",
+    )
 
     def __init__(self) -> None:
         super().__init__("execution_gate_monitor")
@@ -22,6 +30,7 @@ class ExecutionGateMonitor(Node):
         self._cartesian_payload: dict[str, Any] | None = None
         self._ik_payload: dict[str, Any] | None = None
         self._tool_axis_payload: dict[str, Any] | None = None
+        self._orientation_targets_payload: dict[str, Any] | None = None
         self._safety_payload: dict[str, Any] | None = None
         self._safety_raw: str | None = None
         self._metrics_payload: dict[str, Any] | None = None
@@ -40,6 +49,12 @@ class ExecutionGateMonitor(Node):
             10,
         )
         self.create_subscription(String, "/tool_axis_audit", self._on_tool_axis_audit, 10)
+        self.create_subscription(
+            String,
+            "/cartesian_orientation_targets",
+            self._on_orientation_targets,
+            10,
+        )
         self.create_subscription(String, "/safety_status", self._on_safety_status, 10)
         self.create_subscription(
             String,
@@ -65,6 +80,9 @@ class ExecutionGateMonitor(Node):
     def _on_tool_axis_audit(self, message: String) -> None:
         self._tool_axis_payload = self._parse_json(message.data)
 
+    def _on_orientation_targets(self, message: String) -> None:
+        self._orientation_targets_payload = self._parse_json(message.data)
+
     def _on_safety_status(self, message: String) -> None:
         self._safety_raw = message.data.strip()
         self._safety_payload = self._parse_json(message.data)
@@ -78,11 +96,16 @@ class ExecutionGateMonitor(Node):
         ik_solution_available = self._ik_solution_available()
         all_targets_geometrically_feasible = self._all_targets_geometrically_feasible()
         tool_axis_orientation_validated = self._tool_axis_orientation_validated()
+        orientation_targets_available = self._orientation_targets_available()
+        orientation_aware_ik_checked = self._orientation_aware_ik_checked()
+        full_pose_targets_available = self._full_pose_targets_available()
+        selected_tool_axis_candidate = self._selected_tool_axis_candidate()
+        orientation_validated = self._orientation_validated()
         safety_guard_active = self._safety_guard_active()
         contact_metrics_available = self._contact_metrics_available()
         force_guard_active = self._force_guard_active()
 
-        controller_execution_allowed = (
+        execution_conditions_met = (
             geometry_valid
             and ik_available
             and ik_solution_available
@@ -90,6 +113,7 @@ class ExecutionGateMonitor(Node):
             and safety_guard_active
             and force_guard_active
         )
+        controller_execution_allowed = False
         block_reasons = self._block_reasons(
             geometry_valid=geometry_valid,
             ik_available=ik_available,
@@ -98,6 +122,8 @@ class ExecutionGateMonitor(Node):
             safety_guard_active=safety_guard_active,
             force_guard_active=force_guard_active,
         )
+        if execution_conditions_met:
+            block_reasons.append("diagnostic-only launch keeps controller execution disabled")
 
         payload = {
             "status": "execution_gates_diagnostic_only_no_motion",
@@ -109,6 +135,11 @@ class ExecutionGateMonitor(Node):
             "ik_available": ik_available,
             "ik_solution_available": ik_solution_available,
             "all_targets_geometrically_feasible": all_targets_geometrically_feasible,
+            "orientation_targets_available": orientation_targets_available,
+            "orientation_aware_ik_checked": orientation_aware_ik_checked,
+            "full_pose_targets_available": full_pose_targets_available,
+            "selected_tool_axis_candidate": selected_tool_axis_candidate,
+            "orientation_validated": orientation_validated,
             "tool_axis_orientation_validated": tool_axis_orientation_validated,
             "safety_guard_active": safety_guard_active,
             "force_guard_active": force_guard_active,
@@ -156,9 +187,63 @@ class ExecutionGateMonitor(Node):
         return bool(self._ik_payload.get("all_targets_geometrically_feasible", False))
 
     def _tool_axis_orientation_validated(self) -> bool:
-        if self._tool_axis_payload is None:
+        return self._orientation_validated()
+
+    def _orientation_targets_available(self) -> bool:
+        if self._orientation_targets_payload is None:
             return False
-        return bool(self._tool_axis_payload.get("orientation_validated", False))
+        return bool(
+            self._orientation_targets_payload.get(
+                "orientation_targets_available",
+                False,
+            )
+        )
+
+    def _orientation_aware_ik_checked(self) -> bool:
+        if self._ik_payload is None:
+            return False
+        return bool(self._ik_payload.get("orientation_aware_ik_checked", False))
+
+    def _full_pose_targets_available(self) -> bool:
+        if self._ik_payload is None:
+            return False
+        targets = self._ik_payload.get("targets", {})
+        if not isinstance(targets, dict):
+            return False
+        for waypoint in self.PLANNED_WAYPOINTS:
+            target = targets.get(waypoint)
+            if not isinstance(target, dict):
+                return False
+            if target.get("target_position_world") is None:
+                return False
+            if target.get("target_orientation_world") is None:
+                return False
+            if target.get("orientation_target_available") is not True:
+                return False
+        return True
+
+    def _selected_tool_axis_candidate(self) -> str | None:
+        if self._orientation_targets_payload is not None:
+            candidate = self._orientation_targets_payload.get(
+                "selected_tool_axis_candidate"
+            )
+            if candidate is not None:
+                return str(candidate)
+        if self._tool_axis_payload is not None:
+            candidate = self._tool_axis_payload.get(
+                "recommended_selected_tool_axis_candidate"
+            )
+            if candidate is not None:
+                return str(candidate)
+        return None
+
+    def _orientation_validated(self) -> bool:
+        if self._orientation_targets_payload is not None:
+            if self._orientation_targets_payload.get("orientation_validated") is True:
+                return True
+        if self._tool_axis_payload is not None:
+            return bool(self._tool_axis_payload.get("orientation_validated", False))
+        return False
 
     def _safety_guard_active(self) -> bool:
         if self._safety_payload is not None:

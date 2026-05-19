@@ -114,6 +114,8 @@ class ToolAxisAudit(Node):
             "best_candidate_tool_axis": best_candidate_tool_axis,
             "best_candidate_dot": best_candidate_dot,
             "best_candidate_angle_deg": best_candidate_angle_deg,
+            "recommended_selected_tool_axis_candidate": best_candidate_tool_axis,
+            "recommended_next_step": "compute_orientation_targets",
             "orientation_validated": False,
             "validation_reason": "manual validation required before motion",
             "motion_execution_allowed": False,

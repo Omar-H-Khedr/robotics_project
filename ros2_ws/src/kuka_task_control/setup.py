@@ -31,6 +31,7 @@ setup(
             "cartesian_insertion_diagnostics = kuka_task_control.cartesian_insertion_diagnostics:main",
             "ik_feasibility_diagnostics = kuka_task_control.ik_feasibility_diagnostics:main",
             "tool_axis_audit = kuka_task_control.tool_axis_audit:main",
+            "cartesian_orientation_target_calculator = kuka_task_control.cartesian_orientation_target_calculator:main",
             "execution_gate_monitor = kuka_task_control.execution_gate_monitor:main",
         ]
     },
