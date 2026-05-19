@@ -25,6 +25,11 @@ waypoint with an orientation target, but `insertion_success` remains `null`.
 Full-pose target availability is a planning prerequisite only; it does not prove
 insertion depth, contact state, or successful assembly.
 
+Research Baseline v2.6 status: the Cartesian dry-run plan is assembled and
+reported, but `insertion_success` remains `null`. A non-executable dry-run plan
+is still a planning diagnostic, not evidence of insertion depth, contact state,
+or assembly success.
+
 ## Collision Events
 
 Count of collision or contact events that are outside the expected peg-hole interaction.
@@ -293,3 +298,35 @@ full-pose waypoints when no IK solver is available.
 planned waypoints have both position and orientation targets. It still keeps
 `controller_execution_allowed=false` without a real IK solver, real IK
 solutions, explicit orientation validation, and an active force/contact guard.
+
+## Baseline v2.6 Cartesian Dry-Run Plan Fields
+
+The `cartesian_insertion_dry_run_planner` node publishes JSON on
+`/cartesian_insertion_dry_run_plan` with:
+
+- `status`: always `cartesian_dry_run_no_motion`.
+- `motion_execution_enabled`: always false.
+- `trajectory_execution_requested`: always false.
+- `controller_execution_allowed`: always false.
+- `waypoint_order`: `current_tool_pose`, `staging_pose`, `axis_align_pose`,
+  `insertion_touch_pose`, `insertion_hold_pose`, `final_insertion_pose`, and
+  `retreat_pose`.
+- `waypoints`: per-waypoint pose, source, distance, approximate workspace,
+  orientation target, IK availability, IK solution, joint solution, and
+  executability diagnostics.
+- `joint_solution`: null unless a real IK result is present in the IK
+  diagnostics.
+- `all_waypoints_have_full_pose`: true only when every waypoint has position and
+  orientation data.
+- `all_waypoints_geometrically_feasible`: true only when Cartesian geometry and
+  approximate workspace diagnostics pass.
+- `all_waypoints_have_ik_solution`: true only when real IK solutions exist for
+  all planned Cartesian waypoints.
+- `plan_executable`: true only when full poses, geometry, and real IK solutions
+  are all available.
+- `block_reasons` and `primary_block_reason`: explicit no-motion block state.
+
+The execution gate monitor now also reports `dry_run_plan_available`,
+`dry_run_plan_executable`, and `dry_run_primary_block_reason`. Controller
+execution remains disabled in the diagnostic launch, and no controller command
+is sent.

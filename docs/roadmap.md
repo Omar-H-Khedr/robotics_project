@@ -62,6 +62,15 @@ This remains diagnostic-only: no controller motion is allowed without a real IK
 solver, real IK solutions for every waypoint, explicit orientation validation,
 and active safety and force/contact gates.
 
+Baseline v2.6 status: `cartesian_insertion_dry_run_planner` assembles the full
+Cartesian insertion waypoint sequence from the current tool pose through
+staging, axis alignment, touch, hold, final insertion, and retreat. The plan is
+published on `/cartesian_insertion_dry_run_plan` as diagnostics only with
+`motion_execution_enabled=false`, `trajectory_execution_requested=false`, and
+`controller_execution_allowed=false`. It remains non-executable until real IK
+solutions exist for all planned waypoints and the execution gates are available.
+No controller command is sent.
+
 ## Phase 4: Experiment Manager and Reproducible Trials
 
 - Define trial manifests, parameter sweeps, seeds, and metadata.
@@ -107,8 +116,7 @@ Near-term follow-up after v0.5: define a defensible insertion-success rule from 
 
 Near-term follow-up after v2.0: validate a real insertion-depth signal from geometry, TF, or Gazebo state before promoting `insertion_success` from `null` to a binary outcome.
 
-Near-term follow-up after v2.5f: validate the computed target orientations with
-an actual IK solver or MoveIt `compute_ik` service, require a dry-run joint plan
-for every full-pose Cartesian waypoint, and only then consider conservative
-staging and guarded insertion trajectories from object frames instead of
-hand-tuned joint values.
+Near-term follow-up after v2.6: connect a real IK solver or MoveIt `compute_ik`
+service, populate real joint solutions for every full-pose Cartesian waypoint,
+and only then consider conservative staging and guarded insertion trajectories
+from object frames instead of hand-tuned joint values.
