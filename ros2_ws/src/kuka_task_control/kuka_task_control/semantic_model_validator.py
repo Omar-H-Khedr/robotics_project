@@ -29,8 +29,15 @@ class SemanticModelValidator(Node):
 
         self._joint_state_names: list[str] = []
         self._joint_states_observed = False
+        self._tool_link_validation_report: dict[str, Any] | None = None
         self._publisher = self.create_publisher(String, self.TOPIC, 10)
         self.create_subscription(JointState, "/joint_states", self._on_joint_states, 10)
+        self.create_subscription(
+            String,
+            "/tool_link_validation",
+            self._on_tool_link_validation,
+            10,
+        )
         self.create_timer(
             float(self.get_parameter("publish_period_sec").value),
             self._publish_validation,
@@ -42,6 +49,16 @@ class SemanticModelValidator(Node):
     def _on_joint_states(self, message: JointState) -> None:
         self._joint_states_observed = True
         self._joint_state_names = list(message.name)
+
+    def _on_tool_link_validation(self, message: String) -> None:
+        try:
+            payload = json.loads(message.data)
+        except json.JSONDecodeError:
+            self._tool_link_validation_report = {
+                "status": "invalid_tool_link_validation_json"
+            }
+            return
+        self._tool_link_validation_report = payload if isinstance(payload, dict) else None
 
     def _publish_validation(self) -> None:
         srdf_path = self._srdf_path()
@@ -65,6 +82,11 @@ class SemanticModelValidator(Node):
         candidate_complete = bool(
             semantic_model_exact_candidate and joint_states_match_srdf
         )
+        tool_link_validation_status = self._tool_link_validation_status()
+        tool_link_candidate_validated_for_diagnostics = bool(
+            tool_link_validation_status
+            == "tool_link_candidate_valid_but_not_motion_approved"
+        )
 
         payload: dict[str, Any] = {
             "status": "semantic_model_validation_diagnostic_only_no_motion",
@@ -84,6 +106,13 @@ class SemanticModelValidator(Node):
             "joint_states_available": self._joint_states_observed,
             "joint_states_match_srdf": joint_states_match_srdf,
             "tool_link_requires_validation": tool_link_requires_validation,
+            "tool_link_validation_available": (
+                self._tool_link_validation_report is not None
+            ),
+            "tool_link_candidate": self._tool_link_candidate(),
+            "tool_link_candidate_validated_for_diagnostics": (
+                tool_link_candidate_validated_for_diagnostics
+            ),
             "approved_for_motion": False,
             "controller_motion_allowed": False,
             "trajectory_execution_allowed": False,
@@ -114,9 +143,13 @@ class SemanticModelValidator(Node):
                 joint for joint in self.REQUIRED_JOINTS if joint not in joint_state_set
             ],
             "tool_link_validation_status": (
-                "requires_validation"
-                if tool_link_requires_validation
-                else "validated"
+                tool_link_validation_status
+                if self._tool_link_validation_report is not None
+                else (
+                    "requires_validation"
+                    if tool_link_requires_validation
+                    else "validated"
+                )
             ),
             "motion_execution_enabled": False,
             "trajectory_execution_requested": False,
@@ -126,6 +159,18 @@ class SemanticModelValidator(Node):
         message.data = json.dumps(payload, sort_keys=True)
         self._publisher.publish(message)
         self.get_logger().info(message.data)
+
+    def _tool_link_validation_status(self) -> str:
+        if self._tool_link_validation_report is None:
+            return "requires_validation"
+        status = self._tool_link_validation_report.get("tool_link_validation_status")
+        return str(status) if status else "tool_link_candidate_incomplete"
+
+    def _tool_link_candidate(self) -> str:
+        if self._tool_link_validation_report is None:
+            return "tool0"
+        candidate = self._tool_link_validation_report.get("tool_link_candidate")
+        return str(candidate) if candidate else "tool0"
 
     def _srdf_path(self) -> Path:
         configured_path = str(self.get_parameter("srdf_path").value or "").strip()

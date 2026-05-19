@@ -479,3 +479,35 @@ the recommended next step is
 v2.11 prepares semantic diagnostics only. It does not launch `move_group`, call
 `/compute_ik`, fake IK solutions, send `FollowJointTrajectory` goals, start
 Gazebo, or unblock controller execution.
+
+## Baseline v2.12 Tool-Link Validation Fields
+
+The `tool_link_validator` node publishes JSON on `/tool_link_validation` with:
+
+- `tool_link_candidate`: currently `tool0`.
+- `robot_description_available`, `urdf_parse_success`, and
+  `tool_link_exists_in_urdf`: whether `robot_description` was readable and
+  contains the candidate link.
+- `tf_world_to_tool_available`, `tf_base_to_tool_available`, and
+  `tf_world_to_base_available`: required TF checks for the diagnostic candidate.
+- `current_tool_pose_world` and `current_tool_pose_base`: current diagnostic TF
+  poses when available.
+- `arm_group_found`, `arm_group_joints`, and `required_joints_present`: SRDF
+  consistency checks for the project-local `arm` group.
+- `selected_tool_axis_candidate`, `expected_aligned_insertion_axis`,
+  `tool_axis_candidate_available`, and `orientation_targets_available`: optional
+  tool-axis/orientation observations for `tool0_+Z` and `[0, 0, -1]`.
+- `tool_link_validation_status`: either
+  `tool_link_candidate_valid_but_not_motion_approved` or
+  `tool_link_candidate_incomplete`.
+- `approved_for_motion`, `controller_motion_allowed`, and
+  `trajectory_execution_allowed`: always false.
+
+`semantic_model_validator` also reports
+`tool_link_candidate_validated_for_diagnostics` when the validation topic is
+observed with a valid diagnostic status. `moveit_launch_readiness_audit`
+reports `tool_link_validation_available`, `tool_link_candidate`,
+`tool_link_exists_in_urdf`, `tf_base_to_tool_available`, and
+`tool_link_validation_status`. A valid diagnostic tool link changes the
+recommended next step to `prepare_move_group_diagnostic_launch_inputs`; it does
+not make `moveit_launch_ready` true and does not enable `/compute_ik` or motion.

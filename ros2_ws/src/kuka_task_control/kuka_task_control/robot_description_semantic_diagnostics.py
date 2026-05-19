@@ -51,6 +51,9 @@ class RobotDescriptionSemanticDiagnostics(Node):
 
         payload: dict[str, Any] = {
             "status": "robot_description_semantic_diagnostics_no_motion",
+            "tool_link_candidate": "tool0",
+            "tool_link_validation_required": True,
+            "tool_link_validation_topic": "/tool_link_validation",
             "srdf_file_path": str(srdf_path),
             "srdf_file_exists": srdf_report["file_exists"],
             "srdf_parse_success": srdf_report["parse_success"],

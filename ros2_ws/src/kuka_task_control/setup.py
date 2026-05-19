@@ -48,6 +48,7 @@ setup(
             "moveit_launch_readiness_audit = kuka_task_control.moveit_launch_readiness_audit:main",
             "semantic_model_validator = kuka_task_control.semantic_model_validator:main",
             "robot_description_semantic_diagnostics = kuka_task_control.robot_description_semantic_diagnostics:main",
+            "tool_link_validator = kuka_task_control.tool_link_validator:main",
         ]
     },
 )
