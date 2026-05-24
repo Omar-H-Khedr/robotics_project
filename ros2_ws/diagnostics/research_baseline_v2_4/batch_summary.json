@@ -1,0 +1,12 @@
+{
+  "baseline_name": "research_baseline_v2_4_experiment_runner",
+  "batch_size": 20,
+  "mode": "batch_diagnostic_dry_run",
+  "safe_success_count": 0,
+  "safe_success_rate": 0.0,
+  "safety_violation_count": 0,
+  "seed": 24,
+  "status": "complete",
+  "success_count": 0,
+  "success_rate": 0.0
+}
