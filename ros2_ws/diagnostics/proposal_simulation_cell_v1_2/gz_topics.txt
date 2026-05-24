@@ -1,0 +1,32 @@
+# gz topic -l
+/clock
+/gazebo/resource_paths
+/proposal_simulation_cell/d405/color/camera_info
+/proposal_simulation_cell/d405/color/image_raw
+/proposal_simulation_cell/d405/depth/camera_info
+/proposal_simulation_cell/d405/depth/image_rect_raw
+/proposal_simulation_cell/d405/depth/image_rect_raw/points
+/sensors/marker
+/stats
+/world/proposal_simulation_cell_v1_2_rgbd_image_bridge_fix/clock
+/world/proposal_simulation_cell_v1_2_rgbd_image_bridge_fix/dynamic_pose/info
+/world/proposal_simulation_cell_v1_2_rgbd_image_bridge_fix/model/hole_block/link/hole_block_link/sensor/hole_contact_sensor/contact
+/world/proposal_simulation_cell_v1_2_rgbd_image_bridge_fix/pose/info
+/world/proposal_simulation_cell_v1_2_rgbd_image_bridge_fix/scene/deletion
+/world/proposal_simulation_cell_v1_2_rgbd_image_bridge_fix/scene/info
+/world/proposal_simulation_cell_v1_2_rgbd_image_bridge_fix/state
+/world/proposal_simulation_cell_v1_2_rgbd_image_bridge_fix/stats
+/world/proposal_simulation_cell_v1_2_rgbd_image_bridge_fix/light_config
+/world/proposal_simulation_cell_v1_2_rgbd_image_bridge_fix/material_color
+
+# gz topic -i -t /proposal_simulation_cell/d405/color/image_raw
+Publishers [Address, Message Type]:
+  tcp://172.29.114.156:33247, gz.msgs.Image
+Subscribers [Address, Message Type]:
+  tcp://172.29.114.156:36995, gz.msgs.Image
+
+# gz topic -i -t /proposal_simulation_cell/d405/depth/image_rect_raw
+Publishers [Address, Message Type]:
+  tcp://172.29.114.156:33247, gz.msgs.Image
+Subscribers [Address, Message Type]:
+  tcp://172.29.114.156:36995, gz.msgs.Image

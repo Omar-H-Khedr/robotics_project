@@ -25,6 +25,7 @@ setup(
             "controller_readiness_gate = thesis_bringup.controller_readiness_gate:main",
             "proposal_simulation_cell_monitor = thesis_bringup.proposal_simulation_cell_monitor:main",
             "proposal_simulation_cell_v1_1_validator = thesis_bringup.proposal_simulation_cell_v1_1_validator:main",
+            "proposal_simulation_cell_v1_2_rgbd_validator = thesis_bringup.proposal_simulation_cell_v1_2_rgbd_validator:main",
         ]
     },
 )

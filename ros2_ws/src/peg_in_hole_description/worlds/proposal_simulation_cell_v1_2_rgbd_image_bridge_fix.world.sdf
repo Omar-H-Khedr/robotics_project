@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <world name="proposal_simulation_cell_v1_2_rgbd_image_bridge_fix">
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+
+    <plugin name="gz::sim::systems::Physics" filename="ignition-gazebo-physics-system"/>
+    <plugin name="gz::sim::systems::UserCommands" filename="ignition-gazebo-user-commands-system"/>
+    <plugin name="gz::sim::systems::SceneBroadcaster" filename="ignition-gazebo-scene-broadcaster-system"/>
+    <plugin name="gz::sim::systems::Contact" filename="ignition-gazebo-contact-system"/>
+    <plugin name="gz::sim::systems::Sensors" filename="ignition-gazebo-sensors-system">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <gravity>0 0 -9.81</gravity>
+    <scene>
+      <ambient>0.45 0.45 0.45 1</ambient>
+      <background>0.72 0.74 0.76 1</background>
+      <shadows>true</shadows>
+    </scene>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><plane><normal>0 0 1</normal><size>20 20</size></plane></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>20 20</size></plane></geometry>
+          <material>
+            <ambient>0.55 0.57 0.58 1</ambient>
+            <diffuse>0.62 0.64 0.65 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="work_table">
+      <static>true</static>
+      <pose>0.80 0.00 0.375 0 0 0</pose>
+      <link name="table_link">
+        <collision name="table_collision">
+          <geometry><box><size>0.90 0.70 0.75</size></box></geometry>
+        </collision>
+        <visual name="table_visual">
+          <geometry><box><size>0.90 0.70 0.75</size></box></geometry>
+          <material>
+            <ambient>0.45 0.45 0.43 1</ambient>
+            <diffuse>0.55 0.55 0.52 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="hole_block">
+      <static>true</static>
+      <pose>0.52 -0.20 0.78 0 0 0</pose>
+      <link name="hole_block_link">
+        <collision name="block_collision">
+          <geometry><box><size>0.18 0.18 0.06</size></box></geometry>
+        </collision>
+        <visual name="block_visual">
+          <geometry><box><size>0.18 0.18 0.06</size></box></geometry>
+          <material>
+            <ambient>0.12 0.18 0.28 1</ambient>
+            <diffuse>0.18 0.28 0.42 1</diffuse>
+          </material>
+        </visual>
+        <sensor name="hole_contact_sensor" type="contact">
+          <always_on>true</always_on>
+          <update_rate>250</update_rate>
+          <contact>
+            <collision>block_collision</collision>
+          </contact>
+        </sensor>
+      </link>
+    </model>
+
+    <model name="hole_center_marker">
+      <static>true</static>
+      <pose>0.52 -0.20 0.83 0 0 0</pose>
+      <link name="hole_marker_link">
+        <visual name="hole_visual">
+          <geometry><cylinder><radius>0.017</radius><length>0.004</length></cylinder></geometry>
+          <material>
+            <ambient>0.02 0.02 0.02 1</ambient>
+            <diffuse>0.02 0.02 0.02 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="cylindrical_peg">
+      <static>false</static>
+      <pose>0.72 -0.05 0.805 0 0 0</pose>
+      <link name="peg_link">
+        <inertial>
+          <mass>0.08</mass>
+          <inertia>
+            <ixx>0.00005</ixx><iyy>0.00005</iyy><izz>0.00002</izz>
+            <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="peg_collision">
+          <geometry><cylinder><radius>0.015</radius><length>0.11</length></cylinder></geometry>
+        </collision>
+        <visual name="peg_visual">
+          <geometry><cylinder><radius>0.015</radius><length>0.11</length></cylinder></geometry>
+          <material>
+            <ambient>0.85 0.78 0.55 1</ambient>
+            <diffuse>0.95 0.86 0.62 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="d405_rgbd_camera">
+      <static>true</static>
+      <pose>0.42 -0.65 1.18 0.95 0 0.35</pose>
+      <link name="camera_link">
+        <visual name="camera_visual">
+          <geometry><box><size>0.09 0.025 0.025</size></box></geometry>
+          <material>
+            <ambient>0.03 0.03 0.03 1</ambient>
+            <diffuse>0.05 0.05 0.05 1</diffuse>
+          </material>
+        </visual>
+        <sensor name="d405_color" type="camera">
+          <always_on>true</always_on>
+          <update_rate>30</update_rate>
+          <topic>/proposal_simulation_cell/d405/color/image_raw</topic>
+          <camera>
+            <horizontal_fov>1.22</horizontal_fov>
+            <image>
+              <width>848</width>
+              <height>480</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.07</near>
+              <far>2.0</far>
+            </clip>
+          </camera>
+        </sensor>
+        <sensor name="d405_depth" type="depth_camera">
+          <always_on>true</always_on>
+          <update_rate>30</update_rate>
+          <topic>/proposal_simulation_cell/d405/depth/image_rect_raw</topic>
+          <camera>
+            <horizontal_fov>1.22</horizontal_fov>
+            <image>
+              <width>848</width>
+              <height>480</height>
+              <format>R_FLOAT32</format>
+            </image>
+            <clip>
+              <near>0.07</near>
+              <far>2.0</far>
+            </clip>
+          </camera>
+        </sensor>
+      </link>
+    </model>
+
+    <light name="key_area_light" type="point">
+      <pose>0.20 -0.60 1.80 0 0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <intensity>1.4</intensity>
+      <diffuse>0.95 0.95 0.90 1</diffuse>
+      <specular>0.35 0.35 0.35 1</specular>
+      <attenuation>
+        <range>5.0</range>
+        <constant>0.6</constant>
+        <linear>0.15</linear>
+        <quadratic>0.02</quadratic>
+      </attenuation>
+    </light>
+  </world>
+</sdf>

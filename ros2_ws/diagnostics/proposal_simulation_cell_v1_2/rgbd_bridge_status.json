@@ -1,0 +1,22 @@
+{
+  "compute_ik_called": false,
+  "depth_camera_info_available": true,
+  "depth_gazebo_topic_discovered": true,
+  "depth_image_sample_received": true,
+  "depth_ros_topic_available": true,
+  "gazebo_fallback_used": true,
+  "image_bridge_method": "ros_gz_image/image_bridge direct Gazebo topic bridge",
+  "isaac_available": false,
+  "limitation_reason": "none",
+  "motion_execution_enabled": false,
+  "moveit_used": false,
+  "real_robot_used": false,
+  "rgb_camera_info_available": true,
+  "rgb_gazebo_topic_discovered": true,
+  "rgb_image_sample_received": true,
+  "rgb_ros_topic_available": true,
+  "ros_gz_bridge_available": true,
+  "ros_gz_image_available": true,
+  "simulation_engine": "gazebo",
+  "status": "rgbd_image_bridge_validated"
+}
