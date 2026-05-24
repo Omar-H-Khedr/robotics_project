@@ -84,8 +84,8 @@ def generate_launch_description():
                     "Starting Research Baseline v2.7 coordinate-based insertion "
                     "diagnostics, orientation target calculation, execution gates, "
                     "tool-axis audit, Cartesian dry-run planning, and IK backend "
-                    "and MoveIt config audits. This launch performs no task "
-                    "trajectory execution."
+                    "plus MoveIt config and launch readiness audits. This launch "
+                    "performs no task trajectory execution."
                 )
             ),
             LogInfo(msg="Spawning exactly one KUKA robot entity: kuka_lbr_iisy"),
@@ -294,6 +294,102 @@ def generate_launch_description():
                         package="kuka_task_control",
                         executable="moveit_config_audit",
                         name="moveit_config_audit",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=10.75,
+                actions=[
+                    LogInfo(msg="Starting tool-link validator node."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="tool_link_validator",
+                        name="tool_link_validator",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=11.75,
+                actions=[
+                    LogInfo(msg="Starting MoveIt launch readiness audit node."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="moveit_launch_readiness_audit",
+                        name="moveit_launch_readiness_audit",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=11.85,
+                actions=[
+                    LogInfo(
+                        msg=(
+                            "Starting move_group diagnostic config builder "
+                            "without launching move_group."
+                        )
+                    ),
+                    Node(
+                        package="kuka_task_control",
+                        executable="move_group_diagnostic_config_builder",
+                        name="move_group_diagnostic_config_builder",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=11.9,
+                actions=[
+                    LogInfo(msg="Starting MoveIt diagnostic input builder node."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="moveit_diagnostic_input_builder",
+                        name="moveit_diagnostic_input_builder",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=12.0,
+                actions=[
+                    LogInfo(
+                        msg="Starting robot_description_semantic diagnostics node."
+                    ),
+                    Node(
+                        package="kuka_task_control",
+                        executable="robot_description_semantic_diagnostics",
+                        name="robot_description_semantic_diagnostics",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=12.25,
+                actions=[
+                    LogInfo(
+                        msg=(
+                            "Starting move_group runtime audit without launching "
+                            "move_group."
+                        )
+                    ),
+                    Node(
+                        package="kuka_task_control",
+                        executable="move_group_runtime_audit",
+                        name="move_group_runtime_audit",
+                        output="screen",
+                    ),
+                ],
+            ),
+            TimerAction(
+                period=12.5,
+                actions=[
+                    LogInfo(msg="Starting semantic model validator node."),
+                    Node(
+                        package="kuka_task_control",
+                        executable="semantic_model_validator",
+                        name="semantic_model_validator",
                         output="screen",
                     ),
                 ],

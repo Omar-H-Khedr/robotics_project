@@ -93,6 +93,71 @@ service is actually visible. The optional
 not launch `move_group`, `task_trajectory_executor`, Gazebo, or any controller
 client.
 
+Baseline v2.9 status: `moveit_launch_readiness_audit` publishes
+`/moveit_launch_readiness_audit` as a diagnostic-only gate before any future
+MoveIt/move_group IK launch. It requires an exact `lbr_iisy6_r1300` semantic
+model before `moveit_launch_ready` can become true. If only the currently known
+SRDF variants are present, it recommends
+`create_or_select_matching_srdf_for_lbr_iisy6_r1300` and keeps `selected_srdf`
+null. The v2.9 `run_move_group_ik_diagnostic.launch.py` starts only
+`moveit_launch_readiness_audit`, `moveit_config_audit`, and `ik_backend_audit`;
+it does not launch `move_group`, `task_trajectory_executor`, Gazebo, or any
+controller client.
+
+Baseline v2.10 status: a project-local semantic candidate for
+`lbr_iisy6_r1300` exists under
+`kuka_task_control/config/moveit_lbr_iisy6_r1300`. It is derived from the
+same-family `lbr_iisy11_r1300_arm.srdf.xacro` template, selected by the MoveIt
+audits as `project_local_lbr_iisy6_r1300_overlay`, and marked
+`semantic_model_validation_status="candidate_requires_validation"`. The new
+`semantic_model_validator` publishes `/semantic_model_validation` and always
+keeps `approved_for_motion=false`, `controller_motion_allowed=false`, and
+`trajectory_execution_allowed=false`.
+
+Baseline v2.11 status: `robot_description_semantic_diagnostics` publishes
+`/robot_description_semantic_diagnostics` from the project-local or installed
+`lbr_iisy6_r1300.srdf` candidate. `moveit_launch_readiness_audit` now reports
+the semantic candidate source, candidate availability, semantic diagnostics
+availability, and semantic diagnostics status. A structurally valid SRDF still
+keeps `moveit_launch_ready=false` while tool-link validation is required, with
+`recommended_next_step="validate_tool_link_and_prepare_move_group_diagnostic_launch"`.
+No `move_group` launch, `/compute_ik` call, trajectory goal, or controller
+motion is enabled.
+
+Baseline v2.12 status: `tool_link_validator` publishes
+`/tool_link_validation` for the intended diagnostic tool/planning link
+candidate `tool0`. It checks TF availability for `world -> tool0`,
+`base_link -> tool0`, and `world -> base_link`, verifies that `tool0` exists in
+`robot_description` URDF links when `robot_description` is available, confirms
+the project-local SRDF `arm` group joints, and records optional
+`/tool_axis_audit` plus `/cartesian_orientation_targets` availability. When
+valid for diagnostics, `moveit_launch_readiness_audit` recommends
+`prepare_move_group_diagnostic_launch_inputs` while keeping
+`moveit_launch_ready=false`, `compute_ik_expected_after_launch=false`, and all
+controller/trajectory motion flags false.
+
+Baseline v2.13 status: `moveit_diagnostic_input_builder` publishes
+`/moveit_diagnostic_inputs` as the diagnostic-only input bundle for a future
+no-motion `move_group` `/compute_ik` test. It checks `robot_description`,
+the project-local SRDF, `kinematics.yaml`, `ompl_planning.yaml`, the missing
+`joint_limits.yaml` fallback source, `planning_frame="base_link"`,
+`tool_link="tool0"`, and the latest `/tool_link_validation` result. When ready,
+`moveit_launch_readiness_audit` recommends
+`create_move_group_diagnostic_launch_with_trajectory_execution_disabled`.
+`move_group`, `/compute_ik`, controller execution, and trajectory execution
+remain blocked.
+
+Baseline v2.14 status: `run_move_group_ik_diagnostic.launch.py` now has a
+`launch_move_group` argument that defaults to `false`. The default path starts
+diagnostics only, including `move_group_diagnostic_config_builder` on
+`/move_group_diagnostic_config` and `move_group_runtime_audit` on
+`/move_group_runtime_audit`. If `launch_move_group:=true` is explicitly used,
+the launch starts diagnostic-only `move_group` with
+`allow_trajectory_execution=false`; no trajectory executor, controller client,
+FollowJointTrajectory goal, MoveIt plan execution, or `/compute_ik` request is
+started by the launch. The intended outcome is only to observe whether
+`/compute_ik` becomes available.
+
 ## Phase 4: Experiment Manager and Reproducible Trials
 
 - Define trial manifests, parameter sweeps, seeds, and metadata.
@@ -137,6 +202,11 @@ automatically. The old two-terminal workflow remains available for debugging.
 Near-term follow-up after v0.5: define a defensible insertion-success rule from peg/hole pose, insertion depth, contact state, or a documented combination of those signals. Until then, `task_completed`, `insertion_hold_reached`, heuristic `insertion_success_estimate`, and true `insertion_success` remain separate metrics.
 
 Near-term follow-up after v2.0: validate a real insertion-depth signal from geometry, TF, or Gazebo state before promoting `insertion_success` from `null` to a binary outcome.
+
+Near-term follow-up after v2.14: review the diagnostic-only move_group launch
+parameters, then perform a separate no-motion `/compute_ik` service test only
+after `/move_group_runtime_audit` reports the service visible. Keep controller
+motion and trajectory execution blocked.
 
 Near-term follow-up after v2.7: act on the `/ik_backend_audit` decision report.
 If a real `/compute_ik` service is present, add diagnostic IK requests for the

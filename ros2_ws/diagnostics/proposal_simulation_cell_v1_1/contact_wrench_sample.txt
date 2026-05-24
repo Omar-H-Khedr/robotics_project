@@ -1,0 +1,4 @@
+topic: /proposal_simulation_cell/contact_wrench
+frame_id: peg_tip
+force: 0.0000,0.0000,0.0000
+torque: 0.0000,0.0000,0.0000

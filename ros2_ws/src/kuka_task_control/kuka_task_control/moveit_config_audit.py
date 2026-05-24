@@ -23,6 +23,11 @@ class MoveItConfigAudit(Node):
     """Publish MoveIt config readiness without calling IK or executing motion."""
 
     AUDIT_TOPIC = "/moveit_config_audit"
+    TARGET_ROBOT_MODEL = "lbr_iisy6_r1300"
+    PROJECT_LOCAL_OVERLAY_NAME = "project_local_lbr_iisy6_r1300_overlay"
+    PROJECT_LOCAL_OVERLAY_RELATIVE_PATH = Path(
+        "kuka_task_control/config/moveit_lbr_iisy6_r1300"
+    )
     REQUIRED_MOVEIT_PACKAGES = (
         "moveit_ros_move_group",
         "moveit_msgs",
@@ -108,6 +113,20 @@ class MoveItConfigAudit(Node):
             "missing_packages": package_report["missing_packages"],
             "packages": package_report["packages"],
             "moveit_config_package_found": moveit_config_package_found,
+            "project_local_moveit_config_found": config_report[
+                "project_local_moveit_config_found"
+            ],
+            "selected_moveit_config_package": config_report[
+                "selected_moveit_config_package"
+            ],
+            "selected_srdf": config_report["selected_srdf"],
+            "target_robot_model": self.TARGET_ROBOT_MODEL,
+            "exact_robot_semantic_match": config_report[
+                "exact_robot_semantic_match"
+            ],
+            "semantic_model_validation_status": config_report[
+                "semantic_model_validation_status"
+            ],
             "partial_moveit_config_found": partial_moveit_config_found,
             "moveit_config_package_name": config_report["moveit_config_package_name"],
             "moveit_config_package_path": config_report["moveit_config_package_path"],
@@ -226,6 +245,17 @@ class MoveItConfigAudit(Node):
                 candidate_report["can_construct_launch"] = self._can_construct_launch(
                     files
                 )
+                candidate_report["internally_consistent"] = bool(
+                    files["srdf_files"]
+                    and files["kinematics_yaml_files"]
+                    and files["ompl_planning_yaml_files"]
+                )
+                if (
+                    candidate["package"] == self.PROJECT_LOCAL_OVERLAY_NAME
+                    and candidate_report["internally_consistent"]
+                ):
+                    candidate_report["complete_config"] = True
+                    candidate_report["can_construct_launch"] = False
                 if candidate_report["complete_config"]:
                     complete_config_packages.append(candidate_report)
                 else:
@@ -241,20 +271,18 @@ class MoveItConfigAudit(Node):
             )
 
         selected_package = self._select_config_package(complete_config_packages)
-        if selected_package:
-            report_files = selected_package
-        else:
-            report_files = {
-                "srdf_files": sorted(set(srdf_files)),
-                "kinematics_yaml_files": sorted(set(kinematics_yaml_files)),
-                "joint_limits_yaml_files": sorted(set(joint_limits_yaml_files)),
-                "ompl_planning_yaml_files": sorted(set(ompl_planning_yaml_files)),
-                "move_group_launch_files": sorted(set(move_group_launch_files)),
-                "demo_launch_files": sorted(set(demo_launch_files)),
-                "move_group_related_launch_files": sorted(
-                    set(move_group_related_launch_files)
-                ),
-            }
+        report_package = selected_package or self._select_report_package(
+            partial_config_packages
+        )
+        report_files = report_package or {
+            "srdf_files": [],
+            "kinematics_yaml_files": [],
+            "joint_limits_yaml_files": [],
+            "ompl_planning_yaml_files": [],
+            "move_group_launch_files": [],
+            "demo_launch_files": [],
+            "move_group_related_launch_files": [],
+        }
         partial_moveit_config_found = bool(
             not selected_package
             and (
@@ -274,6 +302,16 @@ class MoveItConfigAudit(Node):
             "config_packages": complete_config_packages,
             "partial_config_packages": partial_config_packages,
             "moveit_config_package_found": bool(selected_package),
+            "project_local_moveit_config_found": any(
+                candidate["package"] == self.PROJECT_LOCAL_OVERLAY_NAME
+                for candidate in complete_config_packages + partial_config_packages
+            ),
+            "selected_moveit_config_package": (
+                self.PROJECT_LOCAL_OVERLAY_NAME
+                if selected_package
+                and selected_package["package"] == self.PROJECT_LOCAL_OVERLAY_NAME
+                else (selected_package["package"] if selected_package else None)
+            ),
             "partial_moveit_config_found": partial_moveit_config_found,
             "moveit_config_package_name": (
                 selected_package["package"] if selected_package else None
@@ -281,16 +319,40 @@ class MoveItConfigAudit(Node):
             "moveit_config_package_path": (
                 selected_package["share_path"] if selected_package else None
             ),
+            "reported_config_package_name": (
+                report_package["package"] if report_package else None
+            ),
+            "reported_config_package_path": (
+                report_package["share_path"] if report_package else None
+            ),
             "can_construct_launch": bool(
                 selected_package and selected_package["can_construct_launch"]
             ),
             "srdf_files": sorted(set(report_files["srdf_files"])),
+            "selected_srdf": self._select_exact_srdf(report_files["srdf_files"]),
+            "exact_robot_semantic_match": bool(
+                self._select_exact_srdf(report_files["srdf_files"])
+            ),
+            "semantic_model_validation_status": (
+                "candidate_requires_validation"
+                if selected_package
+                and selected_package["package"] == self.PROJECT_LOCAL_OVERLAY_NAME
+                else (
+                    "verified"
+                    if self._select_exact_srdf(report_files["srdf_files"])
+                    else "missing"
+                )
+            ),
             "kinematics_yaml_files": sorted(set(report_files["kinematics_yaml_files"])),
-            "joint_limits_yaml_files": sorted(set(report_files["joint_limits_yaml_files"])),
+            "joint_limits_yaml_files": sorted(
+                set(report_files["joint_limits_yaml_files"])
+            ),
             "ompl_planning_yaml_files": sorted(
                 set(report_files["ompl_planning_yaml_files"])
             ),
-            "move_group_launch_files": sorted(set(report_files["move_group_launch_files"])),
+            "move_group_launch_files": sorted(
+                set(report_files["move_group_launch_files"])
+            ),
             "demo_launch_files": sorted(set(report_files["demo_launch_files"])),
             "move_group_related_launch_files": sorted(
                 set(report_files["move_group_related_launch_files"])
@@ -314,6 +376,13 @@ class MoveItConfigAudit(Node):
                 }
 
         for source_root in self._source_search_roots():
+            overlay = source_root / self.PROJECT_LOCAL_OVERLAY_RELATIVE_PATH
+            if overlay.exists():
+                candidates[str(overlay)] = {
+                    "package": self.PROJECT_LOCAL_OVERLAY_NAME,
+                    "share_path": str(overlay),
+                    "source": "project_local_config_overlay",
+                }
             for package_xml in source_root.glob("**/package.xml"):
                 package_name = self._package_name_from_xml(package_xml)
                 if not package_name or not self._is_likely_package_name(package_name):
@@ -415,7 +484,8 @@ class MoveItConfigAudit(Node):
     def _find_config_files(self, root: Path) -> dict[str, list[str]]:
         srdf_files = sorted(
             str(path)
-            for path in root.glob("**/*.srdf")
+            for pattern in ("**/*.srdf", "**/*.srdf.xacro")
+            for path in root.glob(pattern)
             if path.is_file()
         )
         kinematics_yaml_files = self._glob_named_files(root, "kinematics.yaml")
@@ -486,8 +556,9 @@ class MoveItConfigAudit(Node):
             and cls._can_construct_launch(files)
         )
 
-    @staticmethod
+    @classmethod
     def _select_config_package(
+        cls,
         complete_config_packages: list[dict[str, Any]],
     ) -> dict[str, Any] | None:
         if not complete_config_packages:
@@ -496,6 +567,7 @@ class MoveItConfigAudit(Node):
         def score(candidate: dict[str, Any]) -> tuple[int, int, int, int, str]:
             package_name = candidate["package"].lower()
             return (
+                1 if package_name == cls.PROJECT_LOCAL_OVERLAY_NAME else 0,
                 1 if "lbr_iisy" in package_name else 0,
                 1 if candidate["move_group_launch_files"] else 0,
                 1 if candidate["joint_limits_yaml_files"] else 0,
@@ -504,6 +576,44 @@ class MoveItConfigAudit(Node):
             )
 
         return sorted(complete_config_packages, key=score, reverse=True)[0]
+
+    def _select_exact_srdf(self, srdf_files: list[str]) -> str | None:
+        for srdf_file in sorted(set(srdf_files)):
+            path = Path(srdf_file)
+            if self.TARGET_ROBOT_MODEL in path.name.lower():
+                return srdf_file
+            if self._srdf_robot_name(path) == self.TARGET_ROBOT_MODEL:
+                return srdf_file
+        return None
+
+    @staticmethod
+    def _srdf_robot_name(path: Path) -> str | None:
+        try:
+            root = ElementTree.parse(path).getroot()
+        except (ElementTree.ParseError, OSError):
+            return None
+        name = root.attrib.get("name")
+        return name.strip().lower() if name else None
+
+    @staticmethod
+    def _select_report_package(
+        partial_config_packages: list[dict[str, Any]],
+    ) -> dict[str, Any] | None:
+        if not partial_config_packages:
+            return None
+
+        def score(candidate: dict[str, Any]) -> tuple[int, int, int, int, int, str]:
+            package_name = candidate["package"].lower()
+            return (
+                1 if "lbr_iisy" in package_name else 0,
+                1 if candidate["srdf_files"] else 0,
+                1 if candidate["kinematics_yaml_files"] else 0,
+                1 if candidate["ompl_planning_yaml_files"] else 0,
+                1 if candidate["source"] == "ament_index" else 0,
+                package_name,
+            )
+
+        return sorted(partial_config_packages, key=score, reverse=True)[0]
 
     def _request_robot_description_if_visible(
         self,

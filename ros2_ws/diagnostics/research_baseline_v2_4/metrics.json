@@ -1,0 +1,18 @@
+{
+  "angular_error_deg": 1.5,
+  "baseline_name": "research_baseline_v2_4_experiment_runner",
+  "cycle_time_sec": 0.0648,
+  "hole_tolerance_mm": 2.0,
+  "max_force_n": 4.0212,
+  "max_torque_nm": 0.0603,
+  "mode": "diagnostic_dry_run",
+  "notes": "Dry-run scaffold only: no MoveIt, /compute_ik, Gazebo motion, controller execution, or FollowJointTrajectory command.",
+  "phase_count": 7,
+  "run_id": "v2_4_single_001",
+  "safe_success": true,
+  "safety_violation_count": 0,
+  "success": true,
+  "task_completed": true,
+  "x_offset_mm": 0.8,
+  "y_offset_mm": -1.1
+}

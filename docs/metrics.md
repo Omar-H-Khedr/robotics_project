@@ -36,6 +36,18 @@ infrastructure and a recommended next step, but `insertion_success` remains
 not a trajectory, and not evidence of insertion depth, contact state, or
 assembly success.
 
+Research Baseline v2.13 status: the MoveIt diagnostic input bundle is a launch
+preparation artifact only. `moveit_diagnostic_inputs_ready=true` means the
+future no-motion `move_group` diagnostic launch inputs are available; it is not
+an IK solution, not a `/compute_ik` result, not a trajectory, and not evidence
+of insertion depth, contact state, or assembly success.
+
+Research Baseline v2.14 status: the diagnostic `move_group` path is still
+no-motion. `move_group_diagnostic_config_builder` reports the planned
+diagnostic inputs and `move_group_runtime_audit` reports whether `move_group`
+and `/compute_ik` are visible. These fields are service-availability diagnostics
+only; they are not IK solutions, not trajectories, and not approval to execute.
+
 ## Collision Events
 
 Count of collision or contact events that are outside the expected peg-hole interaction.
@@ -392,3 +404,163 @@ The `moveit_config_audit` node publishes JSON on `/moveit_config_audit` with:
 
 The audit is preparation only. It does not launch `move_group`, call IK, invent
 joint targets, send trajectory goals, or enable controller execution.
+
+## Baseline v2.9 MoveIt Launch Readiness Audit Fields
+
+The `moveit_launch_readiness_audit` node publishes JSON on
+`/moveit_launch_readiness_audit` with:
+
+- `moveit_launch_ready`: true only when an exact semantic model, IK config,
+  OMPL config, and a move-group launch path are present.
+- `compute_ik_expected_after_launch`: true when the readiness inputs indicate a
+  diagnostic move-group launch should provide `/compute_ik`, or when
+  `/compute_ik` is already visible.
+- `exact_robot_semantic_match`: true only for the exact `lbr_iisy6_r1300`
+  semantic model.
+- `selected_srdf`: the exact matching SRDF path, or null when no exact match
+  exists.
+- `available_srdf_variants`: discovered SRDF and SRDF xacro resources.
+- `kinematics_yaml_found`, `kinematics_yaml_file`,
+  `ompl_planning_yaml_found`, `ompl_planning_yaml_file`,
+  `joint_limits_yaml_found`, and `joint_limits_yaml_file`: launch input
+  resource checks.
+- `robot_description_available` and `robot_description_semantic_available`:
+  observed description parameters when visible.
+- `move_group_launch_found` and `move_group_launch_files`: launch files that
+  appear to start `moveit_ros_move_group`/`move_group`.
+- `controller_motion_allowed` and `trajectory_execution_allowed`: always false.
+- `move_group_diagnostic_config_available`: true when
+  `/move_group_diagnostic_config` has been observed.
+- `move_group_runtime_audit_available`: true when `/move_group_runtime_audit`
+  has been observed.
+- `move_group_node_detected`: true when a `move_group` node is visible.
+- `compute_ik_services`: visible services whose name or type suggests
+  `compute_ik`.
+- `allow_trajectory_execution`: always false.
+- `recommended_next_step`: one of
+  `create_or_select_matching_srdf_for_lbr_iisy6_r1300`,
+  `launch_move_group_diagnostic_only_with_execution_disabled`,
+  `fix_move_group_diagnostic_launch_parameters`, or
+  `test_compute_ik_service_no_motion`.
+
+v2.9 is launch preparation only. It does not launch `move_group`, call IK,
+fake IK solutions, send `FollowJointTrajectory` goals, start Gazebo, or unblock
+controller execution.
+
+## Baseline v2.10 Semantic Model Validation Fields
+
+The `semantic_model_validator` node publishes JSON on
+`/semantic_model_validation` with:
+
+- `target_robot_model`: `lbr_iisy6_r1300`.
+- `selected_moveit_config_package`: `project_local_lbr_iisy6_r1300_overlay`.
+- `selected_srdf`: the project-local `lbr_iisy6_r1300.srdf` path.
+- `srdf_exists`, `srdf_contains_group_arm`, and
+  `srdf_references_required_joints`: static SRDF checks for the `arm` group and
+  `joint_1` through `joint_6`.
+- `joint_states_available`, `joint_state_names`, and
+  `joint_states_contain_required_joints`: live `/joint_states` compatibility
+  checks when robot state is present.
+- `tool_link_requires_validation` and `tool_link_validation_status`: explicit
+  marker that end-effector/tool semantics are not yet validated.
+- `semantic_model_exact_candidate`: true only when the candidate SRDF names the
+  target robot, defines group `arm`, and references all required joints.
+- `semantic_model_validation_status`: `candidate_requires_validation`.
+- `approved_for_motion`, `controller_motion_allowed`, and
+  `trajectory_execution_allowed`: always false.
+
+v2.10 prepares a semantic model candidate only. It does not launch
+`move_group`, call IK, fake IK solutions, send `FollowJointTrajectory` goals,
+start Gazebo, or unblock controller execution.
+
+## Baseline v2.11 robot_description_semantic Diagnostic Fields
+
+The `robot_description_semantic_diagnostics` node publishes JSON on
+`/robot_description_semantic_diagnostics` with:
+
+- `srdf_file_path`, `srdf_file_exists`, and `srdf_parse_success`: the resolved
+  project-local or installed SRDF candidate and parse state.
+- `robot_description_semantic_available` and
+  `robot_description_semantic_length`: whether file-backed semantic XML is
+  available for a future parameter path, and its character length.
+- `arm_group_found`, `arm_group_joints`, and `required_joints_present`: static
+  `arm` group checks for `joint_1` through `joint_6`.
+- `semantic_model_validation_status`: diagnostic candidate status only.
+- `approved_for_motion`, `controller_motion_allowed`, and
+  `trajectory_execution_allowed`: always false.
+
+`moveit_launch_readiness_audit` now also reports
+`robot_description_semantic_candidate_available`,
+`robot_description_semantic_source`, `semantic_diagnostics_available`, and
+`semantic_diagnostics_status`. If the SRDF candidate is structurally valid but
+tool-link validation is still required, `moveit_launch_ready` remains false and
+the recommended next step is
+`validate_tool_link_and_prepare_move_group_diagnostic_launch`.
+
+v2.11 prepares semantic diagnostics only. It does not launch `move_group`, call
+`/compute_ik`, fake IK solutions, send `FollowJointTrajectory` goals, start
+Gazebo, or unblock controller execution.
+
+## Baseline v2.12 Tool-Link Validation Fields
+
+The `tool_link_validator` node publishes JSON on `/tool_link_validation` with:
+
+- `tool_link_candidate`: currently `tool0`.
+- `robot_description_available`, `urdf_parse_success`, and
+  `tool_link_exists_in_urdf`: whether `robot_description` was readable and
+  contains the candidate link.
+- `tf_world_to_tool_available`, `tf_base_to_tool_available`, and
+  `tf_world_to_base_available`: required TF checks for the diagnostic candidate.
+- `current_tool_pose_world` and `current_tool_pose_base`: current diagnostic TF
+  poses when available.
+- `arm_group_found`, `arm_group_joints`, and `required_joints_present`: SRDF
+  consistency checks for the project-local `arm` group.
+- `selected_tool_axis_candidate`, `expected_aligned_insertion_axis`,
+  `tool_axis_candidate_available`, and `orientation_targets_available`: optional
+  tool-axis/orientation observations for `tool0_+Z` and `[0, 0, -1]`.
+- `tool_link_validation_status`: either
+  `tool_link_candidate_valid_but_not_motion_approved` or
+  `tool_link_candidate_incomplete`.
+- `approved_for_motion`, `controller_motion_allowed`, and
+  `trajectory_execution_allowed`: always false.
+
+`semantic_model_validator` also reports
+`tool_link_candidate_validated_for_diagnostics` when the validation topic is
+observed with a valid diagnostic status. `moveit_launch_readiness_audit`
+reports `tool_link_validation_available`, `tool_link_candidate`,
+`tool_link_exists_in_urdf`, `tf_base_to_tool_available`, and
+`tool_link_validation_status`. A valid diagnostic tool link changes the
+recommended next step to `prepare_move_group_diagnostic_launch_inputs`; it does
+not make `moveit_launch_ready` true and does not enable `/compute_ik` or motion.
+
+## Baseline v2.14 Move Group Diagnostic Runtime Fields
+
+`move_group_diagnostic_config_builder` publishes JSON on
+`/move_group_diagnostic_config` with:
+
+- `status`: `move_group_diagnostic_config_prepared`.
+- `robot_description_available`, `robot_description_length`,
+  `robot_description_semantic_available`, and
+  `robot_description_semantic_length`.
+- `kinematics_yaml_found`, `kinematics_yaml_file`,
+  `ompl_planning_yaml_found`, and `ompl_planning_yaml_file`.
+- `planning_group="arm"`, `planning_frame="base_link"`, and
+  `tool_link="tool0"`.
+- `allow_trajectory_execution`, `trajectory_execution_allowed`,
+  `controller_motion_allowed`, `move_group_launch_allowed`, and
+  `approved_for_motion`: always false.
+
+`move_group_runtime_audit` publishes JSON on `/move_group_runtime_audit` with:
+
+- `move_group_node_detected`.
+- `compute_ik_service_available` and `compute_ik_services`.
+- `trajectory_execution_disabled_expected=true`.
+- `compute_ik_test_allowed=false` until a later reviewed diagnostic step.
+- `motion_execution_allowed=false`.
+- `status`: `move_group_not_launched_diagnostic_only`,
+  `move_group_detected_compute_ik_available_no_motion`, or
+  `move_group_detected_compute_ik_missing`.
+
+v2.14 does not call `/compute_ik`, fake IK solutions, execute a MoveIt plan,
+send `FollowJointTrajectory` goals, launch `task_trajectory_executor`, start
+Gazebo, or approve robot motion.

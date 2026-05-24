@@ -1,0 +1,98 @@
+[INFO] [launch]: All log files can be found below /tmp/ros2_logs/2026-05-24-16-29-11-118939-DESKTOP-GVPFGND-24
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [launch.user]: Starting research_baseline_v2_4_experiment_runner in diagnostic dry-run mode. No MoveIt, /compute_ik, real robot, Gazebo motion, controller execution, or FollowJointTrajectory command is used.
+[INFO] [research_baseline_v2_4_experiment_runner-1]: process started with pid [30]
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] [37;1m2026-05-24 16:29:11.457 [31;1m[[37;1mTRANSPORT_UDP[31;1m Error] [37mError creating socket: Operation not permitted[34;1m -> Function [36minit[m
+[research_baseline_v2_4_experiment_runner-1] [37;1m2026-05-24 16:29:11.457 [31;1m[[37;1mRTPS_PARTICIPANT[31;1m Error] [37mUser transport failed to register.[34;1m -> Function [36mRTPSParticipantImpl[m
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629351.583624305] [research_baseline_v2_4_experiment_runner]: Research Baseline v2.4 experiment runner ready in dry-run mode.
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629351.673530905] [research_baseline_v2_4_experiment_runner]: {"angular_error_deg": 1.5, "elapsed_sec": 0.0001, "phase": "initialize", "phase_index": 1, "run_id": "v2_4_single_001", "status": "dry_run_phase_complete", "x_offset_mm": 0.8, "y_offset_mm": -1.1}
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629351.684333806] [research_baseline_v2_4_experiment_runner]: {"angular_error_deg": 1.5, "elapsed_sec": 0.0108, "phase": "approach", "phase_index": 2, "run_id": "v2_4_single_001", "status": "dry_run_phase_complete", "x_offset_mm": 0.8, "y_offset_mm": -1.1}
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629351.695020306] [research_baseline_v2_4_experiment_runner]: {"angular_error_deg": 1.5, "elapsed_sec": 0.0215, "phase": "pre_contact_align", "phase_index": 3, "run_id": "v2_4_single_001", "status": "dry_run_phase_complete", "x_offset_mm": 0.8, "y_offset_mm": -1.1}
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629351.705697306] [research_baseline_v2_4_experiment_runner]: {"angular_error_deg": 1.5, "elapsed_sec": 0.0322, "phase": "contact_search", "phase_index": 4, "run_id": "v2_4_single_001", "status": "dry_run_phase_complete", "x_offset_mm": 0.8, "y_offset_mm": -1.1}
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629351.716925206] [research_baseline_v2_4_experiment_runner]: {"angular_error_deg": 1.5, "elapsed_sec": 0.0432, "phase": "insertion_attempt", "phase_index": 5, "run_id": "v2_4_single_001", "status": "dry_run_phase_complete", "x_offset_mm": 0.8, "y_offset_mm": -1.1}
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629351.727734606] [research_baseline_v2_4_experiment_runner]: {"angular_error_deg": 1.5, "elapsed_sec": 0.0542, "phase": "finish", "phase_index": 6, "run_id": "v2_4_single_001", "status": "dry_run_phase_complete", "x_offset_mm": 0.8, "y_offset_mm": -1.1}
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629351.738435306] [research_baseline_v2_4_experiment_runner]: {"angular_error_deg": 1.5, "elapsed_sec": 0.0649, "phase": "log_results", "phase_index": 7, "run_id": "v2_4_single_001", "status": "dry_run_phase_complete", "x_offset_mm": 0.8, "y_offset_mm": -1.1}
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629351.750084206] [research_baseline_v2_4_experiment_runner]: {"angular_error_deg": 1.5, "baseline_name": "research_baseline_v2_4_experiment_runner", "cycle_time_sec": 0.0649, "hole_tolerance_mm": 2.0, "max_force_n": 4.0212, "max_torque_nm": 0.0603, "mode": "diagnostic_dry_run", "notes": "Dry-run scaffold only: no MoveIt, /compute_ik, Gazebo motion, controller execution, or FollowJointTrajectory command.", "phase_count": 7, "run_id": "v2_4_single_001", "safe_success": true, "safety_violation_count": 0, "success": true, "task_completed": true, "x_offset_mm": 0.8, "y_offset_mm": -1.1}
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629351.750910706] [research_baseline_v2_4_experiment_runner]: v2.4 experiment artifacts written.
+[INFO] [research_baseline_v2_4_experiment_runner-1]: process has finished cleanly [pid 30]
+[INFO] [launch]: All log files can be found below /tmp/ros2_logs/2026-05-24-16-29-21-058445-DESKTOP-GVPFGND-23
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [launch.user]: Starting research_baseline_v2_4_experiment_runner in diagnostic dry-run mode. No MoveIt, /compute_ik, real robot, Gazebo motion, controller execution, or FollowJointTrajectory command is used.
+[INFO] [research_baseline_v2_4_experiment_runner-1]: process started with pid [29]
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] [37;1m2026-05-24 16:29:21.391 [31;1m[[37;1mTRANSPORT_UDP[31;1m Error] [37mError creating socket: Operation not permitted[34;1m -> Function [36minit[m
+[research_baseline_v2_4_experiment_runner-1] [37;1m2026-05-24 16:29:21.391 [31;1m[[37;1mRTPS_PARTICIPANT[31;1m Error] [37mUser transport failed to register.[34;1m -> Function [36mRTPSParticipantImpl[m
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] getifaddrs: Operation not permitted
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629361.516166329] [research_baseline_v2_4_experiment_runner]: Research Baseline v2.4 experiment runner ready in dry-run mode.
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629361.606644932] [research_baseline_v2_4_experiment_runner]: {"angular_error_deg": 1.5, "elapsed_sec": 0.0001, "phase": "initialize", "phase_index": 1, "run_id": "v2_4_single_001", "status": "dry_run_phase_complete", "x_offset_mm": 0.8, "y_offset_mm": -1.1}
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629361.617372632] [research_baseline_v2_4_experiment_runner]: {"angular_error_deg": 1.5, "elapsed_sec": 0.0108, "phase": "approach", "phase_index": 2, "run_id": "v2_4_single_001", "status": "dry_run_phase_complete", "x_offset_mm": 0.8, "y_offset_mm": -1.1}
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629361.628204833] [research_baseline_v2_4_experiment_runner]: {"angular_error_deg": 1.5, "elapsed_sec": 0.0216, "phase": "pre_contact_align", "phase_index": 3, "run_id": "v2_4_single_001", "status": "dry_run_phase_complete", "x_offset_mm": 0.8, "y_offset_mm": -1.1}
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629361.638961133] [research_baseline_v2_4_experiment_runner]: {"angular_error_deg": 1.5, "elapsed_sec": 0.0324, "phase": "contact_search", "phase_index": 4, "run_id": "v2_4_single_001", "status": "dry_run_phase_complete", "x_offset_mm": 0.8, "y_offset_mm": -1.1}
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629361.649823533] [research_baseline_v2_4_experiment_runner]: {"angular_error_deg": 1.5, "elapsed_sec": 0.0432, "phase": "insertion_attempt", "phase_index": 5, "run_id": "v2_4_single_001", "status": "dry_run_phase_complete", "x_offset_mm": 0.8, "y_offset_mm": -1.1}
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629361.660603134] [research_baseline_v2_4_experiment_runner]: {"angular_error_deg": 1.5, "elapsed_sec": 0.054, "phase": "finish", "phase_index": 6, "run_id": "v2_4_single_001", "status": "dry_run_phase_complete", "x_offset_mm": 0.8, "y_offset_mm": -1.1}
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629361.671381234] [research_baseline_v2_4_experiment_runner]: {"angular_error_deg": 1.5, "elapsed_sec": 0.0648, "phase": "log_results", "phase_index": 7, "run_id": "v2_4_single_001", "status": "dry_run_phase_complete", "x_offset_mm": 0.8, "y_offset_mm": -1.1}
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629361.682797834] [research_baseline_v2_4_experiment_runner]: {"angular_error_deg": 1.5, "baseline_name": "research_baseline_v2_4_experiment_runner", "cycle_time_sec": 0.0648, "hole_tolerance_mm": 2.0, "max_force_n": 4.0212, "max_torque_nm": 0.0603, "mode": "diagnostic_dry_run", "notes": "Dry-run scaffold only: no MoveIt, /compute_ik, Gazebo motion, controller execution, or FollowJointTrajectory command.", "phase_count": 7, "run_id": "v2_4_single_001", "safe_success": true, "safety_violation_count": 0, "success": true, "task_completed": true, "x_offset_mm": 0.8, "y_offset_mm": -1.1}
+[research_baseline_v2_4_experiment_runner-1] [INFO] [1779629361.684384634] [research_baseline_v2_4_experiment_runner]: v2.4 experiment artifacts written.
+[INFO] [research_baseline_v2_4_experiment_runner-1]: process has finished cleanly [pid 29]
