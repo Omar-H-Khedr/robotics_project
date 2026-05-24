@@ -1,0 +1,8 @@
+run_id,phase_index,phase,elapsed_sec,x_offset_mm,y_offset_mm,angular_error_deg,status
+v2_4_single_001,1,initialize,0.0001,0.8,-1.1,1.5,dry_run_phase_complete
+v2_4_single_001,2,approach,0.0108,0.8,-1.1,1.5,dry_run_phase_complete
+v2_4_single_001,3,pre_contact_align,0.0216,0.8,-1.1,1.5,dry_run_phase_complete
+v2_4_single_001,4,contact_search,0.0324,0.8,-1.1,1.5,dry_run_phase_complete
+v2_4_single_001,5,insertion_attempt,0.0432,0.8,-1.1,1.5,dry_run_phase_complete
+v2_4_single_001,6,finish,0.054,0.8,-1.1,1.5,dry_run_phase_complete
+v2_4_single_001,7,log_results,0.0648,0.8,-1.1,1.5,dry_run_phase_complete

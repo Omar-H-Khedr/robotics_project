@@ -24,6 +24,7 @@ setup(
     entry_points={
         "console_scripts": [
             "baseline_trial_manager = experiment_manager.baseline_trial_manager:main",
+            "research_baseline_v2_4_experiment_runner = experiment_manager.research_baseline_v2_4_experiment_runner:main",
         ]
     },
 )
