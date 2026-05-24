@@ -1,0 +1,51 @@
+simulation_cell_name: proposal_simulation_cell_v1_2_rgbd_image_bridge_fix
+robot_model: KUKA LBR iisy 6 R1300
+simulation_engine_priority:
+  - isaac_sim
+  - gazebo
+isaac_sim:
+  required: false
+  expected_install_names:
+    - isaac-sim
+    - isaacsim
+gazebo:
+  fallback_world: proposal_simulation_cell_v1_2_rgbd_image_bridge_fix.world.sdf
+  headless: true
+camera:
+  model: Intel RealSense D405 equivalent
+  width: 848
+  height: 480
+  fps: 30
+  fx: 430.0
+  fy: 430.0
+  cx: 424.0
+  cy: 240.0
+  rgb_gazebo_topic: /proposal_simulation_cell/d405/color/image_raw
+  depth_gazebo_topic: /proposal_simulation_cell/d405/depth/image_rect_raw
+  expected_rgb_image_topic: /proposal_simulation_cell/d405/color/image_raw
+  expected_depth_image_topic: /proposal_simulation_cell/d405/depth/image_rect_raw
+  color_camera_info_topic: /proposal_simulation_cell/d405/color/camera_info
+  depth_camera_info_topic: /proposal_simulation_cell/d405/depth/camera_info
+contact_interface:
+  topic: /proposal_simulation_cell/contact_wrench
+  frame_id: peg_tip
+joint_state_interface:
+  topic: /joint_states
+task_frames:
+  required:
+    - world
+    - base_link
+    - tool0
+    - peg_tip
+    - table_work_surface
+    - hole_center
+    - insertion_axis_z
+    - d405_camera_link
+    - d405_camera_optical_frame
+  table_work_surface_xyz: [0.8, 0.0, 0.75]
+  hole_center_xyz: [0.52, -0.20, 0.83]
+safety:
+  motion_execution_enabled: false
+  real_robot_used: false
+  moveit_used: false
+  compute_ik_called: false

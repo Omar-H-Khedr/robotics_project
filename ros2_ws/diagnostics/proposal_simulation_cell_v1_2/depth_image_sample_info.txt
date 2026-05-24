@@ -1,0 +1,9 @@
+topic: /proposal_simulation_cell/d405/depth/image_rect_raw
+sample_received: true
+frame_id: d405_rgbd_camera/camera_link/d405_depth
+width: 848
+height: 480
+encoding: 32FC1
+is_bigendian: 0
+step: 3392
+data_length: 1628160
