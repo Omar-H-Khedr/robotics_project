@@ -1,0 +1,9 @@
+topic: /proposal_simulation_cell/d405/color/image_raw
+sample_received: true
+frame_id: d405_rgbd_camera/camera_link/d405_color
+width: 848
+height: 480
+encoding: rgb8
+is_bigendian: 0
+step: 2544
+data_length: 1221120

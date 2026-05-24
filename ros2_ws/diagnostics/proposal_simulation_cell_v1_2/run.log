@@ -1,0 +1,16 @@
+proposal_simulation_cell_v1_2 RGB-D validator evidence
+elapsed_sec=16.445
+gz_available=True
+status=rgbd_image_bridge_validated
+rgb_image_sample_received=True
+depth_image_sample_received=True
+limitation_reason=none
+phases=initialize_scene,verify_gazebo_camera_topics,verify_ros_image_bridge,record_rgbd_samples,ready_for_control_development
+proposal_simulation_cell_v1_2 RGB-D validator evidence
+elapsed_sec=16.094
+gz_available=True
+status=rgbd_image_bridge_validated
+rgb_image_sample_received=True
+depth_image_sample_received=True
+limitation_reason=none
+phases=initialize_scene,verify_gazebo_camera_topics,verify_ros_image_bridge,record_rgbd_samples,ready_for_control_development

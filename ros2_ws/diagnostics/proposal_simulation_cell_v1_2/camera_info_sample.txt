@@ -1,0 +1,12 @@
+topic: /proposal_simulation_cell/d405/color/camera_info
+sample_received: true
+frame_id: d405_rgbd_camera/camera_link/d405_color
+width: 848
+height: 480
+k: 606.6513,0.0000,424.0000,0.0000,606.6513,240.0000,0.0000,0.0000,1.0000
+topic: /proposal_simulation_cell/d405/depth/camera_info
+sample_received: true
+frame_id: d405_rgbd_camera/camera_link/d405_depth
+width: 848
+height: 480
+k: 606.6512,0.0000,424.0000,0.0000,606.6512,240.0000,0.0000,0.0000,1.0000

@@ -1,0 +1,4 @@
+proposal_lbr_iisy6_r1300_robot_state_publisher
+proposal_simulation_cell_v1_2_gz_bridge
+proposal_simulation_cell_v1_2_image_bridge
+proposal_simulation_cell_v1_2_rgbd_validator
