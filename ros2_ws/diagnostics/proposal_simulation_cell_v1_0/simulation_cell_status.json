@@ -1,0 +1,18 @@
+{
+  "compute_ik_called": false,
+  "force_torque_or_contact_available": true,
+  "gazebo_fallback_used": true,
+  "hole_loaded": true,
+  "isaac_available": false,
+  "joint_states_available": true,
+  "motion_execution_enabled": false,
+  "moveit_used": false,
+  "peg_loaded": true,
+  "real_robot_used": false,
+  "rgbd_camera_configured": true,
+  "robot_model": "KUKA LBR iisy 6 R1300",
+  "simulation_engine": "gazebo",
+  "status": "ready_for_control_development",
+  "table_loaded": true,
+  "task_frames_available": true
+}

@@ -1,0 +1,36 @@
+[INFO] [launch]: All log files can be found below /tmp/ros2_logs/2026-05-24-17-03-35-427950-DESKTOP-GVPFGND-17233
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [launch.user]: proposal_simulation_cell_v1_1_sensor_and_scene_validation: using ROS 2/Gazebo fallback when Isaac Sim is unavailable. No MoveIt, /compute_ik, real robot, controller execution, or FollowJointTrajectory is used.
+[INFO] [gazebo-1]: process started with pid [17238]
+[INFO] [parameter_bridge-2]: process started with pid [17239]
+[INFO] [robot_state_publisher-3]: process started with pid [17241]
+[INFO] [proposal_simulation_cell_v1_1_validator-4]: process started with pid [17242]
+[robot_state_publisher-3] [INFO] [1779631421.999876970] [proposal_lbr_iisy6_r1300_robot_state_publisher]: Robot initialized
+[parameter_bridge-2] [INFO] [1779631422.039678195] [proposal_simulation_cell_v1_1_gz_bridge]: Creating GZ->ROS Bridge: [/clock (gz.msgs.Clock) -> /clock (rosgraph_msgs/msg/Clock)] (Lazy 0)
+[parameter_bridge-2] [INFO] [1779631422.116845343] [proposal_simulation_cell_v1_1_gz_bridge]: Creating GZ->ROS Bridge: [/proposal_simulation_cell/d405/color/image_raw (gz.msgs.Image) -> /proposal_simulation_cell/d405/color/image_raw (sensor_msgs/msg/Image)] (Lazy 0)
+[parameter_bridge-2] [INFO] [1779631422.143593359] [proposal_simulation_cell_v1_1_gz_bridge]: Creating GZ->ROS Bridge: [/proposal_simulation_cell/d405/depth/image_rect_raw (gz.msgs.Image) -> /proposal_simulation_cell/d405/depth/image_rect_raw (sensor_msgs/msg/Image)] (Lazy 0)
+[proposal_simulation_cell_v1_1_validator-4] [INFO] [1779631424.143292105] [proposal_simulation_cell_v1_1_validator]: proposal_simulation_cell_v1_1 validator started
+[proposal_simulation_cell_v1_1_validator-4] [INFO] [1779631424.830991733] [proposal_simulation_cell_v1_1_validator]: phase=initialize_scene
+[proposal_simulation_cell_v1_1_validator-4] [INFO] [1779631425.531311169] [proposal_simulation_cell_v1_1_validator]: phase=verify_robot_loaded
+[proposal_simulation_cell_v1_1_validator-4] [INFO] [1779631426.230964505] [proposal_simulation_cell_v1_1_validator]: phase=verify_camera
+[proposal_simulation_cell_v1_1_validator-4] [INFO] [1779631426.931361421] [proposal_simulation_cell_v1_1_validator]: phase=verify_task_frames
+[proposal_simulation_cell_v1_1_validator-4] [INFO] [1779631427.630936298] [proposal_simulation_cell_v1_1_validator]: phase=verify_contact_interfaces
+[proposal_simulation_cell_v1_1_validator-4] [INFO] [1779631428.331290942] [proposal_simulation_cell_v1_1_validator]: phase=ready_for_control_development
+[gazebo-1] libEGL warning: failed to open /dev/dri/renderD128: Permission denied
+[gazebo-1] 
+[gazebo-1] libEGL warning: failed to open /dev/dri/renderD128: Permission denied
+[gazebo-1] 
+[gazebo-1] libEGL warning: failed to open /dev/dri/card0: Permission denied
+[gazebo-1] 
+[proposal_simulation_cell_v1_1_validator-4] [INFO] [1779631430.132194513] [proposal_simulation_cell_v1_1_validator]: proposal_simulation_cell_v1_1 diagnostics written
+[INFO] [proposal_simulation_cell_v1_1_validator-4]: process has finished cleanly [pid 17242]
+[INFO] [robot_state_publisher-3]: sending signal 'SIGINT' to process[robot_state_publisher-3]
+[INFO] [parameter_bridge-2]: sending signal 'SIGINT' to process[parameter_bridge-2]
+[INFO] [gazebo-1]: sending signal 'SIGINT' to process[gazebo-1]
+[robot_state_publisher-3] [INFO] [1779631430.316305251] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[parameter_bridge-2] [INFO] [1779631430.316683851] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [robot_state_publisher-3]: process has finished cleanly [pid 17241]
+[INFO] [parameter_bridge-2]: process has finished cleanly [pid 17239]
+[ERROR] [gazebo-1]: process[gazebo-1] failed to terminate '5' seconds after receiving 'SIGINT', escalating to 'SIGTERM'
+[INFO] [gazebo-1]: sending signal 'SIGTERM' to process[gazebo-1]
+[ERROR] [gazebo-1]: process has died [pid 17238, exit code -15, cmd 'ruby /opt/ros/jazzy/opt/gz_tools_vendor/bin/gz sim /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds/proposal_simulation_cell_v1_0.world.sdf -s -r -v1 --force-version 8'].

@@ -1,0 +1,19 @@
+/proposal_simulation_cell/d405/color/image_raw: unavailable
+  evidence: /proposal_simulation_cell/d405/color/image_raw sensor_msgs/msg/Image
+/proposal_simulation_cell/d405/depth/image_rect_raw: unavailable
+  evidence: /proposal_simulation_cell/d405/depth/image_rect_raw sensor_msgs/msg/Image
+/proposal_simulation_cell/d405/color/camera_info: available
+  evidence: /proposal_simulation_cell/d405/color/camera_info sensor_msgs/msg/CameraInfo
+/proposal_simulation_cell/d405/depth/camera_info: available
+  evidence: /proposal_simulation_cell/d405/depth/camera_info sensor_msgs/msg/CameraInfo
+/joint_states: available
+  evidence: /joint_states sensor_msgs/msg/JointState
+/tf: available
+  evidence: /tf tf2_msgs/msg/TFMessage
+/tf_static: available
+  evidence: /tf_static tf2_msgs/msg/TFMessage
+/proposal_simulation_cell/contact_wrench: available
+  evidence: /proposal_simulation_cell/contact_wrench geometry_msgs/msg/WrenchStamped
+/proposal_simulation_cell/task_phase: available
+  evidence: /proposal_simulation_cell/task_phase std_msgs/msg/String
+image_bridge_note: Gazebo RGB-D sensor or ros_gz image bridge did not expose the requested ROS image topics during validation; camera_info remains available.

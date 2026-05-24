@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="proposal_lbr_iisy6_r1300_cell">
+  <link name="world"/>
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0.05" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.12" length="0.10"/></geometry>
+      <material name="kuka_silver"><color rgba="0.78 0.80 0.82 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.05" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.12" length="0.10"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <origin xyz="0 0 0.05" rpy="0 0 0"/>
+      <inertia ixx="0.03" ixy="0" ixz="0" iyy="0.03" iyz="0" izz="0.03"/>
+    </inertial>
+  </link>
+
+  <joint name="world_to_base_link" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+    <origin xyz="0.80 -0.75 0.75" rpy="0 0 1.5708"/>
+  </joint>
+
+  <xacro:macro name="box_link" params="name length radius color">
+    <link name="${name}">
+      <visual>
+        <origin xyz="0 0 ${length / 2.0}" rpy="0 0 0"/>
+        <geometry><cylinder radius="${radius}" length="${length}"/></geometry>
+        <material name="${name}_material"><color rgba="${color}"/></material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 ${length / 2.0}" rpy="0 0 0"/>
+        <geometry><cylinder radius="${radius}" length="${length}"/></geometry>
+      </collision>
+      <inertial>
+        <mass value="2.0"/>
+        <origin xyz="0 0 ${length / 2.0}" rpy="0 0 0"/>
+        <inertia ixx="0.02" ixy="0" ixz="0" iyy="0.02" iyz="0" izz="0.01"/>
+      </inertial>
+    </link>
+  </xacro:macro>
+
+  <xacro:box_link name="link_1" length="0.24" radius="0.055" color="0.96 0.46 0.08 1"/>
+  <xacro:box_link name="link_2" length="0.34" radius="0.048" color="0.90 0.90 0.88 1"/>
+  <xacro:box_link name="link_3" length="0.30" radius="0.045" color="0.96 0.46 0.08 1"/>
+  <xacro:box_link name="link_4" length="0.24" radius="0.040" color="0.90 0.90 0.88 1"/>
+  <xacro:box_link name="link_5" length="0.18" radius="0.035" color="0.96 0.46 0.08 1"/>
+  <xacro:box_link name="link_6" length="0.12" radius="0.032" color="0.90 0.90 0.88 1"/>
+
+  <joint name="joint_a1" type="revolute">
+    <parent link="base_link"/>
+    <child link="link_1"/>
+    <origin xyz="0 0 0.10" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.967" upper="2.967" effort="120" velocity="2.0"/>
+  </joint>
+  <joint name="joint_a2" type="revolute">
+    <parent link="link_1"/>
+    <child link="link_2"/>
+    <origin xyz="0 0 0.24" rpy="0 1.5708 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.094" upper="2.094" effort="120" velocity="2.0"/>
+  </joint>
+  <joint name="joint_a3" type="revolute">
+    <parent link="link_2"/>
+    <child link="link_3"/>
+    <origin xyz="0 0 0.34" rpy="0 -1.5708 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.967" upper="2.967" effort="90" velocity="2.0"/>
+  </joint>
+  <joint name="joint_a4" type="revolute">
+    <parent link="link_3"/>
+    <child link="link_4"/>
+    <origin xyz="0 0 0.30" rpy="0 1.5708 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-2.967" upper="2.967" effort="70" velocity="2.0"/>
+  </joint>
+  <joint name="joint_a5" type="revolute">
+    <parent link="link_4"/>
+    <child link="link_5"/>
+    <origin xyz="0 0 0.24" rpy="0 -1.5708 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.094" upper="2.094" effort="50" velocity="2.0"/>
+  </joint>
+  <joint name="joint_a6" type="revolute">
+    <parent link="link_5"/>
+    <child link="link_6"/>
+    <origin xyz="0 0 0.18" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.054" upper="3.054" effort="40" velocity="2.0"/>
+  </joint>
+
+  <link name="tool0"/>
+  <joint name="link_6_to_tool0" type="fixed">
+    <parent link="link_6"/>
+    <child link="tool0"/>
+    <origin xyz="0 0 0.12" rpy="0 0 0"/>
+  </joint>
+
+  <link name="peg_tip"/>
+  <joint name="tool0_to_peg_tip" type="fixed">
+    <parent link="tool0"/>
+    <child link="peg_tip"/>
+    <origin xyz="0 0 0.11" rpy="0 0 0"/>
+  </joint>
+
+  <link name="d405_camera_link">
+    <visual>
+      <geometry><box size="0.09 0.025 0.025"/></geometry>
+      <material name="camera_dark"><color rgba="0.05 0.05 0.05 1"/></material>
+    </visual>
+    <collision>
+      <geometry><box size="0.09 0.025 0.025"/></geometry>
+    </collision>
+  </link>
+  <joint name="world_to_d405_camera_link" type="fixed">
+    <parent link="world"/>
+    <child link="d405_camera_link"/>
+    <origin xyz="0.42 -0.65 1.18" rpy="0.95 0 0.35"/>
+  </joint>
+
+  <link name="d405_camera_optical_frame"/>
+  <joint name="d405_camera_link_to_optical" type="fixed">
+    <parent link="d405_camera_link"/>
+    <child link="d405_camera_optical_frame"/>
+    <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708"/>
+  </joint>
+</robot>
