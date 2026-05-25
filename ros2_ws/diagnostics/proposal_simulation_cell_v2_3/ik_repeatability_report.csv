@@ -1,0 +1,6 @@
+pose_index,offset_x_m,offset_y_m,offset_z_m,response_received,ik_solution_found,ik_error_code,returned_joint_count,repeatability_error_rad
+1,0.000000,0.000000,0.000000,true,true,1,6,0.000000000
+2,0.010000,0.000000,0.000000,true,true,1,6,0.041875015
+3,-0.010000,0.000000,0.000000,true,true,1,6,0.041203093
+4,0.000000,0.010000,0.000000,true,true,1,6,0.027770182
+5,0.000000,0.000000,0.010000,true,true,1,6,0.030113555

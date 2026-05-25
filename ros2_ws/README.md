@@ -26,6 +26,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v2_0_first_gazebo_motion_smoke_test | Completed |
 | proposal_simulation_cell_v2_1_gazebo_motion_validation_suite | Completed |
 | proposal_simulation_cell_v2_2_moveit_ik_diagnostic_validation | Completed |
+| proposal_simulation_cell_v2_3_moveit_model_alignment_and_plan_only_validation | Completed |
+
+## proposal_simulation_cell_v2_3_moveit_model_alignment_and_plan_only_validation
+
+Status: `moveit_model_alignment_and_plan_only_validated`
+
+The v2.3 proposal simulation sprint adds a MoveIt/Gazebo model alignment audit, five nearby diagnostic IK checks for repeatability, and MoveIt plan-only validation.
+
+No trajectory execution, controller execution, real robot execution, `FollowJointTrajectory` execution, peg insertion, contact-seeking motion, learning, or scenario batch execution is used.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_3/`.
 
 ## proposal_simulation_cell_v2_2_moveit_ik_diagnostic_validation
 

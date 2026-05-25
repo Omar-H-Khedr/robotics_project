@@ -1,0 +1,38 @@
+{
+  "base_link_valid": true,
+  "gazebo_controller_joints": [
+    "joint_1",
+    "joint_2",
+    "joint_3",
+    "joint_4",
+    "joint_5",
+    "joint_6"
+  ],
+  "gazebo_reference_model": "lbr_iisy3_r760",
+  "group_links": [
+    "base_link",
+    "tool0"
+  ],
+  "group_valid": true,
+  "joint_sets_match": true,
+  "model_alignment_validated": true,
+  "moveit_expected_joints": [
+    "joint_1",
+    "joint_2",
+    "joint_3",
+    "joint_4",
+    "joint_5",
+    "joint_6"
+  ],
+  "moveit_joints_found": true,
+  "moveit_robot_model": "lbr_iisy3_r760",
+  "real_robot_endpoint_detected": false,
+  "selected_group": "manipulator",
+  "selected_tool_link": "tool0",
+  "semantic_groups": [
+    "manipulator",
+    "end_effector"
+  ],
+  "semantic_parse_error": "",
+  "tool_link_valid": true
+}

@@ -98,6 +98,12 @@ Added MoveIt IK diagnostic validation. The sprint loads the diagnostic MoveIt mo
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_2/`. The diagnostic remains non-executing: no real robot execution, no `FollowJointTrajectory` execution, no trajectory is sent, and planning/controller execution remains disabled.
 
+### proposal_simulation_cell_v2_3_moveit_model_alignment_and_plan_only_validation
+
+Added MoveIt/Gazebo model alignment and plan-only validation. The sprint audits the aligned `lbr_iisy3_r760` model, checks five nearby diagnostic IK poses for repeatability, and calls MoveIt planning in plan-only mode without sending any trajectory.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_3/`. The diagnostic remains non-executing: no trajectory execution, no controller execution, no real robot execution, and no `FollowJointTrajectory` execution.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -124,7 +130,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_2/`. The 
 | v2.0 | First Gazebo-only motion smoke test | Completed |
 | v2.1 | Gazebo-only motion validation suite | Completed |
 | v2.2 | MoveIt IK diagnostic validation | Completed |
-| v2.3 | Coordinate-based insertion diagnostics | In progress |
+| v2.3 | MoveIt/Gazebo model alignment and plan-only validation | Completed |
 | v2.4 | Object-frame publisher for insertion targets | In progress |
 | v2.5 | IK feasibility diagnostics before motion | In progress |
 | v2.5c | Unified execution gates and tool-axis audit | In progress |
