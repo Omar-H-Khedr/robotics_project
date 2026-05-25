@@ -1,0 +1,6 @@
+topic: /proposal_simulation_cell/contact_wrench
+frame_id: contact_frame
+force: 0.000000,-0.000000,0.098100
+torque: 0.000000,0.000000,0.000000
+force_magnitude_n: 0.098100
+torque_magnitude_nm: 0.000000

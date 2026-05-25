@@ -1,0 +1,61 @@
+simulation_cell_name: proposal_simulation_cell_v1_3_contact_physics_validation
+robot_model: KUKA LBR iisy 6 R1300
+simulation_engine_priority:
+  - isaac_sim
+  - gazebo
+isaac_sim:
+  required: false
+  expected_install_names:
+    - isaac-sim
+    - isaacsim
+gazebo:
+  fallback_world: proposal_simulation_cell_v1_3_contact_physics_validation.world.sdf
+  headless: true
+camera:
+  model: Intel RealSense D405 equivalent
+  width: 848
+  height: 480
+  fps: 30
+  fx: 430.0
+  fy: 430.0
+  cx: 424.0
+  cy: 240.0
+  rgb_gazebo_topic: /proposal_simulation_cell/d405/color/image_raw
+  depth_gazebo_topic: /proposal_simulation_cell/d405/depth/image_rect_raw
+  expected_rgb_image_topic: /proposal_simulation_cell/d405/color/image_raw
+  expected_depth_image_topic: /proposal_simulation_cell/d405/depth/image_rect_raw
+  color_camera_info_topic: /proposal_simulation_cell/d405/color/camera_info
+  depth_camera_info_topic: /proposal_simulation_cell/d405/depth/camera_info
+contact_interface:
+  wrench_topic: /proposal_simulation_cell/contact_wrench
+  state_topic: /proposal_simulation_cell/contact_state
+  gazebo_contact_topics:
+    - /proposal_simulation_cell/peg_contacts
+    - /proposal_simulation_cell/hole_contacts
+    - /proposal_simulation_cell/table_contacts
+  frame_id: contact_frame
+  expected_contact_axis: z
+joint_state_interface:
+  topic: /joint_states
+task_frames:
+  required:
+    - world
+    - base_link
+    - tool0
+    - peg_tip
+    - hole_center
+    - insertion_axis_z
+    - contact_frame
+  table_work_surface_xyz: [0.8, 0.0, 0.75]
+  hole_center_xyz: [0.52, -0.20, 0.83]
+  contact_frame_xyz: [0.52, -0.20, 0.84]
+safety:
+  motion_execution_enabled: false
+  real_robot_used: false
+  moveit_used: false
+  compute_ik_called: false
+  max_allowed_force_n: 50.0
+  max_allowed_torque_nm: 5.0
+  contact_detection_force_threshold_n: 0.1
+  contact_timeout_sec: 8.0
+  expected_contact_axis: z

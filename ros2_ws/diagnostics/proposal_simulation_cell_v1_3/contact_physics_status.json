@@ -1,0 +1,40 @@
+{
+  "compute_ik_called": false,
+  "contact_detection_threshold_n": 0.1,
+  "contact_state_topic_available": true,
+  "contact_wrench_sample_available": true,
+  "contact_wrench_topic_available": true,
+  "depth_image_sample_received": true,
+  "expected_contact_axis": "z",
+  "gazebo_contact_topics_configured": [
+    "/proposal_simulation_cell/peg_contacts",
+    "/proposal_simulation_cell/hole_contacts",
+    "/proposal_simulation_cell/table_contacts"
+  ],
+  "gazebo_contact_topics_seen": [
+    "/world/proposal_simulation_cell_v1_3_contact_physics_validation/model/cylindrical_peg/link/peg_link/sensor/peg_contact_sensor/contact",
+    "/world/proposal_simulation_cell_v1_3_contact_physics_validation/model/hole_block/link/hole_block_link/sensor/hole_contact_sensor/contact",
+    "/world/proposal_simulation_cell_v1_3_contact_physics_validation/model/work_table/link/table_link/sensor/table_contact_sensor/contact"
+  ],
+  "gazebo_fallback_used": true,
+  "hole_collision_configured": true,
+  "isaac_available": false,
+  "joint_states_available": true,
+  "limitation_reason": "none",
+  "max_allowed_force_n": 50.0,
+  "max_allowed_torque_nm": 5.0,
+  "max_observed_force_n": 0.0981000000182296,
+  "max_observed_torque_nm": 0.0,
+  "motion_execution_enabled": false,
+  "moveit_used": false,
+  "nonzero_contact_wrench_observed": true,
+  "peg_collision_configured": true,
+  "real_robot_used": false,
+  "rgb_image_sample_received": true,
+  "robot_model": "KUKA LBR iisy 6 R1300",
+  "safety_violation_count": 0,
+  "simulation_engine": "gazebo",
+  "status": "validated",
+  "table_collision_configured": true,
+  "task_frames_available": true
+}

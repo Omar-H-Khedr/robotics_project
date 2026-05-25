@@ -1,0 +1,1 @@
+contact_observed_below_threshold axis=z axis_force_n=0.098100 force_magnitude_n=0.098100 torque_magnitude_nm=0.000000
