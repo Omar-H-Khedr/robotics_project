@@ -12,6 +12,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v1_3_contact_physics_validation | Completed |
 | proposal_simulation_cell_v1_5_safety_virtual_force_interface | Completed |
 | proposal_simulation_cell_v1_6_safety_gate_readiness | Completed |
+| proposal_simulation_cell_v1_7_pre_control_contract | Completed |
+
+## proposal_simulation_cell_v1_7_pre_control_contract
+
+Status: `pre_control_contract_validated`
+
+The v1.7 proposal simulation sprint adds a pre-control simulation contract. It defines the required input signal contract, allowed diagnostic output suggestions, forbidden execution interfaces, readiness dependency contract, and future controller boundary before any controller work is introduced.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_7/`.
+
+Safety constraints remain explicit: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
 
 ## proposal_simulation_cell_v1_6_safety_gate_readiness
 

@@ -1,0 +1,11 @@
+proposal_simulation_cell_v1_7 pre-control contract evidence
+elapsed_sec=18.473
+status=pre_control_contract_validated
+input_signal_contract_passed=true
+output_suggestion_contract_passed=true
+safety_constraint_contract_passed=true
+execution_block_contract_passed=true
+readiness_dependency_contract_passed=true
+future_controller_boundary_contract_passed=true
+command_output_enabled=false
+motion_execution_enabled=false
