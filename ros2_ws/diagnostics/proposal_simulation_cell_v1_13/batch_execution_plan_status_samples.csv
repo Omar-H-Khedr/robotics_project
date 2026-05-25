@@ -1,0 +1,17 @@
+elapsed_sec,selected_scenario_count,execution_plan_generated,execution_plan_written,all_execution_plans_validated,all_plans_configuration_only,all_plans_dry_run_only,fake_dataset_created,fake_plot_created,experimental_result_created,status
+0.206,3,true,false,true,true,true,false,false,false,batch_execution_plan_pending
+0.407,3,true,false,true,true,true,false,false,false,batch_execution_plan_pending
+0.606,3,true,false,true,true,true,false,false,false,batch_execution_plan_pending
+0.807,3,true,false,true,true,true,false,false,false,batch_execution_plan_pending
+1.007,3,true,false,true,true,true,false,false,false,batch_execution_plan_pending
+1.206,3,true,false,true,true,true,false,false,false,batch_execution_plan_pending
+1.406,3,true,false,true,true,true,false,false,false,batch_execution_plan_pending
+1.606,3,true,false,true,true,true,false,false,false,batch_execution_plan_pending
+1.806,3,true,false,true,true,true,false,false,false,batch_execution_plan_pending
+2.006,3,true,false,true,true,true,false,false,false,batch_execution_plan_pending
+2.206,3,true,false,true,true,true,false,false,false,batch_execution_plan_pending
+2.406,3,true,false,true,true,true,false,false,false,batch_execution_plan_pending
+2.607,3,true,false,true,true,true,false,false,false,batch_execution_plan_pending
+2.806,3,true,false,true,true,true,false,false,false,batch_execution_plan_pending
+3.007,3,true,false,true,true,true,false,false,false,batch_execution_plan_pending
+3.021,3,true,true,true,true,true,false,false,false,batch_execution_plan_validated

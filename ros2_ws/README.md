@@ -18,6 +18,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v1_10_experiment_configuration_matrix | Completed |
 | proposal_simulation_cell_v1_11_single_scenario_loader_validation | Completed |
 | proposal_simulation_cell_v1_12_scenario_batch_selector | Completed |
+| proposal_simulation_cell_v1_13_batch_execution_plan_validator | Completed |
+
+## proposal_simulation_cell_v1_13_batch_execution_plan_validator
+
+Status: `batch_execution_plan_validated`
+
+The v1.13 proposal simulation sprint adds a batch execution plan validator. It converts the selected v1.12 batch into a configuration-only execution plan, lists required gates for every scenario, and defines planned diagnostic outputs.
+
+The plan is configuration-only: no scenario execution, no fake datasets, no fake plots, and no experimental results are generated. Safety constraints remain explicit: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_13/`.
 
 ## proposal_simulation_cell_v1_12_scenario_batch_selector
 

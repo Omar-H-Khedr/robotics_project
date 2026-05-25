@@ -1,0 +1,72 @@
+plan_type: configuration_only_execution_plan
+selected_scenario_count: 3
+configuration_only: true
+dry_run_only: true
+fake_dataset_created: false
+fake_plot_created: false
+experimental_result_created: false
+execution_plans:
+- scenario_id: v1_10_scenario_001
+  clearance_mm: 0.1
+  x_offset_mm: -1.0
+  y_offset_mm: -1.0
+  angular_misalignment_deg: 0.0
+  insertion_depth_mm: 5.0
+  contact_detection_force_threshold_n: 0.05
+  required_gates: &id001
+  - rgbd_gate
+  - contact_gate
+  - safety_gate
+  - readiness_gate
+  - pre_control_contract_gate
+  - command_blocker_gate
+  planned_validation_outputs: &id002
+  - sensor_status
+  - contact_status
+  - safety_status
+  - readiness_status
+  - no_motion_control_law_status
+  - blocked_command_status
+  execution_policy: &id003
+    configuration_only: true
+    dry_run_only: true
+    command_output_enabled: false
+    motion_execution_enabled: false
+    controller_execution_allowed: false
+    trajectory_execution_allowed: false
+    follow_joint_trajectory_allowed: false
+    real_robot_allowed: false
+    moveit_allowed: false
+    compute_ik_allowed: false
+  result_policy: &id004
+    fake_dataset_created: false
+    fake_plot_created: false
+    experimental_result_created: false
+  scenario_execution_started: false
+  motion_executed: false
+- scenario_id: v1_10_scenario_365
+  clearance_mm: 0.2
+  x_offset_mm: 0.0
+  y_offset_mm: 0.0
+  angular_misalignment_deg: 1.0
+  insertion_depth_mm: 10.0
+  contact_detection_force_threshold_n: 0.1
+  required_gates: *id001
+  planned_validation_outputs: *id002
+  execution_policy: *id003
+  result_policy: *id004
+  scenario_execution_started: false
+  motion_executed: false
+- scenario_id: v1_10_scenario_729
+  clearance_mm: 0.5
+  x_offset_mm: 1.0
+  y_offset_mm: 1.0
+  angular_misalignment_deg: 2.0
+  insertion_depth_mm: 20.0
+  contact_detection_force_threshold_n: 0.2
+  required_gates: *id001
+  planned_validation_outputs: *id002
+  execution_policy: *id003
+  result_policy: *id004
+  scenario_execution_started: false
+  motion_executed: false

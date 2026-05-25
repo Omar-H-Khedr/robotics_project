@@ -1,0 +1,5 @@
+/parameter_events rcl_interfaces/msg/ParameterEvent
+/proposal_simulation_cell/batch_execution_plan std_msgs/msg/String
+/proposal_simulation_cell/batch_execution_plan_status std_msgs/msg/String
+/proposal_simulation_cell/batch_execution_plan_validation_report std_msgs/msg/String
+/rosout rcl_interfaces/msg/Log

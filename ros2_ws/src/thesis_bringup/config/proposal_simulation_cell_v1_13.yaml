@@ -1,0 +1,58 @@
+simulation_cell_name: proposal_simulation_cell_v1_13_batch_execution_plan_validator
+
+robot:
+  robot_model: KUKA LBR iisy 6 R1300
+  model: KUKA LBR iisy 6 R1300
+
+batch_source:
+  selected_batch_yaml: diagnostics/proposal_simulation_cell_v1_12/selected_scenario_batch.yaml
+  selected_batch_csv: diagnostics/proposal_simulation_cell_v1_12/selected_scenario_batch.csv
+
+execution_plan:
+  plan_type: configuration_only_execution_plan
+  dry_run_only: true
+
+required_gates:
+  - rgbd_gate
+  - contact_gate
+  - safety_gate
+  - readiness_gate
+  - pre_control_contract_gate
+  - command_blocker_gate
+
+planned_diagnostics:
+  - sensor_status
+  - contact_status
+  - safety_status
+  - readiness_status
+  - no_motion_control_law_status
+  - blocked_command_status
+
+execution_policy:
+  configuration_only: true
+  dry_run_only: true
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  trajectory_execution_allowed: false
+  follow_joint_trajectory_allowed: false
+  real_robot_allowed: false
+  moveit_allowed: false
+  compute_ik_allowed: false
+
+result_policy:
+  fake_dataset_created: false
+  fake_plot_created: false
+  experimental_result_created: false
+
+validation:
+  simulation_engine: gazebo
+  gazebo_fallback_used: true
+  isaac_available: false
+  sample_period_sec: 0.2
+  validation_duration_sec: 3.0
+  output_dir: diagnostics/proposal_simulation_cell_v1_13
+  status_success: batch_execution_plan_validated
+  status_topic: /proposal_simulation_cell/batch_execution_plan_status
+  plan_topic: /proposal_simulation_cell/batch_execution_plan
+  validation_report_topic: /proposal_simulation_cell/batch_execution_plan_validation_report
