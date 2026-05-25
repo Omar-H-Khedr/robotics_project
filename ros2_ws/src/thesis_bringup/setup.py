@@ -34,6 +34,7 @@ setup(
             "proposal_simulation_cell_v1_9_control_law_dry_run_node = thesis_bringup.proposal_simulation_cell_v1_9_control_law_dry_run_node:main",
             "proposal_simulation_cell_v1_10_experiment_matrix_node = thesis_bringup.proposal_simulation_cell_v1_10_experiment_matrix_node:main",
             "proposal_simulation_cell_v1_11_single_scenario_loader_node = thesis_bringup.proposal_simulation_cell_v1_11_single_scenario_loader_node:main",
+            "proposal_simulation_cell_v1_12_scenario_batch_selector_node = thesis_bringup.proposal_simulation_cell_v1_12_scenario_batch_selector_node:main",
         ]
     },
 )
