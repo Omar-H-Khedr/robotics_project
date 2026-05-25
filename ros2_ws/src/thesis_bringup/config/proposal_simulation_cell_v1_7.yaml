@@ -1,0 +1,102 @@
+simulation_cell_name: proposal_simulation_cell_v1_7_pre_control_contract
+
+robot:
+  model: KUKA LBR iisy 6 R1300
+  joint_state_topic: /joint_states
+  tf_topic: /tf
+  tf_static_topic: /tf_static
+  task_phase_topic: /proposal_simulation_cell/task_phase
+
+required_inputs:
+  require_rgb_image: true
+  require_depth_image: true
+  require_joint_states: true
+  require_tf: true
+  require_contact_wrench: true
+  require_contact_state: true
+  require_safety_status: true
+  require_virtual_force_interface: true
+  require_admittance_interface: true
+  require_readiness_gates: true
+  require_proposal_readiness_status: true
+  topics:
+    joint_states: /joint_states
+    tf: /tf
+    tf_static: /tf_static
+    rgb_image: /proposal_simulation_cell/d405/color/image_raw
+    depth_image: /proposal_simulation_cell/d405/depth/image_rect_raw
+    contact_wrench: /proposal_simulation_cell/contact_wrench
+    contact_state: /proposal_simulation_cell/contact_state
+    safety_status: /proposal_simulation_cell/safety_status
+    virtual_force_command: /proposal_simulation_cell/virtual_force_command
+    admittance_command_suggestion: /proposal_simulation_cell/admittance_command_suggestion
+    readiness_gates: /proposal_simulation_cell/readiness_gates
+    proposal_readiness_status: /proposal_simulation_cell/proposal_readiness_status
+    safety_gate_report: /proposal_simulation_cell/safety_gate_report
+    task_phase: /proposal_simulation_cell/task_phase
+
+allowed_outputs:
+  diagnostic_only: true
+  topics:
+    - /proposal_simulation_cell/virtual_force_command
+    - /proposal_simulation_cell/admittance_command_suggestion
+    - /proposal_simulation_cell/pre_control_contract_status
+    - /proposal_simulation_cell/controller_boundary_report
+
+forbidden_outputs:
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  trajectory_execution_allowed: false
+  real_robot_allowed: false
+  moveit_allowed: false
+  compute_ik_allowed: false
+  interfaces:
+    - any FollowJointTrajectory action goal
+    - any controller command topic
+    - any real robot command
+    - any MoveIt planning or execution request
+    - any /compute_ik call
+    - any trajectory execution topic
+
+safety_constraints:
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  trajectory_execution_allowed: false
+  real_robot_allowed: false
+  moveit_allowed: false
+  compute_ik_allowed: false
+  max_allowed_force_n: 50.0
+  max_allowed_torque_nm: 5.0
+  max_safety_violation_count: 0
+
+readiness_dependencies:
+  readiness_gates_topic: /proposal_simulation_cell/readiness_gates
+  proposal_readiness_status_topic: /proposal_simulation_cell/proposal_readiness_status
+  safety_gate_report_topic: /proposal_simulation_cell/safety_gate_report
+  require_sensor_gate: true
+  require_contact_gate: true
+  require_safety_gate: true
+  require_virtual_force_gate: true
+  require_admittance_gate: true
+  require_execution_disabled_gate: true
+  require_proposal_readiness_gate: true
+
+future_controller_boundary:
+  may_read_required_inputs: true
+  may_publish_diagnostic_suggestions_only: true
+  may_publish_motion_commands: false
+  may_call_moveit: false
+  may_call_compute_ik: false
+  may_send_follow_joint_trajectory: false
+  may_command_real_robot: false
+
+validation:
+  simulation_engine: gazebo
+  isaac_required: false
+  gazebo_fallback_used: true
+  sample_period_sec: 0.2
+  validation_duration_sec: 18.0
+  output_dir: diagnostics/proposal_simulation_cell_v1_7
+  status_success: pre_control_contract_validated

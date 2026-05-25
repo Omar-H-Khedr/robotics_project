@@ -1,0 +1,30 @@
+proposal_simulation_cell_v1_5 safety virtual-force evidence
+elapsed_sec=12.016
+status=safety_virtual_force_interface_validated
+latest_contact_state=no_contact
+max_observed_force_n=0.000000
+max_observed_torque_nm=0.000000
+command_output_enabled=false
+motion_execution_enabled=false
+phases=initialize_safety_interface,read_simulated_contact_wrench,classify_contact_state,compute_virtual_force_suggestion,compute_admittance_suggestion,write_safety_virtual_force_diagnostics
+
+# contact evidence
+# gz topic -l
+# stderr
+error in getifaddrs: Unknown error -1
+# exit_code=255
+
+# gz topic -i -t /proposal_simulation_cell/peg_contacts
+# stderr
+error in getifaddrs: Unknown error -1
+# exit_code=255
+
+# gz topic -i -t /proposal_simulation_cell/hole_contacts
+# stderr
+error in getifaddrs: Unknown error -1
+# exit_code=255
+
+# gz topic -i -t /proposal_simulation_cell/table_contacts
+# stderr
+error in getifaddrs: Unknown error -1
+# exit_code=255
