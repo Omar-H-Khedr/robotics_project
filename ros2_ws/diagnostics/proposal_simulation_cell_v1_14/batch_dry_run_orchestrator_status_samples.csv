@@ -1,0 +1,17 @@
+elapsed_sec,selected_scenario_count,dry_run_schedule_generated,dry_run_schedule_written,all_dry_run_records_validated,all_records_configuration_only,all_records_dry_run_only,all_records_scenario_execution_disabled,blocked_batch_execution_report_available,fake_dataset_created,fake_plot_created,experimental_result_created,status
+0.215,3,true,false,true,true,true,true,true,false,false,false,batch_dry_run_orchestrator_pending
+0.415,3,true,false,true,true,true,true,true,false,false,false,batch_dry_run_orchestrator_pending
+0.615,3,true,false,true,true,true,true,true,false,false,false,batch_dry_run_orchestrator_pending
+0.815,3,true,false,true,true,true,true,true,false,false,false,batch_dry_run_orchestrator_pending
+1.015,3,true,false,true,true,true,true,true,false,false,false,batch_dry_run_orchestrator_pending
+1.215,3,true,false,true,true,true,true,true,false,false,false,batch_dry_run_orchestrator_pending
+1.415,3,true,false,true,true,true,true,true,false,false,false,batch_dry_run_orchestrator_pending
+1.615,3,true,false,true,true,true,true,true,false,false,false,batch_dry_run_orchestrator_pending
+1.815,3,true,false,true,true,true,true,true,false,false,false,batch_dry_run_orchestrator_pending
+2.015,3,true,false,true,true,true,true,true,false,false,false,batch_dry_run_orchestrator_pending
+2.215,3,true,false,true,true,true,true,true,false,false,false,batch_dry_run_orchestrator_pending
+2.415,3,true,false,true,true,true,true,true,false,false,false,batch_dry_run_orchestrator_pending
+2.615,3,true,false,true,true,true,true,true,false,false,false,batch_dry_run_orchestrator_pending
+2.816,3,true,false,true,true,true,true,true,false,false,false,batch_dry_run_orchestrator_pending
+3.015,3,true,false,true,true,true,true,true,false,false,false,batch_dry_run_orchestrator_pending
+3.019,3,true,true,true,true,true,true,true,false,false,false,batch_dry_run_orchestrator_validated

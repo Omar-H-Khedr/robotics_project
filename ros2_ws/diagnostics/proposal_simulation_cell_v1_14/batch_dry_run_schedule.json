@@ -1,0 +1,194 @@
+{
+  "configuration_only": true,
+  "dry_run_only": true,
+  "dry_run_records": [
+    {
+      "angular_misalignment_deg": 0.0,
+      "blocked_dry_run_record_generated": true,
+      "clearance_mm": 0.1,
+      "command_sent": false,
+      "contact_detection_force_threshold_n": 0.05,
+      "dry_run_record_id": "v1_14_dry_run_record_001",
+      "execution_policy": {
+        "command_output_enabled": false,
+        "compute_ik_allowed": false,
+        "configuration_only": true,
+        "controller_execution_allowed": false,
+        "dry_run_only": true,
+        "follow_joint_trajectory_allowed": false,
+        "motion_execution_enabled": false,
+        "moveit_allowed": false,
+        "real_robot_allowed": false,
+        "scenario_execution_enabled": false,
+        "trajectory_execution_allowed": false
+      },
+      "insertion_depth_mm": 5.0,
+      "motion_executed": false,
+      "orchestration_stages": [
+        "load_scenario_configuration",
+        "verify_rgbd_gate",
+        "verify_contact_gate",
+        "verify_safety_gate",
+        "verify_readiness_gate",
+        "verify_pre_control_contract_gate",
+        "verify_command_blocker_gate",
+        "generate_blocked_dry_run_record",
+        "mark_scenario_not_executed"
+      ],
+      "planned_diagnostic_outputs": [
+        "sensor_status",
+        "contact_status",
+        "safety_status",
+        "readiness_status",
+        "no_motion_control_law_status",
+        "blocked_command_status",
+        "blocked_batch_execution_report"
+      ],
+      "required_gates": [
+        "rgbd_gate",
+        "contact_gate",
+        "safety_gate",
+        "readiness_gate",
+        "pre_control_contract_gate",
+        "command_blocker_gate"
+      ],
+      "result_policy": {
+        "experimental_result_created": false,
+        "fake_dataset_created": false,
+        "fake_plot_created": false
+      },
+      "scenario_executed": false,
+      "scenario_execution_started": false,
+      "scenario_id": "v1_10_scenario_001",
+      "x_offset_mm": -1.0,
+      "y_offset_mm": -1.0
+    },
+    {
+      "angular_misalignment_deg": 1.0,
+      "blocked_dry_run_record_generated": true,
+      "clearance_mm": 0.2,
+      "command_sent": false,
+      "contact_detection_force_threshold_n": 0.1,
+      "dry_run_record_id": "v1_14_dry_run_record_002",
+      "execution_policy": {
+        "command_output_enabled": false,
+        "compute_ik_allowed": false,
+        "configuration_only": true,
+        "controller_execution_allowed": false,
+        "dry_run_only": true,
+        "follow_joint_trajectory_allowed": false,
+        "motion_execution_enabled": false,
+        "moveit_allowed": false,
+        "real_robot_allowed": false,
+        "scenario_execution_enabled": false,
+        "trajectory_execution_allowed": false
+      },
+      "insertion_depth_mm": 10.0,
+      "motion_executed": false,
+      "orchestration_stages": [
+        "load_scenario_configuration",
+        "verify_rgbd_gate",
+        "verify_contact_gate",
+        "verify_safety_gate",
+        "verify_readiness_gate",
+        "verify_pre_control_contract_gate",
+        "verify_command_blocker_gate",
+        "generate_blocked_dry_run_record",
+        "mark_scenario_not_executed"
+      ],
+      "planned_diagnostic_outputs": [
+        "sensor_status",
+        "contact_status",
+        "safety_status",
+        "readiness_status",
+        "no_motion_control_law_status",
+        "blocked_command_status",
+        "blocked_batch_execution_report"
+      ],
+      "required_gates": [
+        "rgbd_gate",
+        "contact_gate",
+        "safety_gate",
+        "readiness_gate",
+        "pre_control_contract_gate",
+        "command_blocker_gate"
+      ],
+      "result_policy": {
+        "experimental_result_created": false,
+        "fake_dataset_created": false,
+        "fake_plot_created": false
+      },
+      "scenario_executed": false,
+      "scenario_execution_started": false,
+      "scenario_id": "v1_10_scenario_365",
+      "x_offset_mm": 0.0,
+      "y_offset_mm": 0.0
+    },
+    {
+      "angular_misalignment_deg": 2.0,
+      "blocked_dry_run_record_generated": true,
+      "clearance_mm": 0.5,
+      "command_sent": false,
+      "contact_detection_force_threshold_n": 0.2,
+      "dry_run_record_id": "v1_14_dry_run_record_003",
+      "execution_policy": {
+        "command_output_enabled": false,
+        "compute_ik_allowed": false,
+        "configuration_only": true,
+        "controller_execution_allowed": false,
+        "dry_run_only": true,
+        "follow_joint_trajectory_allowed": false,
+        "motion_execution_enabled": false,
+        "moveit_allowed": false,
+        "real_robot_allowed": false,
+        "scenario_execution_enabled": false,
+        "trajectory_execution_allowed": false
+      },
+      "insertion_depth_mm": 20.0,
+      "motion_executed": false,
+      "orchestration_stages": [
+        "load_scenario_configuration",
+        "verify_rgbd_gate",
+        "verify_contact_gate",
+        "verify_safety_gate",
+        "verify_readiness_gate",
+        "verify_pre_control_contract_gate",
+        "verify_command_blocker_gate",
+        "generate_blocked_dry_run_record",
+        "mark_scenario_not_executed"
+      ],
+      "planned_diagnostic_outputs": [
+        "sensor_status",
+        "contact_status",
+        "safety_status",
+        "readiness_status",
+        "no_motion_control_law_status",
+        "blocked_command_status",
+        "blocked_batch_execution_report"
+      ],
+      "required_gates": [
+        "rgbd_gate",
+        "contact_gate",
+        "safety_gate",
+        "readiness_gate",
+        "pre_control_contract_gate",
+        "command_blocker_gate"
+      ],
+      "result_policy": {
+        "experimental_result_created": false,
+        "fake_dataset_created": false,
+        "fake_plot_created": false
+      },
+      "scenario_executed": false,
+      "scenario_execution_started": false,
+      "scenario_id": "v1_10_scenario_729",
+      "x_offset_mm": 1.0,
+      "y_offset_mm": 1.0
+    }
+  ],
+  "experimental_result_created": false,
+  "fake_dataset_created": false,
+  "fake_plot_created": false,
+  "orchestrator_type": "configuration_only_batch_dry_run_orchestrator",
+  "selected_scenario_count": 3
+}

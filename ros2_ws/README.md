@@ -19,6 +19,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v1_11_single_scenario_loader_validation | Completed |
 | proposal_simulation_cell_v1_12_scenario_batch_selector | Completed |
 | proposal_simulation_cell_v1_13_batch_execution_plan_validator | Completed |
+| proposal_simulation_cell_v1_14_batch_dry_run_orchestrator | Completed |
+
+## proposal_simulation_cell_v1_14_batch_dry_run_orchestrator
+
+Status: `batch_dry_run_orchestrator_validated`
+
+The v1.14 proposal simulation sprint adds a batch dry-run orchestrator. It converts the v1.13 batch execution plan into blocked dry-run orchestration records, defines the per-scenario gate-check order, and adds the blocked batch execution report.
+
+The orchestration is configuration-only: no scenario execution, no fake datasets, no fake plots, and no experimental results are generated. Safety constraints remain explicit: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_14/`.
 
 ## proposal_simulation_cell_v1_13_batch_execution_plan_validator
 
