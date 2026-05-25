@@ -1,0 +1,139 @@
+checklist_type: proposal_simulation_cell_reproducibility_checklist
+readme_files:
+  main_readme: ../README.md
+  workspace_readme: README.md
+implemented_diagnostics:
+- sprint: v1.0
+  description: simulation cell foundation
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_0
+  found: true
+  summary_found: true
+  run_log_found: true
+- sprint: v1.1
+  description: sensor and scene validation
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_1
+  found: true
+  summary_found: true
+  run_log_found: true
+- sprint: v1.2
+  description: RGB-D image bridge validation
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_2
+  found: true
+  summary_found: true
+  run_log_found: true
+- sprint: v1.3
+  description: contact physics validation
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_3
+  found: true
+  summary_found: true
+  run_log_found: true
+- sprint: v1.5
+  description: safety and virtual-force interface
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_5
+  found: true
+  summary_found: true
+  run_log_found: true
+- sprint: v1.6
+  description: safety gate readiness
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_6
+  found: true
+  summary_found: true
+  run_log_found: true
+- sprint: v1.7
+  description: pre-control contract
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_7
+  found: true
+  summary_found: true
+  run_log_found: true
+- sprint: v1.8
+  description: control-development scaffold
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_8
+  found: true
+  summary_found: true
+  run_log_found: true
+- sprint: v1.9
+  description: no-motion control-law dry run
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_9
+  found: true
+  summary_found: true
+  run_log_found: true
+- sprint: v1.10
+  description: experiment configuration matrix
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_10
+  found: true
+  summary_found: true
+  run_log_found: true
+- sprint: v1.11
+  description: single-scenario loader validation
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_11
+  found: true
+  summary_found: true
+  run_log_found: true
+- sprint: v1.12
+  description: scenario batch selector
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_12
+  found: true
+  summary_found: true
+  run_log_found: true
+- sprint: v1.13
+  description: batch execution plan validator
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_13
+  found: true
+  summary_found: true
+  run_log_found: true
+- sprint: v1.14
+  description: batch dry-run orchestrator
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_14
+  found: true
+  summary_found: true
+  run_log_found: true
+- sprint: v1.15
+  description: evidence package generator
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_15
+  found: true
+  summary_found: true
+  run_log_found: true
+v1_15_required_files:
+- path: diagnostics/proposal_simulation_cell_v1_15/evidence_package_status.json
+  found: true
+- path: diagnostics/proposal_simulation_cell_v1_15/evidence_package_status_samples.csv
+  found: true
+- path: diagnostics/proposal_simulation_cell_v1_15/evidence_registry.csv
+  found: true
+- path: diagnostics/proposal_simulation_cell_v1_15/evidence_registry_samples.csv
+  found: true
+- path: diagnostics/proposal_simulation_cell_v1_15/nodes.txt
+  found: true
+- path: diagnostics/proposal_simulation_cell_v1_15/proposal_implementation_summary_samples.csv
+  found: true
+- path: diagnostics/proposal_simulation_cell_v1_15/proposal_simulation_evidence_package.json
+  found: true
+- path: diagnostics/proposal_simulation_cell_v1_15/proposal_simulation_evidence_package.md
+  found: true
+- path: diagnostics/proposal_simulation_cell_v1_15/proposal_simulation_evidence_package.yaml
+  found: true
+- path: diagnostics/proposal_simulation_cell_v1_15/run.log
+  found: true
+- path: diagnostics/proposal_simulation_cell_v1_15/services.txt
+  found: true
+- path: diagnostics/proposal_simulation_cell_v1_15/summary.md
+  found: true
+- path: diagnostics/proposal_simulation_cell_v1_15/tf_frames.txt
+  found: true
+- path: diagnostics/proposal_simulation_cell_v1_15/topics.txt
+  found: true
+absent_or_not_implemented_sprints:
+- v1.4
+result_policy:
+  fake_dataset_created: false
+  fake_plot_created: false
+  experimental_result_created: false
+  scenario_execution_claimed: false
+  real_robot_validation_claimed: false
+disabled_execution_policy:
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  real_robot_used: false
+  moveit_used: false
+  compute_ik_called: false

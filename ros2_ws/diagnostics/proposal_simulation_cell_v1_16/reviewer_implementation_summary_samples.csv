@@ -1,0 +1,17 @@
+elapsed_sec,implemented_sprint_count,v1_4_absent,no_scenario_execution,no_fake_datasets,no_fake_plots,no_experimental_results,status
+0.222,15,true,true,true,true,true,reproducibility_checklist_pending
+0.404,15,true,true,true,true,true,reproducibility_checklist_pending
+0.604,15,true,true,true,true,true,reproducibility_checklist_pending
+0.804,15,true,true,true,true,true,reproducibility_checklist_pending
+1.003,15,true,true,true,true,true,reproducibility_checklist_pending
+1.203,15,true,true,true,true,true,reproducibility_checklist_pending
+1.403,15,true,true,true,true,true,reproducibility_checklist_pending
+1.603,15,true,true,true,true,true,reproducibility_checklist_pending
+1.803,15,true,true,true,true,true,reproducibility_checklist_pending
+2.003,15,true,true,true,true,true,reproducibility_checklist_pending
+2.203,15,true,true,true,true,true,reproducibility_checklist_pending
+2.403,15,true,true,true,true,true,reproducibility_checklist_pending
+2.604,15,true,true,true,true,true,reproducibility_checklist_pending
+2.803,15,true,true,true,true,true,reproducibility_checklist_pending
+3.002,15,true,true,true,true,true,reproducibility_checklist_pending
+3.009,15,true,true,true,true,true,reproducibility_checklist_validated

@@ -1,0 +1,18 @@
+proposal_simulation_cell_v1_16 reproducibility checklist evidence
+elapsed_sec=3.010
+status=reproducibility_checklist_validated
+evidence_package_found=true
+evidence_registry_found=true
+implemented_diagnostics_found_count=15
+v1_4_marked_absent=true
+fake_dataset_created=false
+fake_plot_created=false
+experimental_result_created=false
+scenario_execution_claimed=false
+real_robot_validation_claimed=false
+command_output_enabled=false
+motion_execution_enabled=false
+controller_execution_allowed=false
+real_robot_used=false
+moveit_used=false
+compute_ik_called=false
