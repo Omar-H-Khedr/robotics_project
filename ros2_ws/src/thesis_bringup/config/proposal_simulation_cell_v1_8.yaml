@@ -1,0 +1,93 @@
+simulation_cell_name: proposal_simulation_cell_v1_8_control_development_scaffold
+
+robot:
+  model: KUKA LBR iisy 6 R1300
+  joint_state_topic: /joint_states
+  tf_topic: /tf
+  tf_static_topic: /tf_static
+  task_phase_topic: /proposal_simulation_cell/task_phase
+
+control_inputs:
+  require_joint_states: true
+  require_tf: true
+  require_rgb_image: true
+  require_depth_image: true
+  require_contact_wrench: true
+  require_contact_state: true
+  require_safety_status: true
+  require_readiness_gates: true
+  require_pre_control_contract: true
+  require_controller_boundary_report: true
+  topics:
+    joint_states: /joint_states
+    tf: /tf
+    tf_static: /tf_static
+    rgb_image: /proposal_simulation_cell/d405/color/image_raw
+    depth_image: /proposal_simulation_cell/d405/depth/image_rect_raw
+    contact_wrench: /proposal_simulation_cell/contact_wrench
+    contact_state: /proposal_simulation_cell/contact_state
+    safety_status: /proposal_simulation_cell/safety_status
+    virtual_force_command: /proposal_simulation_cell/virtual_force_command
+    admittance_command_suggestion: /proposal_simulation_cell/admittance_command_suggestion
+    readiness_gates: /proposal_simulation_cell/readiness_gates
+    proposal_readiness_status: /proposal_simulation_cell/proposal_readiness_status
+    safety_gate_report: /proposal_simulation_cell/safety_gate_report
+    pre_control_contract_status: /proposal_simulation_cell/pre_control_contract_status
+    controller_boundary_report: /proposal_simulation_cell/controller_boundary_report
+    task_phase: /proposal_simulation_cell/task_phase
+
+command_proposal:
+  topic: /proposal_simulation_cell/control_command_proposal
+  diagnostic_only: true
+  blocked: true
+  command_output_enabled: false
+  max_commanded_velocity_mps: 0.0
+  max_commanded_position_delta_m: 0.0
+
+command_blocker:
+  topic: /proposal_simulation_cell/command_blocker_status
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  trajectory_execution_allowed: false
+  real_robot_allowed: false
+  moveit_allowed: false
+  compute_ik_allowed: false
+  follow_joint_trajectory_allowed: false
+
+safety_gates:
+  readiness_gates_topic: /proposal_simulation_cell/readiness_gates
+  proposal_readiness_status_topic: /proposal_simulation_cell/proposal_readiness_status
+  safety_gate_report_topic: /proposal_simulation_cell/safety_gate_report
+  require_sensor_gate: true
+  require_contact_gate: true
+  require_safety_gate: true
+  require_virtual_force_gate: true
+  require_admittance_gate: true
+  require_execution_disabled_gate: true
+  require_proposal_readiness_gate: true
+
+control_boundary:
+  status_topic: /proposal_simulation_cell/control_input_status
+  readiness_report_topic: /proposal_simulation_cell/control_readiness_report
+  pre_control_contract_topic: /proposal_simulation_cell/pre_control_contract_status
+  controller_boundary_report_topic: /proposal_simulation_cell/controller_boundary_report
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  trajectory_execution_allowed: false
+  real_robot_allowed: false
+  moveit_allowed: false
+  compute_ik_allowed: false
+  follow_joint_trajectory_allowed: false
+  max_commanded_velocity_mps: 0.0
+  max_commanded_position_delta_m: 0.0
+
+validation:
+  simulation_engine: gazebo
+  isaac_required: false
+  gazebo_fallback_used: true
+  sample_period_sec: 0.2
+  validation_duration_sec: 20.0
+  output_dir: diagnostics/proposal_simulation_cell_v1_8
+  status_success: control_development_scaffold_validated

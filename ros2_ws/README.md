@@ -13,6 +13,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v1_5_safety_virtual_force_interface | Completed |
 | proposal_simulation_cell_v1_6_safety_gate_readiness | Completed |
 | proposal_simulation_cell_v1_7_pre_control_contract | Completed |
+| proposal_simulation_cell_v1_8_control_development_scaffold | Completed |
+
+## proposal_simulation_cell_v1_8_control_development_scaffold
+
+Status: `control_development_scaffold_validated`
+
+The v1.8 proposal simulation sprint adds a control-development scaffold for future controller work without executing robot motion. It includes the control input monitor, diagnostic command proposal, command blocker, safety gate checker, control boundary checker, and control readiness report.
+
+The command proposal is diagnostic only and blocked. Safety constraints remain explicit: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_8/`.
 
 ## proposal_simulation_cell_v1_7_pre_control_contract
 

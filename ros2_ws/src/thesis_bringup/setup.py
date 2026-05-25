@@ -30,6 +30,7 @@ setup(
             "proposal_simulation_cell_v1_5_safety_virtual_force_node = thesis_bringup.proposal_simulation_cell_v1_5_safety_virtual_force_node:main",
             "proposal_simulation_cell_v1_6_readiness_gate_node = thesis_bringup.proposal_simulation_cell_v1_6_readiness_gate_node:main",
             "proposal_simulation_cell_v1_7_pre_control_contract_node = thesis_bringup.proposal_simulation_cell_v1_7_pre_control_contract_node:main",
+            "proposal_simulation_cell_v1_8_control_scaffold_node = thesis_bringup.proposal_simulation_cell_v1_8_control_scaffold_node:main",
         ]
     },
 )
