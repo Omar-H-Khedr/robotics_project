@@ -1,0 +1,80 @@
+execution_block_contract:
+  command_output_enabled: false
+  compute_ik_allowed: false
+  controller_execution_allowed: false
+  forbidden_execution_interfaces:
+  - any FollowJointTrajectory action goal
+  - any controller command topic
+  - any real robot command
+  - any MoveIt planning or execution request
+  - any /compute_ik call
+  - any trajectory execution topic
+  motion_execution_enabled: false
+  moveit_allowed: false
+  real_robot_allowed: false
+  trajectory_execution_allowed: false
+future_controller_boundary_contract:
+  may_call_compute_ik: false
+  may_call_moveit: false
+  may_command_real_robot: false
+  may_publish_diagnostic_suggestions_only: true
+  may_publish_motion_commands: false
+  may_read_required_inputs: true
+  may_send_follow_joint_trajectory: false
+input_signal_contract:
+  required_flags:
+    require_admittance_interface: true
+    require_contact_state: true
+    require_contact_wrench: true
+    require_depth_image: true
+    require_joint_states: true
+    require_proposal_readiness_status: true
+    require_readiness_gates: true
+    require_rgb_image: true
+    require_safety_status: true
+    require_tf: true
+    require_virtual_force_interface: true
+  required_input_topics:
+    admittance_command_suggestion: /proposal_simulation_cell/admittance_command_suggestion
+    contact_state: /proposal_simulation_cell/contact_state
+    contact_wrench: /proposal_simulation_cell/contact_wrench
+    depth_image: /proposal_simulation_cell/d405/depth/image_rect_raw
+    joint_states: /joint_states
+    proposal_readiness_status: /proposal_simulation_cell/proposal_readiness_status
+    readiness_gates: /proposal_simulation_cell/readiness_gates
+    rgb_image: /proposal_simulation_cell/d405/color/image_raw
+    safety_gate_report: /proposal_simulation_cell/safety_gate_report
+    safety_status: /proposal_simulation_cell/safety_status
+    task_phase: /proposal_simulation_cell/task_phase
+    tf: /tf
+    tf_static: /tf_static
+    virtual_force_command: /proposal_simulation_cell/virtual_force_command
+output_suggestion_contract:
+  allowed_diagnostic_output_topics:
+  - /proposal_simulation_cell/virtual_force_command
+  - /proposal_simulation_cell/admittance_command_suggestion
+  - /proposal_simulation_cell/pre_control_contract_status
+  - /proposal_simulation_cell/controller_boundary_report
+  diagnostic_only: true
+readiness_dependency_contract:
+  proposal_readiness_status_topic: /proposal_simulation_cell/proposal_readiness_status
+  readiness_gates_topic: /proposal_simulation_cell/readiness_gates
+  require_admittance_gate: true
+  require_contact_gate: true
+  require_execution_disabled_gate: true
+  require_proposal_readiness_gate: true
+  require_safety_gate: true
+  require_sensor_gate: true
+  require_virtual_force_gate: true
+  safety_gate_report_topic: /proposal_simulation_cell/safety_gate_report
+safety_constraint_contract:
+  command_output_enabled: false
+  compute_ik_allowed: false
+  controller_execution_allowed: false
+  max_allowed_force_n: 50.0
+  max_allowed_torque_nm: 5.0
+  max_safety_violation_count: 0
+  motion_execution_enabled: false
+  moveit_allowed: false
+  real_robot_allowed: false
+  trajectory_execution_allowed: false
