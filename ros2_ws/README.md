@@ -14,6 +14,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v1_6_safety_gate_readiness | Completed |
 | proposal_simulation_cell_v1_7_pre_control_contract | Completed |
 | proposal_simulation_cell_v1_8_control_development_scaffold | Completed |
+| proposal_simulation_cell_v1_9_no_motion_control_law_dry_run | Completed |
+
+## proposal_simulation_cell_v1_9_no_motion_control_law_dry_run
+
+Status: `no_motion_control_law_dry_run_validated`
+
+The v1.9 proposal simulation sprint adds a no-motion control-law dry run. It reads validated simulated inputs and generates diagnostic control-law output, a blocked control command, and safety clipping/reporting evidence without connecting any output to execution.
+
+The dry-run command remains blocked. Safety constraints remain explicit: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_9/`.
 
 ## proposal_simulation_cell_v1_8_control_development_scaffold
 
