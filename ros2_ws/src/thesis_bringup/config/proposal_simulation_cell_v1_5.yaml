@@ -1,0 +1,52 @@
+simulation_cell_name: proposal_simulation_cell_v1_5_safety_virtual_force_interface
+
+robot:
+  model: KUKA LBR iisy 6 R1300
+  joint_state_topic: /joint_states
+  tf_topic: /tf
+  tf_static_topic: /tf_static
+  task_phase_topic: /proposal_simulation_cell/task_phase
+
+contact:
+  wrench_topic: /proposal_simulation_cell/contact_wrench
+  state_topic: /proposal_simulation_cell/contact_state
+  gazebo_contact_topics:
+    - /proposal_simulation_cell/peg_contacts
+    - /proposal_simulation_cell/hole_contacts
+    - /proposal_simulation_cell/table_contacts
+  frame_id: contact_frame
+  expected_contact_axis: z
+  contact_detection_force_threshold_n: 0.1
+
+safety:
+  safety_status_topic: /proposal_simulation_cell/safety_status
+  max_allowed_force_n: 50.0
+  max_allowed_torque_nm: 5.0
+  warning_force_threshold_n: 25.0
+  emergency_stop_force_threshold_n: 45.0
+  command_output_enabled: false
+  motion_execution_enabled: false
+  real_robot_used: false
+  moveit_used: false
+  compute_ik_called: false
+
+virtual_force:
+  topic: /proposal_simulation_cell/virtual_force_command
+  virtual_stiffness_n_per_m: 1200.0
+  virtual_damping_ns_per_m: 80.0
+  max_commanded_force_n: 20.0
+
+admittance:
+  topic: /proposal_simulation_cell/admittance_command_suggestion
+  admittance_mass_kg: 2.0
+  admittance_damping_ns_per_m: 120.0
+  max_commanded_velocity_mps: 0.02
+
+validation:
+  simulation_engine: gazebo
+  isaac_required: false
+  gazebo_fallback_used: true
+  sample_period_sec: 0.2
+  validation_duration_sec: 12.0
+  output_dir: diagnostics/proposal_simulation_cell_v1_5
+  status_success: safety_virtual_force_interface_validated

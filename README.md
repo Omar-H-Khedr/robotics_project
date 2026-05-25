@@ -20,6 +20,12 @@ The current implementation focuses on a ROS 2 Jazzy and Gazebo-based research fr
 
 Validated the proposal-aligned simulation foundation using the Gazebo fallback. RGB-D sampling remained valid, peg/hole/table collision bodies were configured, and Gazebo contact evidence was captured between the peg and hole collision objects. A nonzero contact wrench was observed with max force approximately 0.0981 N, with `safety_violation_count=0`. MoveIt, `/compute_ik`, controllers, and real robot execution were not used.
 
+### proposal_simulation_cell_v1_5_safety_virtual_force_interface
+
+Added the simulation-only safety status interface, contact-state classification, virtual-force diagnostic command suggestions, and admittance diagnostic command suggestions. The interface reads simulated contact wrench, joint state, TF, TF static, and task phase signals, then publishes diagnostic outputs only on `/proposal_simulation_cell/safety_status`, `/proposal_simulation_cell/contact_state`, `/proposal_simulation_cell/virtual_force_command`, and `/proposal_simulation_cell/admittance_command_suggestion`.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_5/`. Safety constraints remain enforced: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -32,6 +38,7 @@ Validated the proposal-aligned simulation foundation using the Gazebo fallback. 
 | v0.6 | Robot-generated contact validation | Completed |
 | v0.7 | Force-threshold diagnostics | Completed |
 | v0.8/v0.9 | Force-guarded and early-contact guard experiments | In progress |
+| v1.5 | Proposal simulation safety and virtual-force diagnostic interface | Completed |
 | v1.8 | Low-force segmented robot contact validation | Completed |
 | v2.0 | Peg/hole insertion validation instrumentation | In progress |
 | v2.3 | Coordinate-based insertion diagnostics | In progress |
