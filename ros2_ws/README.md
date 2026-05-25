@@ -20,6 +20,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v1_12_scenario_batch_selector | Completed |
 | proposal_simulation_cell_v1_13_batch_execution_plan_validator | Completed |
 | proposal_simulation_cell_v1_14_batch_dry_run_orchestrator | Completed |
+| proposal_simulation_cell_v1_15_evidence_package_generator | Completed |
+
+## proposal_simulation_cell_v1_15_evidence_package_generator
+
+Status: `evidence_package_validated`
+
+The v1.15 proposal simulation sprint adds an evidence package generator. It collects evidence from v1.0, v1.1, v1.2, v1.3, and v1.5 through v1.14, marks v1.4 as absent/not implemented and not invented, generates the proposal simulation evidence package, and creates a validated evidence summary.
+
+The package is evidence-only: no scenario execution, no fake datasets, no fake plots, and no experimental results are generated. Safety constraints remain explicit: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_15/`.
 
 ## proposal_simulation_cell_v1_14_batch_dry_run_orchestrator
 

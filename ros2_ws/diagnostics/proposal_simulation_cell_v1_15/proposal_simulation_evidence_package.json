@@ -1,0 +1,196 @@
+{
+  "absent_or_skipped_sprints": [
+    "v1.4"
+  ],
+  "claims_not_made": {
+    "controller_execution_claimed": false,
+    "learning_run_claimed": false,
+    "real_robot_validation_claimed": false,
+    "scenario_execution_claimed": false
+  },
+  "completed_sprints": [
+    {
+      "description": "simulation cell foundation",
+      "diagnostics_found": true,
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_0",
+      "json_file_count": 1,
+      "sprint": "v1.0",
+      "status_values": [
+        "ready_for_control_development"
+      ],
+      "summary_file_count": 1
+    },
+    {
+      "description": "sensor and scene validation",
+      "diagnostics_found": true,
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_1",
+      "json_file_count": 1,
+      "sprint": "v1.1",
+      "status_values": [
+        "validated_with_camera_image_limitation"
+      ],
+      "summary_file_count": 1
+    },
+    {
+      "description": "RGB-D image bridge validation",
+      "diagnostics_found": true,
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_2",
+      "json_file_count": 1,
+      "sprint": "v1.2",
+      "status_values": [
+        "rgbd_image_bridge_validated"
+      ],
+      "summary_file_count": 1
+    },
+    {
+      "description": "contact physics validation",
+      "diagnostics_found": true,
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_3",
+      "json_file_count": 1,
+      "sprint": "v1.3",
+      "status_values": [
+        "validated"
+      ],
+      "summary_file_count": 1
+    },
+    {
+      "description": "safety and virtual-force interface",
+      "diagnostics_found": true,
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_5",
+      "json_file_count": 1,
+      "sprint": "v1.5",
+      "status_values": [
+        "safety_virtual_force_interface_validated"
+      ],
+      "summary_file_count": 1
+    },
+    {
+      "description": "safety gate readiness",
+      "diagnostics_found": true,
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_6",
+      "json_file_count": 1,
+      "sprint": "v1.6",
+      "status_values": [
+        "safety_gate_readiness_validated"
+      ],
+      "summary_file_count": 1
+    },
+    {
+      "description": "pre-control contract",
+      "diagnostics_found": true,
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_7",
+      "json_file_count": 2,
+      "sprint": "v1.7",
+      "status_values": [
+        "pre_control_contract_validated"
+      ],
+      "summary_file_count": 1
+    },
+    {
+      "description": "control-development scaffold",
+      "diagnostics_found": true,
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_8",
+      "json_file_count": 1,
+      "sprint": "v1.8",
+      "status_values": [
+        "control_development_scaffold_validated"
+      ],
+      "summary_file_count": 1
+    },
+    {
+      "description": "no-motion control-law dry run",
+      "diagnostics_found": true,
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_9",
+      "json_file_count": 1,
+      "sprint": "v1.9",
+      "status_values": [
+        "no_motion_control_law_dry_run_validated"
+      ],
+      "summary_file_count": 1
+    },
+    {
+      "description": "experiment configuration matrix",
+      "diagnostics_found": true,
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_10",
+      "json_file_count": 1,
+      "sprint": "v1.10",
+      "status_values": [
+        "experiment_configuration_matrix_validated"
+      ],
+      "summary_file_count": 1
+    },
+    {
+      "description": "single-scenario loader",
+      "diagnostics_found": true,
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_11",
+      "json_file_count": 2,
+      "sprint": "v1.11",
+      "status_values": [
+        "single_scenario_loader_validated"
+      ],
+      "summary_file_count": 1
+    },
+    {
+      "description": "scenario batch selector",
+      "diagnostics_found": true,
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_12",
+      "json_file_count": 2,
+      "sprint": "v1.12",
+      "status_values": [
+        "scenario_batch_selector_validated"
+      ],
+      "summary_file_count": 1
+    },
+    {
+      "description": "batch execution plan validator",
+      "diagnostics_found": true,
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_13",
+      "json_file_count": 2,
+      "sprint": "v1.13",
+      "status_values": [
+        "batch_execution_plan_validated"
+      ],
+      "summary_file_count": 1
+    },
+    {
+      "description": "batch dry-run orchestrator",
+      "diagnostics_found": true,
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_14",
+      "json_file_count": 2,
+      "sprint": "v1.14",
+      "status_values": [
+        "batch_dry_run_orchestrator_validated"
+      ],
+      "summary_file_count": 1
+    }
+  ],
+  "disabled_execution_constraints": {
+    "command_output_enabled": false,
+    "controller_execution_allowed": false,
+    "follow_joint_trajectory_allowed": false,
+    "motion_execution_enabled": false,
+    "trajectory_execution_allowed": false
+  },
+  "evidence_package_type": "proposal_simulation_implementation_evidence",
+  "result_policy": {
+    "experimental_result_created": false,
+    "fake_dataset_created": false,
+    "fake_plot_created": false
+  },
+  "robot_model": "KUKA LBR iisy 6 R1300",
+  "simulation_engine": "gazebo",
+  "validated_capabilities": [
+    "simulation cell foundation",
+    "sensor and scene validation",
+    "RGB-D validation",
+    "contact physics validation",
+    "safety diagnostic interfaces",
+    "readiness gates",
+    "pre-control contract",
+    "no-motion control-law dry run",
+    "scenario configuration matrix",
+    "scenario loading and batch selection",
+    "configuration-only batch execution planning",
+    "blocked batch dry-run orchestration"
+  ]
+}
