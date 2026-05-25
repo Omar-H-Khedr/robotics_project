@@ -1,0 +1,14 @@
+proposal_simulation_cell_v1_6 safety gate readiness evidence
+elapsed_sec=14.430
+status=safety_gate_readiness_validated
+sensor_gate_passed=true
+contact_gate_passed=true
+safety_gate_passed=true
+virtual_force_gate_passed=true
+admittance_gate_passed=true
+execution_disabled_gate_passed=true
+proposal_readiness_gate_passed=true
+max_observed_force_n=0.000000
+max_observed_torque_nm=0.000000
+command_output_enabled=false
+motion_execution_enabled=false

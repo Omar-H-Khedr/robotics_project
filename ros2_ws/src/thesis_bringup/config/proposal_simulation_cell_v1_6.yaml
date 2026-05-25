@@ -1,0 +1,67 @@
+simulation_cell_name: proposal_simulation_cell_v1_6_safety_gate_readiness
+
+robot:
+  model: KUKA LBR iisy 6 R1300
+  joint_state_topic: /joint_states
+  tf_topic: /tf
+  tf_static_topic: /tf_static
+  task_phase_topic: /proposal_simulation_cell/task_phase
+
+sensors:
+  rgb_image_topic: /proposal_simulation_cell/d405/color/image_raw
+  depth_image_topic: /proposal_simulation_cell/d405/depth/image_rect_raw
+  require_rgb_image: true
+  require_depth_image: true
+  require_joint_states: true
+  require_tf: true
+
+contact:
+  wrench_topic: /proposal_simulation_cell/contact_wrench
+  state_topic: /proposal_simulation_cell/contact_state
+  frame_id: contact_frame
+  require_contact_wrench: true
+  require_contact_state: true
+  contact_detection_force_threshold_n: 0.1
+
+safety:
+  safety_status_topic: /proposal_simulation_cell/safety_status
+  require_safety_status: true
+  max_allowed_force_n: 50.0
+  max_allowed_torque_nm: 5.0
+  warning_force_threshold_n: 25.0
+  emergency_stop_force_threshold_n: 45.0
+  max_safety_violation_count: 0
+  command_output_enabled: false
+  motion_execution_enabled: false
+  real_robot_allowed: false
+  moveit_allowed: false
+  compute_ik_allowed: false
+  controller_execution_allowed: false
+
+virtual_force:
+  topic: /proposal_simulation_cell/virtual_force_command
+  require_virtual_force_interface: true
+
+admittance:
+  topic: /proposal_simulation_cell/admittance_command_suggestion
+  require_admittance_interface: true
+
+readiness_gates:
+  readiness_gates_topic: /proposal_simulation_cell/readiness_gates
+  proposal_readiness_status_topic: /proposal_simulation_cell/proposal_readiness_status
+  safety_gate_report_topic: /proposal_simulation_cell/safety_gate_report
+  require_sensor_gate: true
+  require_contact_gate: true
+  require_safety_gate: true
+  require_virtual_force_gate: true
+  require_admittance_gate: true
+  require_execution_disabled_gate: true
+
+validation:
+  simulation_engine: gazebo
+  isaac_required: false
+  gazebo_fallback_used: true
+  sample_period_sec: 0.2
+  validation_duration_sec: 14.0
+  output_dir: diagnostics/proposal_simulation_cell_v1_6
+  status_success: safety_gate_readiness_validated
