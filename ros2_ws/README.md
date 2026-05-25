@@ -21,6 +21,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v1_13_batch_execution_plan_validator | Completed |
 | proposal_simulation_cell_v1_14_batch_dry_run_orchestrator | Completed |
 | proposal_simulation_cell_v1_15_evidence_package_generator | Completed |
+| proposal_simulation_cell_v1_16_reproducibility_checklist | Completed |
+
+## proposal_simulation_cell_v1_16_reproducibility_checklist
+
+Status: `reproducibility_checklist_validated`
+
+The v1.16 proposal simulation sprint adds a reproducibility checklist and reviewer-facing implementation summary. It verifies that the v1.15 evidence package and evidence registry are available, checks implemented diagnostics folders, and confirms that v1.4 remains absent/not implemented.
+
+The checklist is diagnostic-only: no scenario execution, no fake datasets, no fake plots, and no experimental results are generated. Safety constraints remain explicit: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_16/`.
 
 ## proposal_simulation_cell_v1_15_evidence_package_generator
 

@@ -1,0 +1,71 @@
+simulation_cell_name: proposal_simulation_cell_v1_16_reproducibility_checklist
+
+robot:
+  robot_model: KUKA LBR iisy 6 R1300
+
+paths:
+  repository_root: ..
+  workspace_readme: README.md
+  main_readme: ../README.md
+  diagnostics_root: diagnostics
+  v1_15_diagnostics: diagnostics/proposal_simulation_cell_v1_15
+
+sprint_registry:
+  implemented_sprints:
+    - v1.0
+    - v1.1
+    - v1.2
+    - v1.3
+    - v1.5
+    - v1.6
+    - v1.7
+    - v1.8
+    - v1.9
+    - v1.10
+    - v1.11
+    - v1.12
+    - v1.13
+    - v1.14
+    - v1.15
+  absent_or_not_implemented_sprints:
+    - v1.4
+
+v1_15_required_files:
+  - evidence_package_status.json
+  - evidence_package_status_samples.csv
+  - evidence_registry.csv
+  - evidence_registry_samples.csv
+  - nodes.txt
+  - proposal_implementation_summary_samples.csv
+  - proposal_simulation_evidence_package.json
+  - proposal_simulation_evidence_package.md
+  - proposal_simulation_evidence_package.yaml
+  - run.log
+  - services.txt
+  - summary.md
+  - tf_frames.txt
+  - topics.txt
+
+result_policy:
+  fake_dataset_created: false
+  fake_plot_created: false
+  experimental_result_created: false
+  scenario_execution_claimed: false
+  real_robot_validation_claimed: false
+
+disabled_execution_policy:
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  real_robot_used: false
+  moveit_used: false
+  compute_ik_called: false
+
+validation:
+  sample_period_sec: 0.2
+  validation_duration_sec: 3.0
+  output_dir: diagnostics/proposal_simulation_cell_v1_16
+  status_success: reproducibility_checklist_validated
+  status_topic: /proposal_simulation_cell/reproducibility_checklist_status
+  checklist_topic: /proposal_simulation_cell/reproducibility_checklist
+  reviewer_summary_topic: /proposal_simulation_cell/reviewer_implementation_summary

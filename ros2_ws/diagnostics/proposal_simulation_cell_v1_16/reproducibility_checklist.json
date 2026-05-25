@@ -1,0 +1,205 @@
+{
+  "absent_or_not_implemented_sprints": [
+    "v1.4"
+  ],
+  "checklist_type": "proposal_simulation_cell_reproducibility_checklist",
+  "disabled_execution_policy": {
+    "command_output_enabled": false,
+    "compute_ik_called": false,
+    "controller_execution_allowed": false,
+    "motion_execution_enabled": false,
+    "moveit_used": false,
+    "real_robot_used": false
+  },
+  "implemented_diagnostics": [
+    {
+      "description": "simulation cell foundation",
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_0",
+      "found": true,
+      "run_log_found": true,
+      "sprint": "v1.0",
+      "summary_found": true
+    },
+    {
+      "description": "sensor and scene validation",
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_1",
+      "found": true,
+      "run_log_found": true,
+      "sprint": "v1.1",
+      "summary_found": true
+    },
+    {
+      "description": "RGB-D image bridge validation",
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_2",
+      "found": true,
+      "run_log_found": true,
+      "sprint": "v1.2",
+      "summary_found": true
+    },
+    {
+      "description": "contact physics validation",
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_3",
+      "found": true,
+      "run_log_found": true,
+      "sprint": "v1.3",
+      "summary_found": true
+    },
+    {
+      "description": "safety and virtual-force interface",
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_5",
+      "found": true,
+      "run_log_found": true,
+      "sprint": "v1.5",
+      "summary_found": true
+    },
+    {
+      "description": "safety gate readiness",
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_6",
+      "found": true,
+      "run_log_found": true,
+      "sprint": "v1.6",
+      "summary_found": true
+    },
+    {
+      "description": "pre-control contract",
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_7",
+      "found": true,
+      "run_log_found": true,
+      "sprint": "v1.7",
+      "summary_found": true
+    },
+    {
+      "description": "control-development scaffold",
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_8",
+      "found": true,
+      "run_log_found": true,
+      "sprint": "v1.8",
+      "summary_found": true
+    },
+    {
+      "description": "no-motion control-law dry run",
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_9",
+      "found": true,
+      "run_log_found": true,
+      "sprint": "v1.9",
+      "summary_found": true
+    },
+    {
+      "description": "experiment configuration matrix",
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_10",
+      "found": true,
+      "run_log_found": true,
+      "sprint": "v1.10",
+      "summary_found": true
+    },
+    {
+      "description": "single-scenario loader validation",
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_11",
+      "found": true,
+      "run_log_found": true,
+      "sprint": "v1.11",
+      "summary_found": true
+    },
+    {
+      "description": "scenario batch selector",
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_12",
+      "found": true,
+      "run_log_found": true,
+      "sprint": "v1.12",
+      "summary_found": true
+    },
+    {
+      "description": "batch execution plan validator",
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_13",
+      "found": true,
+      "run_log_found": true,
+      "sprint": "v1.13",
+      "summary_found": true
+    },
+    {
+      "description": "batch dry-run orchestrator",
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_14",
+      "found": true,
+      "run_log_found": true,
+      "sprint": "v1.14",
+      "summary_found": true
+    },
+    {
+      "description": "evidence package generator",
+      "diagnostics_path": "diagnostics/proposal_simulation_cell_v1_15",
+      "found": true,
+      "run_log_found": true,
+      "sprint": "v1.15",
+      "summary_found": true
+    }
+  ],
+  "readme_files": {
+    "main_readme": "../README.md",
+    "workspace_readme": "README.md"
+  },
+  "result_policy": {
+    "experimental_result_created": false,
+    "fake_dataset_created": false,
+    "fake_plot_created": false,
+    "real_robot_validation_claimed": false,
+    "scenario_execution_claimed": false
+  },
+  "v1_15_required_files": [
+    {
+      "found": true,
+      "path": "diagnostics/proposal_simulation_cell_v1_15/evidence_package_status.json"
+    },
+    {
+      "found": true,
+      "path": "diagnostics/proposal_simulation_cell_v1_15/evidence_package_status_samples.csv"
+    },
+    {
+      "found": true,
+      "path": "diagnostics/proposal_simulation_cell_v1_15/evidence_registry.csv"
+    },
+    {
+      "found": true,
+      "path": "diagnostics/proposal_simulation_cell_v1_15/evidence_registry_samples.csv"
+    },
+    {
+      "found": true,
+      "path": "diagnostics/proposal_simulation_cell_v1_15/nodes.txt"
+    },
+    {
+      "found": true,
+      "path": "diagnostics/proposal_simulation_cell_v1_15/proposal_implementation_summary_samples.csv"
+    },
+    {
+      "found": true,
+      "path": "diagnostics/proposal_simulation_cell_v1_15/proposal_simulation_evidence_package.json"
+    },
+    {
+      "found": true,
+      "path": "diagnostics/proposal_simulation_cell_v1_15/proposal_simulation_evidence_package.md"
+    },
+    {
+      "found": true,
+      "path": "diagnostics/proposal_simulation_cell_v1_15/proposal_simulation_evidence_package.yaml"
+    },
+    {
+      "found": true,
+      "path": "diagnostics/proposal_simulation_cell_v1_15/run.log"
+    },
+    {
+      "found": true,
+      "path": "diagnostics/proposal_simulation_cell_v1_15/services.txt"
+    },
+    {
+      "found": true,
+      "path": "diagnostics/proposal_simulation_cell_v1_15/summary.md"
+    },
+    {
+      "found": true,
+      "path": "diagnostics/proposal_simulation_cell_v1_15/tf_frames.txt"
+    },
+    {
+      "found": true,
+      "path": "diagnostics/proposal_simulation_cell_v1_15/topics.txt"
+    }
+  ]
+}

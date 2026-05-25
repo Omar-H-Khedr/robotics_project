@@ -1,0 +1,17 @@
+elapsed_sec,evidence_package_found,evidence_registry_found,implemented_diagnostics_found_count,v1_4_marked_absent,reproducibility_checklist_written,reviewer_summary_written,fake_dataset_created,fake_plot_created,experimental_result_created,scenario_execution_claimed,real_robot_validation_claimed,status
+0.222,true,true,15,true,false,false,false,false,false,false,false,reproducibility_checklist_pending
+0.404,true,true,15,true,false,false,false,false,false,false,false,reproducibility_checklist_pending
+0.604,true,true,15,true,false,false,false,false,false,false,false,reproducibility_checklist_pending
+0.804,true,true,15,true,false,false,false,false,false,false,false,reproducibility_checklist_pending
+1.003,true,true,15,true,false,false,false,false,false,false,false,reproducibility_checklist_pending
+1.203,true,true,15,true,false,false,false,false,false,false,false,reproducibility_checklist_pending
+1.403,true,true,15,true,false,false,false,false,false,false,false,reproducibility_checklist_pending
+1.603,true,true,15,true,false,false,false,false,false,false,false,reproducibility_checklist_pending
+1.803,true,true,15,true,false,false,false,false,false,false,false,reproducibility_checklist_pending
+2.003,true,true,15,true,false,false,false,false,false,false,false,reproducibility_checklist_pending
+2.203,true,true,15,true,false,false,false,false,false,false,false,reproducibility_checklist_pending
+2.403,true,true,15,true,false,false,false,false,false,false,false,reproducibility_checklist_pending
+2.604,true,true,15,true,false,false,false,false,false,false,false,reproducibility_checklist_pending
+2.803,true,true,15,true,false,false,false,false,false,false,false,reproducibility_checklist_pending
+3.002,true,true,15,true,false,false,false,false,false,false,false,reproducibility_checklist_pending
+3.009,true,true,15,true,true,true,false,false,false,false,false,reproducibility_checklist_validated
