@@ -1,0 +1,13 @@
+{
+  "goal_joint_count": 6,
+  "plan_error_code": 1,
+  "plan_only": true,
+  "plan_request_sent": true,
+  "plan_response_received": true,
+  "plan_service": "/plan_kinematic_path",
+  "plan_service_available": true,
+  "plan_solution_found": true,
+  "trajectory_executed": false,
+  "trajectory_point_count": 111,
+  "trajectory_sent": false
+}

@@ -1,0 +1,105 @@
+simulation_cell_name: proposal_simulation_cell_v2_3_moveit_model_alignment_and_plan_only_validation
+
+robot:
+  robot_model: KUKA LBR iisy MoveIt and Gazebo aligned diagnostic model
+  moveit_robot_model: lbr_iisy3_r760
+  gazebo_reference_model: lbr_iisy3_r760
+  moveit_group: manipulator
+  tool_link: tool0
+  base_link: base_link
+  gazebo_controller_joints:
+    - joint_1
+    - joint_2
+    - joint_3
+    - joint_4
+    - joint_5
+    - joint_6
+  moveit_expected_joints:
+    - joint_1
+    - joint_2
+    - joint_3
+    - joint_4
+    - joint_5
+    - joint_6
+
+moveit_diagnostic:
+  diagnostic_only: true
+  moveit_used: true
+  compute_ik_allowed: true
+  plan_only_allowed: true
+  compute_ik_service: /compute_ik
+  plan_service: /plan_kinematic_path
+  move_group_node_name: /move_group
+  selected_group: manipulator
+  selected_end_effector_link: tool0
+
+ik_repeatability:
+  pose_count: 5
+  ik_timeout_sec: 2.0
+  max_pose_offset_m: 0.02
+  repeatability_joint_tolerance_rad: 0.25
+  frame_id: base_link
+  seed_joint_state:
+    joint_1: 0.0
+    joint_2: -0.7
+    joint_3: 1.1
+    joint_4: 0.0
+    joint_5: 0.7
+    joint_6: 0.0
+  base_target_pose:
+    position:
+      x: 0.36
+      y: 0.0
+      z: 0.42
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+  nearby_pose_offsets_m:
+    - {x: 0.0, y: 0.0, z: 0.0}
+    - {x: 0.01, y: 0.0, z: 0.0}
+    - {x: -0.01, y: 0.0, z: 0.0}
+    - {x: 0.0, y: 0.01, z: 0.0}
+    - {x: 0.0, y: 0.0, z: 0.01}
+
+plan_only_validation:
+  allowed_planning_time_sec: 3.0
+  planning_attempts: 1
+  max_velocity_scaling_factor: 0.1
+  max_acceleration_scaling_factor: 0.1
+  joint_goal_tolerance_rad: 0.01
+  use_first_successful_ik_solution: true
+
+safety_constraints:
+  no_real_robot_endpoint: true
+  no_trajectory_execution: true
+  no_controller_execution: true
+  no_follow_joint_trajectory_execution: true
+  no_moveit_plan_execution: true
+  no_peg_insertion: true
+  no_contact_seeking_motion: true
+
+execution_policy:
+  diagnostic_only: true
+  allow_trajectory_execution: false
+  moveit_execution_allowed: false
+  controller_execution_allowed: false
+  trajectory_execution_allowed: false
+  follow_joint_trajectory_execution_allowed: false
+  real_robot_allowed: false
+  planning_execution_allowed: false
+  motion_execution_enabled: false
+  trajectory_sent: false
+  real_robot_used: false
+
+validation:
+  output_dir: diagnostics/proposal_simulation_cell_v2_3
+  status_success: moveit_model_alignment_and_plan_only_validated
+  status_topic: /proposal_simulation_cell/moveit_model_alignment_plan_only_status
+  alignment_report_topic: /proposal_simulation_cell/moveit_gazebo_model_alignment_report
+  ik_repeatability_report_topic: /proposal_simulation_cell/moveit_ik_repeatability_report
+  plan_only_report_topic: /proposal_simulation_cell/moveit_plan_only_report
+  execution_block_report_topic: /proposal_simulation_cell/moveit_plan_execution_block_report
+  validation_timeout_sec: 60.0
+  startup_wait_sec: 2.0

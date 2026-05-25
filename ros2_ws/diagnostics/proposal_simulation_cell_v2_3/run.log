@@ -1,0 +1,9 @@
+proposal_simulation_cell_v2_3_moveit_model_alignment_and_plan_only_validation
+status=moveit_model_alignment_and_plan_only_validated
+model_alignment_validated=true
+ik_success_count=5
+plan_solution_found=true
+trajectory_execution_allowed=false
+controller_execution_allowed=false
+follow_joint_trajectory_execution_allowed=false
+real_robot_used=false

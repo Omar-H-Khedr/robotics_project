@@ -1,0 +1,9 @@
+check,value
+trajectory_execution_allowed,false
+controller_execution_allowed,false
+follow_joint_trajectory_execution_allowed,false
+planning_execution_allowed,false
+real_robot_used,false
+motion_executed,false
+trajectory_sent,false
+real_robot_endpoint_detected,false
