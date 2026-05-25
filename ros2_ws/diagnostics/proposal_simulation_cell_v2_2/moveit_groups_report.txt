@@ -1,0 +1,25 @@
+{
+  "available_groups": [
+    "manipulator",
+    "end_effector"
+  ],
+  "expected_joints": [
+    "joint_1",
+    "joint_2",
+    "joint_3",
+    "joint_4",
+    "joint_5",
+    "joint_6"
+  ],
+  "group_links": [
+    "base_link",
+    "tool0"
+  ],
+  "model_choice": "consistent lbr_iisy3_r760 MoveIt model",
+  "project_local_iisy6_candidate_used": false,
+  "robot_description_available": true,
+  "robot_description_semantic_available": true,
+  "selected_end_effector_link": "tool0",
+  "selected_group": "manipulator",
+  "semantic_parse_error": ""
+}

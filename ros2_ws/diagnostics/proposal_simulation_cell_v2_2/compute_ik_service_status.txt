@@ -1,0 +1,5 @@
+compute_ik_service=/compute_ik
+compute_ik_service_available=true
+compute_ik_called=true
+compute_ik_call_count=1
+diagnostic_only=true

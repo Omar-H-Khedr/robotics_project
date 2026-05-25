@@ -1,0 +1,10 @@
+proposal_simulation_cell_v2_2_moveit_ik_diagnostic_validation
+status=moveit_ik_diagnostic_validated
+move_group_started=true
+compute_ik_service_available=true
+compute_ik_called=true
+ik_solution_found=true
+trajectory_execution_allowed=false
+controller_execution_allowed=false
+follow_joint_trajectory_execution_allowed=false
+real_robot_used=false
