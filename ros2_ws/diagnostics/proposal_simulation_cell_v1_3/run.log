@@ -1,0 +1,211 @@
+proposal_simulation_cell_v1_3 contact validator evidence
+elapsed_sec=42.552
+gz_available=True
+status=validated
+contact_state=contact_observed_below_threshold axis=z axis_force_n=0.098100 force_magnitude_n=0.098100 torque_magnitude_nm=0.000000
+max_observed_force_n=0.098100
+max_observed_torque_nm=0.000000
+limitation_reason=none
+phases=initialize_scene,verify_collision_bodies,verify_contact_topics,record_contact_wrench_samples,verify_rgbd_samples,write_contact_diagnostics
+
+# contact evidence
+# gz topic -l
+/clock
+/gazebo/resource_paths
+/proposal_simulation_cell/d405/color/camera_info
+/proposal_simulation_cell/d405/color/image_raw
+/proposal_simulation_cell/d405/depth/camera_info
+/proposal_simulation_cell/d405/depth/image_rect_raw
+/proposal_simulation_cell/d405/depth/image_rect_raw/points
+/sensors/marker
+/stats
+/world/proposal_simulation_cell_v1_3_contact_physics_validation/clock
+/world/proposal_simulation_cell_v1_3_contact_physics_validation/dynamic_pose/info
+/world/proposal_simulation_cell_v1_3_contact_physics_validation/model/cylindrical_peg/link/peg_link/sensor/peg_contact_sensor/contact
+/world/proposal_simulation_cell_v1_3_contact_physics_validation/model/hole_block/link/hole_block_link/sensor/hole_contact_sensor/contact
+/world/proposal_simulation_cell_v1_3_contact_physics_validation/model/work_table/link/table_link/sensor/table_contact_sensor/contact
+/world/proposal_simulation_cell_v1_3_contact_physics_validation/pose/info
+/world/proposal_simulation_cell_v1_3_contact_physics_validation/scene/deletion
+/world/proposal_simulation_cell_v1_3_contact_physics_validation/scene/info
+/world/proposal_simulation_cell_v1_3_contact_physics_validation/state
+/world/proposal_simulation_cell_v1_3_contact_physics_validation/stats
+/world/proposal_simulation_cell_v1_3_contact_physics_validation/light_config
+/world/proposal_simulation_cell_v1_3_contact_physics_validation/material_color
+
+# gz topic -i -t /proposal_simulation_cell/peg_contacts
+No publishers on topic [/proposal_simulation_cell/peg_contacts]
+No subscribers on topic [/proposal_simulation_cell/peg_contacts]
+
+# gz topic -i -t /proposal_simulation_cell/hole_contacts
+No publishers on topic [/proposal_simulation_cell/hole_contacts]
+No subscribers on topic [/proposal_simulation_cell/hole_contacts]
+
+# gz topic -i -t /proposal_simulation_cell/table_contacts
+No publishers on topic [/proposal_simulation_cell/table_contacts]
+No subscribers on topic [/proposal_simulation_cell/table_contacts]
+
+# gz topic -i -t /world/proposal_simulation_cell_v1_3_contact_physics_validation/model/cylindrical_peg/link/peg_link/sensor/peg_contact_sensor/contact
+Publishers [Address, Message Type]:
+  tcp://172.29.114.156:45125, gz.msgs.Contacts
+No subscribers on topic [/world/proposal_simulation_cell_v1_3_contact_physics_validation/model/cylindrical_peg/link/peg_link/sensor/peg_contact_sensor/contact]
+
+# gz topic -e -t /world/proposal_simulation_cell_v1_3_contact_physics_validation/model/cylindrical_peg/link/peg_link/sensor/peg_contact_sensor/contact
+header {
+  stamp {
+    sec: 18
+    nsec: 86000000
+  }
+}
+contact {
+  header {
+    stamp {
+      sec: 18
+      nsec: 86000000
+    }
+  }
+  collision1 {
+    id: 24
+    name: "cylindrical_peg::peg_link::peg_collision"
+  }
+  collision2 {
+    id: 16
+    name: "hole_block::hole_block_link::hole_collision"
+  }
+  position {
+    x: 0.50851949702904731
+    y: -0.21148050297095269
+    z: 0.81
+  }
+  position {
+    x: 0.50376411699561408
+    y: -0.2
+    z: 0.81
+  }
+  position {
+    x: 0.50851949702904731
+    y: -0.1885194970290473
+    z: 0.81
+  }
+  position {
+    x: 0.52
+    y: -0.1837641169956141
+    z: 0.81
+  }
+  position {
+    x: 0.53148050297095273
+    y: -0.1885194970290473
+    z: 0.81
+  }
+  position {
+    x: 0.536235883004386
+    y: -0.2
+    z: 0.81
+  }
+  position {
+    x: 0.53148050297095273
+    y: -0.21148050297095272
+    z: 0.81
+  }
+  position {
+    x: 0.52
+    y: -0.21623588300438593
+    z: 0.81
+  }
+  normal {
+    z: 1
+  }
+  normal {
+    z: 1
+  }
+  normal {
+    z: 1
+  }
+  normal {
+    z: 1
+  }
+  normal {
+    z: 1
+  }
+  normal {
+    z: 1
+  }
+  normal {
+    z: 1
+  }
+  normal {
+    z: 1
+  }
+  depth: 1.7434463386867272e-09
+  depth: 1.7434463386867272e-09
+  depth: 1.7434463386867272e-09
+  depth: 1.7434463386867272e-09
+  depth: 1.7434463386867272e-09
+  depth: 1.7434463386867272e-09
+  depth: 1.7434463386867272e-09
+  depth: 1.7434463386867272e-09
+  wrench {
+    body_1_wrench {
+      force {
+        x: 5.7708297500209653e-13
+        y: 4.162986407279572e-13
+        z: 0.098100000001403426
+      }
+    }
+    body_2_wrench {
+      force {
+        x: -5.7708297500209653e-13
+        y: -4.162986407279572e-13
+        z: -0.098100000001403426
+      }
+    }
+  }
+  wrench {
+    body_1_wrench {
+      force {
+        x: 3.0284631764070993e-14
+        y: 2.3278332923230257e-13
+        z: 0.0980999999927536
+      }
+    }
+    body_2_wrench {
+      force {
+        x: -3.0284631764070993e-14
+        y: -2.3278332923230257e-13
+        z: -0.0980999999927536
+      }
+    }
+  }
+  wrench {
+    body_1_wrench {
+      force {
+        x: -1.0701654825672872e-13
+        y: 5.124866255475308e-13
+        z: 0.098100000006516655
+      }
+    }
+    body_2_wrench {
+      force {
+        x: 1.0701654825672872e-13
+        y: -5.124866255475308e-13
+        z: -0.098100000006516655
+      }
+    }
+  }
+  wrench {
+    body_1_wrench {
+      force {
+        x: -4.3457680261497457e-13
+        y: -7.0309508864861974e-13
+        z: 0.09809999999931264
+      }
+    }
+    body_2_wrench {
+      force {
+        x: 4.3457680261497457e-13
+        y: 7.0309508864861974e-13
+        z: -0.09809999999931264
+      }
+    }
+  }
+  wrench {
+    body_1_wrench {

@@ -14,6 +14,12 @@ The current implementation focuses on a ROS 2 Jazzy and Gazebo-based research fr
 - Gazebo contact sensing and contact-force extraction
 - Robot-generated contact validation with force guard logic
 
+## Proposal Simulation Cell Progress
+
+### proposal_simulation_cell_v1_3_contact_physics_validation
+
+Validated the proposal-aligned simulation foundation using the Gazebo fallback. RGB-D sampling remained valid, peg/hole/table collision bodies were configured, and Gazebo contact evidence was captured between the peg and hole collision objects. A nonzero contact wrench was observed with max force approximately 0.0981 N, with `safety_violation_count=0`. MoveIt, `/compute_ik`, controllers, and real robot execution were not used.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
