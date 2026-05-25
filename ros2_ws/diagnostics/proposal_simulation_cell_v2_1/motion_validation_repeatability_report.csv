@@ -1,0 +1,5 @@
+cycle,observed_delta_deg,return_error_deg,repeatability_error_deg,within_return_tolerance,within_repeatability_tolerance
+0,0.000000,0.147670,0.000000,true,true
+1,1.848570,0.167987,0.000000,true,true
+2,1.814937,0.165057,0.033633,true,true
+3,1.815649,0.183521,0.033633,true,true

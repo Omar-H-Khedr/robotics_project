@@ -24,6 +24,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v1_16_reproducibility_checklist | Completed |
 | proposal_simulation_cell_v1_17_release_documentation_index | Completed |
 | proposal_simulation_cell_v2_0_first_gazebo_motion_smoke_test | Completed |
+| proposal_simulation_cell_v2_1_gazebo_motion_validation_suite | Completed |
+
+## proposal_simulation_cell_v2_1_gazebo_motion_validation_suite
+
+Status: `gazebo_motion_validation_suite_validated`
+
+The v2.1 proposal simulation sprint adds a combined Gazebo-only motion validation suite. It tests single forward and return motion, three repeatability cycles, and a small two-joint motion using the Gazebo simulation controller.
+
+The suite records joint-state evidence, repeatability and return errors, contact wrench monitoring, and a safety report. No real robot execution, MoveIt, `/compute_ik`, learning, scenario batch execution, peg insertion, or contact-seeking motion is used.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_1/`.
 
 ## proposal_simulation_cell_v2_0_first_gazebo_motion_smoke_test
 
