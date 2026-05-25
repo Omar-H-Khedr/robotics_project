@@ -1,0 +1,13 @@
+proposal_simulation_cell_v1_10 experiment configuration matrix evidence
+elapsed_sec=3.644
+status=experiment_configuration_matrix_validated
+scenario_count=729
+all_scenarios_execution_disabled=true
+all_scenarios_require_rgbd=true
+fake_datasets_created=false
+fake_plots_created=false
+command_output_enabled=false
+motion_execution_enabled=false
+controller_execution_allowed=false
+trajectory_execution_allowed=false
+follow_joint_trajectory_allowed=false

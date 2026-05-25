@@ -1,0 +1,64 @@
+simulation_cell_name: proposal_simulation_cell_v1_10_experiment_configuration_matrix
+
+robot:
+  robot_model: KUKA LBR iisy 6 R1300
+  model: KUKA LBR iisy 6 R1300
+  joint_state_topic: /joint_states
+  tf_topic: /tf
+  tf_static_topic: /tf_static
+
+scenario_matrix:
+  description: simulation_only_future_validation_scenario_configurations
+  generate_datasets: false
+  generate_plots: false
+  generate_results: false
+  output_status_topic: /proposal_simulation_cell/experiment_matrix_status
+  scenario_list_topic: /proposal_simulation_cell/scenario_configuration_list
+  validation_report_topic: /proposal_simulation_cell/scenario_validation_report
+
+peg_hole_geometry:
+  clearance_mm: [0.1, 0.2, 0.5]
+
+misalignment_variants:
+  x_offset_mm: [-1.0, 0.0, 1.0]
+  y_offset_mm: [-1.0, 0.0, 1.0]
+  angular_misalignment_deg: [0.0, 1.0, 2.0]
+  insertion_depth_mm: [5.0, 10.0, 20.0]
+
+contact_thresholds:
+  contact_detection_force_threshold_n: [0.05, 0.1, 0.2]
+
+safety_limits:
+  max_allowed_force_n: 50.0
+  max_allowed_torque_nm: 5.0
+
+sensor_requirements:
+  require_rgbd: true
+  require_rgb_image: true
+  require_depth_image: true
+  require_camera_info: true
+
+readiness_requirements:
+  require_contact_gate: true
+  require_safety_gate: true
+  require_readiness_gate: true
+  require_pre_control_contract: true
+
+execution_policy:
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  trajectory_execution_allowed: false
+  follow_joint_trajectory_allowed: false
+  real_robot_allowed: false
+  moveit_allowed: false
+  compute_ik_allowed: false
+
+validation:
+  simulation_engine: gazebo
+  gazebo_fallback_used: true
+  isaac_available: false
+  sample_period_sec: 0.2
+  validation_duration_sec: 3.0
+  output_dir: diagnostics/proposal_simulation_cell_v1_10
+  status_success: experiment_configuration_matrix_validated
