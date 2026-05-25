@@ -1,0 +1,17 @@
+elapsed_sec,blocked_batch_execution_report_available,selected_scenario_count,all_records_blocked,fake_dataset_created,fake_plot_created,experimental_result_created,status
+0.215,true,3,true,false,false,false,blocked_batch_execution_confirmed
+0.415,true,3,true,false,false,false,blocked_batch_execution_confirmed
+0.615,true,3,true,false,false,false,blocked_batch_execution_confirmed
+0.815,true,3,true,false,false,false,blocked_batch_execution_confirmed
+1.015,true,3,true,false,false,false,blocked_batch_execution_confirmed
+1.215,true,3,true,false,false,false,blocked_batch_execution_confirmed
+1.415,true,3,true,false,false,false,blocked_batch_execution_confirmed
+1.615,true,3,true,false,false,false,blocked_batch_execution_confirmed
+1.815,true,3,true,false,false,false,blocked_batch_execution_confirmed
+2.015,true,3,true,false,false,false,blocked_batch_execution_confirmed
+2.215,true,3,true,false,false,false,blocked_batch_execution_confirmed
+2.415,true,3,true,false,false,false,blocked_batch_execution_confirmed
+2.615,true,3,true,false,false,false,blocked_batch_execution_confirmed
+2.816,true,3,true,false,false,false,blocked_batch_execution_confirmed
+3.015,true,3,true,false,false,false,blocked_batch_execution_confirmed
+3.019,true,3,true,false,false,false,blocked_batch_execution_confirmed

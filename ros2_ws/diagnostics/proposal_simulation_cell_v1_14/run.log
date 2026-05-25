@@ -1,0 +1,16 @@
+proposal_simulation_cell_v1_14 batch dry-run orchestration evidence
+elapsed_sec=3.020
+status=batch_dry_run_orchestrator_validated
+selected_scenario_count=3
+dry_run_schedule_generated=true
+dry_run_schedule_written=true
+all_dry_run_records_validated=true
+blocked_batch_execution_report_available=true
+fake_dataset_created=false
+fake_plot_created=false
+experimental_result_created=false
+command_output_enabled=false
+motion_execution_enabled=false
+controller_execution_allowed=false
+trajectory_execution_allowed=false
+follow_joint_trajectory_allowed=false

@@ -1,0 +1,17 @@
+elapsed_sec,selected_scenario_count,dry_run_schedule_generated,all_dry_run_records_validated,all_records_require_rgbd_gate,all_records_require_contact_gate,all_records_require_safety_gate,all_records_require_readiness_gate,all_records_require_pre_control_contract_gate,all_records_require_command_blocker_gate,fake_dataset_created,fake_plot_created,experimental_result_created,status
+0.215,3,true,true,true,true,true,true,true,true,false,false,false,batch_dry_run_validation_passed
+0.415,3,true,true,true,true,true,true,true,true,false,false,false,batch_dry_run_validation_passed
+0.615,3,true,true,true,true,true,true,true,true,false,false,false,batch_dry_run_validation_passed
+0.815,3,true,true,true,true,true,true,true,true,false,false,false,batch_dry_run_validation_passed
+1.015,3,true,true,true,true,true,true,true,true,false,false,false,batch_dry_run_validation_passed
+1.215,3,true,true,true,true,true,true,true,true,false,false,false,batch_dry_run_validation_passed
+1.415,3,true,true,true,true,true,true,true,true,false,false,false,batch_dry_run_validation_passed
+1.615,3,true,true,true,true,true,true,true,true,false,false,false,batch_dry_run_validation_passed
+1.815,3,true,true,true,true,true,true,true,true,false,false,false,batch_dry_run_validation_passed
+2.015,3,true,true,true,true,true,true,true,true,false,false,false,batch_dry_run_validation_passed
+2.215,3,true,true,true,true,true,true,true,true,false,false,false,batch_dry_run_validation_passed
+2.415,3,true,true,true,true,true,true,true,true,false,false,false,batch_dry_run_validation_passed
+2.615,3,true,true,true,true,true,true,true,true,false,false,false,batch_dry_run_validation_passed
+2.816,3,true,true,true,true,true,true,true,true,false,false,false,batch_dry_run_validation_passed
+3.015,3,true,true,true,true,true,true,true,true,false,false,false,batch_dry_run_validation_passed
+3.019,3,true,true,true,true,true,true,true,true,false,false,false,batch_dry_run_validation_passed

@@ -1,0 +1,64 @@
+simulation_cell_name: proposal_simulation_cell_v1_14_batch_dry_run_orchestrator
+
+robot:
+  robot_model: KUKA LBR iisy 6 R1300
+  model: KUKA LBR iisy 6 R1300
+
+batch_execution_plan_source:
+  batch_execution_plan_yaml: diagnostics/proposal_simulation_cell_v1_13/batch_execution_plan.yaml
+  batch_execution_plan_csv: diagnostics/proposal_simulation_cell_v1_13/batch_execution_plan.csv
+
+dry_run_orchestration:
+  orchestrator_type: configuration_only_batch_dry_run_orchestrator
+  dry_run_only: true
+
+gate_check_order:
+  - load_scenario_configuration
+  - verify_rgbd_gate
+  - verify_contact_gate
+  - verify_safety_gate
+  - verify_readiness_gate
+  - verify_pre_control_contract_gate
+  - verify_command_blocker_gate
+  - generate_blocked_dry_run_record
+  - mark_scenario_not_executed
+
+planned_diagnostics:
+  - sensor_status
+  - contact_status
+  - safety_status
+  - readiness_status
+  - no_motion_control_law_status
+  - blocked_command_status
+  - blocked_batch_execution_report
+
+execution_policy:
+  configuration_only: true
+  dry_run_only: true
+  scenario_execution_enabled: false
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  trajectory_execution_allowed: false
+  follow_joint_trajectory_allowed: false
+  real_robot_allowed: false
+  moveit_allowed: false
+  compute_ik_allowed: false
+
+result_policy:
+  fake_dataset_created: false
+  fake_plot_created: false
+  experimental_result_created: false
+
+validation:
+  simulation_engine: gazebo
+  gazebo_fallback_used: true
+  isaac_available: false
+  sample_period_sec: 0.2
+  validation_duration_sec: 3.0
+  output_dir: diagnostics/proposal_simulation_cell_v1_14
+  status_success: batch_dry_run_orchestrator_validated
+  status_topic: /proposal_simulation_cell/batch_dry_run_orchestrator_status
+  schedule_topic: /proposal_simulation_cell/batch_dry_run_schedule
+  validation_report_topic: /proposal_simulation_cell/batch_dry_run_validation_report
+  blocked_report_topic: /proposal_simulation_cell/blocked_batch_execution_report
