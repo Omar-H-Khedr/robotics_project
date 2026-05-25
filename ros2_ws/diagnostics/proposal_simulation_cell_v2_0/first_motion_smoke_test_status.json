@@ -1,0 +1,21 @@
+{
+  "commanded_joint_delta_deg": 2.0,
+  "compute_ik_called": false,
+  "contact_wrench_topic_available": true,
+  "controller_joint": "joint_6",
+  "gazebo_only_motion_test": true,
+  "max_observed_force_n": 0.0,
+  "max_observed_torque_nm": 0.0,
+  "motion_command_sent": true,
+  "motion_observed_in_joint_states": true,
+  "motion_within_limit": true,
+  "moveit_used": false,
+  "observed_joint_delta_deg": 1.935194992514572,
+  "real_robot_used": false,
+  "robot_model": "KUKA LBR iisy Gazebo support model",
+  "safety_violation_count": 0,
+  "selected_joint": "joint_a6",
+  "simulation_control_interface_used": "gz_ros2_control/GazeboSimSystem via joint_trajectory_controller",
+  "simulation_engine": "gazebo",
+  "status": "first_gazebo_motion_smoke_test_validated"
+}

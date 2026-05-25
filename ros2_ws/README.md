@@ -23,6 +23,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v1_15_evidence_package_generator | Completed |
 | proposal_simulation_cell_v1_16_reproducibility_checklist | Completed |
 | proposal_simulation_cell_v1_17_release_documentation_index | Completed |
+| proposal_simulation_cell_v2_0_first_gazebo_motion_smoke_test | Completed |
+
+## proposal_simulation_cell_v2_0_first_gazebo_motion_smoke_test
+
+Status: `first_gazebo_motion_smoke_test_validated`
+
+The v2.0 proposal simulation sprint adds the first intentional Gazebo-only motion smoke test. It sends one small joint-space movement for the selected sixth-axis joint, records joint-state before/after evidence, monitors the contact wrench topic, and writes a safety report.
+
+The smoke test is Gazebo-only: no real robot execution, no MoveIt, no `/compute_ik`, no learning, and no scenario batch execution are used.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_0/`.
 
 ## proposal_simulation_cell_v1_17_release_documentation_index
 

@@ -80,6 +80,12 @@ Added the simulation-only release documentation index, reviewer quickstart, spri
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_17/`. The release index is documentation-only: no scenario execution, no fake datasets, no fake plots, and no experimental results are generated. Safety constraints remain enforced: no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
 
+### proposal_simulation_cell_v2_0_first_gazebo_motion_smoke_test
+
+Added the first intentional Gazebo-only motion smoke test. It sends one small joint-space movement for the selected sixth-axis joint, records joint-state evidence before and after motion, monitors the contact wrench topic, and writes a safety report.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_0/`. The smoke test is simulation-only: no real robot execution, no MoveIt, and no `/compute_ik` are used.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -103,7 +109,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_17/`. The
 | v1.16 | Reproducibility checklist and reviewer implementation summary | Completed |
 | v1.17 | Release documentation index | Completed |
 | v1.8 | Low-force segmented robot contact validation | Completed |
-| v2.0 | Peg/hole insertion validation instrumentation | In progress |
+| v2.0 | First Gazebo-only motion smoke test | Completed |
 | v2.3 | Coordinate-based insertion diagnostics | In progress |
 | v2.4 | Object-frame publisher for insertion targets | In progress |
 | v2.5 | IK feasibility diagnostics before motion | In progress |

@@ -1,0 +1,60 @@
+simulation_cell_name: proposal_simulation_cell_v2_0_first_gazebo_motion_smoke_test
+
+robot:
+  robot_model: KUKA LBR iisy Gazebo support model
+  gazebo_robot_model: lbr_iisy3_r760
+  proposal_selected_joint: joint_a6
+  gazebo_controller_joint: joint_6
+  controller_joint_names:
+    - joint_1
+    - joint_2
+    - joint_3
+    - joint_4
+    - joint_5
+    - joint_6
+
+gazebo_motion_test:
+  simulation_engine: gazebo
+  gazebo_only_motion_test: true
+  require_gazebo_topics: true
+  require_gazebo_sim_system: true
+  control_interface: /joint_trajectory_controller/follow_joint_trajectory
+  simulation_control_interface_used: gz_ros2_control/GazeboSimSystem via joint_trajectory_controller
+  no_cartesian_motion: true
+  no_peg_insertion: true
+  no_contact_seeking_motion: true
+
+selected_joint_motion:
+  selected_joint: joint_a6
+  controller_joint: joint_6
+  commanded_joint_delta_deg: 2.0
+  max_joint_delta_deg: 2.0
+  motion_duration_sec: 5.0
+
+safety_limits:
+  max_allowed_force_n: 50.0
+  max_allowed_torque_nm: 5.0
+  emergency_stop_force_threshold_n: 45.0
+  max_observed_joint_delta_tolerance_deg: 2.25
+
+execution_policy:
+  motion_execution_enabled: true
+  gazebo_only_motion_test: true
+  real_robot_allowed: false
+  moveit_allowed: false
+  compute_ik_allowed: false
+  follow_joint_trajectory_allowed_only_for_gazebo: true
+  real_robot_used: false
+  learning_enabled: false
+  scenario_batch_execution_enabled: false
+
+validation:
+  output_dir: diagnostics/proposal_simulation_cell_v2_0
+  status_success: first_gazebo_motion_smoke_test_validated
+  status_topic: /proposal_simulation_cell/first_motion_smoke_test_status
+  joint_delta_report_topic: /proposal_simulation_cell/first_motion_joint_delta_report
+  safety_report_topic: /proposal_simulation_cell/first_motion_safety_report
+  contact_wrench_topic: /proposal_simulation_cell/contact_wrench
+  joint_states_topic: /joint_states
+  validation_timeout_sec: 35.0
+  pre_motion_wait_sec: 2.0
