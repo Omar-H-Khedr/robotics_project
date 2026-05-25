@@ -27,6 +27,7 @@ setup(
             "proposal_simulation_cell_v1_1_validator = thesis_bringup.proposal_simulation_cell_v1_1_validator:main",
             "proposal_simulation_cell_v1_2_rgbd_validator = thesis_bringup.proposal_simulation_cell_v1_2_rgbd_validator:main",
             "proposal_simulation_cell_v1_3_contact_validator = thesis_bringup.proposal_simulation_cell_v1_3_contact_validator:main",
+            "proposal_simulation_cell_v1_5_safety_virtual_force_node = thesis_bringup.proposal_simulation_cell_v1_5_safety_virtual_force_node:main",
         ]
     },
 )
