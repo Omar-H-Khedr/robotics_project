@@ -26,6 +26,12 @@ Added the simulation-only safety status interface, contact-state classification,
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_5/`. Safety constraints remain enforced: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
 
+### proposal_simulation_cell_v1_9_no_motion_control_law_dry_run
+
+Added the simulation-only no-motion control-law dry run. It reads validated simulated inputs, generates diagnostic control-law output, generates a blocked control command, and adds safety clipping/reporting without connecting any output to controllers or execution.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_9/`. Safety constraints remain enforced: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -39,6 +45,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_5/`. Safe
 | v0.7 | Force-threshold diagnostics | Completed |
 | v0.8/v0.9 | Force-guarded and early-contact guard experiments | In progress |
 | v1.5 | Proposal simulation safety and virtual-force diagnostic interface | Completed |
+| v1.9 | No-motion control-law dry run | Completed |
 | v1.8 | Low-force segmented robot contact validation | Completed |
 | v2.0 | Peg/hole insertion validation instrumentation | In progress |
 | v2.3 | Coordinate-based insertion diagnostics | In progress |

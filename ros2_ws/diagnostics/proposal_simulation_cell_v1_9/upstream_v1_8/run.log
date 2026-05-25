@@ -1,0 +1,13 @@
+proposal_simulation_cell_v1_8 control development scaffold evidence
+elapsed_sec=20.263
+status=control_development_scaffold_pending
+all_required_inputs_available=false
+pre_control_contract_available=true
+controller_boundary_report_available=true
+command_proposal_generated=true
+command_proposal_blocked=true
+command_output_enabled=false
+motion_execution_enabled=false
+controller_execution_allowed=false
+trajectory_execution_allowed=false
+follow_joint_trajectory_allowed=false

@@ -1,0 +1,3 @@
+proposal_lbr_iisy6_r1300_robot_state_publisher
+proposal_simulation_cell_v1_8_control_scaffold_node
+proposal_simulation_cell_v1_9_control_law_dry_run_node

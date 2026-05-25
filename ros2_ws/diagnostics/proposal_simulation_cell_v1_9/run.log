@@ -1,0 +1,13 @@
+proposal_simulation_cell_v1_9 no-motion control-law dry-run evidence
+elapsed_sec=24.282
+status=no_motion_control_law_dry_run_validated
+all_required_inputs_available=true
+control_law_output_generated=true
+blocked_control_command_generated=true
+blocked_control_command_confirmed=true
+safety_report_available=true
+command_output_enabled=false
+motion_execution_enabled=false
+controller_execution_allowed=false
+trajectory_execution_allowed=false
+follow_joint_trajectory_allowed=false

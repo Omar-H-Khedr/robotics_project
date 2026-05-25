@@ -1,0 +1,76 @@
+simulation_cell_name: proposal_simulation_cell_v1_9_no_motion_control_law_dry_run
+
+robot:
+  model: KUKA LBR iisy 6 R1300
+  joint_state_topic: /joint_states
+  tf_topic: /tf
+  tf_static_topic: /tf_static
+
+control_law:
+  enabled: true
+  control_law_enabled: true
+  dry_run_only: true
+  status_topic: /proposal_simulation_cell/no_motion_control_law_status
+  dry_run_output_topic: /proposal_simulation_cell/control_law_dry_run_output
+  blocked_command_topic: /proposal_simulation_cell/blocked_control_command
+  safety_report_topic: /proposal_simulation_cell/control_law_safety_report
+  expected_contact_axis: z
+  insertion_axis_gain: 0.05
+  force_velocity_gain: 0.002
+  max_commanded_velocity_mps: 0.0
+  max_commanded_position_delta_m: 0.0
+  input_topics:
+    joint_states: /joint_states
+    tf: /tf
+    tf_static: /tf_static
+    contact_wrench: /proposal_simulation_cell/contact_wrench
+    contact_state: /proposal_simulation_cell/contact_state
+    safety_status: /proposal_simulation_cell/safety_status
+    virtual_force_command: /proposal_simulation_cell/virtual_force_command
+    admittance_command_suggestion: /proposal_simulation_cell/admittance_command_suggestion
+    readiness_gates: /proposal_simulation_cell/readiness_gates
+    proposal_readiness_status: /proposal_simulation_cell/proposal_readiness_status
+    pre_control_contract_status: /proposal_simulation_cell/pre_control_contract_status
+    control_readiness_report: /proposal_simulation_cell/control_readiness_report
+
+virtual_force:
+  enabled: true
+  topic: /proposal_simulation_cell/virtual_force_command
+  correction_gain: 0.01
+  diagnostic_only: true
+
+admittance:
+  enabled: true
+  topic: /proposal_simulation_cell/admittance_command_suggestion
+  linear_velocity_limit_mps: 0.0
+  diagnostic_only: true
+
+safety_limits:
+  max_allowed_force_n: 5.0
+  max_allowed_torque_nm: 1.0
+  contact_detection_force_threshold_n: 0.1
+  warning_force_threshold_n: 2.5
+  emergency_stop_force_threshold_n: 5.0
+  expected_contact_axis: z
+
+command_blocking:
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  trajectory_execution_allowed: false
+  follow_joint_trajectory_allowed: false
+  real_robot_allowed: false
+  moveit_allowed: false
+  compute_ik_allowed: false
+  max_commanded_velocity_mps: 0.0
+  max_commanded_position_delta_m: 0.0
+  block_reason: dry_run_only_command_output_disabled
+
+validation:
+  simulation_engine: gazebo
+  isaac_required: false
+  gazebo_fallback_used: true
+  sample_period_sec: 0.2
+  validation_duration_sec: 24.0
+  output_dir: diagnostics/proposal_simulation_cell_v1_9
+  status_success: no_motion_control_law_dry_run_validated
