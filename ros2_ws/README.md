@@ -16,6 +16,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v1_8_control_development_scaffold | Completed |
 | proposal_simulation_cell_v1_9_no_motion_control_law_dry_run | Completed |
 | proposal_simulation_cell_v1_10_experiment_configuration_matrix | Completed |
+| proposal_simulation_cell_v1_11_single_scenario_loader_validation | Completed |
+
+## proposal_simulation_cell_v1_11_single_scenario_loader_validation
+
+Status: `single_scenario_loader_validated`
+
+The v1.11 proposal simulation sprint adds a single-scenario loader. It loads the selected scenario from the v1.10 matrix and validates the selected scenario configuration.
+
+The loader is configuration-only: no fake datasets, no fake plots, and no experimental results are generated. Safety constraints remain explicit: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_11/`.
 
 ## proposal_simulation_cell_v1_10_experiment_configuration_matrix
 

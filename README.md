@@ -38,6 +38,12 @@ Added the simulation-only experiment configuration matrix for future peg-in-hole
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_10/`. The matrix is configuration-only: no fake datasets, no fake plots, and no experimental results are generated. Safety constraints remain enforced: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
 
+### proposal_simulation_cell_v1_11_single_scenario_loader_validation
+
+Added the simulation-only single-scenario loader. It loads the selected scenario from the v1.10 matrix and completes selected scenario validation.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_11/`. The loader is configuration-only: no fake datasets, no fake plots, and no experimental results are generated. Safety constraints remain enforced: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -53,6 +59,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_10/`. The
 | v1.5 | Proposal simulation safety and virtual-force diagnostic interface | Completed |
 | v1.9 | No-motion control-law dry run | Completed |
 | v1.10 | Experiment configuration matrix | Completed |
+| v1.11 | Single-scenario loader validation | Completed |
 | v1.8 | Low-force segmented robot contact validation | Completed |
 | v2.0 | Peg/hole insertion validation instrumentation | In progress |
 | v2.3 | Coordinate-based insertion diagnostics | In progress |
