@@ -1,0 +1,2 @@
+selected_joint,controller_joint,before_rad,after_rad,commanded_delta_deg,observed_delta_deg
+joint_a6,joint_6,-0.000000000,0.033775524,2.000000,1.935195
