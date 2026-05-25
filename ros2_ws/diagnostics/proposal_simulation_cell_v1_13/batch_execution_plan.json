@@ -1,0 +1,143 @@
+{
+  "configuration_only": true,
+  "dry_run_only": true,
+  "execution_plans": [
+    {
+      "angular_misalignment_deg": 0.0,
+      "clearance_mm": 0.1,
+      "contact_detection_force_threshold_n": 0.05,
+      "execution_policy": {
+        "command_output_enabled": false,
+        "compute_ik_allowed": false,
+        "configuration_only": true,
+        "controller_execution_allowed": false,
+        "dry_run_only": true,
+        "follow_joint_trajectory_allowed": false,
+        "motion_execution_enabled": false,
+        "moveit_allowed": false,
+        "real_robot_allowed": false,
+        "trajectory_execution_allowed": false
+      },
+      "insertion_depth_mm": 5.0,
+      "motion_executed": false,
+      "planned_validation_outputs": [
+        "sensor_status",
+        "contact_status",
+        "safety_status",
+        "readiness_status",
+        "no_motion_control_law_status",
+        "blocked_command_status"
+      ],
+      "required_gates": [
+        "rgbd_gate",
+        "contact_gate",
+        "safety_gate",
+        "readiness_gate",
+        "pre_control_contract_gate",
+        "command_blocker_gate"
+      ],
+      "result_policy": {
+        "experimental_result_created": false,
+        "fake_dataset_created": false,
+        "fake_plot_created": false
+      },
+      "scenario_execution_started": false,
+      "scenario_id": "v1_10_scenario_001",
+      "x_offset_mm": -1.0,
+      "y_offset_mm": -1.0
+    },
+    {
+      "angular_misalignment_deg": 1.0,
+      "clearance_mm": 0.2,
+      "contact_detection_force_threshold_n": 0.1,
+      "execution_policy": {
+        "command_output_enabled": false,
+        "compute_ik_allowed": false,
+        "configuration_only": true,
+        "controller_execution_allowed": false,
+        "dry_run_only": true,
+        "follow_joint_trajectory_allowed": false,
+        "motion_execution_enabled": false,
+        "moveit_allowed": false,
+        "real_robot_allowed": false,
+        "trajectory_execution_allowed": false
+      },
+      "insertion_depth_mm": 10.0,
+      "motion_executed": false,
+      "planned_validation_outputs": [
+        "sensor_status",
+        "contact_status",
+        "safety_status",
+        "readiness_status",
+        "no_motion_control_law_status",
+        "blocked_command_status"
+      ],
+      "required_gates": [
+        "rgbd_gate",
+        "contact_gate",
+        "safety_gate",
+        "readiness_gate",
+        "pre_control_contract_gate",
+        "command_blocker_gate"
+      ],
+      "result_policy": {
+        "experimental_result_created": false,
+        "fake_dataset_created": false,
+        "fake_plot_created": false
+      },
+      "scenario_execution_started": false,
+      "scenario_id": "v1_10_scenario_365",
+      "x_offset_mm": 0.0,
+      "y_offset_mm": 0.0
+    },
+    {
+      "angular_misalignment_deg": 2.0,
+      "clearance_mm": 0.5,
+      "contact_detection_force_threshold_n": 0.2,
+      "execution_policy": {
+        "command_output_enabled": false,
+        "compute_ik_allowed": false,
+        "configuration_only": true,
+        "controller_execution_allowed": false,
+        "dry_run_only": true,
+        "follow_joint_trajectory_allowed": false,
+        "motion_execution_enabled": false,
+        "moveit_allowed": false,
+        "real_robot_allowed": false,
+        "trajectory_execution_allowed": false
+      },
+      "insertion_depth_mm": 20.0,
+      "motion_executed": false,
+      "planned_validation_outputs": [
+        "sensor_status",
+        "contact_status",
+        "safety_status",
+        "readiness_status",
+        "no_motion_control_law_status",
+        "blocked_command_status"
+      ],
+      "required_gates": [
+        "rgbd_gate",
+        "contact_gate",
+        "safety_gate",
+        "readiness_gate",
+        "pre_control_contract_gate",
+        "command_blocker_gate"
+      ],
+      "result_policy": {
+        "experimental_result_created": false,
+        "fake_dataset_created": false,
+        "fake_plot_created": false
+      },
+      "scenario_execution_started": false,
+      "scenario_id": "v1_10_scenario_729",
+      "x_offset_mm": 1.0,
+      "y_offset_mm": 1.0
+    }
+  ],
+  "experimental_result_created": false,
+  "fake_dataset_created": false,
+  "fake_plot_created": false,
+  "plan_type": "configuration_only_execution_plan",
+  "selected_scenario_count": 3
+}
