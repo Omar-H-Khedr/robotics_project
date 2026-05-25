@@ -39,6 +39,7 @@ setup(
             "proposal_simulation_cell_v1_14_batch_dry_run_orchestrator_node = thesis_bringup.proposal_simulation_cell_v1_14_batch_dry_run_orchestrator_node:main",
             "proposal_simulation_cell_v1_15_evidence_package_node = thesis_bringup.proposal_simulation_cell_v1_15_evidence_package_node:main",
             "proposal_simulation_cell_v1_16_reproducibility_checklist_node = thesis_bringup.proposal_simulation_cell_v1_16_reproducibility_checklist_node:main",
+            "proposal_simulation_cell_v1_17_release_index_node = thesis_bringup.proposal_simulation_cell_v1_17_release_index_node:main",
         ]
     },
 )

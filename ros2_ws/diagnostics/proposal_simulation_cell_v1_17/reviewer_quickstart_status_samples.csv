@@ -1,0 +1,17 @@
+elapsed_sec,reviewer_quickstart_written,release_index_written,evidence_package_found,reproducibility_checklist_found,status
+0.203,true,true,true,true,release_documentation_index_pending
+0.402,true,true,true,true,release_documentation_index_pending
+0.601,true,true,true,true,release_documentation_index_pending
+0.801,true,true,true,true,release_documentation_index_pending
+1.002,true,true,true,true,release_documentation_index_pending
+1.201,true,true,true,true,release_documentation_index_pending
+1.402,true,true,true,true,release_documentation_index_pending
+1.601,true,true,true,true,release_documentation_index_pending
+1.801,true,true,true,true,release_documentation_index_pending
+2.002,true,true,true,true,release_documentation_index_pending
+2.202,true,true,true,true,release_documentation_index_pending
+2.402,true,true,true,true,release_documentation_index_pending
+2.602,true,true,true,true,release_documentation_index_pending
+2.802,true,true,true,true,release_documentation_index_pending
+3.002,true,true,true,true,release_documentation_index_pending
+3.003,true,true,true,true,release_documentation_index_validated

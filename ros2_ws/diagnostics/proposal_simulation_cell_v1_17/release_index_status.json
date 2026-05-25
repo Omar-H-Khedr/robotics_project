@@ -1,0 +1,23 @@
+{
+  "command_output_enabled": false,
+  "compute_ik_called": false,
+  "controller_execution_allowed": false,
+  "evidence_package_found": true,
+  "experimental_result_created": false,
+  "fake_dataset_created": false,
+  "fake_plot_created": false,
+  "main_readme_found": true,
+  "motion_execution_enabled": false,
+  "moveit_used": false,
+  "no_false_claims_statement_written": true,
+  "real_robot_used": false,
+  "real_robot_validation_claimed": false,
+  "release_index_written": true,
+  "reproducibility_checklist_found": true,
+  "reviewer_quickstart_written": true,
+  "scenario_execution_claimed": false,
+  "sprint_traceability_written": true,
+  "status": "release_documentation_index_validated",
+  "v1_4_marked_absent": true,
+  "workspace_readme_found": true
+}
