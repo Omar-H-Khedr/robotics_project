@@ -1,0 +1,16 @@
+elapsed_sec,selected_scenario_id,scenario_matrix_yaml_found,scenario_matrix_csv_found,selected_scenario_found,selected_scenario_validated,command_output_enabled,motion_execution_enabled,fake_dataset_created,fake_plot_created,experimental_result_created,status
+1.300,v1_10_scenario_001,true,true,true,true,false,false,false,false,false,single_scenario_loader_validated
+1.500,v1_10_scenario_001,true,true,true,true,false,false,false,false,false,single_scenario_loader_validated
+1.699,v1_10_scenario_001,true,true,true,true,false,false,false,false,false,single_scenario_loader_validated
+1.900,v1_10_scenario_001,true,true,true,true,false,false,false,false,false,single_scenario_loader_validated
+2.100,v1_10_scenario_001,true,true,true,true,false,false,false,false,false,single_scenario_loader_validated
+2.300,v1_10_scenario_001,true,true,true,true,false,false,false,false,false,single_scenario_loader_validated
+2.500,v1_10_scenario_001,true,true,true,true,false,false,false,false,false,single_scenario_loader_validated
+2.699,v1_10_scenario_001,true,true,true,true,false,false,false,false,false,single_scenario_loader_validated
+2.899,v1_10_scenario_001,true,true,true,true,false,false,false,false,false,single_scenario_loader_validated
+3.099,v1_10_scenario_001,true,true,true,true,false,false,false,false,false,single_scenario_loader_validated
+3.300,v1_10_scenario_001,true,true,true,true,false,false,false,false,false,single_scenario_loader_validated
+3.500,v1_10_scenario_001,true,true,true,true,false,false,false,false,false,single_scenario_loader_validated
+3.700,v1_10_scenario_001,true,true,true,true,false,false,false,false,false,single_scenario_loader_validated
+3.899,v1_10_scenario_001,true,true,true,true,false,false,false,false,false,single_scenario_loader_validated
+4.100,v1_10_scenario_001,true,true,true,true,false,false,false,false,false,single_scenario_loader_validated

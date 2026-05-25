@@ -1,0 +1,16 @@
+elapsed_sec,selected_scenario_id,selected_scenario_found,selected_scenario_validated,require_rgbd,require_contact_gate,require_safety_gate,require_readiness_gate,require_pre_control_contract,fake_dataset_created,fake_plot_created,experimental_result_created,status
+1.300,v1_10_scenario_001,true,true,true,true,true,true,true,false,false,false,selected_scenario_validation_passed
+1.500,v1_10_scenario_001,true,true,true,true,true,true,true,false,false,false,selected_scenario_validation_passed
+1.699,v1_10_scenario_001,true,true,true,true,true,true,true,false,false,false,selected_scenario_validation_passed
+1.900,v1_10_scenario_001,true,true,true,true,true,true,true,false,false,false,selected_scenario_validation_passed
+2.100,v1_10_scenario_001,true,true,true,true,true,true,true,false,false,false,selected_scenario_validation_passed
+2.300,v1_10_scenario_001,true,true,true,true,true,true,true,false,false,false,selected_scenario_validation_passed
+2.500,v1_10_scenario_001,true,true,true,true,true,true,true,false,false,false,selected_scenario_validation_passed
+2.699,v1_10_scenario_001,true,true,true,true,true,true,true,false,false,false,selected_scenario_validation_passed
+2.899,v1_10_scenario_001,true,true,true,true,true,true,true,false,false,false,selected_scenario_validation_passed
+3.099,v1_10_scenario_001,true,true,true,true,true,true,true,false,false,false,selected_scenario_validation_passed
+3.300,v1_10_scenario_001,true,true,true,true,true,true,true,false,false,false,selected_scenario_validation_passed
+3.500,v1_10_scenario_001,true,true,true,true,true,true,true,false,false,false,selected_scenario_validation_passed
+3.700,v1_10_scenario_001,true,true,true,true,true,true,true,false,false,false,selected_scenario_validation_passed
+3.899,v1_10_scenario_001,true,true,true,true,true,true,true,false,false,false,selected_scenario_validation_passed
+4.100,v1_10_scenario_001,true,true,true,true,true,true,true,false,false,false,selected_scenario_validation_passed

@@ -1,0 +1,32 @@
+selected_scenario_id: v1_10_scenario_001
+selected_scenario_found: true
+configuration_only: true
+fake_dataset_created: false
+fake_plot_created: false
+experimental_result_created: false
+selected_scenario:
+  scenario_id: v1_10_scenario_001
+  clearance_mm: 0.1
+  x_offset_mm: -1.0
+  y_offset_mm: -1.0
+  angular_misalignment_deg: 0.0
+  insertion_depth_mm: 5.0
+  contact_detection_force_threshold_n: 0.05
+  max_allowed_force_n: 50.0
+  max_allowed_torque_nm: 5.0
+  require_rgbd: true
+  require_contact_gate: true
+  require_safety_gate: true
+  require_readiness_gate: true
+  require_pre_control_contract: true
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  trajectory_execution_allowed: false
+  follow_joint_trajectory_allowed: false
+  real_robot_allowed: false
+  moveit_allowed: false
+  compute_ik_allowed: false
+  fake_dataset_created: false
+  fake_plot_created: false
+  experimental_result_created: false

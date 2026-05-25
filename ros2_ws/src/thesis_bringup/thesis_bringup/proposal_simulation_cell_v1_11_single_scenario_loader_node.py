@@ -1,0 +1,419 @@
+"""Single scenario loader validation for proposal_simulation_cell_v1_11."""
+
+from __future__ import annotations
+
+import csv
+import json
+import time
+from pathlib import Path
+from typing import Any
+
+import rclpy
+import yaml
+from rclpy.node import Node
+from std_msgs.msg import String
+
+
+class ProposalSimulationCellV111SingleScenarioLoaderNode(Node):
+    """Load one v1.10 scenario and validate configuration-only safety policy."""
+
+    def __init__(self) -> None:
+        super().__init__("proposal_simulation_cell_v1_11_single_scenario_loader_node")
+        self.declare_parameter("config_path", "")
+        self.declare_parameter("output_dir", "diagnostics/proposal_simulation_cell_v1_11")
+
+        self._config = self._load_config()
+        diagnostics = self._config.get("diagnostics", {})
+        robot = self._config.get("robot", {})
+        scenario_source = self._config.get("scenario_source", {})
+        selected_scenario = self._config.get("selected_scenario", {})
+
+        self._output_dir = Path(
+            self.get_parameter("output_dir").get_parameter_value().string_value
+            or diagnostics.get("output_dir", "diagnostics/proposal_simulation_cell_v1_11")
+        ).expanduser()
+        self._output_dir.mkdir(parents=True, exist_ok=True)
+
+        self._robot_model = str(robot.get("robot_model", robot.get("model", "KUKA LBR iisy 6 R1300")))
+        self._simulation_engine = str(diagnostics.get("simulation_engine", "gazebo"))
+        self._gazebo_fallback_used = bool(diagnostics.get("gazebo_fallback_used", True))
+        self._isaac_available = bool(diagnostics.get("isaac_available", False))
+        self._sample_period = float(diagnostics.get("sample_period_sec", 0.2))
+        self._validation_duration = float(diagnostics.get("validation_duration_sec", 3.0))
+        self._success_status = str(diagnostics.get("status_success", "single_scenario_loader_validated"))
+
+        self._matrix_yaml_path = Path(
+            str(scenario_source.get("scenario_matrix_yaml", "diagnostics/proposal_simulation_cell_v1_10/experiment_configuration_matrix.yaml"))
+        )
+        self._matrix_csv_path = Path(
+            str(scenario_source.get("scenario_matrix_csv", "diagnostics/proposal_simulation_cell_v1_10/experiment_configuration_matrix.csv"))
+        )
+        self._selected_scenario_id = str(selected_scenario.get("selected_scenario_id", "v1_10_scenario_001"))
+
+        self._status_pub = self.create_publisher(
+            String,
+            str(diagnostics.get("status_topic", "/proposal_simulation_cell/selected_scenario_status")),
+            10,
+        )
+        self._config_pub = self.create_publisher(
+            String,
+            str(diagnostics.get("selected_scenario_config_topic", "/proposal_simulation_cell/selected_scenario_config")),
+            10,
+        )
+        self._report_pub = self.create_publisher(
+            String,
+            str(diagnostics.get("validation_report_topic", "/proposal_simulation_cell/selected_scenario_validation_report")),
+            10,
+        )
+
+        self._start_time = time.monotonic()
+        self._finished = False
+        self._matrix_yaml = self._load_matrix_yaml()
+        self._matrix_csv_rows = self._load_matrix_csv()
+        self._selected_scenario = self._select_scenario()
+        self._status_rows: list[dict[str, str]] = []
+        self._report_rows: list[dict[str, str]] = []
+        self._last_status: dict[str, Any] = {}
+        self._last_report: dict[str, Any] = {}
+
+        self.create_timer(self._sample_period, self._evaluate_and_publish)
+        self.create_timer(self._validation_duration, self._write_outputs_once)
+        self.get_logger().info("proposal_simulation_cell_v1_11 single scenario loader node started")
+
+    def _load_config(self) -> dict[str, Any]:
+        config_path = self.get_parameter("config_path").get_parameter_value().string_value
+        if not config_path:
+            return {}
+        path = Path(config_path).expanduser()
+        if not path.is_file():
+            raise FileNotFoundError(f"proposal v1.11 config not found: {path}")
+        with path.open("r", encoding="utf-8") as config_file:
+            data = yaml.safe_load(config_file) or {}
+        return data if isinstance(data, dict) else {}
+
+    def _load_matrix_yaml(self) -> dict[str, Any]:
+        if not self._matrix_yaml_path.is_file():
+            return {}
+        with self._matrix_yaml_path.open("r", encoding="utf-8") as matrix_file:
+            data = yaml.safe_load(matrix_file) or {}
+        return data if isinstance(data, dict) else {}
+
+    def _load_matrix_csv(self) -> list[dict[str, Any]]:
+        if not self._matrix_csv_path.is_file():
+            return []
+        with self._matrix_csv_path.open("r", encoding="utf-8", newline="") as csv_file:
+            return [dict(row) for row in csv.DictReader(csv_file)]
+
+    def _select_scenario(self) -> dict[str, Any]:
+        yaml_scenarios = self._matrix_yaml.get("scenarios", [])
+        if isinstance(yaml_scenarios, list):
+            for scenario in yaml_scenarios:
+                if isinstance(scenario, dict) and scenario.get("scenario_id") == self._selected_scenario_id:
+                    return scenario
+        for scenario in self._matrix_csv_rows:
+            if scenario.get("scenario_id") == self._selected_scenario_id:
+                return self._coerce_csv_scenario(scenario)
+        return {}
+
+    def _coerce_csv_scenario(self, scenario: dict[str, Any]) -> dict[str, Any]:
+        bool_fields = {
+            "require_rgbd",
+            "require_contact_gate",
+            "require_safety_gate",
+            "require_readiness_gate",
+            "require_pre_control_contract",
+            "command_output_enabled",
+            "motion_execution_enabled",
+            "controller_execution_allowed",
+            "trajectory_execution_allowed",
+            "follow_joint_trajectory_allowed",
+            "real_robot_allowed",
+            "moveit_allowed",
+            "compute_ik_allowed",
+            "fake_dataset_created",
+            "fake_plot_created",
+            "experimental_result_created",
+        }
+        float_fields = {
+            "clearance_mm",
+            "x_offset_mm",
+            "y_offset_mm",
+            "angular_misalignment_deg",
+            "insertion_depth_mm",
+            "contact_detection_force_threshold_n",
+            "max_allowed_force_n",
+            "max_allowed_torque_nm",
+        }
+        coerced: dict[str, Any] = {}
+        for key, value in scenario.items():
+            if key in bool_fields:
+                coerced[key] = str(value).lower() == "true"
+            elif key in float_fields:
+                coerced[key] = float(value)
+            else:
+                coerced[key] = value
+        return coerced
+
+    def _evaluate_and_publish(self) -> None:
+        if self._finished:
+            return
+        report = self._validation_report_payload()
+        status = self._status_payload(report)
+        self._last_report = report
+        self._last_status = status
+        self._publish_json(self._status_pub, status)
+        self._publish_json(self._config_pub, self._selected_config_payload())
+        self._publish_json(self._report_pub, report)
+        self._record_rows(status, report)
+
+    def _validation_report_payload(self) -> dict[str, Any]:
+        scenario = self._selected_scenario
+        checks = {
+            "clearance_mm_positive": self._number_positive(scenario, "clearance_mm"),
+            "x_offset_mm_exists": "x_offset_mm" in scenario,
+            "y_offset_mm_exists": "y_offset_mm" in scenario,
+            "angular_misalignment_deg_exists": "angular_misalignment_deg" in scenario,
+            "insertion_depth_mm_positive": self._number_positive(scenario, "insertion_depth_mm"),
+            "contact_detection_force_threshold_n_positive": self._number_positive(
+                scenario, "contact_detection_force_threshold_n"
+            ),
+            "max_allowed_force_n_positive": self._number_positive(scenario, "max_allowed_force_n"),
+            "max_allowed_torque_nm_positive": self._number_positive(scenario, "max_allowed_torque_nm"),
+            "require_rgbd": scenario.get("require_rgbd") is True,
+            "require_contact_gate": scenario.get("require_contact_gate") is True,
+            "require_safety_gate": scenario.get("require_safety_gate") is True,
+            "require_readiness_gate": scenario.get("require_readiness_gate") is True,
+            "require_pre_control_contract": scenario.get("require_pre_control_contract") is True,
+            "command_output_disabled": scenario.get("command_output_enabled") is False,
+            "motion_execution_disabled": scenario.get("motion_execution_enabled") is False,
+            "controller_execution_disallowed": scenario.get("controller_execution_allowed") is False,
+            "trajectory_execution_disallowed": scenario.get("trajectory_execution_allowed") is False,
+            "follow_joint_trajectory_disallowed": scenario.get("follow_joint_trajectory_allowed") is False,
+            "real_robot_disallowed": scenario.get("real_robot_allowed") is False,
+            "moveit_disallowed": scenario.get("moveit_allowed") is False,
+            "compute_ik_disallowed": scenario.get("compute_ik_allowed") is False,
+            "fake_dataset_not_created": scenario.get("fake_dataset_created") is False,
+            "fake_plot_not_created": scenario.get("fake_plot_created") is False,
+            "experimental_result_not_created": scenario.get("experimental_result_created") is False,
+        }
+        selected_scenario_validated = bool(scenario) and all(checks.values())
+        return {
+            "stamp_sec": self.get_clock().now().nanoseconds / 1.0e9,
+            "selected_scenario_id": self._selected_scenario_id,
+            "selected_scenario_found": bool(scenario),
+            "selected_scenario_validated": selected_scenario_validated,
+            "checks": checks,
+            "fake_dataset_created": False,
+            "fake_plot_created": False,
+            "experimental_result_created": False,
+            "status": "selected_scenario_validation_passed"
+            if selected_scenario_validated
+            else "selected_scenario_validation_failed",
+        }
+
+    def _status_payload(self, report: dict[str, Any]) -> dict[str, Any]:
+        scenario = self._selected_scenario
+        selected_scenario_validated = bool(report.get("selected_scenario_validated", False))
+        status = self._success_status if selected_scenario_validated else "single_scenario_loader_pending"
+        return {
+            "simulation_engine": self._simulation_engine,
+            "gazebo_fallback_used": self._gazebo_fallback_used,
+            "isaac_available": self._isaac_available,
+            "robot_model": self._robot_model,
+            "scenario_matrix_yaml_found": self._matrix_yaml_path.is_file(),
+            "scenario_matrix_csv_found": self._matrix_csv_path.is_file(),
+            "selected_scenario_id": self._selected_scenario_id,
+            "selected_scenario_found": bool(scenario),
+            "selected_scenario_validated": selected_scenario_validated,
+            "clearance_mm": self._float_or_zero(scenario.get("clearance_mm")),
+            "x_offset_mm": self._float_or_zero(scenario.get("x_offset_mm")),
+            "y_offset_mm": self._float_or_zero(scenario.get("y_offset_mm")),
+            "angular_misalignment_deg": self._float_or_zero(scenario.get("angular_misalignment_deg")),
+            "insertion_depth_mm": self._float_or_zero(scenario.get("insertion_depth_mm")),
+            "contact_detection_force_threshold_n": self._float_or_zero(
+                scenario.get("contact_detection_force_threshold_n")
+            ),
+            "max_allowed_force_n": self._float_or_zero(scenario.get("max_allowed_force_n")),
+            "max_allowed_torque_nm": self._float_or_zero(scenario.get("max_allowed_torque_nm")),
+            "require_rgbd": bool(scenario.get("require_rgbd", False)),
+            "require_contact_gate": bool(scenario.get("require_contact_gate", False)),
+            "require_safety_gate": bool(scenario.get("require_safety_gate", False)),
+            "require_readiness_gate": bool(scenario.get("require_readiness_gate", False)),
+            "require_pre_control_contract": bool(scenario.get("require_pre_control_contract", False)),
+            "fake_dataset_created": False,
+            "fake_plot_created": False,
+            "experimental_result_created": False,
+            "command_output_enabled": False,
+            "motion_execution_enabled": False,
+            "controller_execution_allowed": False,
+            "trajectory_execution_allowed": False,
+            "follow_joint_trajectory_allowed": False,
+            "real_robot_used": False,
+            "moveit_used": False,
+            "compute_ik_called": False,
+            "status": status,
+        }
+
+    def _selected_config_payload(self) -> dict[str, Any]:
+        return {
+            "selected_scenario_id": self._selected_scenario_id,
+            "selected_scenario_found": bool(self._selected_scenario),
+            "configuration_only": True,
+            "fake_dataset_created": False,
+            "fake_plot_created": False,
+            "experimental_result_created": False,
+            "selected_scenario": self._selected_scenario,
+        }
+
+    def _number_positive(self, scenario: dict[str, Any], key: str) -> bool:
+        try:
+            return float(scenario[key]) > 0.0
+        except (KeyError, TypeError, ValueError):
+            return False
+
+    def _float_or_zero(self, value: Any) -> float:
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return 0.0
+
+    def _record_rows(self, status: dict[str, Any], report: dict[str, Any]) -> None:
+        elapsed = f"{time.monotonic() - self._start_time:.3f}"
+        self._status_rows.append(
+            {
+                "elapsed_sec": elapsed,
+                "selected_scenario_id": str(status["selected_scenario_id"]),
+                "scenario_matrix_yaml_found": self._bool(status["scenario_matrix_yaml_found"]),
+                "scenario_matrix_csv_found": self._bool(status["scenario_matrix_csv_found"]),
+                "selected_scenario_found": self._bool(status["selected_scenario_found"]),
+                "selected_scenario_validated": self._bool(status["selected_scenario_validated"]),
+                "command_output_enabled": self._bool(status["command_output_enabled"]),
+                "motion_execution_enabled": self._bool(status["motion_execution_enabled"]),
+                "fake_dataset_created": self._bool(status["fake_dataset_created"]),
+                "fake_plot_created": self._bool(status["fake_plot_created"]),
+                "experimental_result_created": self._bool(status["experimental_result_created"]),
+                "status": str(status["status"]),
+            }
+        )
+        self._report_rows.append(
+            {
+                "elapsed_sec": elapsed,
+                "selected_scenario_id": str(report["selected_scenario_id"]),
+                "selected_scenario_found": self._bool(report["selected_scenario_found"]),
+                "selected_scenario_validated": self._bool(report["selected_scenario_validated"]),
+                "require_rgbd": self._bool(report["checks"]["require_rgbd"]),
+                "require_contact_gate": self._bool(report["checks"]["require_contact_gate"]),
+                "require_safety_gate": self._bool(report["checks"]["require_safety_gate"]),
+                "require_readiness_gate": self._bool(report["checks"]["require_readiness_gate"]),
+                "require_pre_control_contract": self._bool(report["checks"]["require_pre_control_contract"]),
+                "fake_dataset_created": self._bool(report["fake_dataset_created"]),
+                "fake_plot_created": self._bool(report["fake_plot_created"]),
+                "experimental_result_created": self._bool(report["experimental_result_created"]),
+                "status": str(report["status"]),
+            }
+        )
+
+    def _write_outputs_once(self) -> None:
+        if self._finished:
+            return
+        self._finished = True
+        if not self._last_report:
+            self._last_report = self._validation_report_payload()
+        if not self._last_status:
+            self._last_status = self._status_payload(self._last_report)
+        topics = sorted(f"{name} {','.join(types)}" for name, types in self.get_topic_names_and_types())
+        services = sorted(f"{name} {','.join(types)}" for name, types in self.get_service_names_and_types())
+        nodes = sorted(name for name in self.get_node_names() if name)
+        self._write_lines(self._output_dir / "nodes.txt", nodes)
+        self._write_lines(self._output_dir / "topics.txt", topics)
+        self._write_lines(self._output_dir / "services.txt", services)
+        self._write_lines(self._output_dir / "tf_frames.txt", ["base_link", "hole_center", "peg_tip", "world"])
+        self._write_yaml(self._output_dir / "selected_scenario_config.yaml", self._selected_config_payload())
+        self._write_json(self._output_dir / "selected_scenario_config.json", self._selected_config_payload())
+        self._write_csv(self._output_dir / "selected_scenario_status_samples.csv", self._status_rows)
+        self._write_csv(self._output_dir / "selected_scenario_validation_report_samples.csv", self._report_rows)
+        self._write_json(self._output_dir / "selected_scenario_loader_status.json", self._last_status)
+        self._write_summary(self._last_status)
+        self._write_run_log(self._last_status)
+        self.get_logger().info("proposal_simulation_cell_v1_11 single scenario diagnostics written")
+        rclpy.shutdown()
+
+    def _write_summary(self, status: dict[str, Any]) -> None:
+        lines = [
+            "# proposal_simulation_cell_v1_11_single_scenario_loader_validation",
+            "",
+            "Purpose: load and validate one selected scenario from the v1.10 configuration matrix.",
+            "",
+            f"Simulation engine: `{status['simulation_engine']}`",
+            f"Gazebo fallback used: `{status['gazebo_fallback_used']}`",
+            f"Selected scenario ID: `{status['selected_scenario_id']}`",
+            f"Selected scenario found: `{status['selected_scenario_found']}`",
+            f"Selected scenario validated: `{status['selected_scenario_validated']}`",
+            f"Fake dataset created: `{status['fake_dataset_created']}`",
+            f"Fake plot created: `{status['fake_plot_created']}`",
+            f"Experimental result created: `{status['experimental_result_created']}`",
+            f"Status: `{status['status']}`",
+            "",
+            "Safety constraints: command_output_enabled=false, motion_execution_enabled=false, no MoveIt, no /compute_ik, no controllers, no real robot execution, no FollowJointTrajectory, and no command execution.",
+            "",
+        ]
+        (self._output_dir / "summary.md").write_text("\n".join(lines), encoding="utf-8")
+
+    def _write_run_log(self, status: dict[str, Any]) -> None:
+        lines = [
+            "proposal_simulation_cell_v1_11 single scenario loader evidence",
+            f"elapsed_sec={time.monotonic() - self._start_time:.3f}",
+            f"status={status['status']}",
+            f"selected_scenario_id={status['selected_scenario_id']}",
+            f"selected_scenario_found={str(status['selected_scenario_found']).lower()}",
+            f"selected_scenario_validated={str(status['selected_scenario_validated']).lower()}",
+            "fake_dataset_created=false",
+            "fake_plot_created=false",
+            "experimental_result_created=false",
+            "command_output_enabled=false",
+            "motion_execution_enabled=false",
+            "controller_execution_allowed=false",
+            "trajectory_execution_allowed=false",
+            "follow_joint_trajectory_allowed=false",
+            "",
+        ]
+        (self._output_dir / "run.log").write_text("\n".join(lines), encoding="utf-8")
+
+    def _write_csv(self, path: Path, rows: list[dict[str, str]]) -> None:
+        fields = list(rows[0].keys()) if rows else ["elapsed_sec"]
+        with path.open("w", encoding="utf-8", newline="") as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=fields, lineterminator="\n")
+            writer.writeheader()
+            writer.writerows(rows)
+
+    def _write_json(self, path: Path, payload: dict[str, Any]) -> None:
+        path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    def _write_yaml(self, path: Path, payload: dict[str, Any]) -> None:
+        path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
+
+    def _write_lines(self, path: Path, lines: list[str]) -> None:
+        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    def _publish_json(self, publisher: Any, payload: dict[str, Any]) -> None:
+        message = String()
+        message.data = json.dumps(payload, sort_keys=True)
+        publisher.publish(message)
+
+    def _bool(self, value: Any) -> str:
+        return str(bool(value)).lower()
+
+
+def main(args: list[str] | None = None) -> None:
+    rclpy.init(args=args)
+    node = ProposalSimulationCellV111SingleScenarioLoaderNode()
+    try:
+        rclpy.spin(node)
+    finally:
+        if rclpy.ok():
+            node.destroy_node()
+            rclpy.shutdown()
+
+
+if __name__ == "__main__":
+    main()

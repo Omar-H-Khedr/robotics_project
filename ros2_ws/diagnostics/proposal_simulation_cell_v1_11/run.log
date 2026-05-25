@@ -1,0 +1,14 @@
+proposal_simulation_cell_v1_11 single scenario loader evidence
+elapsed_sec=4.105
+status=single_scenario_loader_validated
+selected_scenario_id=v1_10_scenario_001
+selected_scenario_found=true
+selected_scenario_validated=true
+fake_dataset_created=false
+fake_plot_created=false
+experimental_result_created=false
+command_output_enabled=false
+motion_execution_enabled=false
+controller_execution_allowed=false
+trajectory_execution_allowed=false
+follow_joint_trajectory_allowed=false
