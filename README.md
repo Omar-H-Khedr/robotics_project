@@ -74,6 +74,12 @@ Added the simulation-only reproducibility checklist and reviewer-facing implemen
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_16/`. The checklist is diagnostic-only: no scenario execution, no fake datasets, no fake plots, and no experimental results are generated. Safety constraints remain enforced: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
 
+### proposal_simulation_cell_v1_17_release_documentation_index
+
+Added the simulation-only release documentation index, reviewer quickstart, sprint traceability, and no-false-claims statement. The documentation links the v1.15 evidence package at `ros2_ws/diagnostics/proposal_simulation_cell_v1_15/` and the v1.16 reproducibility checklist at `ros2_ws/diagnostics/proposal_simulation_cell_v1_16/`, and confirms that v1.4 remains absent/not implemented.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_17/`. The release index is documentation-only: no scenario execution, no fake datasets, no fake plots, and no experimental results are generated. Safety constraints remain enforced: no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -95,6 +101,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_16/`. The
 | v1.14 | Batch dry-run orchestrator | Completed |
 | v1.15 | Evidence package generator | Completed |
 | v1.16 | Reproducibility checklist and reviewer implementation summary | Completed |
+| v1.17 | Release documentation index | Completed |
 | v1.8 | Low-force segmented robot contact validation | Completed |
 | v2.0 | Peg/hole insertion validation instrumentation | In progress |
 | v2.3 | Coordinate-based insertion diagnostics | In progress |

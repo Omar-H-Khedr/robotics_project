@@ -1,0 +1,55 @@
+simulation_cell_name: proposal_simulation_cell_v1_17_release_documentation_index
+
+paths:
+  main_readme: ../README.md
+  workspace_readme: README.md
+  release_index: ../docs/proposal_simulation_cell_release_index.md
+  reviewer_quickstart: ../docs/proposal_simulation_cell_reviewer_quickstart.md
+  sprint_traceability: ../docs/proposal_simulation_cell_sprint_traceability.md
+  no_false_claims_statement: ../docs/proposal_simulation_cell_no_false_claims_statement.md
+  evidence_package_dir: diagnostics/proposal_simulation_cell_v1_15
+  reproducibility_checklist_dir: diagnostics/proposal_simulation_cell_v1_16
+
+sprint_registry:
+  completed_sprints:
+    - v1.0
+    - v1.1
+    - v1.2
+    - v1.3
+    - v1.5
+    - v1.6
+    - v1.7
+    - v1.8
+    - v1.9
+    - v1.10
+    - v1.11
+    - v1.12
+    - v1.13
+    - v1.14
+    - v1.15
+    - v1.16
+  absent_or_not_implemented_sprints:
+    - v1.4
+
+result_policy:
+  fake_dataset_created: false
+  fake_plot_created: false
+  experimental_result_created: false
+  scenario_execution_claimed: false
+  real_robot_validation_claimed: false
+
+disabled_execution_policy:
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  real_robot_used: false
+  moveit_used: false
+  compute_ik_called: false
+
+validation:
+  sample_period_sec: 0.2
+  validation_duration_sec: 3.0
+  output_dir: diagnostics/proposal_simulation_cell_v1_17
+  status_success: release_documentation_index_validated
+  release_index_status_topic: /proposal_simulation_cell/release_index_status
+  reviewer_quickstart_status_topic: /proposal_simulation_cell/reviewer_quickstart_status

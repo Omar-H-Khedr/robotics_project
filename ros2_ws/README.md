@@ -22,6 +22,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v1_14_batch_dry_run_orchestrator | Completed |
 | proposal_simulation_cell_v1_15_evidence_package_generator | Completed |
 | proposal_simulation_cell_v1_16_reproducibility_checklist | Completed |
+| proposal_simulation_cell_v1_17_release_documentation_index | Completed |
+
+## proposal_simulation_cell_v1_17_release_documentation_index
+
+Status: `release_documentation_index_validated`
+
+The v1.17 proposal simulation sprint adds a release documentation index, reviewer quickstart, sprint traceability, and no-false-claims statement. The documents link the v1.15 evidence package and v1.16 reproducibility checklist, summarize completed sprints v1.0, v1.1, v1.2, v1.3, and v1.5 through v1.16, and confirm that v1.4 remains absent/not implemented.
+
+The release index is documentation-only: no scenario execution, no fake datasets, no fake plots, and no experimental results are generated. Safety constraints remain explicit: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, no `FollowJointTrajectory`, and no real robot execution.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_17/`.
 
 ## proposal_simulation_cell_v1_16_reproducibility_checklist
 

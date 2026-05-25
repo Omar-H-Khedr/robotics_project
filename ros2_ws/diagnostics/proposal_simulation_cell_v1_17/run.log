@@ -1,0 +1,21 @@
+proposal_simulation_cell_v1_17 release documentation index evidence
+elapsed_sec=3.005
+status=release_documentation_index_validated
+release_index_written=true
+reviewer_quickstart_written=true
+sprint_traceability_written=true
+no_false_claims_statement_written=true
+evidence_package_found=true
+reproducibility_checklist_found=true
+v1_4_marked_absent=true
+fake_dataset_created=false
+fake_plot_created=false
+experimental_result_created=false
+scenario_execution_claimed=false
+real_robot_validation_claimed=false
+command_output_enabled=false
+motion_execution_enabled=false
+controller_execution_allowed=false
+real_robot_used=false
+moveit_used=false
+compute_ik_called=false
