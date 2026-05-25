@@ -1,0 +1,31 @@
+group_name: manipulator
+ik_link_name: tool0
+frame_id: base_link
+avoid_collisions: false
+timeout_sec: 2.0
+configured_attempts: 1
+seed_joint_names:
+- joint_1
+- joint_2
+- joint_3
+- joint_4
+- joint_5
+- joint_6
+seed_joint_positions:
+- 0.0
+- -0.7
+- 1.1
+- 0.0
+- 0.7
+- 0.0
+target_pose:
+  position:
+    x: 0.36
+    y: 0.0
+    z: 0.42
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+diagnostic_only: true

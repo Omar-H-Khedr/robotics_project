@@ -25,6 +25,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v1_17_release_documentation_index | Completed |
 | proposal_simulation_cell_v2_0_first_gazebo_motion_smoke_test | Completed |
 | proposal_simulation_cell_v2_1_gazebo_motion_validation_suite | Completed |
+| proposal_simulation_cell_v2_2_moveit_ik_diagnostic_validation | Completed |
+
+## proposal_simulation_cell_v2_2_moveit_ik_diagnostic_validation
+
+Status: `moveit_ik_diagnostic_validated`
+
+The v2.2 proposal simulation sprint adds diagnostic-only MoveIt IK validation. It loads the diagnostic MoveIt model, starts `move_group` with trajectory execution disabled, verifies `/compute_ik`, and records the IK request and response.
+
+No real robot execution, controller execution, trajectory execution, `FollowJointTrajectory` execution, peg insertion, contact-seeking motion, learning, or scenario batch execution is used.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_2/`.
 
 ## proposal_simulation_cell_v2_1_gazebo_motion_validation_suite
 

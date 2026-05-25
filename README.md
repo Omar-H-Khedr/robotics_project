@@ -92,6 +92,12 @@ Added the Gazebo-only motion validation suite. It tests single forward and retur
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_1/`. The suite is simulation-only: no real robot execution, no MoveIt, and no `/compute_ik` are used.
 
+### proposal_simulation_cell_v2_2_moveit_ik_diagnostic_validation
+
+Added MoveIt IK diagnostic validation. The sprint loads the diagnostic MoveIt model, starts `move_group` with trajectory execution disabled, tests `/compute_ik` as a diagnostic service call, and records the IK request and response without sending any trajectory.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_2/`. The diagnostic remains non-executing: no real robot execution, no `FollowJointTrajectory` execution, no trajectory is sent, and planning/controller execution remains disabled.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -117,6 +123,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_1/`. The 
 | v1.8 | Low-force segmented robot contact validation | Completed |
 | v2.0 | First Gazebo-only motion smoke test | Completed |
 | v2.1 | Gazebo-only motion validation suite | Completed |
+| v2.2 | MoveIt IK diagnostic validation | Completed |
 | v2.3 | Coordinate-based insertion diagnostics | In progress |
 | v2.4 | Object-frame publisher for insertion targets | In progress |
 | v2.5 | IK feasibility diagnostics before motion | In progress |

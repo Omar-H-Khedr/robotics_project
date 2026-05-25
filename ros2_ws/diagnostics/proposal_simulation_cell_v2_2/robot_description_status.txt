@@ -1,0 +1,5 @@
+robot_description_available=true
+robot_model=lbr_iisy3_r760
+expected_joint_names_found=true
+real_robot_endpoint_detected=false
+description_source=kuka_lbr_iisy_support lbr_iisy3_r760 mode mock

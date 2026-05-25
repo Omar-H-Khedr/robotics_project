@@ -1,0 +1,17 @@
+service_response_received: true
+ik_solution_found: true
+ik_error_code: 1
+returned_joint_names:
+- joint_1
+- joint_2
+- joint_3
+- joint_4
+- joint_5
+- joint_6
+returned_joint_positions:
+- -3.1415926525395
+- -3.9401801610502782
+- 1.843149496691313
+- -2.0652580984763897e-10
+- 0.5262343377747171
+- 3.14159265291135

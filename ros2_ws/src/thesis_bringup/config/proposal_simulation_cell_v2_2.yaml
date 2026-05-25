@@ -1,0 +1,87 @@
+simulation_cell_name: proposal_simulation_cell_v2_2_moveit_ik_diagnostic_validation
+
+robot:
+  robot_model: KUKA LBR iisy MoveIt diagnostic model
+  moveit_robot_model: lbr_iisy3_r760
+  gazebo_reference_model: lbr_iisy3_r760
+  joint_name_policy: use_consistent_moveit_model
+  expected_joint_names:
+    - joint_1
+    - joint_2
+    - joint_3
+    - joint_4
+    - joint_5
+    - joint_6
+
+moveit_diagnostic:
+  diagnostic_only: true
+  moveit_used: true
+  compute_ik_allowed: true
+  compute_ik_called: false
+  selected_group: manipulator
+  selected_end_effector_link: tool0
+  robot_description_topic: /robot_description
+  robot_description_semantic_topic: /robot_description_semantic
+  compute_ik_service: /compute_ik
+  move_group_node_name: /move_group
+
+ik_request:
+  selected_group: manipulator
+  selected_end_effector_link: tool0
+  ik_timeout_sec: 2.0
+  ik_attempts: 1
+  target_pose_mode: near_current_pose
+  max_pose_offset_m: 0.02
+  max_orientation_change_deg: 5.0
+  frame_id: base_link
+  seed_joint_state:
+    joint_1: 0.0
+    joint_2: -0.7
+    joint_3: 1.1
+    joint_4: 0.0
+    joint_5: 0.7
+    joint_6: 0.0
+  diagnostic_target_pose:
+    position:
+      x: 0.36
+      y: 0.0
+      z: 0.42
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+
+safety_constraints:
+  no_real_robot_endpoint: true
+  no_planning_execution: true
+  no_trajectory_execution: true
+  no_controller_execution: true
+  no_follow_joint_trajectory_execution: true
+  no_peg_insertion: true
+  no_contact_seeking_motion: true
+
+execution_policy:
+  diagnostic_only: true
+  moveit_used: true
+  compute_ik_allowed: true
+  allow_trajectory_execution: false
+  moveit_execution_allowed: false
+  controller_execution_allowed: false
+  trajectory_execution_allowed: false
+  follow_joint_trajectory_execution_allowed: false
+  real_robot_allowed: false
+  planning_execution_allowed: false
+  motion_execution_enabled: false
+  trajectory_sent: false
+  real_robot_used: false
+
+validation:
+  output_dir: diagnostics/proposal_simulation_cell_v2_2
+  status_success: moveit_ik_diagnostic_validated
+  status_topic: /proposal_simulation_cell/moveit_ik_diagnostic_status
+  request_report_topic: /proposal_simulation_cell/moveit_ik_request_report
+  response_report_topic: /proposal_simulation_cell/moveit_ik_response_report
+  execution_block_report_topic: /proposal_simulation_cell/moveit_execution_block_report
+  validation_timeout_sec: 45.0
+  startup_wait_sec: 2.0

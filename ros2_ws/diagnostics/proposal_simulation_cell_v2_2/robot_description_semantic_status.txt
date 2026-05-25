@@ -1,0 +1,6 @@
+robot_description_semantic_available=true
+selected_group=manipulator
+selected_end_effector_link=tool0
+group_available=true
+tool_link_available=true
+project_local_iisy6_candidate_used=false
