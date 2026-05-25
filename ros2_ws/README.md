@@ -4,6 +4,25 @@ This folder is reserved for the future ROS 2 workspace.
 
 When ROS 2 is installed later, this workspace can contain build, install, log, and source folders used by ROS 2 development tools.
 
+## Milestones
+
+| Milestone | Status |
+| --- | --- |
+| proposal_simulation_cell_v1_2_rgbd_image_bridge_fix | Completed |
+| proposal_simulation_cell_v1_3_contact_physics_validation | Completed |
+| proposal_simulation_cell_v1_5_safety_virtual_force_interface | Completed |
+| proposal_simulation_cell_v1_6_safety_gate_readiness | Completed |
+
+## proposal_simulation_cell_v1_6_safety_gate_readiness
+
+Status: `safety_gate_readiness_validated`
+
+The v1.6 proposal simulation sprint adds readiness gates for the next control-development stage. It evaluates the sensor gate, contact gate, safety gate, virtual-force gate, admittance gate, execution-disabled gate, and proposal readiness gate from validated simulation diagnostic signals only.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_6/`.
+
+Safety constraints remain explicit: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, no real robot execution, no `FollowJointTrajectory`, and no command output.
+
 ## proposal_simulation_cell_v1_5_safety_virtual_force_interface
 
 Status: `safety_virtual_force_interface_validated`
