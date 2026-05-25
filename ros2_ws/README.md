@@ -15,6 +15,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v1_7_pre_control_contract | Completed |
 | proposal_simulation_cell_v1_8_control_development_scaffold | Completed |
 | proposal_simulation_cell_v1_9_no_motion_control_law_dry_run | Completed |
+| proposal_simulation_cell_v1_10_experiment_configuration_matrix | Completed |
+
+## proposal_simulation_cell_v1_10_experiment_configuration_matrix
+
+Status: `experiment_configuration_matrix_validated`
+
+The v1.10 proposal simulation sprint adds an experiment configuration matrix for future peg-in-hole validation scenarios. It defines scenario variants for clearance, x/y offset, angular misalignment, insertion depth, and contact thresholds.
+
+The matrix is configuration-only: no fake datasets, no fake plots, and no experimental results are generated. Safety constraints remain explicit: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_10/`.
 
 ## proposal_simulation_cell_v1_9_no_motion_control_law_dry_run
 

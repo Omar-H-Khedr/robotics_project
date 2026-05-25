@@ -1,0 +1,16 @@
+elapsed_sec,scenario_count,all_scenarios_execution_disabled,all_scenarios_require_rgbd,all_scenarios_require_contact_gate,all_scenarios_require_safety_gate,all_scenarios_require_readiness_gate,all_scenarios_require_pre_control_contract,fake_datasets_created,fake_plots_created,status
+0.211,729,true,true,true,true,true,true,false,false,scenario_configuration_contract_validated
+0.411,729,true,true,true,true,true,true,false,false,scenario_configuration_contract_validated
+0.610,729,true,true,true,true,true,true,false,false,scenario_configuration_contract_validated
+0.814,729,true,true,true,true,true,true,false,false,scenario_configuration_contract_validated
+1.016,729,true,true,true,true,true,true,false,false,scenario_configuration_contract_validated
+1.214,729,true,true,true,true,true,true,false,false,scenario_configuration_contract_validated
+1.409,729,true,true,true,true,true,true,false,false,scenario_configuration_contract_validated
+1.619,729,true,true,true,true,true,true,false,false,scenario_configuration_contract_validated
+1.815,729,true,true,true,true,true,true,false,false,scenario_configuration_contract_validated
+2.010,729,true,true,true,true,true,true,false,false,scenario_configuration_contract_validated
+2.219,729,true,true,true,true,true,true,false,false,scenario_configuration_contract_validated
+2.419,729,true,true,true,true,true,true,false,false,scenario_configuration_contract_validated
+2.612,729,true,true,true,true,true,true,false,false,scenario_configuration_contract_validated
+2.810,729,true,true,true,true,true,true,false,false,scenario_configuration_contract_validated
+3.011,729,true,true,true,true,true,true,false,false,scenario_configuration_contract_validated

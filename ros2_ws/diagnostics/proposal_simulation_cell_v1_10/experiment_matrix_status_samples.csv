@@ -1,0 +1,16 @@
+elapsed_sec,scenario_matrix_generated,scenario_count,all_scenarios_execution_disabled,all_scenarios_require_rgbd,all_scenarios_require_contact_gate,all_scenarios_require_safety_gate,all_scenarios_require_readiness_gate,fake_datasets_created,fake_plots_created,status
+0.211,true,729,true,true,true,true,true,false,false,experiment_configuration_matrix_validated
+0.411,true,729,true,true,true,true,true,false,false,experiment_configuration_matrix_validated
+0.610,true,729,true,true,true,true,true,false,false,experiment_configuration_matrix_validated
+0.814,true,729,true,true,true,true,true,false,false,experiment_configuration_matrix_validated
+1.016,true,729,true,true,true,true,true,false,false,experiment_configuration_matrix_validated
+1.214,true,729,true,true,true,true,true,false,false,experiment_configuration_matrix_validated
+1.409,true,729,true,true,true,true,true,false,false,experiment_configuration_matrix_validated
+1.619,true,729,true,true,true,true,true,false,false,experiment_configuration_matrix_validated
+1.815,true,729,true,true,true,true,true,false,false,experiment_configuration_matrix_validated
+2.010,true,729,true,true,true,true,true,false,false,experiment_configuration_matrix_validated
+2.219,true,729,true,true,true,true,true,false,false,experiment_configuration_matrix_validated
+2.419,true,729,true,true,true,true,true,false,false,experiment_configuration_matrix_validated
+2.612,true,729,true,true,true,true,true,false,false,experiment_configuration_matrix_validated
+2.810,true,729,true,true,true,true,true,false,false,experiment_configuration_matrix_validated
+3.011,true,729,true,true,true,true,true,false,false,experiment_configuration_matrix_validated
