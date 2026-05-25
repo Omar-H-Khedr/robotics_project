@@ -1,0 +1,6 @@
+field,value
+contact_wrench_topic_available,true
+max_observed_force_n,0.000000
+max_observed_torque_nm,0.000000
+safety_violation_count,0
+real_robot_used,false

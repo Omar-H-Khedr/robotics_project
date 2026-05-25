@@ -104,6 +104,12 @@ Added MoveIt/Gazebo model alignment and plan-only validation. The sprint audits 
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_3/`. The diagnostic remains non-executing: no trajectory execution, no controller execution, no real robot execution, and no `FollowJointTrajectory` execution.
 
+### proposal_simulation_cell_v2_4_moveit_gazebo_execution_validation
+
+Added the first MoveIt-generated Gazebo-only trajectory execution. The sprint verifies the Gazebo simulation controller endpoint, generates a small MoveIt plan, executes it only through the Gazebo `joint_trajectory_controller`, records joint-state evidence before and after execution, returns to the initial posture, and monitors the contact wrench.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_4/`. The execution remains simulation-only: no real robot execution, no physical endpoint, no peg insertion, and no contact-seeking motion.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -131,6 +137,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_3/`. The 
 | v2.1 | Gazebo-only motion validation suite | Completed |
 | v2.2 | MoveIt IK diagnostic validation | Completed |
 | v2.3 | MoveIt/Gazebo model alignment and plan-only validation | Completed |
+| v2.4 | MoveIt-generated Gazebo-only execution validation | Completed |
 | v2.4 | Object-frame publisher for insertion targets | In progress |
 | v2.5 | IK feasibility diagnostics before motion | In progress |
 | v2.5c | Unified execution gates and tool-axis audit | In progress |
