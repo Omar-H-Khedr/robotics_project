@@ -1,0 +1,11 @@
+proposal_simulation_cell_v2_1 Gazebo motion validation suite evidence
+elapsed_sec=27.029
+status=gazebo_motion_validation_suite_validated
+commands_sent=10
+repeatability_cycles_completed=3
+max_observed_primary_delta_deg=1.848570
+max_observed_secondary_delta_deg=0.909976
+safety_violation_count=0
+real_robot_used=false
+moveit_used=false
+compute_ik_called=false

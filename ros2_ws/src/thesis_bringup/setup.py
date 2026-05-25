@@ -41,6 +41,7 @@ setup(
             "proposal_simulation_cell_v1_16_reproducibility_checklist_node = thesis_bringup.proposal_simulation_cell_v1_16_reproducibility_checklist_node:main",
             "proposal_simulation_cell_v1_17_release_index_node = thesis_bringup.proposal_simulation_cell_v1_17_release_index_node:main",
             "proposal_simulation_cell_v2_0_motion_smoke_test_node = thesis_bringup.proposal_simulation_cell_v2_0_motion_smoke_test_node:main",
+            "proposal_simulation_cell_v2_1_motion_validation_suite_node = thesis_bringup.proposal_simulation_cell_v2_1_motion_validation_suite_node:main",
         ]
     },
 )

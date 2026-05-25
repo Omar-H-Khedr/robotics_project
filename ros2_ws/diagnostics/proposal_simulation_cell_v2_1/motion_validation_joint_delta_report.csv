@@ -1,0 +1,7 @@
+phase,joint,before_rad,after_rad,commanded_delta_deg,observed_delta_deg
+single_forward,joint_6,0.034906585,0.066338774,2.000000,1.800932
+repeatability_cycle_1_forward,joint_6,0.034906585,0.067170220,2.000000,1.848570
+repeatability_cycle_2_forward,joint_6,0.034906585,0.066583218,2.000000,1.814937
+repeatability_cycle_3_forward,joint_6,0.034906585,0.066595629,2.000000,1.815649
+two_joint_primary,joint_6,0.034906585,0.066930255,2.000000,1.834821
+two_joint_secondary,joint_5,0.800000000,0.815882077,1.000000,0.909976

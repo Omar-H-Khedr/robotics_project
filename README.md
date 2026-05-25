@@ -86,6 +86,12 @@ Added the first intentional Gazebo-only motion smoke test. It sends one small jo
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_0/`. The smoke test is simulation-only: no real robot execution, no MoveIt, and no `/compute_ik` are used.
 
+### proposal_simulation_cell_v2_1_gazebo_motion_validation_suite
+
+Added the Gazebo-only motion validation suite. It tests single forward and return motion, three repeatability cycles, and a small two-joint motion while recording joint-state evidence, repeatability errors, return errors, contact wrench monitoring, and the safety report.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_1/`. The suite is simulation-only: no real robot execution, no MoveIt, and no `/compute_ik` are used.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -110,6 +116,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_0/`. The 
 | v1.17 | Release documentation index | Completed |
 | v1.8 | Low-force segmented robot contact validation | Completed |
 | v2.0 | First Gazebo-only motion smoke test | Completed |
+| v2.1 | Gazebo-only motion validation suite | Completed |
 | v2.3 | Coordinate-based insertion diagnostics | In progress |
 | v2.4 | Object-frame publisher for insertion targets | In progress |
 | v2.5 | IK feasibility diagnostics before motion | In progress |

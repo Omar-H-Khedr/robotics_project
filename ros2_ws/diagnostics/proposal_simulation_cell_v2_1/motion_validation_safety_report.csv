@@ -1,0 +1,2 @@
+contact_wrench_topic_available,max_observed_force_n,max_observed_torque_nm,safety_violation_count,real_robot_used,moveit_used,compute_ik_called,status
+true,0.000000,0.000000,0,false,false,false,gazebo_motion_validation_suite_validated
