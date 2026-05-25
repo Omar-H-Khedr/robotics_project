@@ -1,0 +1,17 @@
+elapsed_sec,selected_scenario_count,all_selected_scenarios_found,all_selected_scenarios_validated,selected_batch_written,batch_is_configuration_only,command_output_enabled,motion_execution_enabled,fake_dataset_created,fake_plot_created,experimental_result_created,status
+1.280,3,true,true,false,true,false,false,false,false,false,scenario_batch_selector_pending
+1.480,3,true,true,false,true,false,false,false,false,false,scenario_batch_selector_pending
+1.679,3,true,true,false,true,false,false,false,false,false,scenario_batch_selector_pending
+1.879,3,true,true,false,true,false,false,false,false,false,scenario_batch_selector_pending
+2.080,3,true,true,false,true,false,false,false,false,false,scenario_batch_selector_pending
+2.279,3,true,true,false,true,false,false,false,false,false,scenario_batch_selector_pending
+2.479,3,true,true,false,true,false,false,false,false,false,scenario_batch_selector_pending
+2.679,3,true,true,false,true,false,false,false,false,false,scenario_batch_selector_pending
+2.880,3,true,true,false,true,false,false,false,false,false,scenario_batch_selector_pending
+3.080,3,true,true,false,true,false,false,false,false,false,scenario_batch_selector_pending
+3.280,3,true,true,false,true,false,false,false,false,false,scenario_batch_selector_pending
+3.479,3,true,true,false,true,false,false,false,false,false,scenario_batch_selector_pending
+3.679,3,true,true,false,true,false,false,false,false,false,scenario_batch_selector_pending
+3.880,3,true,true,false,true,false,false,false,false,false,scenario_batch_selector_pending
+4.080,3,true,true,false,true,false,false,false,false,false,scenario_batch_selector_pending
+4.095,3,true,true,true,true,false,false,false,false,false,scenario_batch_selector_validated

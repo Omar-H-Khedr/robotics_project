@@ -1,0 +1,4 @@
+scenario_id,clearance_mm,x_offset_mm,y_offset_mm,angular_misalignment_deg,insertion_depth_mm,contact_detection_force_threshold_n,max_allowed_force_n,max_allowed_torque_nm,require_rgbd,require_contact_gate,require_safety_gate,require_readiness_gate,require_pre_control_contract,command_output_enabled,motion_execution_enabled,controller_execution_allowed,trajectory_execution_allowed,follow_joint_trajectory_allowed,real_robot_allowed,moveit_allowed,compute_ik_allowed,fake_dataset_created,fake_plot_created,experimental_result_created
+v1_10_scenario_001,0.1,-1.0,-1.0,0.0,5.0,0.05,50.0,5.0,True,True,True,True,True,False,False,False,False,False,False,False,False,False,False,False
+v1_10_scenario_365,0.2,0.0,0.0,1.0,10.0,0.1,50.0,5.0,True,True,True,True,True,False,False,False,False,False,False,False,False,False,False,False
+v1_10_scenario_729,0.5,1.0,1.0,2.0,20.0,0.2,50.0,5.0,True,True,True,True,True,False,False,False,False,False,False,False,False,False,False,False

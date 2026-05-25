@@ -17,6 +17,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v1_9_no_motion_control_law_dry_run | Completed |
 | proposal_simulation_cell_v1_10_experiment_configuration_matrix | Completed |
 | proposal_simulation_cell_v1_11_single_scenario_loader_validation | Completed |
+| proposal_simulation_cell_v1_12_scenario_batch_selector | Completed |
+
+## proposal_simulation_cell_v1_12_scenario_batch_selector
+
+Status: `scenario_batch_selector_validated`
+
+The v1.12 proposal simulation sprint adds a scenario batch selector. It loads a representative selected batch from the v1.10 matrix and validates the selected scenarios.
+
+The batch is configuration-only: no fake datasets, no fake plots, and no experimental results are generated. Safety constraints remain explicit: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_12/`.
 
 ## proposal_simulation_cell_v1_11_single_scenario_loader_validation
 

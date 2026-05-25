@@ -1,0 +1,30 @@
+{
+  "all_selected_scenarios_found": true,
+  "all_selected_scenarios_validated": true,
+  "batch_is_configuration_only": true,
+  "command_output_enabled": false,
+  "compute_ik_called": false,
+  "controller_execution_allowed": false,
+  "experimental_result_created": false,
+  "fake_dataset_created": false,
+  "fake_plot_created": false,
+  "follow_joint_trajectory_allowed": false,
+  "gazebo_fallback_used": true,
+  "isaac_available": false,
+  "motion_execution_enabled": false,
+  "moveit_used": false,
+  "real_robot_used": false,
+  "robot_model": "KUKA LBR iisy 6 R1300",
+  "scenario_matrix_csv_found": true,
+  "scenario_matrix_yaml_found": true,
+  "selected_batch_written": true,
+  "selected_scenario_count": 3,
+  "selected_scenario_ids": [
+    "v1_10_scenario_001",
+    "v1_10_scenario_365",
+    "v1_10_scenario_729"
+  ],
+  "simulation_engine": "gazebo",
+  "status": "scenario_batch_selector_validated",
+  "trajectory_execution_allowed": false
+}

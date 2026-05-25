@@ -1,0 +1,61 @@
+simulation_cell_name: proposal_simulation_cell_v1_12_scenario_batch_selector
+
+robot:
+  robot_model: KUKA LBR iisy 6 R1300
+  model: KUKA LBR iisy 6 R1300
+
+scenario_source:
+  scenario_matrix_yaml: diagnostics/proposal_simulation_cell_v1_10/experiment_configuration_matrix.yaml
+  scenario_matrix_csv: diagnostics/proposal_simulation_cell_v1_10/experiment_configuration_matrix.csv
+
+selected_batch:
+  selected_scenario_ids:
+    - v1_10_scenario_001
+    - v1_10_scenario_365
+    - v1_10_scenario_729
+
+selection_policy:
+  name: representative_configuration_only_batch
+  low_condition: v1_10_scenario_001
+  medium_condition: v1_10_scenario_365
+  higher_stress_condition: v1_10_scenario_729
+
+validation_rules:
+  require_positive_clearance_mm: true
+  require_x_offset_mm: true
+  require_y_offset_mm: true
+  require_angular_misalignment_deg: true
+  require_positive_insertion_depth_mm: true
+  require_positive_contact_detection_force_threshold_n: true
+  require_positive_max_allowed_force_n: true
+  require_positive_max_allowed_torque_nm: true
+  require_rgbd: true
+  require_contact_gate: true
+  require_safety_gate: true
+  require_readiness_gate: true
+  require_pre_control_contract: true
+  require_no_fake_dataset: true
+  require_no_fake_plot: true
+  require_no_experimental_result: true
+
+execution_policy:
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  trajectory_execution_allowed: false
+  follow_joint_trajectory_allowed: false
+  real_robot_allowed: false
+  moveit_allowed: false
+  compute_ik_allowed: false
+
+diagnostics:
+  simulation_engine: gazebo
+  gazebo_fallback_used: true
+  isaac_available: false
+  sample_period_sec: 0.2
+  validation_duration_sec: 3.0
+  output_dir: diagnostics/proposal_simulation_cell_v1_12
+  status_success: scenario_batch_selector_validated
+  status_topic: /proposal_simulation_cell/scenario_batch_status
+  selected_batch_topic: /proposal_simulation_cell/selected_scenario_batch
+  validation_report_topic: /proposal_simulation_cell/scenario_batch_validation_report

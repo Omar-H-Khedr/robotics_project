@@ -1,0 +1,15 @@
+proposal_simulation_cell_v1_12 scenario batch selector evidence
+elapsed_sec=4.098
+status=scenario_batch_selector_validated
+selected_scenario_count=3
+all_selected_scenarios_found=true
+all_selected_scenarios_validated=true
+selected_batch_written=true
+fake_dataset_created=false
+fake_plot_created=false
+experimental_result_created=false
+command_output_enabled=false
+motion_execution_enabled=false
+controller_execution_allowed=false
+trajectory_execution_allowed=false
+follow_joint_trajectory_allowed=false

@@ -1,0 +1,86 @@
+selected_scenario_ids:
+- v1_10_scenario_001
+- v1_10_scenario_365
+- v1_10_scenario_729
+selected_scenario_count: 3
+selection_policy: representative_configuration_only_batch
+configuration_only: true
+fake_dataset_created: false
+fake_plot_created: false
+experimental_result_created: false
+selected_scenarios:
+- scenario_id: v1_10_scenario_001
+  clearance_mm: 0.1
+  x_offset_mm: -1.0
+  y_offset_mm: -1.0
+  angular_misalignment_deg: 0.0
+  insertion_depth_mm: 5.0
+  contact_detection_force_threshold_n: 0.05
+  max_allowed_force_n: 50.0
+  max_allowed_torque_nm: 5.0
+  require_rgbd: true
+  require_contact_gate: true
+  require_safety_gate: true
+  require_readiness_gate: true
+  require_pre_control_contract: true
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  trajectory_execution_allowed: false
+  follow_joint_trajectory_allowed: false
+  real_robot_allowed: false
+  moveit_allowed: false
+  compute_ik_allowed: false
+  fake_dataset_created: false
+  fake_plot_created: false
+  experimental_result_created: false
+- scenario_id: v1_10_scenario_365
+  clearance_mm: 0.2
+  x_offset_mm: 0.0
+  y_offset_mm: 0.0
+  angular_misalignment_deg: 1.0
+  insertion_depth_mm: 10.0
+  contact_detection_force_threshold_n: 0.1
+  max_allowed_force_n: 50.0
+  max_allowed_torque_nm: 5.0
+  require_rgbd: true
+  require_contact_gate: true
+  require_safety_gate: true
+  require_readiness_gate: true
+  require_pre_control_contract: true
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  trajectory_execution_allowed: false
+  follow_joint_trajectory_allowed: false
+  real_robot_allowed: false
+  moveit_allowed: false
+  compute_ik_allowed: false
+  fake_dataset_created: false
+  fake_plot_created: false
+  experimental_result_created: false
+- scenario_id: v1_10_scenario_729
+  clearance_mm: 0.5
+  x_offset_mm: 1.0
+  y_offset_mm: 1.0
+  angular_misalignment_deg: 2.0
+  insertion_depth_mm: 20.0
+  contact_detection_force_threshold_n: 0.2
+  max_allowed_force_n: 50.0
+  max_allowed_torque_nm: 5.0
+  require_rgbd: true
+  require_contact_gate: true
+  require_safety_gate: true
+  require_readiness_gate: true
+  require_pre_control_contract: true
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  trajectory_execution_allowed: false
+  follow_joint_trajectory_allowed: false
+  real_robot_allowed: false
+  moveit_allowed: false
+  compute_ik_allowed: false
+  fake_dataset_created: false
+  fake_plot_created: false
+  experimental_result_created: false
