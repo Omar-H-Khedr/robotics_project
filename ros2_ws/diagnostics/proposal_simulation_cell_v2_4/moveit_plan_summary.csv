@@ -1,0 +1,8 @@
+field,value
+plan_request_sent,true
+plan_solution_found,true
+plan_error_code,1
+planned_trajectory_point_count,4
+planned_trajectory_joint_count,6
+planned_duration_sec,0.277893
+max_joint_delta_deg_limit,3.000000

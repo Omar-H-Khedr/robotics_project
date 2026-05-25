@@ -1,0 +1,7 @@
+proposal_simulation_cell_v2_4_moveit_gazebo_execution_validation
+status=moveit_gazebo_execution_validated
+plan_solution_found=true
+execution_endpoint_verified_simulation_only=true
+trajectory_sent=true
+motion_observed_in_joint_states=true
+real_robot_used=false
