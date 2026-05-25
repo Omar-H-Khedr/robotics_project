@@ -1,0 +1,15 @@
+sprint,description,diagnostics_path,diagnostics_found,json_file_count,summary_file_count,status_values
+v1.0,simulation cell foundation,diagnostics/proposal_simulation_cell_v1_0,true,1,1,ready_for_control_development
+v1.1,sensor and scene validation,diagnostics/proposal_simulation_cell_v1_1,true,1,1,validated_with_camera_image_limitation
+v1.2,RGB-D image bridge validation,diagnostics/proposal_simulation_cell_v1_2,true,1,1,rgbd_image_bridge_validated
+v1.3,contact physics validation,diagnostics/proposal_simulation_cell_v1_3,true,1,1,validated
+v1.5,safety and virtual-force interface,diagnostics/proposal_simulation_cell_v1_5,true,1,1,safety_virtual_force_interface_validated
+v1.6,safety gate readiness,diagnostics/proposal_simulation_cell_v1_6,true,1,1,safety_gate_readiness_validated
+v1.7,pre-control contract,diagnostics/proposal_simulation_cell_v1_7,true,2,1,pre_control_contract_validated
+v1.8,control-development scaffold,diagnostics/proposal_simulation_cell_v1_8,true,1,1,control_development_scaffold_validated
+v1.9,no-motion control-law dry run,diagnostics/proposal_simulation_cell_v1_9,true,1,1,no_motion_control_law_dry_run_validated
+v1.10,experiment configuration matrix,diagnostics/proposal_simulation_cell_v1_10,true,1,1,experiment_configuration_matrix_validated
+v1.11,single-scenario loader,diagnostics/proposal_simulation_cell_v1_11,true,2,1,single_scenario_loader_validated
+v1.12,scenario batch selector,diagnostics/proposal_simulation_cell_v1_12,true,2,1,scenario_batch_selector_validated
+v1.13,batch execution plan validator,diagnostics/proposal_simulation_cell_v1_13,true,2,1,batch_execution_plan_validated
+v1.14,batch dry-run orchestrator,diagnostics/proposal_simulation_cell_v1_14,true,2,1,batch_dry_run_orchestrator_validated

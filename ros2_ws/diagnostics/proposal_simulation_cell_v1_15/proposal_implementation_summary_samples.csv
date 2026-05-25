@@ -1,0 +1,17 @@
+elapsed_sec,completed_sprint_count,v1_4_absent,no_scenario_execution,no_fake_datasets,no_fake_plots,no_experimental_results,status
+0.316,14,true,true,true,true,true,evidence_package_pending
+0.516,14,true,true,true,true,true,evidence_package_pending
+0.717,14,true,true,true,true,true,evidence_package_pending
+0.917,14,true,true,true,true,true,evidence_package_pending
+1.116,14,true,true,true,true,true,evidence_package_pending
+1.316,14,true,true,true,true,true,evidence_package_pending
+1.516,14,true,true,true,true,true,evidence_package_pending
+1.716,14,true,true,true,true,true,evidence_package_pending
+1.916,14,true,true,true,true,true,evidence_package_pending
+2.116,14,true,true,true,true,true,evidence_package_pending
+2.317,14,true,true,true,true,true,evidence_package_pending
+2.516,14,true,true,true,true,true,evidence_package_pending
+2.716,14,true,true,true,true,true,evidence_package_pending
+2.916,14,true,true,true,true,true,evidence_package_pending
+3.116,14,true,true,true,true,true,evidence_package_pending
+3.126,14,true,true,true,true,true,evidence_package_validated

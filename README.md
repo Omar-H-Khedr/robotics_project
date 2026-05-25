@@ -62,6 +62,12 @@ Added the simulation-only batch dry-run orchestrator. It converts the v1.13 batc
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_14/`. The orchestration is configuration-only: no scenario execution, no fake datasets, no fake plots, and no experimental results are generated. Safety constraints remain enforced: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
 
+### proposal_simulation_cell_v1_15_evidence_package_generator
+
+Added the simulation-only evidence package generator. It collects evidence from v1.0, v1.1, v1.2, v1.3, and v1.5 through v1.14, marks v1.4 as absent/not implemented and not invented, generates the proposal simulation evidence package, and creates a validated evidence summary.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_15/`. The package is evidence-only: no scenario execution, no fake datasets, no fake plots, and no experimental results are generated. Safety constraints remain enforced: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, and no real robot execution.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -81,6 +87,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_14/`. The
 | v1.12 | Scenario batch selector | Completed |
 | v1.13 | Batch execution plan validator | Completed |
 | v1.14 | Batch dry-run orchestrator | Completed |
+| v1.15 | Evidence package generator | Completed |
 | v1.8 | Low-force segmented robot contact validation | Completed |
 | v2.0 | Peg/hole insertion validation instrumentation | In progress |
 | v2.3 | Coordinate-based insertion diagnostics | In progress |

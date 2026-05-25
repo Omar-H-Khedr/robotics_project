@@ -1,0 +1,146 @@
+evidence_package_type: proposal_simulation_implementation_evidence
+simulation_engine: gazebo
+robot_model: KUKA LBR iisy 6 R1300
+completed_sprints:
+- sprint: v1.0
+  description: simulation cell foundation
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_0
+  diagnostics_found: true
+  json_file_count: 1
+  summary_file_count: 1
+  status_values:
+  - ready_for_control_development
+- sprint: v1.1
+  description: sensor and scene validation
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_1
+  diagnostics_found: true
+  json_file_count: 1
+  summary_file_count: 1
+  status_values:
+  - validated_with_camera_image_limitation
+- sprint: v1.2
+  description: RGB-D image bridge validation
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_2
+  diagnostics_found: true
+  json_file_count: 1
+  summary_file_count: 1
+  status_values:
+  - rgbd_image_bridge_validated
+- sprint: v1.3
+  description: contact physics validation
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_3
+  diagnostics_found: true
+  json_file_count: 1
+  summary_file_count: 1
+  status_values:
+  - validated
+- sprint: v1.5
+  description: safety and virtual-force interface
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_5
+  diagnostics_found: true
+  json_file_count: 1
+  summary_file_count: 1
+  status_values:
+  - safety_virtual_force_interface_validated
+- sprint: v1.6
+  description: safety gate readiness
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_6
+  diagnostics_found: true
+  json_file_count: 1
+  summary_file_count: 1
+  status_values:
+  - safety_gate_readiness_validated
+- sprint: v1.7
+  description: pre-control contract
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_7
+  diagnostics_found: true
+  json_file_count: 2
+  summary_file_count: 1
+  status_values:
+  - pre_control_contract_validated
+- sprint: v1.8
+  description: control-development scaffold
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_8
+  diagnostics_found: true
+  json_file_count: 1
+  summary_file_count: 1
+  status_values:
+  - control_development_scaffold_validated
+- sprint: v1.9
+  description: no-motion control-law dry run
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_9
+  diagnostics_found: true
+  json_file_count: 1
+  summary_file_count: 1
+  status_values:
+  - no_motion_control_law_dry_run_validated
+- sprint: v1.10
+  description: experiment configuration matrix
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_10
+  diagnostics_found: true
+  json_file_count: 1
+  summary_file_count: 1
+  status_values:
+  - experiment_configuration_matrix_validated
+- sprint: v1.11
+  description: single-scenario loader
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_11
+  diagnostics_found: true
+  json_file_count: 2
+  summary_file_count: 1
+  status_values:
+  - single_scenario_loader_validated
+- sprint: v1.12
+  description: scenario batch selector
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_12
+  diagnostics_found: true
+  json_file_count: 2
+  summary_file_count: 1
+  status_values:
+  - scenario_batch_selector_validated
+- sprint: v1.13
+  description: batch execution plan validator
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_13
+  diagnostics_found: true
+  json_file_count: 2
+  summary_file_count: 1
+  status_values:
+  - batch_execution_plan_validated
+- sprint: v1.14
+  description: batch dry-run orchestrator
+  diagnostics_path: diagnostics/proposal_simulation_cell_v1_14
+  diagnostics_found: true
+  json_file_count: 2
+  summary_file_count: 1
+  status_values:
+  - batch_dry_run_orchestrator_validated
+absent_or_skipped_sprints:
+- v1.4
+validated_capabilities:
+- simulation cell foundation
+- sensor and scene validation
+- RGB-D validation
+- contact physics validation
+- safety diagnostic interfaces
+- readiness gates
+- pre-control contract
+- no-motion control-law dry run
+- scenario configuration matrix
+- scenario loading and batch selection
+- configuration-only batch execution planning
+- blocked batch dry-run orchestration
+disabled_execution_constraints:
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  trajectory_execution_allowed: false
+  follow_joint_trajectory_allowed: false
+result_policy:
+  fake_dataset_created: false
+  fake_plot_created: false
+  experimental_result_created: false
+claims_not_made:
+  scenario_execution_claimed: false
+  real_robot_validation_claimed: false
+  controller_execution_claimed: false
+  learning_run_claimed: false

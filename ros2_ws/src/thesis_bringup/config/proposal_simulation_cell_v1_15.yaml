@@ -1,0 +1,70 @@
+simulation_cell_name: proposal_simulation_cell_v1_15_evidence_package_generator
+
+robot:
+  robot_model: KUKA LBR iisy 6 R1300
+  model: KUKA LBR iisy 6 R1300
+
+evidence_sources:
+  diagnostics_root: diagnostics
+  evidence_package_type: proposal_simulation_implementation_evidence
+
+sprint_registry:
+  include_sprints:
+    - v1.0
+    - v1.1
+    - v1.2
+    - v1.3
+    - v1.5
+    - v1.6
+    - v1.7
+    - v1.8
+    - v1.9
+    - v1.10
+    - v1.11
+    - v1.12
+    - v1.13
+    - v1.14
+  excluded_or_absent_sprints:
+    - v1.4
+
+validation_summary:
+  evidence_package_type: proposal_simulation_implementation_evidence
+  summarize_existing_diagnostics_only: true
+
+safety_summary:
+  simulation_only: true
+  scenario_execution_claimed: false
+  real_robot_validation_claimed: false
+
+disabled_execution_policy:
+  command_output_enabled: false
+  motion_execution_enabled: false
+  controller_execution_allowed: false
+  trajectory_execution_allowed: false
+  follow_joint_trajectory_allowed: false
+  real_robot_allowed: false
+  moveit_allowed: false
+  compute_ik_allowed: false
+
+result_policy:
+  fake_dataset_created: false
+  fake_plot_created: false
+  experimental_result_created: false
+
+documentation_outputs:
+  markdown: proposal_simulation_evidence_package.md
+  json: proposal_simulation_evidence_package.json
+  yaml: proposal_simulation_evidence_package.yaml
+  registry_csv: evidence_registry.csv
+
+validation:
+  simulation_engine: gazebo
+  gazebo_fallback_used: true
+  isaac_available: false
+  sample_period_sec: 0.2
+  validation_duration_sec: 3.0
+  output_dir: diagnostics/proposal_simulation_cell_v1_15
+  status_success: evidence_package_validated
+  status_topic: /proposal_simulation_cell/evidence_package_status
+  registry_topic: /proposal_simulation_cell/evidence_registry
+  summary_topic: /proposal_simulation_cell/proposal_implementation_summary
