@@ -1,0 +1,71 @@
+simulation_cell_name: proposal_simulation_cell_v2_13_context_encoder_prototype
+
+encoder:
+  encoder_type: deterministic_context_encoder_prototype
+  context_embedding_dim: 8
+  deterministic_only: true
+  variational_encoder_used: false
+  learning_executed: false
+  policy_training_executed: false
+  rl_training_executed: false
+  fake_result_created: false
+
+source_context:
+  source_sprint: v2.12
+  source_diagnostics_dir: diagnostics/proposal_simulation_cell_v2_12
+  scenario_context_vectors: scenario_context_vectors.csv
+  contact_transition_feature_vectors: contact_transition_feature_vectors.csv
+  episode_summary_table: episode_summary_table.csv
+  safety_gated_context_summary: safety_gated_context_summary.csv
+  context_dataset_manifest: context_dataset_manifest.json
+
+feature_schema:
+  required_features:
+    - offset_x_norm
+    - offset_y_norm
+    - yaw_norm
+    - trigger_step_norm
+    - force_norm
+    - rgb_depth_available_flag
+    - safety_clear_flag
+    - contact_binary_label
+    - safe_contact_label
+
+derived_features:
+  lateral_offset_norm: sqrt(offset_x_norm^2 + offset_y_norm^2)
+  contact_context_strength: force_norm * safe_contact_label
+  observation_reliability: rgb_depth_available_flag * safety_clear_flag
+  scenario_difficulty_proxy: lateral_offset_norm + force_norm
+
+embedding:
+  context_embedding_dim: 8
+  components:
+    - offset_x_norm
+    - offset_y_norm
+    - lateral_offset_norm
+    - trigger_step_norm
+    - force_norm
+    - contact_context_strength
+    - observation_reliability
+    - scenario_difficulty_proxy_norm
+
+similarity_report:
+  similarity_metric: cosine_similarity
+  nearest_context_excludes_self: true
+
+validation:
+  output_dir: diagnostics/proposal_simulation_cell_v2_13
+  status_success: context_encoder_prototype_validated
+  status_missing_inputs: context_encoder_source_inputs_missing
+  status_invalid_features: context_encoder_required_features_missing
+  status_topic: /proposal_simulation_cell/context_encoder_status
+  embedding_report_topic: /proposal_simulation_cell/context_embedding_report
+  similarity_report_topic: /proposal_simulation_cell/context_similarity_report
+
+safety_policy:
+  learning_executed: false
+  policy_training_executed: false
+  rl_training_executed: false
+  fake_result_created: false
+  real_robot_used: false
+  peg_insertion_executed: false

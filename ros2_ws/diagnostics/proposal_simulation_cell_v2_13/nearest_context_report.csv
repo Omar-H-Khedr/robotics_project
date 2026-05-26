@@ -1,0 +1,6 @@
+scenario_id,nearest_context_id,cosine_similarity,ordered_neighbors
+nominal_centered,x_negative_offset,0.506957321,x_negative_offset:0.506957|y_positive_offset:0.506957|y_negative_offset:0.506955|x_positive_offset:0.506954
+x_negative_offset,y_positive_offset,0.750450831,y_positive_offset:0.750451|y_negative_offset:0.750450|nominal_centered:0.506957|x_positive_offset:0.500901
+x_positive_offset,y_positive_offset,0.750450263,y_positive_offset:0.750450|y_negative_offset:0.750450|nominal_centered:0.506954|x_negative_offset:0.500901
+y_negative_offset,x_negative_offset,0.750450497,x_negative_offset:0.750450|x_positive_offset:0.750450|nominal_centered:0.506955|y_positive_offset:0.500901
+y_positive_offset,x_negative_offset,0.750450831,x_negative_offset:0.750451|x_positive_offset:0.750450|nominal_centered:0.506957|y_negative_offset:0.500901

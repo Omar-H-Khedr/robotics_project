@@ -158,6 +158,12 @@ Added context vector extraction from the real v2.11 simulation observation logs.
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_12/`. This sprint is feature extraction only: no fake dataset, no fake result, no learning, no policy training, no real robot execution, no peg insertion, and no forceful contact.
 
+### proposal_simulation_cell_v2_13_context_encoder_prototype
+
+Added a deterministic context encoder prototype using the real v2.12 simulation context vectors. The sprint defines the context feature schema, validates required features, generates deterministic 8-D context embeddings for each scenario, and writes similarity plus nearest-context reports.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_13/`. This sprint is an encoder prototype only: no policy training, no RL training, no fake learning result, no real robot execution, and no peg insertion.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -194,6 +200,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_12/`. Thi
 | v2.10 | Misalignment contact-gate batch validation | Completed |
 | v2.11 | Multimodal contact observation logging | Completed |
 | v2.12 | Context vector extraction | Completed |
+| v2.13 | Deterministic context encoder prototype | Completed |
 | v2.5c | Unified execution gates and tool-axis audit | In progress |
 | v2.5d | Diagnostic Cartesian orientation target calculation | In progress |
 | v2.5e/v2.5f | Orientation-aware IK diagnostics and full-pose waypoint policy | In progress |

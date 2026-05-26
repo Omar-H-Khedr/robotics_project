@@ -36,6 +36,15 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v2_10_misalignment_contact_gate_batch_validation | Completed |
 | proposal_simulation_cell_v2_11_multimodal_contact_observation_logging | Completed |
 | proposal_simulation_cell_v2_12_context_vector_extraction | Completed |
+| proposal_simulation_cell_v2_13_context_encoder_prototype | Completed |
+
+## proposal_simulation_cell_v2_13_context_encoder_prototype
+
+Status: `context_encoder_prototype_validated`
+
+The v2.13 proposal simulation sprint adds a deterministic context encoder prototype using the real v2.12 simulation context vectors. It defines a stable context feature schema, validates required normalized features, generates deterministic 8-D context embeddings for each scenario, and writes similarity plus nearest-context reports.
+
+The prototype does not train a policy, run RL training, create fake learning results, use a real robot, or execute peg insertion. Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_13/`.
 
 ## proposal_simulation_cell_v2_12_context_vector_extraction
 

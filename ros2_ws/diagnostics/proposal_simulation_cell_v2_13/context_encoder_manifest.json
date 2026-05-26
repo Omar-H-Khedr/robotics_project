@@ -1,0 +1,32 @@
+{
+  "context_embedding_count": 5,
+  "context_embedding_dim": 8,
+  "deterministic_only": true,
+  "encoder_type": "deterministic_context_encoder_prototype",
+  "fake_result_created": false,
+  "generated_files": [
+    "context_encoder_status.json",
+    "context_feature_schema.json",
+    "context_embedding_table.csv",
+    "context_embedding_table.json",
+    "context_similarity_matrix.csv",
+    "nearest_context_report.csv",
+    "context_encoder_manifest.json",
+    "context_encoder_validation_report.csv",
+    "summary.md"
+  ],
+  "learning_executed": false,
+  "peg_insertion_executed": false,
+  "policy_training_executed": false,
+  "real_robot_used": false,
+  "rl_training_executed": false,
+  "source_files": {
+    "contact_transition_vectors": "diagnostics/proposal_simulation_cell_v2_12/contact_transition_feature_vectors.csv",
+    "context_vectors": "diagnostics/proposal_simulation_cell_v2_12/scenario_context_vectors.csv",
+    "episode_summary": "diagnostics/proposal_simulation_cell_v2_12/episode_summary_table.csv",
+    "manifest": "diagnostics/proposal_simulation_cell_v2_12/context_dataset_manifest.json",
+    "safety_summary": "diagnostics/proposal_simulation_cell_v2_12/safety_gated_context_summary.csv"
+  },
+  "source_sprint": "v2.12",
+  "variational_encoder_used": false
+}
