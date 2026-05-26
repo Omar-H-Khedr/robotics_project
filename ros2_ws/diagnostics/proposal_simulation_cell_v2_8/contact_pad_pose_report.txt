@@ -1,0 +1,17 @@
+target_name=proposal_v2_8_contact_reachability_pad
+target_type=reachable_runtime_spawned_calibration_pad
+contact_topic=/world/proposal_simulation_cell_v1_3_contact_physics_validation/model/proposal_v2_8_contact_reachability_pad/link/contact_calibration_pad_link/sensor/contact_calibration_sensor/contact
+gz_contact_topic=/world/proposal_simulation_cell_v1_3_contact_physics_validation/model/proposal_v2_8_contact_reachability_pad/link/contact_calibration_pad_link/sensor/contact_calibration_sensor/contact
+spawned=true
+tool_pose_available=true
+tool_frame=tool0
+distal_collision_frame=link_6
+contact_pad_pose_computed=true
+contact_pad_reachable=true
+contact_pad_on_touch_path=true
+contact_collision_enabled=true
+spawn_pose_xyz=0.794253,-0.266125,1.063837
+size_xyz=0.160000,0.160000,0.160000
+separate_from_peg_insertion=true
+spawn_output=[INFO] [1779794206.181733580] [ros_gz_sim]: Requesting list of world names.
+spawn_output=[INFO] [1779794206.385220724] [ros_gz_sim]: Entity creation successful.

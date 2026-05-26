@@ -1,0 +1,16 @@
+phase,status,timestamp_sec,duration_sec,final_error_deg,max_force_n_so_far,max_torque_nm_so_far,safety_violation_count,note
+initialize,succeeded,5.001385,0.000000,0.000000,0.000000,0.000000,0,task sequence initialized
+verify_simulation_endpoint,succeeded,12.058076,0.000000,0.000000,0.000000,0.000000,0,Gazebo endpoint verified
+verify_moveit_ready,succeeded,12.058087,0.000000,0.000000,0.000000,0.000000,0,MoveIt planning and IK services available
+verify_tf_or_tool_pose_ready,succeeded,12.058415,0.000000,0.000000,0.000000,0.000000,0,Tool or distal collision frame pose checked
+verify_contact_topic_wiring,succeeded,12.058420,0.000000,0.000000,0.000000,0.000000,0,Raw Gazebo contact message type and bridge wiring available
+verify_safety_gate_ready,succeeded,12.058423,0.000000,0.000000,0.000000,0.000000,0,Safety gate clear
+move_to_ready_pose,succeeded,13.513204,1.403445,0.647012,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+move_to_touch_standby_pose,succeeded,14.720046,1.155803,0.680367,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+compute_reachable_contact_pad_pose,succeeded,16.597192,0.000000,0.000000,0.399980,0.000000,0,Calibration pad pose computed from distal collision frame path
+spawn_or_reposition_contact_pad_on_tool_path,succeeded,16.597203,0.000000,0.000000,0.399980,0.000000,0,Runtime calibration pad placed on guarded touch path
+execute_contact_trigger_steps,succeeded,17.623485,0.000000,0.000000,0.399980,0.000000,0,Contact trigger step loop started
+stop_on_contact_gate,succeeded,17.623573,0.000000,0.000000,0.399980,0.000000,0,Contact gate checked after guarded touch steps
+retreat_to_touch_standby_pose,succeeded,19.161925,1.487297,0.659225,0.399980,0.000000,0,Motion phase executed through Gazebo controller
+return_to_ready_pose,succeeded,20.498744,1.285571,0.420271,0.399980,0.000000,0,Motion phase executed through Gazebo controller
+validate_final_state,succeeded,20.498770,0.000000,0.420271,0.399980,0.000000,0,Final state checked against ready pose

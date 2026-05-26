@@ -31,6 +31,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v2_5_guarded_pre_contact_task_sequence | Completed |
 | proposal_simulation_cell_v2_6_contact_gated_guarded_approach_validation | Completed |
 | proposal_simulation_cell_v2_7_contact_triggered_guarded_touch_calibration | Completed |
+| proposal_simulation_cell_v2_8_contact_reachability_and_trigger_validation | Completed |
+
+## proposal_simulation_cell_v2_8_contact_reachability_and_trigger_validation
+
+Status: `contact_reachability_and_trigger_validated`
+
+The v2.8 proposal simulation sprint adds contact reachability and trigger validation using MoveIt planning and Gazebo-only execution. It computes a simulation-only calibration pad pose relative to the tool/distal-link path, checks raw contact topic wiring, records raw contact plus derived wrench evidence, and runs bounded contact-trigger steps through the verified Gazebo simulation endpoint.
+
+The contact gate triggered with nonzero raw contact and derived wrench evidence. Stop-on-contact, retreat, return-to-ready, and final state validation are recorded. No real robot execution, physical endpoint, peg insertion, forceful contact, learning, or scenario batch execution is used.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_8/`.
 
 ## proposal_simulation_cell_v2_7_contact_triggered_guarded_touch_calibration
 
