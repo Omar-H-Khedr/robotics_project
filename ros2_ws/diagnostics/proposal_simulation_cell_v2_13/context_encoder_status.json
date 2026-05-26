@@ -1,0 +1,23 @@
+{
+  "context_embedding_count": 5,
+  "context_embedding_dim": 8,
+  "context_embeddings_written": true,
+  "deterministic_only": true,
+  "fake_result_created": false,
+  "feature_schema_written": true,
+  "learning_executed": false,
+  "nearest_context_report_written": true,
+  "peg_insertion_executed": false,
+  "policy_training_executed": false,
+  "real_robot_used": false,
+  "required_features_available": true,
+  "rl_training_executed": false,
+  "scenario_count": 5,
+  "similarity_matrix_written": true,
+  "source_contact_transition_vectors_found": true,
+  "source_context_vectors_found": true,
+  "source_manifest_found": true,
+  "source_sprint": "v2.12",
+  "status": "context_encoder_prototype_validated",
+  "variational_encoder_used": false
+}

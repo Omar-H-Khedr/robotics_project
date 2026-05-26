@@ -1,0 +1,5 @@
+/parameter_events rcl_interfaces/msg/ParameterEvent
+/proposal_simulation_cell/context_embedding_report std_msgs/msg/String
+/proposal_simulation_cell/context_encoder_status std_msgs/msg/String
+/proposal_simulation_cell/context_similarity_report std_msgs/msg/String
+/rosout rcl_interfaces/msg/Log

@@ -1,0 +1,10 @@
+check,value,passed
+source_context_vector_count,5,true
+required_features_available,true,true
+embedding_dim,8,true
+embedding_count,5,true
+deterministic_only,true,true
+variational_encoder_used,false,true
+learning_executed,false,true
+policy_training_executed,false,true
+fake_result_created,false,true

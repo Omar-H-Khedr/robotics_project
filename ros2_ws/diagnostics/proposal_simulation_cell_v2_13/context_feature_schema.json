@@ -1,0 +1,33 @@
+{
+  "context_embedding_dim": 8,
+  "derived_features": {
+    "contact_context_strength": "force_norm * safe_contact_label",
+    "lateral_offset_norm": "sqrt(offset_x_norm^2 + offset_y_norm^2)",
+    "observation_reliability": "rgb_depth_available_flag * safety_clear_flag",
+    "scenario_difficulty_proxy": "lateral_offset_norm + force_norm, clipped to 1.0"
+  },
+  "deterministic_only": true,
+  "embedding_components": [
+    "offset_x_norm",
+    "offset_y_norm",
+    "lateral_offset_norm",
+    "trigger_step_norm",
+    "force_norm",
+    "contact_context_strength",
+    "observation_reliability",
+    "scenario_difficulty_proxy_norm"
+  ],
+  "encoder_type": "deterministic_context_encoder_prototype",
+  "required_features": [
+    "offset_x_norm",
+    "offset_y_norm",
+    "yaw_norm",
+    "trigger_step_norm",
+    "force_norm",
+    "rgb_depth_available_flag",
+    "safety_clear_flag",
+    "contact_binary_label",
+    "safe_contact_label"
+  ],
+  "variational_encoder_used": false
+}
