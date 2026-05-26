@@ -1,0 +1,8 @@
+moveit_execution_allowed=gazebo_simulation_only
+controller_execution_allowed=gazebo_simulation_only
+trajectory_execution_allowed=gazebo_simulation_only
+follow_joint_trajectory_execution_allowed=gazebo_simulation_only
+real_robot_allowed=false
+peg_insertion_allowed=false
+forceful_contact_allowed=false
+Command '['ros2', 'param', 'list', '/move_group']' timed out after 2.0 seconds

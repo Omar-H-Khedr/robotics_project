@@ -47,6 +47,7 @@ setup(
             "proposal_simulation_cell_v2_4_moveit_gazebo_execution_node = thesis_bringup.proposal_simulation_cell_v2_4_moveit_gazebo_execution_node:main",
             "proposal_simulation_cell_v2_5_guarded_task_sequence_node = thesis_bringup.proposal_simulation_cell_v2_5_guarded_task_sequence_node:main",
             "proposal_simulation_cell_v2_6_contact_gated_guarded_approach_node = thesis_bringup.proposal_simulation_cell_v2_6_contact_gated_guarded_approach_node:main",
+            "proposal_simulation_cell_v2_7_contact_triggered_guarded_touch_node = thesis_bringup.proposal_simulation_cell_v2_7_contact_triggered_guarded_touch_node:main",
         ]
     },
 )

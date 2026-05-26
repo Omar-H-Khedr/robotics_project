@@ -1,0 +1,14 @@
+phase,status,timestamp_sec,duration_sec,final_error_deg,max_force_n_so_far,max_torque_nm_so_far,safety_violation_count,note
+initialize,succeeded,5.000865,0.000000,0.000000,0.000000,0.000000,0,task sequence initialized
+verify_simulation_endpoint,succeeded,13.062610,0.000000,0.000000,0.000000,0.000000,0,Gazebo endpoint verified
+verify_moveit_ready,succeeded,13.062641,0.000000,0.000000,0.000000,0.000000,0,MoveIt planning and IK services available
+verify_contact_wrench_ready,succeeded,13.062647,0.000000,0.000000,0.000000,0.000000,0,Contact wrench topic available
+verify_contact_calibration_target,succeeded,13.062649,0.000000,0.000000,0.000000,0.000000,0,Runtime compliant contact calibration pad available
+verify_safety_gate_ready,succeeded,13.062653,0.000000,0.000000,0.000000,0.000000,0,Safety gate clear
+move_to_ready_pose,succeeded,14.367544,1.253715,0.522683,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+move_to_touch_standby_pose,succeeded,15.873851,1.455350,0.679156,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+execute_low_force_guarded_touch_steps,succeeded,17.739582,0.000000,0.000000,0.000000,0.000000,0,Guarded touch step loop started
+stop_on_contact_gate,failed,39.411222,0.000000,0.000000,0.000000,0.000000,0,Contact gate checked after guarded touch steps
+retreat_to_touch_standby_pose,succeeded,40.766696,1.304493,0.600616,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+return_to_ready_pose,succeeded,42.222112,1.404210,0.615490,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+validate_final_state,succeeded,42.222143,0.000000,0.615490,0.000000,0.000000,0,Final state checked against ready pose
