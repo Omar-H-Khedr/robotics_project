@@ -45,6 +45,7 @@ setup(
             "proposal_simulation_cell_v2_2_moveit_ik_diagnostic_node = thesis_bringup.proposal_simulation_cell_v2_2_moveit_ik_diagnostic_node:main",
             "proposal_simulation_cell_v2_3_model_alignment_plan_only_node = thesis_bringup.proposal_simulation_cell_v2_3_model_alignment_plan_only_node:main",
             "proposal_simulation_cell_v2_4_moveit_gazebo_execution_node = thesis_bringup.proposal_simulation_cell_v2_4_moveit_gazebo_execution_node:main",
+            "proposal_simulation_cell_v2_5_guarded_task_sequence_node = thesis_bringup.proposal_simulation_cell_v2_5_guarded_task_sequence_node:main",
         ]
     },
 )

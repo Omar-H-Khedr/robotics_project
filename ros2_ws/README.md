@@ -28,6 +28,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v2_2_moveit_ik_diagnostic_validation | Completed |
 | proposal_simulation_cell_v2_3_moveit_model_alignment_and_plan_only_validation | Completed |
 | proposal_simulation_cell_v2_4_moveit_gazebo_execution_validation | Completed |
+| proposal_simulation_cell_v2_5_guarded_pre_contact_task_sequence | Completed |
+
+## proposal_simulation_cell_v2_5_guarded_pre_contact_task_sequence
+
+Status: `guarded_pre_contact_task_sequence_validated`
+
+The v2.5 proposal simulation sprint adds a guarded pre-contact task sequence using MoveIt planning and Gazebo-only execution. It validates ready, pre-approach, pre-insertion standby, hold, and return phases while verifying the Gazebo simulation endpoint before executed phases.
+
+Phase reports, joint-state evidence, endpoint checks, and contact wrench monitoring are recorded. No real robot execution, physical endpoint, peg insertion, contact-seeking motion, learning, or scenario batch execution is used.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_5/`.
 
 ## proposal_simulation_cell_v2_4_moveit_gazebo_execution_validation
 

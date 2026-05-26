@@ -1,0 +1,9 @@
+proposal_simulation_cell_v2_5_guarded_pre_contact_task_sequence
+status=guarded_pre_contact_task_sequence_validated
+all_phase_plans_found=true
+all_phase_executions_observed=true
+hold_completed=true
+return_to_ready_completed=true
+real_robot_used=false
+peg_insertion_executed=false
+contact_seeking_executed=false

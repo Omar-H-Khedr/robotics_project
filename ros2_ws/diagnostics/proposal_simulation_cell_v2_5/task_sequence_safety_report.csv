@@ -1,0 +1,10 @@
+field,value
+contact_wrench_topic_available,true
+max_observed_force_n,0.0
+max_observed_torque_nm,0.0
+max_allowed_force_n,50.0
+emergency_stop_force_threshold_n,45.0
+safety_violation_count,0
+peg_insertion_executed,false
+contact_seeking_executed,false
+real_robot_used,false

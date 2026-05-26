@@ -110,6 +110,12 @@ Added the first MoveIt-generated Gazebo-only trajectory execution. The sprint ve
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_4/`. The execution remains simulation-only: no real robot execution, no physical endpoint, no peg insertion, and no contact-seeking motion.
 
+### proposal_simulation_cell_v2_5_guarded_pre_contact_task_sequence
+
+Added the guarded pre-contact task sequence. The sprint uses MoveIt planning and Gazebo-only execution to validate ready, pre-approach, pre-insertion standby, hold, and return phases with the Gazebo simulation endpoint verified before executed phases.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_5/`. Phase reports, joint-state evidence, endpoint checks, and contact wrench monitoring are recorded. The sequence remains simulation-only: no real robot execution, no physical endpoint, no peg insertion, and no contact-seeking motion.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -138,8 +144,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_4/`. The 
 | v2.2 | MoveIt IK diagnostic validation | Completed |
 | v2.3 | MoveIt/Gazebo model alignment and plan-only validation | Completed |
 | v2.4 | MoveIt-generated Gazebo-only execution validation | Completed |
-| v2.4 | Object-frame publisher for insertion targets | In progress |
-| v2.5 | IK feasibility diagnostics before motion | In progress |
+| v2.5 | Guarded pre-contact task sequence | Completed |
 | v2.5c | Unified execution gates and tool-axis audit | In progress |
 | v2.5d | Diagnostic Cartesian orientation target calculation | In progress |
 | v2.5e/v2.5f | Orientation-aware IK diagnostics and full-pose waypoint policy | In progress |
