@@ -1,0 +1,18 @@
+{
+  "contact_link_pose_available": true,
+  "contact_link_pose_xyz": [
+    0.8053468797500869,
+    -0.26439605274143185,
+    1.0678734365021527
+  ],
+  "robot_base_pose_available": true,
+  "selected_contact_link": "link_6",
+  "table_pose_available": true,
+  "table_top_z": 0.76,
+  "tool0_pose_xyz": [
+    0.8058352020556763,
+    -0.20533894167717792,
+    0.9186344698276604
+  ],
+  "tool_pose_available": true
+}

@@ -1,0 +1,6 @@
+scenario,x_offset_m,y_offset_m,yaw_offset_deg
+nominal_centered,0.000000,0.000000,0.000000
+x_positive_offset,0.003000,0.000000,0.000000
+x_negative_offset,-0.003000,0.000000,0.000000
+y_positive_offset,0.000000,0.003000,0.000000
+y_negative_offset,0.000000,-0.003000,0.000000

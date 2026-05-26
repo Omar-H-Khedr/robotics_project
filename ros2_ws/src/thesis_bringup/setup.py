@@ -50,6 +50,7 @@ setup(
             "proposal_simulation_cell_v2_7_contact_triggered_guarded_touch_node = thesis_bringup.proposal_simulation_cell_v2_7_contact_triggered_guarded_touch_node:main",
             "proposal_simulation_cell_v2_8_contact_reachability_trigger_node = thesis_bringup.proposal_simulation_cell_v2_8_contact_reachability_trigger_node:main",
             "proposal_simulation_cell_v2_9_non_overlapping_contact_node = thesis_bringup.proposal_simulation_cell_v2_9_non_overlapping_contact_node:main",
+            "proposal_simulation_cell_v2_10_misalignment_contact_batch_node = thesis_bringup.proposal_simulation_cell_v2_10_misalignment_contact_batch_node:main",
         ]
     },
 )

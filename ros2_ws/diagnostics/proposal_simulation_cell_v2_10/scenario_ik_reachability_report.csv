@@ -1,0 +1,6 @@
+scenario,standby_pose_reachable,touch_target_reachable,selected_group,selected_end_effector_link
+nominal_centered,true,true,manipulator,tool0
+x_positive_offset,true,true,manipulator,tool0
+x_negative_offset,true,true,manipulator,tool0
+y_positive_offset,true,true,manipulator,tool0
+y_negative_offset,true,true,manipulator,tool0
