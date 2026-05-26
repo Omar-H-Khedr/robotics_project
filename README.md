@@ -122,6 +122,12 @@ Added contact-gated guarded approach validation. The sprint uses MoveIt planning
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_6/`. Guarded approach steps are executed with contact wrench monitoring, the stop-on-contact or stand-off gate is validated, and retreat plus return-to-ready evidence is recorded. The sequence remains simulation-only: no real robot execution, no physical endpoint, no peg insertion, and no forceful contact.
 
+### proposal_simulation_cell_v2_7_contact_triggered_guarded_touch_calibration
+
+Added contact-triggered guarded touch calibration. The sprint uses MoveIt planning and Gazebo-only execution with a simulation-only contact calibration target, guarded touch step reporting, contact wrench reporting, stop-on-contact gating, retreat, and return-to-ready validation.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_7/`. The contact gate was not reached within the bounded guarded touch steps, so the validated status is `contact_triggered_guarded_touch_not_reached`. The sequence remains simulation-only: no real robot execution, no physical endpoint, no peg insertion, and no forceful contact.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -152,10 +158,10 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_6/`. Guar
 | v2.4 | MoveIt-generated Gazebo-only execution validation | Completed |
 | v2.5 | Guarded pre-contact task sequence | Completed |
 | v2.6 | Contact-gated guarded approach validation | Completed |
+| v2.7 | Contact-triggered guarded touch calibration | Completed |
 | v2.5c | Unified execution gates and tool-axis audit | In progress |
 | v2.5d | Diagnostic Cartesian orientation target calculation | In progress |
 | v2.5e/v2.5f | Orientation-aware IK diagnostics and full-pose waypoint policy | In progress |
-| v2.7 | Diagnostic-only IK backend audit and decision report | In progress |
 | v2.8 | MoveIt configuration audit and non-motion IK launch preparation | In progress |
 | v2.9 | MoveIt IK diagnostic launch readiness audit | In progress |
 | v2.10 | LBR iisy 6 R1300 semantic candidate for MoveIt IK diagnostics | In progress |

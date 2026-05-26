@@ -1,0 +1,7 @@
+target_name=proposal_v2_7_contact_calibration_pad
+target_type=runtime_spawned_compliant_contact_pad
+contact_topic=/proposal_simulation_cell/contact_calibration_contacts
+spawned=true
+spawn_pose_xyz=0.807443,-0.210536,0.915203
+size_xyz=0.500000,0.500000,0.500000
+separate_from_peg_insertion=true

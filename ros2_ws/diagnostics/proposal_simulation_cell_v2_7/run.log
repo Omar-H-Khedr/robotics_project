@@ -1,0 +1,10 @@
+proposal_simulation_cell_v2_7_contact_triggered_guarded_touch_calibration
+status=contact_triggered_guarded_touch_not_reached
+contact_gate_triggered=false
+contact_trigger_step_index=0
+max_observed_force_n=0.0
+retreat_completed=true
+return_to_ready_completed=true
+real_robot_used=false
+peg_insertion_executed=false
+forceful_contact_executed=false

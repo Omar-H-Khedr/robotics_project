@@ -30,6 +30,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v2_4_moveit_gazebo_execution_validation | Completed |
 | proposal_simulation_cell_v2_5_guarded_pre_contact_task_sequence | Completed |
 | proposal_simulation_cell_v2_6_contact_gated_guarded_approach_validation | Completed |
+| proposal_simulation_cell_v2_7_contact_triggered_guarded_touch_calibration | Completed |
+
+## proposal_simulation_cell_v2_7_contact_triggered_guarded_touch_calibration
+
+Status: `contact_triggered_guarded_touch_not_reached`
+
+The v2.7 proposal simulation sprint adds contact-triggered guarded touch calibration using MoveIt planning and Gazebo-only execution. It uses a simulation-only contact calibration target, records guarded touch steps, records contact wrench reports, and validates stop-on-contact plus retreat behavior if the contact gate triggers.
+
+The contact gate was not reached within the bounded guarded touch steps, and the diagnostic output records that result without fake contact evidence. No real robot execution, physical endpoint, peg insertion, forceful contact, learning, or scenario batch execution is used.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_7/`.
 
 ## proposal_simulation_cell_v2_6_contact_gated_guarded_approach_validation
 

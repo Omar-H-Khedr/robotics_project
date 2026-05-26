@@ -1,0 +1,11 @@
+step_index,force_n,torque_nm,contact_detection_force_threshold_n,desired_contact_force_upper_n,contact_gate_triggered,within_desired_contact_band,emergency_stop_triggered
+1,0.000000,0.000000,0.050000,5.000000,false,false,false
+2,0.000000,0.000000,0.050000,5.000000,false,false,false
+3,0.000000,0.000000,0.050000,5.000000,false,false,false
+4,0.000000,0.000000,0.050000,5.000000,false,false,false
+5,0.000000,0.000000,0.050000,5.000000,false,false,false
+6,0.000000,0.000000,0.050000,5.000000,false,false,false
+7,0.000000,0.000000,0.050000,5.000000,false,false,false
+8,0.000000,0.000000,0.050000,5.000000,false,false,false
+9,0.000000,0.000000,0.050000,5.000000,false,false,false
+10,0.000000,0.000000,0.050000,5.000000,false,false,false
