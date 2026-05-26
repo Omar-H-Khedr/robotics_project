@@ -1,7 +1,7 @@
 # Visuomotor Context-Based Meta-Reinforcement Learning for Safe Peg-in-Hole Assembly
 
 **Repository status:** active doctoral research prototype  
-**Latest documented sprint:** `proposal_simulation_cell_v2_11_multimodal_contact_observation_logging`  
+**Latest documented:** `proposal_simulation_cell_v2_11_multimodal_contact_observation_logging`  
 **README last updated:** 2026-05-26  
 **Execution scope:** simulation-first validation only; no real-robot claim is made in this repository state.
 
@@ -25,9 +25,9 @@ The current implementation focuses on reproducible simulation infrastructure, la
 
 ---
 
-## 2. Latest Validated Sprint
+## 2. Latest Validated
 
-### Sprint Name
+###  Name
 
 ```text
 proposal_simulation_cell_v2_11_multimodal_contact_observation_logging
@@ -73,7 +73,7 @@ The latest reported run completed successfully with the following outcome:
 
 ### Known Runtime Note
 
-`move_group` may log a shutdown-time segmentation fault after diagnostics are already written. In the latest reported run, this occurred after the validation artifacts had already been generated and did not invalidate the recorded sprint evidence.
+`move_group` may log a shutdown-time segmentation fault after diagnostics are already written. In the latest reported run, this occurred after the validation artifacts had already been generated and did not invalidate the recorded evidence.
 
 ---
 
@@ -104,7 +104,7 @@ The intended physical platform for later-stage transfer is:
 - **Simulation:** Gazebo
 - **Optional future simulation backend:** NVIDIA Isaac Sim
 
-Current repository status remains simulation-focused. Real-robot deployment is not claimed unless explicitly validated in a future sprint.
+Current repository status remains simulation-focused. Real-robot deployment is not claimed unless explicitly validated in a future.
 
 ---
 
@@ -112,7 +112,7 @@ Current repository status remains simulation-focused. Real-robot deployment is n
 
 ### 5.1 Multi-Modal Observation Pipeline
 
-The latest sprint validates logging of:
+The latest validates logging of:
 
 - RGB topic availability.
 - Depth topic availability.
