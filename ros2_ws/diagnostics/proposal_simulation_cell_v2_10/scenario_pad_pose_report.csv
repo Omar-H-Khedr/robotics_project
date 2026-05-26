@@ -1,0 +1,6 @@
+scenario,pad_x,pad_y,pad_z,pad_top_z,x_offset_m,y_offset_m,yaw_offset_deg,pad_inside_table_bounds,pad_on_tool_path
+nominal_centered,0.983350,-0.262718,1.018234,1.033234,0.000000,0.000000,0.000000,true,true
+x_positive_offset,0.979385,-0.265958,1.022720,1.037720,0.003000,0.000000,0.000000,true,true
+x_negative_offset,0.971209,-0.264604,1.026124,1.041124,-0.003000,0.000000,0.000000,true,true
+y_positive_offset,0.980695,-0.261251,1.022732,1.037732,0.000000,0.003000,0.000000,true,true
+y_negative_offset,0.985347,-0.267396,1.022873,1.037873,0.000000,-0.003000,0.000000,true,true

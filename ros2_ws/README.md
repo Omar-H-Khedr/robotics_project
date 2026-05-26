@@ -33,6 +33,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v2_7_contact_triggered_guarded_touch_calibration | Completed |
 | proposal_simulation_cell_v2_8_contact_reachability_and_trigger_validation | Completed |
 | proposal_simulation_cell_v2_9_non_overlapping_approach_to_contact_validation | Completed |
+| proposal_simulation_cell_v2_10_misalignment_contact_gate_batch_validation | Completed |
+
+## proposal_simulation_cell_v2_10_misalignment_contact_gate_batch_validation
+
+Status: `misalignment_contact_gate_batch_validated`
+
+The v2.10 proposal simulation sprint adds misalignment contact-gate batch validation using MoveIt planning and Gazebo-only execution. It runs five actual Gazebo scenarios: nominal centered, positive x offset, negative x offset, positive y offset, and negative y offset. Each scenario computes the calibration pad pose from robot/tool/table geometry, applies the lateral offset, verifies initial no-contact, triggers contact after guarded approach motion, stops on contact, retreats, verifies post-retreat no-contact, and returns to ready.
+
+Scenario definitions, pad poses, IK reachability, initial no-contact checks, contact transitions, post-retreat checks, safety evidence, and endpoint checks are recorded. No real robot execution, physical endpoint, peg insertion, forceful contact, learning, or fake scenario evidence is used.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_10/`.
 
 ## proposal_simulation_cell_v2_9_non_overlapping_approach_to_contact_validation
 

@@ -1,0 +1,67 @@
+phase,status,timestamp_sec,duration_sec,final_error_deg,max_force_n_so_far,max_torque_nm_so_far,safety_violation_count,note
+initialize,succeeded,5.001338,0.000000,0.000000,0.000000,0.000000,0,batch sequence initialized
+verify_simulation_endpoint,succeeded,13.057065,0.000000,0.000000,0.000000,0.000000,0,Gazebo endpoint verified
+verify_moveit_ready,succeeded,13.057076,0.000000,0.000000,0.000000,0.000000,0,MoveIt planning and IK services available
+compute_robot_tool_table_geometry,succeeded,13.057291,0.000000,0.000000,0.000000,0.000000,0,Tool and distal collision frame pose checked once for batch geometry
+verify_contact_topic_wiring,succeeded,13.057296,0.000000,0.000000,0.000000,0.000000,0,Raw Gazebo contact message type and bridge wiring available
+verify_safety_gate_ready,succeeded,13.057300,0.000000,0.000000,0.000000,0.000000,0,Safety gate clear
+nominal_centered:start,succeeded,13.057321,0.000000,0.000000,0.000000,0.000000,0,Scenario started
+nominal_centered:move_to_ready_pose,succeeded,14.274994,1.110665,0.537212,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+nominal_centered:move_to_no_contact_standby_pose,succeeded,15.630232,1.304208,0.667144,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+nominal_centered:compute_pad_pose,succeeded,17.289124,0.000000,0.000000,0.000000,0.000000,0,Scenario pad pose computed from batch geometry and offset
+nominal_centered:spawn_or_reposition_pad,succeeded,17.289134,0.000000,0.000000,0.000000,0.000000,0,Scenario pad spawned or repositioned
+nominal_centered:verify_initial_no_contact,succeeded,18.299615,0.000000,0.000000,0.000000,0.000000,0,Initial no-contact checked for scenario
+execute_bounded_approach_to_contact_steps,succeeded,18.299619,0.000000,0.000000,0.000000,0.000000,0,Contact trigger step loop started
+nominal_centered:stop_on_contact_gate,succeeded,21.822066,0.000000,0.000000,0.092160,0.000000,0,Contact gate checked for scenario
+nominal_centered:retreat_to_no_contact_standby_pose,succeeded,24.601055,2.725830,0.637735,0.094692,0.000000,0,Motion phase executed through Gazebo controller
+nominal_centered:verify_post_retreat_no_contact,succeeded,25.919175,0.000000,0.000000,0.094886,0.000000,0,Post-retreat no-contact checked for scenario
+nominal_centered:return_to_ready_pose,succeeded,27.524795,1.554277,0.527241,0.094886,0.000000,0,Motion phase executed through Gazebo controller
+nominal_centered:validate_final_state,succeeded,27.524828,0.000000,0.527241,0.094886,0.000000,0,Scenario final state checked
+x_positive_offset:start,succeeded,27.524848,0.000000,0.000000,0.000000,0.000000,0,Scenario started
+x_positive_offset:move_to_ready_pose,succeeded,29.032252,1.456404,0.667176,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+x_positive_offset:move_to_no_contact_standby_pose,succeeded,30.538080,1.454899,0.583667,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+x_positive_offset:compute_pad_pose,succeeded,31.846304,0.000000,0.000000,0.000000,0.000000,0,Scenario pad pose computed from batch geometry and offset
+x_positive_offset:spawn_or_reposition_pad,succeeded,31.846319,0.000000,0.000000,0.000000,0.000000,0,Scenario pad spawned or repositioned
+x_positive_offset:verify_initial_no_contact,succeeded,32.848524,0.000000,0.000000,0.000000,0.000000,0,Initial no-contact checked for scenario
+execute_bounded_approach_to_contact_steps,succeeded,32.848529,0.000000,0.000000,0.000000,0.000000,0,Contact trigger step loop started
+x_positive_offset:stop_on_contact_gate,succeeded,36.318377,0.000000,0.000000,0.089743,0.000000,0,Contact gate checked for scenario
+x_positive_offset:retreat_to_no_contact_standby_pose,succeeded,39.669850,3.298888,0.570011,0.091424,0.000000,0,Motion phase executed through Gazebo controller
+x_positive_offset:verify_post_retreat_no_contact,succeeded,40.980686,0.000000,0.000000,0.091681,0.000000,0,Post-retreat no-contact checked for scenario
+x_positive_offset:return_to_ready_pose,succeeded,42.436194,1.404518,0.614007,0.091681,0.000000,0,Motion phase executed through Gazebo controller
+x_positive_offset:validate_final_state,succeeded,42.436223,0.000000,0.614007,0.091681,0.000000,0,Scenario final state checked
+x_negative_offset:start,succeeded,42.436238,0.000000,0.000000,0.000000,0.000000,0,Scenario started
+x_negative_offset:move_to_ready_pose,succeeded,43.941354,1.453881,0.683776,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+x_negative_offset:move_to_no_contact_standby_pose,succeeded,45.748009,1.755689,0.683586,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+x_negative_offset:compute_pad_pose,succeeded,47.053930,0.000000,0.000000,0.000000,0.000000,0,Scenario pad pose computed from batch geometry and offset
+x_negative_offset:spawn_or_reposition_pad,succeeded,47.053945,0.000000,0.000000,0.000000,0.000000,0,Scenario pad spawned or repositioned
+x_negative_offset:verify_initial_no_contact,succeeded,48.055956,0.000000,0.000000,0.000000,0.000000,0,Initial no-contact checked for scenario
+execute_bounded_approach_to_contact_steps,succeeded,48.055961,0.000000,0.000000,0.000000,0.000000,0,Contact trigger step loop started
+x_negative_offset:stop_on_contact_gate,succeeded,51.522519,0.000000,0.000000,0.089191,0.000000,0,Contact gate checked for scenario
+x_negative_offset:retreat_to_no_contact_standby_pose,succeeded,53.766531,2.190344,0.673255,0.090710,0.000000,0,Motion phase executed through Gazebo controller
+x_negative_offset:verify_post_retreat_no_contact,succeeded,55.078054,0.000000,0.000000,0.090927,0.000000,0,Post-retreat no-contact checked for scenario
+x_negative_offset:return_to_ready_pose,succeeded,56.484090,1.355023,0.680178,0.090927,0.000000,0,Motion phase executed through Gazebo controller
+x_negative_offset:validate_final_state,succeeded,56.484117,0.000000,0.680178,0.090927,0.000000,0,Scenario final state checked
+y_positive_offset:start,succeeded,56.484128,0.000000,0.000000,0.000000,0.000000,0,Scenario started
+y_positive_offset:move_to_ready_pose,succeeded,57.639608,1.104344,0.653696,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+y_positive_offset:move_to_no_contact_standby_pose,succeeded,58.944710,1.254099,0.484600,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+y_positive_offset:compute_pad_pose,succeeded,60.253350,0.000000,0.000000,0.000000,0.000000,0,Scenario pad pose computed from batch geometry and offset
+y_positive_offset:spawn_or_reposition_pad,succeeded,60.253367,0.000000,0.000000,0.000000,0.000000,0,Scenario pad spawned or repositioned
+y_positive_offset:verify_initial_no_contact,succeeded,61.255404,0.000000,0.000000,0.000000,0.000000,0,Initial no-contact checked for scenario
+execute_bounded_approach_to_contact_steps,succeeded,61.255409,0.000000,0.000000,0.000000,0.000000,0,Contact trigger step loop started
+y_positive_offset:stop_on_contact_gate,succeeded,64.726679,0.000000,0.000000,0.092151,0.000000,0,Contact gate checked for scenario
+y_positive_offset:retreat_to_no_contact_standby_pose,succeeded,66.903625,2.115330,0.532646,0.092663,0.000000,0,Motion phase executed through Gazebo controller
+y_positive_offset:verify_post_retreat_no_contact,succeeded,68.213481,0.000000,0.000000,0.092671,0.000000,0,Post-retreat no-contact checked for scenario
+y_positive_offset:return_to_ready_pose,succeeded,69.618780,1.354318,0.604921,0.092671,0.000000,0,Motion phase executed through Gazebo controller
+y_positive_offset:validate_final_state,succeeded,69.618808,0.000000,0.604921,0.092671,0.000000,0,Scenario final state checked
+y_negative_offset:start,succeeded,69.618819,0.000000,0.000000,0.000000,0.000000,0,Scenario started
+y_negative_offset:move_to_ready_pose,succeeded,70.924756,1.254791,0.644307,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+y_negative_offset:move_to_no_contact_standby_pose,succeeded,72.329994,1.354263,0.631525,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+y_negative_offset:compute_pad_pose,succeeded,73.635229,0.000000,0.000000,0.000000,0.000000,0,Scenario pad pose computed from batch geometry and offset
+y_negative_offset:spawn_or_reposition_pad,succeeded,73.635243,0.000000,0.000000,0.000000,0.000000,0,Scenario pad spawned or repositioned
+y_negative_offset:verify_initial_no_contact,succeeded,74.637518,0.000000,0.000000,0.000000,0.000000,0,Initial no-contact checked for scenario
+execute_bounded_approach_to_contact_steps,succeeded,74.637523,0.000000,0.000000,0.000000,0.000000,0,Contact trigger step loop started
+y_negative_offset:stop_on_contact_gate,succeeded,78.116833,0.000000,0.000000,0.091713,0.000000,0,Contact gate checked for scenario
+y_negative_offset:retreat_to_no_contact_standby_pose,succeeded,79.657519,1.489580,0.632295,0.093147,0.000000,0,Motion phase executed through Gazebo controller
+y_negative_offset:verify_post_retreat_no_contact,succeeded,80.974107,0.000000,0.000000,0.093324,0.000000,0,Post-retreat no-contact checked for scenario
+y_negative_offset:return_to_ready_pose,succeeded,82.630414,1.605185,0.606616,0.093324,0.000000,0,Motion phase executed through Gazebo controller
+y_negative_offset:validate_final_state,succeeded,82.630440,0.000000,0.606616,0.093324,0.000000,0,Scenario final state checked

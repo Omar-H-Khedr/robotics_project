@@ -1,0 +1,6 @@
+scenario,max_force_n,max_torque_nm,safety_violation_count,emergency_stop_triggered,validated,peg_insertion_executed,forceful_contact_executed,real_robot_used
+nominal_centered,0.094886423,0.000000000,0,false,true,false,false,false
+x_positive_offset,0.091680973,0.000000000,0,false,true,false,false,false
+x_negative_offset,0.090927075,0.000000000,0,false,true,false,false,false
+y_positive_offset,0.092671242,0.000000000,0,false,true,false,false,false
+y_negative_offset,0.093323588,0.000000000,0,false,true,false,false,false
