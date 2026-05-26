@@ -1,0 +1,5 @@
+/parameter_events rcl_interfaces/msg/ParameterEvent
+/proposal_simulation_cell/contact_transition_feature_report std_msgs/msg/String
+/proposal_simulation_cell/context_vector_extraction_status std_msgs/msg/String
+/proposal_simulation_cell/context_vector_report std_msgs/msg/String
+/rosout rcl_interfaces/msg/Log

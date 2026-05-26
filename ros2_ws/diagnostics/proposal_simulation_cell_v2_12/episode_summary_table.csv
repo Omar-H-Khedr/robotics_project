@@ -1,0 +1,6 @@
+scenario_id,observation_count,contact_trigger_step_index,contact_force_at_trigger,max_force_n,safe_contact_label,rgb_depth_available_flag,safety_clear_flag,learning_executed,policy_training_executed
+nominal_centered,13,1,0.090233000,0.090630499,1,1,1,false,false
+x_negative_offset,13,1,0.091999000,0.095040713,1,1,1,false,false
+x_positive_offset,13,1,0.091598000,0.092090749,1,1,1,false,false
+y_negative_offset,13,1,0.091450000,0.093157150,1,1,1,false,false
+y_positive_offset,13,1,0.092517000,0.094907826,1,1,1,false,false

@@ -52,6 +52,7 @@ setup(
             "proposal_simulation_cell_v2_9_non_overlapping_contact_node = thesis_bringup.proposal_simulation_cell_v2_9_non_overlapping_contact_node:main",
             "proposal_simulation_cell_v2_10_misalignment_contact_batch_node = thesis_bringup.proposal_simulation_cell_v2_10_misalignment_contact_batch_node:main",
             "proposal_simulation_cell_v2_11_multimodal_observation_logger_node = thesis_bringup.proposal_simulation_cell_v2_11_multimodal_observation_logger_node:main",
+            "proposal_simulation_cell_v2_12_context_vector_extraction_node = thesis_bringup.proposal_simulation_cell_v2_12_context_vector_extraction_node:main",
         ]
     },
 )

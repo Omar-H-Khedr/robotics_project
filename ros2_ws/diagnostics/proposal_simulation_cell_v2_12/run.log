@@ -1,0 +1,11 @@
+proposal_simulation_cell_v2_12_context_vector_extraction
+status=context_vector_extraction_validated
+source_sprint=v2.11
+observation_row_count=65
+contact_transition_row_count=5
+context_vector_count=5
+fake_dataset_created=false
+fake_result_created=false
+learning_executed=false
+policy_training_executed=false
+real_robot_used=false

@@ -35,6 +35,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v2_9_non_overlapping_approach_to_contact_validation | Completed |
 | proposal_simulation_cell_v2_10_misalignment_contact_gate_batch_validation | Completed |
 | proposal_simulation_cell_v2_11_multimodal_contact_observation_logging | Completed |
+| proposal_simulation_cell_v2_12_context_vector_extraction | Completed |
+
+## proposal_simulation_cell_v2_12_context_vector_extraction
+
+Status: `context_vector_extraction_validated`
+
+The v2.12 proposal simulation sprint extracts compact context vectors from the real v2.11 Gazebo simulation observation logs. It reads the v2.11 multimodal observation log, contact-transition log, scenario summary, RGB-D frame-count report, channel completeness report, and safety report.
+
+Scenario-level context vectors, contact-transition feature vectors, episode summaries, observation-channel summaries, safety-gated context summaries, and a metadata manifest are generated. This sprint performs feature extraction only: no fake dataset, fake result, learning, policy training, real robot execution, peg insertion, or forceful contact is used.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_12/`.
 
 ## proposal_simulation_cell_v2_11_multimodal_contact_observation_logging
 

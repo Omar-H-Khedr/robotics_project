@@ -152,6 +152,12 @@ Added multimodal contact observation logging. The sprint replays the five valida
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_11/`. RGB-D topics were available and lightweight frame-count metadata was recorded without saving full image datasets. The batch creates real simulation observation logs only: no fake dataset, no experimental performance claim, no real robot execution, no physical endpoint, no peg insertion, and no forceful contact.
 
+### proposal_simulation_cell_v2_12_context_vector_extraction
+
+Added context vector extraction from the real v2.11 simulation observation logs. The sprint reads the v2.11 multimodal observation log, contact-transition log, scenario summary, RGB-D frame-count report, channel completeness report, and safety report to generate scenario-level context vectors, contact-transition feature vectors, episode summaries, channel summaries, safety-gated context summaries, and a metadata manifest.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_12/`. This sprint is feature extraction only: no fake dataset, no fake result, no learning, no policy training, no real robot execution, no peg insertion, and no forceful contact.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -187,6 +193,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_11/`. RGB
 | v2.9 | Non-overlapping approach-to-contact validation | Completed |
 | v2.10 | Misalignment contact-gate batch validation | Completed |
 | v2.11 | Multimodal contact observation logging | Completed |
+| v2.12 | Context vector extraction | Completed |
 | v2.5c | Unified execution gates and tool-axis audit | In progress |
 | v2.5d | Diagnostic Cartesian orientation target calculation | In progress |
 | v2.5e/v2.5f | Orientation-aware IK diagnostics and full-pose waypoint policy | In progress |
