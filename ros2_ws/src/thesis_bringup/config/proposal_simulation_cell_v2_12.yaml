@@ -1,0 +1,39 @@
+simulation_cell_name: proposal_simulation_cell_v2_12_context_vector_extraction
+
+context_vector_extraction:
+  task_type: context_vector_extraction
+  source_sprint: v2.11
+  source_is_real_simulation_log: true
+  source_diagnostics_dir: diagnostics/proposal_simulation_cell_v2_11
+  output_dir: diagnostics/proposal_simulation_cell_v2_12
+  fake_dataset_created: false
+  fake_result_created: false
+  learning_executed: false
+  policy_training_executed: false
+  real_robot_used: false
+  peg_insertion_executed: false
+  forceful_contact_executed: false
+
+input_files:
+  observation_log: multimodal_observation_log.csv
+  contact_transition_log: contact_transition_observation_log.csv
+  scenario_summary: scenario_execution_summary.csv
+  rgbd_frame_count_report: rgbd_frame_count_report.csv
+  observation_channel_completeness_report: observation_channel_completeness_report.csv
+  scenario_safety_report: scenario_safety_report.csv
+
+feature_extraction:
+  max_expected_offset_m: 0.003
+  max_expected_yaw_deg: 2.0
+  max_expected_trigger_step: 12
+  force_normalization_n: 8.0
+  require_contact_transition_rows: true
+  require_observation_rows: true
+
+validation:
+  status_success: context_vector_extraction_validated
+  status_missing_inputs: context_vector_source_inputs_missing
+  status_empty_inputs: context_vector_source_inputs_empty
+  status_topic: /proposal_simulation_cell/context_vector_extraction_status
+  context_vector_report_topic: /proposal_simulation_cell/context_vector_report
+  contact_transition_feature_report_topic: /proposal_simulation_cell/contact_transition_feature_report

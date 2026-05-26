@@ -1,0 +1,6 @@
+scenario_id,step_index,force_n,torque_nm,contact_detection_force_threshold_n,contact_validation_min_force_n,contact_gate_triggered,within_desired_contact_band,emergency_stop_triggered,contact_binary_label,safe_contact_label,force_norm,trigger_step_norm
+nominal_centered,1,0.090233000,0.000000000,0.020000000,0.020000000,true,true,false,1,1,0.011328812,0.083333333
+x_positive_offset,1,0.091598000,0.000000000,0.020000000,0.020000000,true,true,false,1,1,0.011511344,0.083333333
+x_negative_offset,1,0.091999000,0.000000000,0.020000000,0.020000000,true,true,false,1,1,0.011880089,0.083333333
+y_positive_offset,1,0.092517000,0.000000000,0.020000000,0.020000000,true,true,false,1,1,0.011863478,0.083333333
+y_negative_offset,1,0.091450000,0.000000000,0.020000000,0.020000000,true,true,false,1,1,0.011644644,0.083333333

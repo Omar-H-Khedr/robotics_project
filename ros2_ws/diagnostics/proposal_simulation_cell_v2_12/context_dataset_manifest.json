@@ -1,0 +1,36 @@
+{
+  "fake_dataset_created": false,
+  "fake_result_created": false,
+  "forceful_contact_executed": false,
+  "generated_files": [
+    "context_vector_extraction_status.json",
+    "scenario_context_vectors.csv",
+    "scenario_context_vectors.json",
+    "contact_transition_feature_vectors.csv",
+    "episode_summary_table.csv",
+    "observation_channel_context_summary.csv",
+    "safety_gated_context_summary.csv",
+    "context_dataset_manifest.json",
+    "summary.md"
+  ],
+  "learning_executed": false,
+  "peg_insertion_executed": false,
+  "policy_training_executed": false,
+  "real_robot_used": false,
+  "row_counts": {
+    "contact_transition_rows": 5,
+    "context_vectors": 5,
+    "observation_rows": 65
+  },
+  "source_files": {
+    "channel": "diagnostics/proposal_simulation_cell_v2_11/observation_channel_completeness_report.csv",
+    "contact_transition": "diagnostics/proposal_simulation_cell_v2_11/contact_transition_observation_log.csv",
+    "observation": "diagnostics/proposal_simulation_cell_v2_11/multimodal_observation_log.csv",
+    "rgbd": "diagnostics/proposal_simulation_cell_v2_11/rgbd_frame_count_report.csv",
+    "safety": "diagnostics/proposal_simulation_cell_v2_11/scenario_safety_report.csv",
+    "scenario_summary": "diagnostics/proposal_simulation_cell_v2_11/scenario_execution_summary.csv"
+  },
+  "source_is_real_simulation_log": true,
+  "source_sprint": "v2.11",
+  "task_type": "context_vector_extraction"
+}

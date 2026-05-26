@@ -1,0 +1,23 @@
+{
+  "channel_summary_written": true,
+  "contact_transition_row_count": 5,
+  "contact_transition_vectors_written": true,
+  "context_vector_count": 5,
+  "context_vectors_written": true,
+  "episode_summary_written": true,
+  "fake_dataset_created": false,
+  "fake_result_created": false,
+  "forceful_contact_executed": false,
+  "learning_executed": false,
+  "observation_row_count": 65,
+  "peg_insertion_executed": false,
+  "policy_training_executed": false,
+  "real_robot_used": false,
+  "safety_summary_written": true,
+  "scenario_count": 5,
+  "source_contact_transition_log_found": true,
+  "source_observation_log_found": true,
+  "source_scenario_summary_found": true,
+  "source_sprint": "v2.11",
+  "status": "context_vector_extraction_validated"
+}

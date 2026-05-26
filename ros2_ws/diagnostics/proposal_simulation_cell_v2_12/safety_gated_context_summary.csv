@@ -1,0 +1,6 @@
+scenario_id,safety_clear_flag,safe_contact_label,safety_violation_count,peg_insertion_executed,forceful_contact_executed,real_robot_used
+nominal_centered,1,1,0,false,false,false
+x_negative_offset,1,1,0,false,false,false
+x_positive_offset,1,1,0,false,false,false
+y_negative_offset,1,1,0,false,false,false
+y_positive_offset,1,1,0,false,false,false
