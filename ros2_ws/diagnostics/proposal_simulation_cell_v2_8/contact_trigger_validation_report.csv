@@ -1,0 +1,2 @@
+step_index,force_n,torque_nm,contact_detection_force_threshold_n,contact_validation_min_force_n,raw_contact_topic_available,raw_contact_message_count,raw_contact_count,max_contact_depth_m,desired_contact_force_upper_n,contact_gate_triggered,within_desired_contact_band,emergency_stop_triggered
+0,0.388120,0.000000,0.020000,0.020000,true,2377,2377,0.080000000,3.000000,true,true,false

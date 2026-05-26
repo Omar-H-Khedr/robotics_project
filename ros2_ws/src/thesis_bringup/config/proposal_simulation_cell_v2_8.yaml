@@ -1,0 +1,136 @@
+simulation_cell_name: proposal_simulation_cell_v2_8_contact_reachability_and_trigger_validation
+
+robot:
+  robot_model: KUKA LBR iisy contact reachability Gazebo task model
+  gazebo_robot_model: lbr_iisy3_r760
+  selected_group: manipulator
+  selected_end_effector_link: tool0
+  controller_joint_names:
+    - joint_1
+    - joint_2
+    - joint_3
+    - joint_4
+    - joint_5
+    - joint_6
+
+task_sequence:
+  simulation_engine: gazebo
+  task_sequence_type: contact_reachability_and_trigger_validation
+  max_task_duration_sec: 90.0
+  return_tolerance_deg: 1.0
+  phases:
+    - initialize
+    - verify_simulation_endpoint
+    - verify_moveit_ready
+    - verify_tf_or_tool_pose_ready
+    - compute_reachable_contact_pad_pose
+    - spawn_or_reposition_contact_pad_on_tool_path
+    - verify_contact_topic_wiring
+    - verify_safety_gate_ready
+    - move_to_ready_pose
+    - move_to_touch_standby_pose
+    - execute_contact_trigger_steps
+    - stop_on_contact_gate
+    - retreat_to_touch_standby_pose
+    - return_to_ready_pose
+    - validate_final_state
+
+tool_pose_source:
+  reference_frame: world
+  tool_frame: tool0
+  distal_collision_frame: link_6
+  fallback_world_pose_xyz: [0.95, -0.25, 1.05]
+
+contact_calibration_target:
+  target_name: proposal_v2_8_contact_reachability_pad
+  contact_target_type: reachable_runtime_spawned_calibration_pad
+  target_type: reachable_runtime_spawned_calibration_pad
+  contact_topic: /world/proposal_simulation_cell_v1_3_contact_physics_validation/model/proposal_v2_8_contact_reachability_pad/link/contact_calibration_pad_link/sensor/contact_calibration_sensor/contact
+  gz_contact_topic: /world/proposal_simulation_cell_v1_3_contact_physics_validation/model/proposal_v2_8_contact_reachability_pad/link/contact_calibration_pad_link/sensor/contact_calibration_sensor/contact
+  frame_id: contact_reachability_pad
+  reference_frame: world
+  size_xyz: [0.16, 0.16, 0.16]
+  mass_kg: 0.01
+  contact_kp: 5.0
+  contact_kd: 0.5
+  pad_center_offset_xyz: [0.0, 0.0, 0.0]
+  collision_enabled: true
+  separate_from_peg_insertion: true
+
+contact_topic_wiring:
+  raw_contact_topic: /world/proposal_simulation_cell_v1_3_contact_physics_validation/model/proposal_v2_8_contact_reachability_pad/link/contact_calibration_pad_link/sensor/contact_calibration_sensor/contact
+  derived_contact_wrench_topic: /proposal_simulation_cell/contact_wrench
+  raw_contact_topic_must_be_available: true
+  derived_contact_wrench_must_be_available: true
+
+moveit_execution:
+  moveit_used: true
+  selected_group: manipulator
+  selected_end_effector_link: tool0
+  compute_ik_service: /compute_ik
+  plan_service: /plan_kinematic_path
+  move_group_node_name: /move_group
+  control_interface: /joint_trajectory_controller/follow_joint_trajectory
+  simulation_control_interface_used: gz_ros2_control/GazeboSimSystem via joint_trajectory_controller
+  plan_allowed_time_sec: 3.0
+  planning_attempts: 1
+  max_velocity_scaling_factor: 0.05
+  max_acceleration_scaling_factor: 0.05
+  joint_goal_tolerance_rad: 0.012
+
+guarded_touch:
+  max_joint_delta_from_initial_deg: 8.0
+  guarded_touch_step_count: 12
+  max_single_step_joint_delta_deg: 0.5
+  ready_pose_delta_deg:
+    joint_6: 0.75
+  touch_standby_pose_delta_deg:
+    joint_5: 0.75
+    joint_6: 1.5
+  guarded_step_delta_deg:
+    joint_5: 0.25
+    joint_6: 0.25
+
+contact_gate:
+  contact_detection_force_threshold_n: 0.02
+  contact_validation_min_force_n: 0.02
+  desired_contact_force_upper_n: 3.0
+  contact_wrench_topic_must_be_available: true
+
+safety_gates:
+  max_allowed_force_n: 8.0
+  max_allowed_torque_nm: 5.0
+  emergency_stop_force_threshold_n: 6.0
+  peg_insertion_allowed: false
+  forceful_contact_allowed: false
+
+execution_policy:
+  moveit_execution_allowed: gazebo_simulation_only
+  controller_execution_allowed: gazebo_simulation_only
+  trajectory_execution_allowed: gazebo_simulation_only
+  follow_joint_trajectory_execution_allowed: gazebo_simulation_only
+  real_robot_allowed: false
+  real_robot_used: false
+  learning_enabled: false
+  scenario_batch_execution_enabled: false
+  peg_insertion_allowed: false
+  forceful_contact_allowed: false
+
+validation:
+  output_dir: diagnostics/proposal_simulation_cell_v2_8
+  status_success_contact: contact_reachability_and_trigger_validated
+  status_no_contact: contact_target_reachable_but_contact_not_triggered
+  status_unreachable: contact_target_not_reachable
+  status_contact_topic_unavailable: contact_topic_wiring_unavailable
+  status_emergency: contact_reachability_emergency_stop_triggered
+  status_topic: /proposal_simulation_cell/contact_reachability_status
+  pad_pose_report_topic: /proposal_simulation_cell/contact_pad_pose_report
+  topic_wiring_report_topic: /proposal_simulation_cell/contact_topic_wiring_report
+  step_report_topic: /proposal_simulation_cell/contact_trigger_step_report
+  contact_trigger_validation_report_topic: /proposal_simulation_cell/contact_trigger_validation_report
+  safety_report_topic: /proposal_simulation_cell/contact_reachability_safety_report
+  endpoint_report_topic: /proposal_simulation_cell/contact_reachability_endpoint_report
+  contact_wrench_topic: /proposal_simulation_cell/contact_wrench
+  joint_states_topic: /joint_states
+  validation_timeout_sec: 210.0
+  startup_wait_sec: 5.0

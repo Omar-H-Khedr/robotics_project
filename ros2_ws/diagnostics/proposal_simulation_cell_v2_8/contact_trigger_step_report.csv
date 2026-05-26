@@ -1,0 +1,2 @@
+step_index,status,duration_sec,force_n,torque_nm,contact_gate_triggered,emergency_stop_triggered,joint_state_snapshot,raw_contact_topic_available,raw_contact_message_count,raw_contact_count,max_contact_depth_m
+0,contact_gate_triggered_before_step_motion,0.000000,0.388120,0.000000,true,false,joint_1=-0.011894321;joint_2=-0.805282101;joint_3=1.207638722;joint_4=0.011747000;joint_5=0.824438982;joint_6=0.033722673,true,2377,2377,0.080000000

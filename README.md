@@ -128,6 +128,12 @@ Added contact-triggered guarded touch calibration. The sprint uses MoveIt planni
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_7/`. The contact gate was not reached within the bounded guarded touch steps, so the validated status is `contact_triggered_guarded_touch_not_reached`. The sequence remains simulation-only: no real robot execution, no physical endpoint, no peg insertion, and no forceful contact.
 
+### proposal_simulation_cell_v2_8_contact_reachability_and_trigger_validation
+
+Added contact reachability and trigger validation. The sprint computes a simulation-only calibration pad pose relative to the tool/distal-link path, checks raw contact topic wiring, records raw contact plus derived wrench evidence, and executes bounded Gazebo-only contact-trigger steps through the verified simulation endpoint.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_8/`. The contact gate triggered with nonzero raw contact and derived wrench evidence, stop-on-contact was executed, and retreat plus return-to-ready behavior were validated. The sequence remains simulation-only: no real robot execution, no physical endpoint, no peg insertion, and no forceful contact.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -159,6 +165,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_7/`. The 
 | v2.5 | Guarded pre-contact task sequence | Completed |
 | v2.6 | Contact-gated guarded approach validation | Completed |
 | v2.7 | Contact-triggered guarded touch calibration | Completed |
+| v2.8 | Contact reachability and trigger validation | Completed |
 | v2.5c | Unified execution gates and tool-axis audit | In progress |
 | v2.5d | Diagnostic Cartesian orientation target calculation | In progress |
 | v2.5e/v2.5f | Orientation-aware IK diagnostics and full-pose waypoint policy | In progress |
