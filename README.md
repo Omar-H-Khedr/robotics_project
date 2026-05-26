@@ -134,6 +134,12 @@ Added contact reachability and trigger validation. The sprint computes a simulat
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_8/`. The contact gate triggered with nonzero raw contact and derived wrench evidence, stop-on-contact was executed, and retreat plus return-to-ready behavior were validated. The sequence remains simulation-only: no real robot execution, no physical endpoint, no peg insertion, and no forceful contact.
 
+### proposal_simulation_cell_v2_9_non_overlapping_approach_to_contact_validation
+
+Added non-overlapping approach-to-contact validation. The sprint places a simulation-only calibration pad on the computed tool path with positive initial clearance, verifies the initial no-contact standby condition, executes bounded Gazebo-only approach motion, triggers contact after motion rather than at step 0, and records stop-on-contact, retreat, post-retreat no-contact, and return-to-ready evidence.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_9/`. The sequence remains simulation-only: no real robot execution, no physical endpoint, no peg insertion, and no forceful contact.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -166,6 +172,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_8/`. The 
 | v2.6 | Contact-gated guarded approach validation | Completed |
 | v2.7 | Contact-triggered guarded touch calibration | Completed |
 | v2.8 | Contact reachability and trigger validation | Completed |
+| v2.9 | Non-overlapping approach-to-contact validation | Completed |
 | v2.5c | Unified execution gates and tool-axis audit | In progress |
 | v2.5d | Diagnostic Cartesian orientation target calculation | In progress |
 | v2.5e/v2.5f | Orientation-aware IK diagnostics and full-pose waypoint policy | In progress |

@@ -1,0 +1,133 @@
+simulation_cell_name: proposal_simulation_cell_v2_9_non_overlapping_approach_to_contact_validation
+
+robot:
+  robot_model: KUKA LBR iisy non-overlapping contact approach Gazebo task model
+  gazebo_robot_model: lbr_iisy3_r760
+  selected_group: manipulator
+  selected_end_effector_link: tool0
+  selected_contact_link: link_6
+  controller_joint_names: [joint_1, joint_2, joint_3, joint_4, joint_5, joint_6]
+
+task_sequence:
+  simulation_engine: gazebo
+  task_sequence_type: non_overlapping_approach_to_contact_validation
+  max_task_duration_sec: 90.0
+  return_tolerance_deg: 1.0
+  phases:
+    - initialize
+    - verify_simulation_endpoint
+    - verify_moveit_ready
+    - compute_robot_tool_table_geometry
+    - compute_non_overlapping_pad_pose
+    - spawn_or_reposition_contact_pad
+    - move_to_no_contact_standby_pose
+    - verify_initial_no_contact
+    - execute_bounded_approach_to_contact_steps
+    - stop_on_contact_gate
+    - retreat_to_no_contact_standby_pose
+    - verify_post_retreat_no_contact
+    - return_to_ready_pose
+    - validate_final_state
+
+tool_pose_source:
+  reference_frame: world
+  tool_frame: tool0
+  distal_collision_frame: link_6
+  table_frame: table
+  fallback_world_pose_xyz: [0.95, -0.25, 1.05]
+  table_top_z: 0.76
+
+contact_calibration_target:
+  target_name: proposal_v2_9_non_overlapping_contact_pad
+  contact_target_type: computed_non_overlapping_table_top_calibration_pad
+  contact_topic: /world/proposal_simulation_cell_v1_3_contact_physics_validation/model/proposal_v2_9_non_overlapping_contact_pad/link/contact_calibration_pad_link/sensor/contact_calibration_sensor/contact
+  gz_contact_topic: /world/proposal_simulation_cell_v1_3_contact_physics_validation/model/proposal_v2_9_non_overlapping_contact_pad/link/contact_calibration_pad_link/sensor/contact_calibration_sensor/contact
+  frame_id: non_overlapping_contact_pad
+  pad_size_x_m: 0.12
+  pad_size_y_m: 0.12
+  pad_thickness_m: 0.03
+  mass_kg: 0.01
+  contact_kp: 5.0
+  contact_kd: 0.5
+  collision_enabled: true
+
+contact_topic_wiring:
+  raw_contact_topic: /world/proposal_simulation_cell_v1_3_contact_physics_validation/model/proposal_v2_9_non_overlapping_contact_pad/link/contact_calibration_pad_link/sensor/contact_calibration_sensor/contact
+  derived_contact_wrench_topic: /proposal_simulation_cell/contact_wrench
+
+moveit_execution:
+  moveit_used: true
+  selected_group: manipulator
+  selected_end_effector_link: tool0
+  compute_ik_service: /compute_ik
+  plan_service: /plan_kinematic_path
+  move_group_node_name: /move_group
+  control_interface: /joint_trajectory_controller/follow_joint_trajectory
+  simulation_control_interface_used: gz_ros2_control/GazeboSimSystem via joint_trajectory_controller
+  plan_allowed_time_sec: 3.0
+  planning_attempts: 1
+  max_velocity_scaling_factor: 0.04
+  max_acceleration_scaling_factor: 0.04
+  joint_goal_tolerance_rad: 0.012
+
+guarded_touch:
+  max_joint_delta_from_initial_deg: 8.0
+  guarded_touch_step_count: 12
+  max_single_step_joint_delta_deg: 0.5
+  max_step_distance_m: 0.004
+  initial_clearance_m: 0.030
+  min_initial_clearance_m: 0.010
+  max_initial_clearance_m: 0.030
+  commanded_penetration_m: 0.002
+  approach_axis: vertical_negative_z
+  ready_pose_delta_deg:
+    joint_6: 0.75
+  touch_standby_pose_delta_deg:
+    joint_5: 0.75
+    joint_6: 1.5
+  guarded_step_delta_deg:
+    joint_5: 0.25
+    joint_6: 0.25
+
+contact_gate:
+  contact_detection_force_threshold_n: 0.02
+  contact_validation_min_force_n: 0.02
+  desired_contact_force_upper_n: 3.0
+
+safety_gates:
+  max_allowed_force_n: 8.0
+  max_allowed_torque_nm: 5.0
+  emergency_stop_force_threshold_n: 6.0
+  peg_insertion_allowed: false
+  forceful_contact_allowed: false
+
+execution_policy:
+  moveit_execution_allowed: gazebo_simulation_only
+  controller_execution_allowed: gazebo_simulation_only
+  trajectory_execution_allowed: gazebo_simulation_only
+  follow_joint_trajectory_execution_allowed: gazebo_simulation_only
+  real_robot_allowed: false
+  real_robot_used: false
+  learning_enabled: false
+  peg_insertion_allowed: false
+  forceful_contact_allowed: false
+
+validation:
+  output_dir: diagnostics/proposal_simulation_cell_v2_9
+  status_success_contact: non_overlapping_approach_to_contact_validated
+  status_initial_contact: initial_no_contact_not_verified
+  status_standby_unreachable: standby_pose_not_reachable
+  status_touch_unreachable: touch_target_pose_not_reachable
+  status_no_contact: contact_not_triggered_after_bounded_approach
+  status_step_zero: contact_triggered_at_step_zero_again
+  status_post_retreat_contact: post_retreat_contact_not_cleared
+  status_emergency: non_overlapping_contact_emergency_stop_triggered
+  status_topic: /proposal_simulation_cell/non_overlapping_approach_to_contact_status
+  step_report_topic: /proposal_simulation_cell/approach_to_contact_step_report
+  contact_trigger_validation_report_topic: /proposal_simulation_cell/contact_transition_report
+  safety_report_topic: /proposal_simulation_cell/approach_to_contact_safety_report
+  endpoint_report_topic: /proposal_simulation_cell/approach_to_contact_endpoint_report
+  contact_wrench_topic: /proposal_simulation_cell/contact_wrench
+  joint_states_topic: /joint_states
+  validation_timeout_sec: 210.0
+  startup_wait_sec: 5.0

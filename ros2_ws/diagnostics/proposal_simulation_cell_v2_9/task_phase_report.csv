@@ -1,0 +1,18 @@
+phase,status,timestamp_sec,duration_sec,final_error_deg,max_force_n_so_far,max_torque_nm_so_far,safety_violation_count,note
+initialize,succeeded,5.001498,0.000000,0.000000,0.000000,0.000000,0,task sequence initialized
+verify_simulation_endpoint,succeeded,12.594004,0.000000,0.000000,0.000000,0.000000,0,Gazebo endpoint verified
+verify_moveit_ready,succeeded,12.594016,0.000000,0.000000,0.000000,0.000000,0,MoveIt planning and IK services available
+compute_robot_tool_table_geometry,succeeded,12.594189,0.000000,0.000000,0.000000,0.000000,0,Tool or distal collision frame pose checked
+verify_contact_topic_wiring,succeeded,12.594194,0.000000,0.000000,0.000000,0.000000,0,Raw Gazebo contact message type and bridge wiring available
+verify_safety_gate_ready,succeeded,12.594217,0.000000,0.000000,0.000000,0.000000,0,Safety gate clear
+move_to_ready_pose,succeeded,14.199411,1.553886,0.619866,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+move_to_no_contact_standby_pose,succeeded,15.354099,1.103731,0.665647,0.000000,0.000000,0,Motion phase executed through Gazebo controller
+compute_non_overlapping_pad_pose,succeeded,16.977290,0.000000,0.000000,0.000000,0.000000,0,Calibration pad pose computed below the contact-link standby path
+spawn_or_reposition_contact_pad,succeeded,16.977301,0.000000,0.000000,0.000000,0.000000,0,Runtime calibration pad placed with positive standby clearance
+verify_initial_no_contact,succeeded,17.987318,0.000000,0.000000,0.000000,0.000000,0,Initial standby contact gate and force checked
+execute_bounded_approach_to_contact_steps,succeeded,17.987322,0.000000,0.000000,0.000000,0.000000,0,Contact trigger step loop started
+stop_on_contact_gate,succeeded,21.480661,0.000000,0.000000,0.091306,0.000000,0,Contact gate checked after guarded touch steps
+retreat_to_no_contact_standby_pose,succeeded,23.307304,1.775309,0.666630,0.093211,0.000000,0,Motion phase executed through Gazebo controller
+verify_post_retreat_no_contact,succeeded,24.620532,0.000000,0.000000,0.093428,0.000000,0,Post-retreat contact gate and force checked
+return_to_ready_pose,succeeded,25.976252,1.304127,0.593053,0.093428,0.000000,0,Motion phase executed through Gazebo controller
+validate_final_state,succeeded,25.976284,0.000000,0.593053,0.093428,0.000000,0,Final state checked against ready pose

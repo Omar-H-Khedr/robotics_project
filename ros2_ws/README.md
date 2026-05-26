@@ -32,6 +32,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v2_6_contact_gated_guarded_approach_validation | Completed |
 | proposal_simulation_cell_v2_7_contact_triggered_guarded_touch_calibration | Completed |
 | proposal_simulation_cell_v2_8_contact_reachability_and_trigger_validation | Completed |
+| proposal_simulation_cell_v2_9_non_overlapping_approach_to_contact_validation | Completed |
+
+## proposal_simulation_cell_v2_9_non_overlapping_approach_to_contact_validation
+
+Status: `non_overlapping_approach_to_contact_validated`
+
+The v2.9 proposal simulation sprint adds non-overlapping approach-to-contact validation using MoveIt planning and Gazebo-only execution. It computes the robot/tool/table/pad geometry, places the simulation-only calibration pad on the computed tool path with positive clearance, verifies the initial no-contact standby condition, and executes bounded approach motion until contact triggers after motion rather than at step 0.
+
+Stop-on-contact, retreat, post-retreat no-contact, return-to-ready, raw contact evidence, and derived compliant force evidence are recorded. No real robot execution, physical endpoint, peg insertion, forceful contact, learning, or scenario batch execution is used.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_9/`.
 
 ## proposal_simulation_cell_v2_8_contact_reachability_and_trigger_validation
 

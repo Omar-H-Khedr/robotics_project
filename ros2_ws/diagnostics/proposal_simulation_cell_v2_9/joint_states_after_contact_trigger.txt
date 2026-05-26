@@ -1,0 +1,7 @@
+joint_state_available=true
+joint_1: 0.011813589
+joint_2: -0.809322657
+joint_3: 1.194477677
+joint_4: 0.001860869
+joint_5: 0.808874547
+joint_6: 0.041767243
