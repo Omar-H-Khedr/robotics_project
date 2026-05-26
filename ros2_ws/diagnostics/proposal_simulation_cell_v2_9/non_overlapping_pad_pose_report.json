@@ -1,0 +1,14 @@
+{
+  "initial_clearance_m": 0.03,
+  "initial_lateral_clearance_m": 0.18,
+  "max_initial_clearance_m": 0.03,
+  "min_initial_clearance_m": 0.01,
+  "pad_inside_table_bounds": true,
+  "pad_on_tool_path": true,
+  "pad_pose_xyz": [
+    0.9856328489063002,
+    -0.2650190312428407,
+    1.0244324949297527
+  ],
+  "pad_top_z": 1.0394324949297526
+}

@@ -1,0 +1,2 @@
+initial_clearance_m,initial_force_n,contact_detection_force_threshold_n,initial_contact_gate_triggered,raw_contact_message_count,raw_contact_count,robot_pad_contact_count,raw_contact_pairs_sample,robot_contact_pairs_sample,initial_no_contact_verified
+0.030000,0.000000,0.020000,false,1010,1010,0,proposal_v2_9_non_overlapping_contact_pad::contact_calibration_pad_link::contact_calibration_pad_collision <-> ground_plane::link::collision,,true

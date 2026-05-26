@@ -1,0 +1,17 @@
+proposal_simulation_cell_v2_9_non_overlapping_approach_to_contact_validation
+status=non_overlapping_approach_to_contact_validated
+tool_pose_available=true
+pad_pose_computed=true
+pad_on_tool_path=true
+initial_no_contact_verified=true
+initial_force_n=0.0
+contact_gate_triggered=true
+contact_trigger_step_index=1
+contact_trigger_after_motion=true
+max_observed_force_n=0.09342787345205858
+retreat_completed=true
+post_retreat_no_contact_verified=true
+return_to_ready_completed=true
+real_robot_used=false
+peg_insertion_executed=false
+forceful_contact_executed=false
