@@ -1,0 +1,101 @@
+simulation_cell_name: proposal_simulation_cell_v2_6_contact_gated_guarded_approach_validation
+
+robot:
+  robot_model: KUKA LBR iisy contact-gated guarded approach Gazebo task model
+  gazebo_robot_model: lbr_iisy3_r760
+  selected_group: manipulator
+  selected_end_effector_link: tool0
+  controller_joint_names:
+    - joint_1
+    - joint_2
+    - joint_3
+    - joint_4
+    - joint_5
+    - joint_6
+
+task_sequence:
+  simulation_engine: gazebo
+  task_sequence_type: contact_gated_guarded_approach
+  max_task_duration_sec: 60.0
+  return_tolerance_deg: 1.0
+  phases:
+    - initialize
+    - verify_simulation_endpoint
+    - verify_moveit_ready
+    - verify_contact_wrench_ready
+    - verify_safety_gate_ready
+    - move_to_ready_pose
+    - move_to_pre_approach_pose
+    - move_to_pre_contact_standby_pose
+    - execute_guarded_approach_steps
+    - stop_on_contact_or_standoff_limit
+    - retreat_to_pre_contact_standby_pose
+    - return_to_ready_pose
+    - validate_final_state
+
+moveit_execution:
+  moveit_used: true
+  selected_group: manipulator
+  selected_end_effector_link: tool0
+  compute_ik_service: /compute_ik
+  plan_service: /plan_kinematic_path
+  move_group_node_name: /move_group
+  control_interface: /joint_trajectory_controller/follow_joint_trajectory
+  simulation_control_interface_used: gz_ros2_control/GazeboSimSystem via joint_trajectory_controller
+  plan_allowed_time_sec: 3.0
+  planning_attempts: 1
+  max_velocity_scaling_factor: 0.08
+  max_acceleration_scaling_factor: 0.08
+  joint_goal_tolerance_rad: 0.012
+
+guarded_approach:
+  max_joint_delta_from_initial_deg: 7.0
+  guarded_approach_step_count: 5
+  max_single_step_joint_delta_deg: 1.0
+  ready_pose_delta_deg:
+    joint_6: 1.0
+  pre_approach_pose_delta_deg:
+    joint_5: 1.0
+    joint_6: 2.0
+  pre_contact_standby_pose_delta_deg:
+    joint_5: 1.5
+    joint_6: 3.0
+  guarded_step_delta_deg:
+    joint_6: 0.5
+
+contact_gate:
+  contact_detection_force_threshold_n: 0.05
+  contact_wrench_topic_must_be_available: true
+
+safety_gates:
+  max_allowed_force_n: 50.0
+  max_allowed_torque_nm: 5.0
+  emergency_stop_force_threshold_n: 45.0
+  peg_insertion_allowed: false
+  forceful_contact_allowed: false
+
+execution_policy:
+  moveit_execution_allowed: gazebo_simulation_only
+  controller_execution_allowed: gazebo_simulation_only
+  trajectory_execution_allowed: gazebo_simulation_only
+  follow_joint_trajectory_execution_allowed: gazebo_simulation_only
+  real_robot_allowed: false
+  real_robot_used: false
+  learning_enabled: false
+  scenario_batch_execution_enabled: false
+  peg_insertion_allowed: false
+  forceful_contact_allowed: false
+
+validation:
+  output_dir: diagnostics/proposal_simulation_cell_v2_6
+  status_success_contact: contact_gated_guarded_approach_validated
+  status_success_no_contact: contact_gated_guarded_approach_validated_no_contact_detected
+  status_topic: /proposal_simulation_cell/contact_gated_guarded_approach_status
+  step_report_topic: /proposal_simulation_cell/guarded_approach_step_report
+  contact_gate_report_topic: /proposal_simulation_cell/contact_gate_report
+  safety_report_topic: /proposal_simulation_cell/contact_gated_safety_report
+  endpoint_report_topic: /proposal_simulation_cell/contact_gated_endpoint_report
+  contact_wrench_topic: /proposal_simulation_cell/contact_wrench
+  joint_states_topic: /joint_states
+  validation_timeout_sec: 180.0
+  startup_wait_sec: 5.0

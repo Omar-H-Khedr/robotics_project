@@ -1,0 +1,6 @@
+step_index,status,duration_sec,max_delta_from_initial_deg,force_n,torque_nm,contact_gate_triggered,emergency_stop_triggered,note
+1,succeeded,1.956609,3.089733,0.000000,0.000000,false,false,Guarded step executed
+2,succeeded,2.006553,3.588501,0.000000,0.000000,false,false,Guarded step executed
+3,succeeded,1.955347,4.086980,0.000000,0.000000,false,false,Guarded step executed
+4,succeeded,2.006147,4.585747,0.000000,0.000000,false,false,Guarded step executed
+5,succeeded,1.955819,5.084064,0.000000,0.000000,false,false,Guarded step executed

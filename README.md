@@ -116,6 +116,12 @@ Added the guarded pre-contact task sequence. The sprint uses MoveIt planning and
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_5/`. Phase reports, joint-state evidence, endpoint checks, and contact wrench monitoring are recorded. The sequence remains simulation-only: no real robot execution, no physical endpoint, no peg insertion, and no contact-seeking motion.
 
+### proposal_simulation_cell_v2_6_contact_gated_guarded_approach_validation
+
+Added contact-gated guarded approach validation. The sprint uses MoveIt planning and Gazebo-only execution for ready, pre-approach, pre-contact standby, guarded approach, retreat, return-to-ready, and final validation phases through the verified Gazebo simulation endpoint.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_6/`. Guarded approach steps are executed with contact wrench monitoring, the stop-on-contact or stand-off gate is validated, and retreat plus return-to-ready evidence is recorded. The sequence remains simulation-only: no real robot execution, no physical endpoint, no peg insertion, and no forceful contact.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -145,10 +151,10 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_5/`. Phas
 | v2.3 | MoveIt/Gazebo model alignment and plan-only validation | Completed |
 | v2.4 | MoveIt-generated Gazebo-only execution validation | Completed |
 | v2.5 | Guarded pre-contact task sequence | Completed |
+| v2.6 | Contact-gated guarded approach validation | Completed |
 | v2.5c | Unified execution gates and tool-axis audit | In progress |
 | v2.5d | Diagnostic Cartesian orientation target calculation | In progress |
 | v2.5e/v2.5f | Orientation-aware IK diagnostics and full-pose waypoint policy | In progress |
-| v2.6 | Diagnostic-only Cartesian dry-run insertion plan | In progress |
 | v2.7 | Diagnostic-only IK backend audit and decision report | In progress |
 | v2.8 | MoveIt configuration audit and non-motion IK launch preparation | In progress |
 | v2.9 | MoveIt IK diagnostic launch readiness audit | In progress |

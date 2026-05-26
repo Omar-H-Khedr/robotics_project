@@ -29,6 +29,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v2_3_moveit_model_alignment_and_plan_only_validation | Completed |
 | proposal_simulation_cell_v2_4_moveit_gazebo_execution_validation | Completed |
 | proposal_simulation_cell_v2_5_guarded_pre_contact_task_sequence | Completed |
+| proposal_simulation_cell_v2_6_contact_gated_guarded_approach_validation | Completed |
+
+## proposal_simulation_cell_v2_6_contact_gated_guarded_approach_validation
+
+Status: `contact_gated_guarded_approach_validated_no_contact_detected`
+
+The v2.6 proposal simulation sprint adds a contact-gated guarded approach sequence using MoveIt planning and Gazebo-only execution. It validates ready, pre-approach, pre-contact standby, guarded approach steps, stop-on-contact or stand-off gating, retreat, return-to-ready, and final state validation through the verified Gazebo simulation endpoint.
+
+Guarded approach step reports, contact gate reports, joint-state evidence, endpoint checks, and contact wrench monitoring are recorded. No real robot execution, physical endpoint, peg insertion, forceful contact, learning, or scenario batch execution is used.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_6/`.
 
 ## proposal_simulation_cell_v2_5_guarded_pre_contact_task_sequence
 
