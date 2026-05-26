@@ -1,0 +1,6 @@
+scenario,rgb_topic_available,depth_topic_available,camera_info_available,rgb_frame_count_start,rgb_frame_count_end,rgb_frame_count_delta,depth_frame_count_start,depth_frame_count_end,depth_frame_count_delta,rgb_encoding,depth_encoding
+nominal_centered,true,true,true,233,512,279,232,512,280,rgb8,32FC1
+x_positive_offset,true,true,true,512,776,264,512,776,264,rgb8,32FC1
+x_negative_offset,true,true,true,776,1054,278,776,1054,278,rgb8,32FC1
+y_positive_offset,true,true,true,1054,1316,262,1054,1315,261,rgb8,32FC1
+y_negative_offset,true,true,true,1316,1556,240,1315,1556,241,rgb8,32FC1

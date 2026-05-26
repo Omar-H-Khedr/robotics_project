@@ -34,6 +34,17 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v2_8_contact_reachability_and_trigger_validation | Completed |
 | proposal_simulation_cell_v2_9_non_overlapping_approach_to_contact_validation | Completed |
 | proposal_simulation_cell_v2_10_misalignment_contact_gate_batch_validation | Completed |
+| proposal_simulation_cell_v2_11_multimodal_contact_observation_logging | Completed |
+
+## proposal_simulation_cell_v2_11_multimodal_contact_observation_logging
+
+Status: `multimodal_contact_observation_logging_validated`
+
+The v2.11 proposal simulation sprint adds synchronized multimodal contact observation logging. It replays the five validated v2.10 misalignment contact-gate scenarios and records observation rows for RGB-D availability, joint state, TF/tool pose, contact wrench, task phase, scenario metadata, and contact transition labels.
+
+RGB-D topics were available, frame counts were recorded, and lightweight metadata was saved without writing full image datasets. The outputs are real Gazebo simulation observation logs only. No fake dataset, experimental performance claim, real robot execution, physical endpoint, peg insertion, forceful contact, or learning is used.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_11/`.
 
 ## proposal_simulation_cell_v2_10_misalignment_contact_gate_batch_validation
 

@@ -1,0 +1,6 @@
+scenario,validated,initial_no_contact_verified,contact_trigger_after_motion,contact_trigger_step_index,stop_on_contact_executed,retreat_completed,post_retreat_no_contact_verified,return_to_ready_completed,max_force_n,max_torque_nm,safety_violation_count,final_return_error_deg
+nominal_centered,true,true,true,1,true,true,true,true,0.090630499,0.000000000,0,0.615544851
+x_positive_offset,true,true,true,1,true,true,true,true,0.092090749,0.000000000,0,0.681139732
+x_negative_offset,true,true,true,1,true,true,true,true,0.095040713,0.000000000,0,0.651973893
+y_positive_offset,true,true,true,1,true,true,true,true,0.094907826,0.000000000,0,0.646520314
+y_negative_offset,true,true,true,1,true,true,true,true,0.093157150,0.000000000,0,0.584550654

@@ -1,0 +1,22 @@
+{
+  "camera_info_available": true,
+  "color_camera_info_topic": "/proposal_simulation_cell/d405/color/camera_info",
+  "contact_wrench_available": true,
+  "contact_wrench_topic": "/proposal_simulation_cell/contact_wrench",
+  "depth_camera_info_count": 1572,
+  "depth_camera_info_topic": "/proposal_simulation_cell/d405/depth/camera_info",
+  "depth_frame_count_total": 1581,
+  "depth_topic": "/proposal_simulation_cell/d405/depth/image_rect_raw",
+  "depth_topic_available": true,
+  "experimental_result_created": false,
+  "fake_dataset_created": false,
+  "joint_states_available": true,
+  "raw_contact_topic": "/world/proposal_simulation_cell_v1_3_contact_physics_validation/model/proposal_v2_11_multimodal_contact_pad/link/contact_calibration_pad_link/sensor/contact_calibration_sensor/contact",
+  "raw_contact_topic_available": true,
+  "rgb_camera_info_count": 1572,
+  "rgb_frame_count_total": 1581,
+  "rgb_topic": "/proposal_simulation_cell/d405/color/image_raw",
+  "rgb_topic_available": true,
+  "tf_available": true,
+  "write_full_image_data": false
+}

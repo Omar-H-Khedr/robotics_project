@@ -1,0 +1,12 @@
+channel,available,sample_count
+rgb_image,true,1581
+depth_image,true,1581
+camera_info,true,3144
+joint_states,true,65
+tf_tool_pose,true,65
+contact_wrench,true,5
+raw_contact,true,0
+task_phase,true,66
+scenario_metadata,true,5
+observation_vector,true,65
+contact_transition_label,true,5

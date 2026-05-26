@@ -146,6 +146,12 @@ Added misalignment contact-gate batch validation. The sprint reuses the validate
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_10/`. The batch remains simulation-only: no real robot execution, no physical endpoint, no peg insertion, and no forceful contact.
 
+### proposal_simulation_cell_v2_11_multimodal_contact_observation_logging
+
+Added multimodal contact observation logging. The sprint replays the five validated misalignment contact-gate scenarios and records synchronized observation rows for RGB-D availability, joint state, TF/tool pose, contact wrench, task phase, scenario metadata, and contact transition labels.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_11/`. RGB-D topics were available and lightweight frame-count metadata was recorded without saving full image datasets. The batch creates real simulation observation logs only: no fake dataset, no experimental performance claim, no real robot execution, no physical endpoint, no peg insertion, and no forceful contact.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -180,6 +186,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_10/`. The
 | v2.8 | Contact reachability and trigger validation | Completed |
 | v2.9 | Non-overlapping approach-to-contact validation | Completed |
 | v2.10 | Misalignment contact-gate batch validation | Completed |
+| v2.11 | Multimodal contact observation logging | Completed |
 | v2.5c | Unified execution gates and tool-axis audit | In progress |
 | v2.5d | Diagnostic Cartesian orientation target calculation | In progress |
 | v2.5e/v2.5f | Orientation-aware IK diagnostics and full-pose waypoint policy | In progress |
