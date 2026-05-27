@@ -1,0 +1,2 @@
+insertion_success,insertion_failure_reason,max_insertion_depth_m,target_insertion_depth_m,success_insertion_depth_threshold_m,status
+false,initial_alignment_error_too_large,0.000000,0.015000,0.010000,guarded_peg_in_hole_objective_attempt_completed_with_failure_reason

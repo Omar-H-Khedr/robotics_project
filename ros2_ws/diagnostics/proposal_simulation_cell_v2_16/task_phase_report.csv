@@ -1,0 +1,13 @@
+phase,status,note,duration_sec,final_error_deg,max_force_n,max_torque_nm
+initialize,succeeded,node started,0.000000,0.000000,0.000000000,0.000000000
+verify_simulation_endpoint,succeeded,gz_ros2_control/GazeboSimSystem via joint_trajectory_controller,0.000000,0.000000,0.000000000,0.000000000
+verify_moveit_ready,succeeded,move_group/planning/ik checked,0.000000,0.000000,0.000000000,0.000000000
+verify_contact_wrench_ready,warning,contact wrench or raw contact topic checked,0.000000,0.000000,0.000000000,0.000000000
+compute_peg_hole_geometry,succeeded,"{'peg': 'tf_frame', 'hole': 'proposal_simulation_cell_scene_model_links', 'axis': 'proposal_simulation_cell_scene_model_links'}",0.000000,0.000000,0.000000000,0.000000000
+verify_peg_and_hole_frames,succeeded,TF frames used when available; otherwise scene model link fallback is recorded.,0.000000,0.000000,0.000000000,0.000000000
+move_to_ready_pose,succeeded,planned=true executed=true,2.177466,0.033076,0.000000000,0.000000000
+move_to_pre_approach_pose,succeeded,planned=true executed=true,2.086630,0.034021,0.000000000,0.000000000
+move_to_above_hole_alignment_pose,succeeded,planned=true executed=true,2.125399,0.018254,0.000000000,0.000000000
+verify_initial_clearance_and_alignment,failed,lateral_error=0.280126 clearance=0.083041,0.000000,0.000000,0.000000000,0.000000000
+return_to_ready_pose,succeeded,final_return_error_deg=0.084598,0.000000,0.084598,0.000000000,0.000000000
+validate_final_state,succeeded,final return checked,0.000000,0.084598,0.000000000,0.000000000

@@ -1,0 +1,131 @@
+simulation_cell_name: proposal_simulation_cell_v2_16_guarded_peg_in_hole_objective_validation
+
+robot:
+  robot_model: KUKA LBR iisy guarded peg-in-hole Gazebo objective model
+  gazebo_robot_model: lbr_iisy3_r760
+  selected_group: manipulator
+  selected_end_effector_link: tool0
+  selected_contact_link: link_6
+  controller_joint_names: [joint_1, joint_2, joint_3, joint_4, joint_5, joint_6]
+
+task_sequence:
+  simulation_engine: gazebo
+  task_sequence_type: guarded_peg_in_hole_objective_validation
+  main_objective_sprint: true
+  max_task_duration_sec: 180.0
+  return_tolerance_deg: 1.0
+  phases:
+    - initialize
+    - verify_simulation_endpoint
+    - verify_moveit_ready
+    - verify_contact_wrench_ready
+    - compute_peg_hole_geometry
+    - verify_peg_and_hole_frames
+    - move_to_ready_pose
+    - move_to_pre_approach_pose
+    - move_to_above_hole_alignment_pose
+    - verify_initial_clearance_and_alignment
+    - execute_guarded_insertion_steps
+    - stop_on_success_or_contact_limit
+    - validate_insertion_depth_or_failure_reason
+    - retreat_or_hold_safe_final_pose
+    - return_to_ready_pose
+    - validate_final_state
+
+peg_hole_geometry:
+  world_frame: world
+  peg_frame_candidates: [peg_tip, cylindrical_peg::peg_link, peg::peg_link, tool0, link_6]
+  hole_frame_candidates: [hole_center, hole_center_marker, hole_block::hole_block_link]
+  insertion_axis_frame_candidates: [insertion_axis, hole_center]
+  fallback_peg_tip_xyz: [0.52, -0.20, 0.955]
+  fallback_hole_center_xyz: [0.52, -0.20, 0.83]
+  fallback_insertion_axis_xyz: [0.0, 0.0, -1.0]
+  fallback_geometry_source: proposal_simulation_cell_scene_model_links
+  peg_tip_offset_from_contact_link_xyz: [0.0, 0.0, -0.055]
+  hole_radius_m: 0.016
+  peg_radius_m: 0.0125
+  target_insertion_depth_m: 0.015
+  success_insertion_depth_threshold_m: 0.010
+  max_lateral_alignment_error_m: 0.005
+  minimum_vertical_clearance_m: 0.002
+
+moveit_execution:
+  moveit_used: true
+  selected_group: manipulator
+  selected_end_effector_link: tool0
+  selected_contact_link: link_6
+  compute_ik_service: /compute_ik
+  plan_service: /plan_kinematic_path
+  move_group_node_name: /move_group
+  control_interface: /joint_trajectory_controller/follow_joint_trajectory
+  simulation_control_interface_used: gz_ros2_control/GazeboSimSystem via joint_trajectory_controller
+  plan_allowed_time_sec: 3.0
+  planning_attempts: 1
+  max_velocity_scaling_factor: 0.035
+  max_acceleration_scaling_factor: 0.035
+  joint_goal_tolerance_rad: 0.015
+
+guarded_insertion:
+  max_insertion_step_count: 15
+  max_insertion_step_distance_m: 0.002
+  ready_pose_delta_deg:
+    joint_6: 0.5
+  pre_approach_pose_delta_deg:
+    joint_5: 0.5
+    joint_6: 1.0
+  above_hole_alignment_pose_delta_deg:
+    joint_5: 0.75
+    joint_6: 1.25
+  insertion_step_delta_deg:
+    joint_5: 0.10
+    joint_6: 0.10
+  return_pose_delta_deg:
+    joint_5: 0.0
+    joint_6: 0.0
+
+contact_gate:
+  contact_detection_force_threshold_n: 0.02
+  desired_contact_force_upper_n: 3.0
+  max_allowed_force_n: 8.0
+  emergency_stop_force_threshold_n: 6.0
+
+safety_gates:
+  max_allowed_force_n: 8.0
+  max_allowed_torque_nm: 5.0
+  emergency_stop_force_threshold_n: 6.0
+  peg_insertion_allowed: controlled_gazebo_only
+  forceful_contact_allowed: false
+  real_robot_allowed: false
+
+execution_policy:
+  moveit_execution_allowed: gazebo_simulation_only
+  controller_execution_allowed: gazebo_simulation_only
+  trajectory_execution_allowed: gazebo_simulation_only
+  follow_joint_trajectory_execution_allowed: gazebo_simulation_only
+  real_robot_allowed: false
+  real_robot_used: false
+  peg_insertion_allowed: controlled_gazebo_only
+  forceful_contact_allowed: false
+  fake_success_allowed: false
+
+validation:
+  output_dir: diagnostics/proposal_simulation_cell_v2_16
+  status_success: guarded_peg_in_hole_objective_validated
+  status_attempt_failure: guarded_peg_in_hole_objective_attempt_completed_with_failure_reason
+  status_endpoint_unverified: gazebo_execution_endpoint_not_verified
+  status_contact_unavailable: contact_topic_unavailable
+  status_geometry_unavailable: peg_hole_geometry_unavailable
+  status_alignment_unreachable: alignment_pose_not_reachable
+  status_alignment_error: initial_alignment_error_too_large
+  status_force_limit: contact_force_limit_reached_before_success_depth
+  status_depth_not_reached: insertion_depth_not_reached_within_step_limit
+  status_topic: /proposal_simulation_cell/guarded_peg_in_hole_objective_status
+  geometry_report_topic: /proposal_simulation_cell/peg_hole_geometry_report
+  insertion_step_report_topic: /proposal_simulation_cell/guarded_insertion_step_report
+  safety_report_topic: /proposal_simulation_cell/insertion_safety_report
+  contact_wrench_topic: /proposal_simulation_cell/contact_wrench
+  peg_contact_topic: /proposal_simulation_cell/peg_contacts
+  hole_contact_topic: /proposal_simulation_cell/hole_contacts
+  joint_states_topic: /joint_states
+  startup_wait_sec: 5.0
+  validation_timeout_sec: 180.0

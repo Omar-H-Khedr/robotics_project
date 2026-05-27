@@ -1,0 +1,21 @@
+Gazebo GUI visual evidence status for proposal_simulation_cell_v2_16_guarded_peg_in_hole_objective_validation
+
+DISPLAY=:0
+WAYLAND_DISPLAY=wayland-0
+
+Gazebo GUI launch attempted: true
+Gazebo GUI opened: not verified
+Simulation scene visible: not verified
+Robot/table/peg/hole visible: not verified
+Screenshot captured: false
+Screenshot path: ros2_ws/diagnostics/proposal_simulation_cell_v2_16/gui_evidence/gazebo_gui_window.png
+
+Observed GUI-related runtime messages:
+QStandardPaths: wrong permissions on runtime directory /mnt/wslg/runtime-dir, 0777 instead of 0700
+libEGL warning: failed to open /dev/dri/renderD128: Permission denied
+libEGL warning: failed to open /dev/dri/card0: Permission denied
+
+Screenshot capture result:
+gnome-screenshot was not installed: /bin/bash: line 1: gnome-screenshot: command not found
+
+No visual evidence was fabricated.

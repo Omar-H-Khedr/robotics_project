@@ -1,0 +1,2 @@
+peg_tip_x,peg_tip_y,peg_tip_z,hole_center_x,hole_center_y,hole_center_z,lateral_alignment_error_m,vertical_clearance_m,max_lateral_alignment_error_m,initial_alignment_within_tolerance
+0.799998,-0.208472,0.913041,0.520000,-0.200000,0.830000,0.280126,0.083041,0.005000,false

@@ -1,0 +1,2 @@
+max_observed_force_n,max_observed_torque_nm,max_allowed_force_n,emergency_stop_force_threshold_n,force_limit_triggered,emergency_stop_triggered,safety_violation_count,forceful_contact_executed,real_robot_used
+0.000000000,0.000000000,8.000000,6.000000,false,false,0,false,false

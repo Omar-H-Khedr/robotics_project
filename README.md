@@ -1,8 +1,8 @@
 # Visuomotor Context-Based Meta-Reinforcement Learning for Safe Peg-in-Hole Assembly
 
-**Repository status:** active doctoral research prototype  
-**Latest documented:** `proposal_simulation_cell_v2_11_multimodal_contact_observation_logging`  
-**README last updated:** 2026-05-26  
+**Repository status:** active doctoral research prototype
+**Latest documented:** `proposal_simulation_cell_v2_16_guarded_peg_in_hole_objective_validation`
+**README last updated:** 2026-05-27
 **Execution scope:** simulation-first validation only; no real-robot claim is made in this repository state.
 
 ---
@@ -21,7 +21,6 @@ The target doctoral research direction is:
 
 > **Visuomotor Context-Based Meta-Reinforcement Learning with Virtual-Force Safety for Adaptable Peg-in-Hole Assembly in Smart Manufacturing**
 
-<<<<<<< HEAD
 ### proposal_simulation_cell_v1_5_safety_virtual_force_interface
 
 Added the simulation-only safety status interface, contact-state classification, virtual-force diagnostic command suggestions, and admittance diagnostic command suggestions. The interface reads simulated contact wrench, joint state, TF, TF static, and task phase signals, then publishes diagnostic outputs only on `/proposal_simulation_cell/safety_status`, `/proposal_simulation_cell/contact_state`, `/proposal_simulation_cell/virtual_force_command`, and `/proposal_simulation_cell/admittance_command_suggestion`.
@@ -178,6 +177,12 @@ Added a context-conditioned versus fixed-baseline guarded action ablation. The s
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_15/`. This is diagnostic ablation only: no RL training, no policy training, no fake learning result, no real robot execution, no physical endpoint, no peg insertion, and no forceful contact.
 
+### proposal_simulation_cell_v2_16_guarded_peg_in_hole_objective_validation
+
+Added the first main-objective guarded peg-in-hole validation attempt. The sprint computes peg/hole geometry, validates an above-hole alignment phase, attempts guarded insertion only through Gazebo-only execution when alignment and safety gates permit it, and records insertion success or the exact failure reason. The recorded attempt stopped before insertion because the initial lateral alignment error was above tolerance.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_16/`. Contact force and safety gates are monitored during the objective attempt. The sprint remains Gazebo-only: no real robot execution, no physical endpoint, no forceful contact, and no fake insertion success.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -217,6 +222,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_15/`. Thi
 | v2.13 | Deterministic context encoder prototype | Completed |
 | v2.14 | Context-conditioned guarded action validation | Completed |
 | v2.15 | Context action ablation validation | Completed |
+| v2.16 | Guarded peg-in-hole objective validation | Completed |
 | v2.5c | Unified execution gates and tool-axis audit | In progress |
 | v2.5d | Diagnostic Cartesian orientation target calculation | In progress |
 | v2.5e/v2.5f | Orientation-aware IK diagnostics and full-pose waypoint policy | In progress |
@@ -227,11 +233,6 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_15/`. Thi
 | v2.12 | Diagnostic tool-link validation for MoveIt IK readiness | In progress |
 | v2.13 | MoveIt diagnostic input bundle preparation | In progress |
 | v2.14 | Diagnostic-only move_group launch path with execution disabled | In progress |
-=======
-The current implementation focuses on reproducible simulation infrastructure, launch files, observation logging, contact-transition evidence, and validation artifacts.
-
----
->>>>>>> 05ad0d216035d42eeed6d590a361f8eef194ddeb
 
 ## 2. Latest Validated
 
@@ -619,4 +620,3 @@ Keep the README synchronized with the latest validated sprint. Every future push
 - Topic availability.
 - Known runtime notes.
 - Clear claims and non-claims.
-

@@ -1,0 +1,9 @@
+peg_frame_available=true
+hole_frame_available=false
+peg_tip_pose_xyz=[0.7999980108584337, -0.2084721109044223, 0.9130414355906521]
+hole_center_pose_xyz=[0.52, -0.2, 0.83]
+insertion_axis_xyz=[0.0, 0.0, -1.0]
+initial_lateral_alignment_error_m=0.280126
+vertical_clearance_m=0.083041
+geometry_source={'peg': 'tf_frame', 'hole': 'proposal_simulation_cell_scene_model_links', 'axis': 'proposal_simulation_cell_scene_model_links'}
+fallback_note=TF frames are preferred; configured scene model links are used only when TF frames are unavailable.

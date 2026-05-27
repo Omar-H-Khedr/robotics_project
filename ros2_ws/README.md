@@ -39,6 +39,15 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v2_13_context_encoder_prototype | Completed |
 | proposal_simulation_cell_v2_14_context_conditioned_guarded_action_validation | Completed |
 | proposal_simulation_cell_v2_15_context_action_ablation_validation | Completed |
+| proposal_simulation_cell_v2_16_guarded_peg_in_hole_objective_validation | Completed |
+
+## proposal_simulation_cell_v2_16_guarded_peg_in_hole_objective_validation
+
+Status: `guarded_peg_in_hole_objective_attempt_completed_with_failure_reason`
+
+The v2.16 proposal simulation sprint adds the first main-objective guarded peg-in-hole validation attempt. It computes peg/hole geometry, validates an above-hole alignment phase, executes guarded insertion steps only when alignment and safety gates permit it, records insertion success or an exact failure reason, and monitors contact force and safety gates. The recorded attempt stopped before insertion because the initial lateral alignment error was above tolerance.
+
+This sprint is Gazebo-only. It does not use a real robot, use a physical endpoint, perform forceful contact, or fake insertion success. Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_16/`.
 
 ## proposal_simulation_cell_v2_15_context_action_ablation_validation
 
