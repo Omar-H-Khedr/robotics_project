@@ -37,6 +37,15 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v2_11_multimodal_contact_observation_logging | Completed |
 | proposal_simulation_cell_v2_12_context_vector_extraction | Completed |
 | proposal_simulation_cell_v2_13_context_encoder_prototype | Completed |
+| proposal_simulation_cell_v2_14_context_conditioned_guarded_action_validation | Completed |
+
+## proposal_simulation_cell_v2_14_context_conditioned_guarded_action_validation
+
+Status: `context_conditioned_guarded_action_validated`
+
+The v2.14 proposal simulation sprint uses the real v2.13 deterministic context embeddings to generate guarded action suggestions for the five validated contact-gate scenarios. It validates the suggested action parameters against safety bounds, then performs Gazebo-only contact-gated execution with initial no-contact checks, stop-on-contact, retreat, post-retreat no-contact checks, and return-to-ready checks.
+
+This sprint does not train a policy, run RL training, create fake learning results, use a real robot, use a physical endpoint, execute peg insertion, or perform forceful contact. Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_14/`.
 
 ## proposal_simulation_cell_v2_13_context_encoder_prototype
 

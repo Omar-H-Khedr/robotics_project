@@ -164,6 +164,12 @@ Added a deterministic context encoder prototype using the real v2.12 simulation 
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_13/`. This sprint is an encoder prototype only: no policy training, no RL training, no fake learning result, no real robot execution, and no peg insertion.
 
+### proposal_simulation_cell_v2_14_context_conditioned_guarded_action_validation
+
+Added context-conditioned guarded action validation using the real v2.13 deterministic context embeddings. The sprint generates deterministic guarded action suggestions per scenario, validates action parameters against safety bounds, and performs Gazebo-only contact-gated execution with stop-on-contact, retreat, post-retreat no-contact, and return-to-ready checks.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_14/`. This sprint does not train a policy, run RL training, create a fake learning result, use a real robot, use a physical endpoint, execute peg insertion, or perform forceful contact.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -201,6 +207,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_13/`. Thi
 | v2.11 | Multimodal contact observation logging | Completed |
 | v2.12 | Context vector extraction | Completed |
 | v2.13 | Deterministic context encoder prototype | Completed |
+| v2.14 | Context-conditioned guarded action validation | Completed |
 | v2.5c | Unified execution gates and tool-axis audit | In progress |
 | v2.5d | Diagnostic Cartesian orientation target calculation | In progress |
 | v2.5e/v2.5f | Orientation-aware IK diagnostics and full-pose waypoint policy | In progress |

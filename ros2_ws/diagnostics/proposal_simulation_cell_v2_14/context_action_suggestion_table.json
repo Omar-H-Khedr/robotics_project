@@ -1,0 +1,69 @@
+{
+  "rows": [
+    {
+      "approach_step_distance_m": "0.004000",
+      "contact_detection_force_threshold_n": "0.020000",
+      "context_embedding_dim": "8",
+      "context_embedding_loaded": "true",
+      "deterministic_action_suggestion": "true",
+      "emergency_stop_force_threshold_n": "6.000000",
+      "max_allowed_force_n": "8.000000",
+      "max_guarded_steps": "12",
+      "parameters_within_bounds": "true",
+      "retreat_distance_m": "0.030000",
+      "scenario": "nominal_centered"
+    },
+    {
+      "approach_step_distance_m": "0.003000",
+      "contact_detection_force_threshold_n": "0.020000",
+      "context_embedding_dim": "8",
+      "context_embedding_loaded": "true",
+      "deterministic_action_suggestion": "true",
+      "emergency_stop_force_threshold_n": "6.000000",
+      "max_allowed_force_n": "8.000000",
+      "max_guarded_steps": "14",
+      "parameters_within_bounds": "true",
+      "retreat_distance_m": "0.030000",
+      "scenario": "x_positive_offset"
+    },
+    {
+      "approach_step_distance_m": "0.003000",
+      "contact_detection_force_threshold_n": "0.020000",
+      "context_embedding_dim": "8",
+      "context_embedding_loaded": "true",
+      "deterministic_action_suggestion": "true",
+      "emergency_stop_force_threshold_n": "6.000000",
+      "max_allowed_force_n": "8.000000",
+      "max_guarded_steps": "14",
+      "parameters_within_bounds": "true",
+      "retreat_distance_m": "0.030000",
+      "scenario": "x_negative_offset"
+    },
+    {
+      "approach_step_distance_m": "0.003000",
+      "contact_detection_force_threshold_n": "0.020000",
+      "context_embedding_dim": "8",
+      "context_embedding_loaded": "true",
+      "deterministic_action_suggestion": "true",
+      "emergency_stop_force_threshold_n": "6.000000",
+      "max_allowed_force_n": "8.000000",
+      "max_guarded_steps": "14",
+      "parameters_within_bounds": "true",
+      "retreat_distance_m": "0.030000",
+      "scenario": "y_positive_offset"
+    },
+    {
+      "approach_step_distance_m": "0.003000",
+      "contact_detection_force_threshold_n": "0.020000",
+      "context_embedding_dim": "8",
+      "context_embedding_loaded": "true",
+      "deterministic_action_suggestion": "true",
+      "emergency_stop_force_threshold_n": "6.000000",
+      "max_allowed_force_n": "8.000000",
+      "max_guarded_steps": "14",
+      "parameters_within_bounds": "true",
+      "retreat_distance_m": "0.030000",
+      "scenario": "y_negative_offset"
+    }
+  ]
+}

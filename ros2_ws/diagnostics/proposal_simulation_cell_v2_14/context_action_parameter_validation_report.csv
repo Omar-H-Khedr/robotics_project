@@ -1,0 +1,6 @@
+scenario,context_embedding_loaded,step_distance_within_bounds,max_guarded_steps_within_bounds,contact_threshold_within_bounds,retreat_distance_within_bounds,max_force_within_bounds,emergency_force_within_bounds,all_action_parameters_within_bounds
+nominal_centered,true,true,true,true,true,true,true,true
+x_positive_offset,true,true,true,true,true,true,true,true
+x_negative_offset,true,true,true,true,true,true,true,true
+y_positive_offset,true,true,true,true,true,true,true,true
+y_negative_offset,true,true,true,true,true,true,true,true

@@ -1,0 +1,6 @@
+scenario,context_embedding_loaded,context_embedding_dim,approach_step_distance_m,max_guarded_steps,contact_detection_force_threshold_n,retreat_distance_m,max_allowed_force_n,emergency_stop_force_threshold_n,parameters_within_bounds,deterministic_action_suggestion
+nominal_centered,true,8,0.004000,12,0.020000,0.030000,8.000000,6.000000,true,true
+x_positive_offset,true,8,0.003000,14,0.020000,0.030000,8.000000,6.000000,true,true
+x_negative_offset,true,8,0.003000,14,0.020000,0.030000,8.000000,6.000000,true,true
+y_positive_offset,true,8,0.003000,14,0.020000,0.030000,8.000000,6.000000,true,true
+y_negative_offset,true,8,0.003000,14,0.020000,0.030000,8.000000,6.000000,true,true
