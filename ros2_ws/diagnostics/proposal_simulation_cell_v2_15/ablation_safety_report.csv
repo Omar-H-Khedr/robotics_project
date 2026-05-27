@@ -1,0 +1,11 @@
+scenario,action_mode,max_force_n,max_torque_nm,safety_violation_count,emergency_stop_triggered,validated,peg_insertion_executed,forceful_contact_executed,real_robot_used
+nominal_centered,baseline_fixed_action,0.093190858,0.000000000,0,false,true,false,false,false
+nominal_centered,context_conditioned_action,0.089905630,0.000000000,0,false,true,false,false,false
+x_positive_offset,baseline_fixed_action,0.092326044,0.000000000,0,false,true,false,false,false
+x_positive_offset,context_conditioned_action,0.093797730,0.000000000,0,false,true,false,false,false
+x_negative_offset,baseline_fixed_action,0.093232252,0.000000000,0,false,true,false,false,false
+x_negative_offset,context_conditioned_action,0.093496176,0.000000000,0,false,true,false,false,false
+y_positive_offset,baseline_fixed_action,0.091286818,0.000000000,0,false,true,false,false,false
+y_positive_offset,context_conditioned_action,0.093922079,0.000000000,0,false,true,false,false,false
+y_negative_offset,baseline_fixed_action,0.092817168,0.000000000,0,false,true,false,false,false
+y_negative_offset,context_conditioned_action,0.091581002,0.000000000,0,false,true,false,false,false

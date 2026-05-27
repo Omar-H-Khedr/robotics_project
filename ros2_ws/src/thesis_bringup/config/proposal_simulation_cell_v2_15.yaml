@@ -1,0 +1,196 @@
+simulation_cell_name: proposal_simulation_cell_v2_15_context_action_ablation_validation
+
+robot:
+  robot_model: KUKA LBR iisy context action ablation Gazebo task model
+  gazebo_robot_model: lbr_iisy3_r760
+  selected_group: manipulator
+  selected_end_effector_link: tool0
+  selected_contact_link: link_6
+  controller_joint_names: [joint_1, joint_2, joint_3, joint_4, joint_5, joint_6]
+
+scenario_batch:
+  simulation_engine: gazebo
+  task_sequence_type: context_action_ablation_validation
+  source_context_sprint: v2.13
+  source_action_sprint: v2.14
+  deterministic_action_suggestion: true
+  diagnostic_ablation_only: true
+  scenario_count: 5
+  expected_run_count: 10
+  action_modes: [baseline_fixed_action, context_conditioned_action]
+  max_task_duration_sec: 240.0
+  return_tolerance_deg: 1.0
+  scenarios:
+    - name: nominal_centered
+      x_offset_m: 0.000
+      y_offset_m: 0.000
+      yaw_offset_deg: 0.0
+    - name: x_positive_offset
+      x_offset_m: 0.003
+      y_offset_m: 0.000
+      yaw_offset_deg: 0.0
+    - name: x_negative_offset
+      x_offset_m: -0.003
+      y_offset_m: 0.000
+      yaw_offset_deg: 0.0
+    - name: y_positive_offset
+      x_offset_m: 0.000
+      y_offset_m: 0.003
+      yaw_offset_deg: 0.0
+    - name: y_negative_offset
+      x_offset_m: 0.000
+      y_offset_m: -0.003
+      yaw_offset_deg: 0.0
+
+source_context:
+  source_sprint: v2.13
+  source_action_sprint: v2.14
+  context_embedding_table: diagnostics/proposal_simulation_cell_v2_13/context_embedding_table.csv
+  context_encoder_manifest: diagnostics/proposal_simulation_cell_v2_13/context_encoder_manifest.json
+  context_action_suggestion_table: diagnostics/proposal_simulation_cell_v2_14/context_action_suggestion_table.csv
+  scenario_context_vectors: diagnostics/proposal_simulation_cell_v2_12/scenario_context_vectors.csv
+  context_embedding_dim: 8
+
+action_modes:
+  baseline_fixed_action:
+    approach_step_distance_m: 0.004
+    max_guarded_steps: 12
+    contact_detection_force_threshold_n: 0.02
+    retreat_distance_m: 0.030
+    max_allowed_force_n: 8.0
+    emergency_stop_force_threshold_n: 6.0
+  context_conditioned_action:
+    nominal_approach_step_distance_m: 0.004
+    offset_approach_step_distance_m: 0.003
+    nominal_max_guarded_steps: 12
+    offset_max_guarded_steps: 14
+    contact_detection_force_threshold_n: 0.02
+    retreat_distance_m: 0.030
+    max_allowed_force_n: 8.0
+    emergency_stop_force_threshold_n: 6.0
+
+action_suggestion:
+  deterministic_action_suggestion: true
+  nominal_approach_step_distance_m: 0.004
+  offset_approach_step_distance_m: 0.003
+  nominal_max_guarded_steps: 12
+  offset_max_guarded_steps: 14
+  contact_detection_force_threshold_n: 0.02
+  retreat_distance_m: 0.030
+  max_allowed_force_n: 8.0
+  emergency_stop_force_threshold_n: 6.0
+  max_approach_step_distance_m: 0.004
+  max_guarded_steps_limit: 14
+
+geometry_computation:
+  reference_frame: world
+  tool_frame: tool0
+  distal_collision_frame: link_6
+  table_frame: table
+  fallback_world_pose_xyz: [0.95, -0.25, 1.05]
+  table_top_z: 0.76
+  pad_type: computed_non_overlapping_context_action_ablation_contact_pad
+  pad_size_x_m: 0.12
+  pad_size_y_m: 0.12
+  pad_thickness_m: 0.03
+  initial_clearance_m: 0.030
+  min_initial_clearance_m: 0.010
+  commanded_penetration_m: 0.002
+  initial_lateral_clearance_m: 0.18
+
+contact_calibration_target:
+  target_name: proposal_v2_15_context_action_ablation_contact_pad
+  contact_target_type: computed_non_overlapping_context_action_ablation_contact_pad
+  contact_topic: /world/proposal_simulation_cell_v1_3_contact_physics_validation/model/proposal_v2_15_context_action_ablation_contact_pad/link/contact_calibration_pad_link/sensor/contact_calibration_sensor/contact
+  gz_contact_topic: /world/proposal_simulation_cell_v1_3_contact_physics_validation/model/proposal_v2_15_context_action_ablation_contact_pad/link/contact_calibration_pad_link/sensor/contact_calibration_sensor/contact
+  frame_id: context_action_ablation_contact_pad
+  pad_size_x_m: 0.12
+  pad_size_y_m: 0.12
+  pad_thickness_m: 0.03
+  mass_kg: 0.01
+  contact_kp: 5.0
+  contact_kd: 0.5
+  collision_enabled: true
+
+contact_topic_wiring:
+  raw_contact_topic: /world/proposal_simulation_cell_v1_3_contact_physics_validation/model/proposal_v2_15_context_action_ablation_contact_pad/link/contact_calibration_pad_link/sensor/contact_calibration_sensor/contact
+  derived_contact_wrench_topic: /proposal_simulation_cell/contact_wrench
+
+moveit_execution:
+  moveit_used: true
+  selected_group: manipulator
+  selected_end_effector_link: tool0
+  compute_ik_service: /compute_ik
+  plan_service: /plan_kinematic_path
+  move_group_node_name: /move_group
+  control_interface: /joint_trajectory_controller/follow_joint_trajectory
+  simulation_control_interface_used: gz_ros2_control/GazeboSimSystem via joint_trajectory_controller
+  plan_allowed_time_sec: 3.0
+  planning_attempts: 1
+  max_velocity_scaling_factor: 0.04
+  max_acceleration_scaling_factor: 0.04
+  joint_goal_tolerance_rad: 0.012
+
+guarded_touch:
+  max_joint_delta_from_initial_deg: 8.0
+  guarded_touch_step_count: 12
+  max_single_step_joint_delta_deg: 0.5
+  max_step_distance_m: 0.004
+  initial_clearance_m: 0.030
+  min_initial_clearance_m: 0.010
+  max_initial_clearance_m: 0.030
+  commanded_penetration_m: 0.002
+  approach_axis: vertical_negative_z
+  ready_pose_delta_deg:
+    joint_6: 0.75
+  touch_standby_pose_delta_deg:
+    joint_5: 0.75
+    joint_6: 1.5
+  guarded_step_delta_deg:
+    joint_5: 0.25
+    joint_6: 0.25
+
+contact_gate:
+  contact_detection_force_threshold_n: 0.02
+  contact_validation_min_force_n: 0.02
+  desired_contact_force_upper_n: 3.0
+
+safety_gates:
+  max_allowed_force_n: 8.0
+  max_allowed_torque_nm: 5.0
+  emergency_stop_force_threshold_n: 6.0
+  peg_insertion_allowed: false
+  forceful_contact_allowed: false
+
+execution_policy:
+  moveit_execution_allowed: gazebo_simulation_only
+  controller_execution_allowed: gazebo_simulation_only
+  trajectory_execution_allowed: gazebo_simulation_only
+  follow_joint_trajectory_execution_allowed: gazebo_simulation_only
+  real_robot_allowed: false
+  real_robot_used: false
+  learning_executed: false
+  policy_training_executed: false
+  rl_training_executed: false
+  fake_result_created: false
+  diagnostic_ablation_only: true
+  peg_insertion_allowed: false
+  forceful_contact_allowed: false
+
+validation:
+  output_dir: diagnostics/proposal_simulation_cell_v2_15
+  status_success: context_action_ablation_validated
+  status_partial: context_action_ablation_partially_validated
+  status_context_unavailable: context_action_ablation_context_unavailable
+  status_geometry_unavailable: context_action_ablation_geometry_unavailable
+  status_ik_failed: context_action_ablation_ik_reachability_failed
+  status_no_contact: context_action_ablation_contact_not_triggered
+  status_safety_limit: context_action_ablation_safety_limit_exceeded
+  status_topic: /proposal_simulation_cell/context_action_ablation_status
+  run_report_topic: /proposal_simulation_cell/action_mode_run_report
+  comparison_report_topic: /proposal_simulation_cell/paired_ablation_comparison_report
+  safety_report_topic: /proposal_simulation_cell/context_action_ablation_safety_report
+  contact_wrench_topic: /proposal_simulation_cell/contact_wrench
+  joint_states_topic: /joint_states
+  validation_timeout_sec: 360.0
+  startup_wait_sec: 5.0

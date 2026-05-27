@@ -1,0 +1,7 @@
+reference_frame=world
+tool_frame=tool0
+distal_collision_frame=link_6
+tool_pose_available=true
+distal_collision_pose_available=true
+tool_pose_xyz=0.795633,-0.205305,0.918368
+distal_collision_pose_xyz=0.796372,-0.264671,1.067483

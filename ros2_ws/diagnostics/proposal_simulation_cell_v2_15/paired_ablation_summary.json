@@ -1,0 +1,20 @@
+{
+  "action_modes": [
+    "baseline_fixed_action",
+    "context_conditioned_action"
+  ],
+  "diagnostic_ablation_only": true,
+  "expected_run_count": 10,
+  "fake_result_created": false,
+  "forceful_contact_executed": false,
+  "generalization_claimed": false,
+  "learning_executed": false,
+  "paired_comparison_count": 5,
+  "paired_comparison_written": true,
+  "peg_insertion_executed": false,
+  "policy_training_executed": false,
+  "real_robot_used": false,
+  "rl_improvement_claimed": false,
+  "runs_validated": 10,
+  "scenario_count": 5
+}

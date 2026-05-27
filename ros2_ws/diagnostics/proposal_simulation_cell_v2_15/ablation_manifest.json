@@ -1,0 +1,33 @@
+{
+  "context_embedding_count": 5,
+  "context_embedding_dim": 8,
+  "context_embedding_table": "/home/omar/code/robotics_project/ros2_ws/diagnostics/proposal_simulation_cell_v2_13/context_embedding_table.csv",
+  "context_embeddings_found": true,
+  "context_encoder_manifest": "/home/omar/code/robotics_project/ros2_ws/diagnostics/proposal_simulation_cell_v2_13/context_encoder_manifest.json",
+  "context_manifest_found": true,
+  "deterministic_action_suggestion": true,
+  "fake_result_created": false,
+  "forceful_contact_executed": false,
+  "generated_files": [
+    "context_action_ablation_status.json",
+    "action_mode_definition_table.csv",
+    "action_mode_run_report.csv",
+    "paired_ablation_comparison_report.csv",
+    "paired_ablation_summary.json",
+    "ablation_contact_transition_report.csv",
+    "ablation_safety_report.csv",
+    "ablation_endpoint_report.csv",
+    "ablation_manifest.json",
+    "summary.md"
+  ],
+  "learning_executed": false,
+  "peg_insertion_executed": false,
+  "policy_training_executed": false,
+  "real_robot_used": false,
+  "rl_training_executed": false,
+  "scenario_context_vectors": "/home/omar/code/robotics_project/ros2_ws/diagnostics/proposal_simulation_cell_v2_12/scenario_context_vectors.csv",
+  "source_action_sprint": "v2.14",
+  "source_context_sprint": "v2.13",
+  "source_scenario_definition_table": "/home/omar/code/robotics_project/ros2_ws/diagnostics/proposal_simulation_cell_v2_10/scenario_definition_table.csv",
+  "status": "context_action_ablation_validated"
+}

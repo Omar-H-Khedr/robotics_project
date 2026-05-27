@@ -1,0 +1,11 @@
+scenario,action_mode,context_embedding_loaded,action_parameters_within_bounds,approach_step_distance_m,max_guarded_steps,validated,initial_no_contact_verified,contact_trigger_after_motion,contact_trigger_step_index,stop_on_contact_executed,retreat_completed,post_retreat_no_contact_verified,return_to_ready_completed,max_force_n,max_torque_nm,safety_violation_count,final_return_error_deg,real_robot_used,peg_insertion_executed,forceful_contact_executed
+nominal_centered,baseline_fixed_action,true,true,0.004000,12,true,true,true,1,true,true,true,true,0.093190858,0.000000000,0,0.507940284,false,false,false
+nominal_centered,context_conditioned_action,true,true,0.004000,12,true,true,true,1,true,true,true,true,0.089905630,0.000000000,0,0.650656646,false,false,false
+x_positive_offset,baseline_fixed_action,true,true,0.004000,12,true,true,true,1,true,true,true,true,0.092326044,0.000000000,0,0.637401326,false,false,false
+x_positive_offset,context_conditioned_action,true,true,0.003000,14,true,true,true,1,true,true,true,true,0.093797730,0.000000000,0,0.668546292,false,false,false
+x_negative_offset,baseline_fixed_action,true,true,0.004000,12,true,true,true,1,true,true,true,true,0.093232252,0.000000000,0,0.667392786,false,false,false
+x_negative_offset,context_conditioned_action,true,true,0.003000,14,true,true,true,1,true,true,true,true,0.093496176,0.000000000,0,0.593469467,false,false,false
+y_positive_offset,baseline_fixed_action,true,true,0.004000,12,true,true,true,1,true,true,true,true,0.091286818,0.000000000,0,0.622724935,false,false,false
+y_positive_offset,context_conditioned_action,true,true,0.003000,14,true,true,true,1,true,true,true,true,0.093922079,0.000000000,0,0.588596711,false,false,false
+y_negative_offset,baseline_fixed_action,true,true,0.004000,12,true,true,true,1,true,true,true,true,0.092817168,0.000000000,0,0.616387383,false,false,false
+y_negative_offset,context_conditioned_action,true,true,0.003000,14,true,true,true,1,true,true,true,true,0.091581002,0.000000000,0,0.455581905,false,false,false
