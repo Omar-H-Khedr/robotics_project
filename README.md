@@ -1,25 +1,27 @@
-# Visuomotor Context-Based Meta-RL with Virtual-Force Safety for Peg-in-Hole Assembly
+# Visuomotor Context-Based Meta-Reinforcement Learning for Safe Peg-in-Hole Assembly
 
-This repository documents the technical development of my doctoral research project on safe and adaptable robotic peg-in-hole assembly for smart manufacturing.
+**Repository status:** active doctoral research prototype  
+**Latest documented:** `proposal_simulation_cell_v2_11_multimodal_contact_observation_logging`  
+**README last updated:** 2026-05-26  
+**Execution scope:** simulation-first validation only; no real-robot claim is made in this repository state.
 
-## Project Status
+---
 
-The current implementation focuses on a ROS 2 Jazzy and Gazebo-based research framework for:
+## 1. Project Overview
 
-- KUKA LBR iisy simulation workcell
-- Peg-in-hole task environment
-- Joint-space task execution baseline
-- Safety monitoring layer
-- Experiment logging and trial summaries
-- Gazebo contact sensing and contact-force extraction
-- Robot-generated contact validation with force guard logic
+This repository contains a ROS 2 / Gazebo-based research framework for robotic peg-in-hole assembly in smart manufacturing cells. The project investigates how a robot can adapt to product variation, tolerance uncertainty, and contact-state changes using:
 
-## Proposal Simulation Cell Progress
+- Multi-modal observation logging from RGB-D, depth, camera info, robot state, and contact events.
+- Context-based meta-reinforcement learning concepts for fast online adaptation.
+- A virtual-force / admittance-style safety layer for bounded contact execution.
+- Runtime safety monitoring and empirical transfer gates.
+- Simulation-backed validation before any real-robot transfer.
 
-### proposal_simulation_cell_v1_3_contact_physics_validation
+The target doctoral research direction is:
 
-Validated the proposal-aligned simulation foundation using the Gazebo fallback. RGB-D sampling remained valid, peg/hole/table collision bodies were configured, and Gazebo contact evidence was captured between the peg and hole collision objects. A nonzero contact wrench was observed with max force approximately 0.0981 N, with `safety_violation_count=0`. MoveIt, `/compute_ik`, controllers, and real robot execution were not used.
+> **Visuomotor Context-Based Meta-Reinforcement Learning with Virtual-Force Safety for Adaptable Peg-in-Hole Assembly in Smart Manufacturing**
 
+<<<<<<< HEAD
 ### proposal_simulation_cell_v1_5_safety_virtual_force_interface
 
 Added the simulation-only safety status interface, contact-state classification, virtual-force diagnostic command suggestions, and admittance diagnostic command suggestions. The interface reads simulated contact wrench, joint state, TF, TF static, and task phase signals, then publishes diagnostic outputs only on `/proposal_simulation_cell/safety_status`, `/proposal_simulation_cell/contact_state`, `/proposal_simulation_cell/virtual_force_command`, and `/proposal_simulation_cell/admittance_command_suggestion`.
@@ -225,143 +227,396 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_15/`. Thi
 | v2.12 | Diagnostic tool-link validation for MoveIt IK readiness | In progress |
 | v2.13 | MoveIt diagnostic input bundle preparation | In progress |
 | v2.14 | Diagnostic-only move_group launch path with execution disabled | In progress |
+=======
+The current implementation focuses on reproducible simulation infrastructure, launch files, observation logging, contact-transition evidence, and validation artifacts.
 
-## Recommended Launch Commands
+---
+>>>>>>> 05ad0d216035d42eeed6d590a361f8eef194ddeb
 
-### Full research baseline trial
+## 2. Latest Validated
 
-```bash
-cd ~/code/robotics_project/ros2_ws
-source /opt/ros/jazzy/setup.bash
-source install/setup.bash
-ros2 launch thesis_bringup run_full_research_trial.launch.py
+###  Name
+
+```text
+proposal_simulation_cell_v2_11_multimodal_contact_observation_logging
 ```
 
-### Peg/hole insertion validation trial
+### Latest Runtime Result
 
-```bash
-cd ~/code/robotics_project/ros2_ws
-source /opt/ros/jazzy/setup.bash
-source install/setup.bash
-ros2 launch thesis_bringup run_full_peg_hole_insertion_validation_trial.launch.py
+The latest reported run completed successfully with the following outcome:
+
+```json
+{
+  "status": "multimodal_contact_observation_logging_validated",
+  "scenario_count": 5,
+  "scenarios_attempted": 5,
+  "scenarios_validated": 5,
+  "rgb_topic_available": true,
+  "depth_topic_available": true,
+  "camera_info_available": true,
+  "observation_row_count": 65,
+  "contact_transition_row_count": 5
+}
 ```
 
-### Coordinate-based insertion diagnostics
+### Validation Summary
 
-```bash
-cd ~/code/robotics_project/ros2_ws
-source /opt/ros/jazzy/setup.bash
-source install/setup.bash
-ros2 launch thesis_bringup run_full_cartesian_insertion_diagnostics.launch.py
+| Item | Result |
+|---|---:|
+| Build result | Success |
+| Packages built | 4 |
+| Scenarios attempted | 5 |
+| Scenarios validated | 5 |
+| RGB topic available | Yes |
+| Depth topic available | Yes |
+| Camera info available | Yes |
+| Observation rows logged | 65 |
+| Contact transition rows logged | 5 |
+| Fake dataset used | No |
+| Fake result claimed | No |
+| Real robot used | No |
+| Physical endpoint used | No |
+| Forceful contact used | No |
+| Physical peg insertion claimed | No |
+
+### Known Runtime Note
+
+`move_group` may log a shutdown-time segmentation fault after diagnostics are already written. In the latest reported run, this occurred after the validation artifacts had already been generated and did not invalidate the recorded evidence.
+
+---
+
+## 3. Research Motivation
+
+Smart manufacturing cells increasingly need robotic assembly skills that remain reliable under:
+
+- Product changes.
+- Hole and peg tolerance variation.
+- Pose uncertainty.
+- Partial observability.
+- Contact-state ambiguity.
+- Edge contact, jamming, wedging, and recovery cases.
+
+Pure geometric planning is insufficient once contact begins. Robust assembly requires closed-loop sensing, safe contact handling, and systematic validation under realistic uncertainty.
+
+This repository therefore focuses on the software and simulation backbone needed to test adaptive, safety-aware assembly policies before transferring them to a physical robot.
+
+---
+
+## 4. Target Robot and Sensors
+
+The intended physical platform for later-stage transfer is:
+
+- **Robot:** KUKA LBR iisy 6 R1300
+- **External RGB-D sensor:** Intel RealSense D405
+- **Software middleware:** ROS 2 Jazzy
+- **Simulation:** Gazebo
+- **Optional future simulation backend:** NVIDIA Isaac Sim
+
+Current repository status remains simulation-focused. Real-robot deployment is not claimed unless explicitly validated in a future.
+
+---
+
+## 5. Main Technical Components
+
+### 5.1 Multi-Modal Observation Pipeline
+
+The latest validates logging of:
+
+- RGB topic availability.
+- Depth topic availability.
+- Camera info availability.
+- Scenario-level observation records.
+- Contact-transition records.
+- Validation status summaries.
+
+This supports later training and evaluation of policies that use visual, geometric, proprioceptive, and contact-related state information.
+
+### 5.2 Safety Layer
+
+The project uses a safety-focused execution concept with two levels:
+
+1. **Runtime safety monitoring**
+   - Monitors task phase and relevant state signals.
+   - Supports pre-contact and contact-aware constraints.
+
+2. **Virtual-force / admittance-style interaction layer**
+   - Intended to mediate contact behavior.
+   - Avoids strong “guarantee” claims.
+   - Uses bounded operational constraints and empirical safety gates.
+
+The current repository state validates logging and simulation infrastructure rather than final real-world safety performance.
+
+### 5.3 Context-Based Meta-RL Direction
+
+The doctoral method is planned around context-based adaptation:
+
+- A policy should infer task context from short interaction history.
+- Context may represent hole/peg variation, misalignment, friction, clearance, or contact regime.
+- Future ablations may compare deterministic context encoders with PEARL-style variational encoders.
+- The current sprint does not yet claim full meta-RL training completion.
+
+### 5.4 Simulation and Digital Twin Direction
+
+The repository is being developed as a simulation-backed experimental cell:
+
+- Gazebo provides reproducible simulation execution.
+- ROS 2 launch files coordinate robot, task, perception, and safety packages.
+- Scenario validation is logged into machine-readable artifacts.
+- Domain randomization and empirical transfer gates are planned for later stages.
+
+---
+
+## 6. Repository Structure
+
+The workspace is expected to follow a ROS 2 structure similar to:
+
+```text
+robotics_project/
+└── ros2_ws/
+    ├── src/
+    │   ├── thesis_bringup/
+    │   ├── safety_layer/
+    │   ├── perception_pipeline/
+    │   ├── experiment_manager/
+    │   ├── kuka_task_control/
+    │   └── peg_in_hole_description/
+    ├── build/
+    ├── install/
+    └── log/
 ```
 
-This diagnostic launch publishes named peg/hole target frames, reports
-Cartesian distances, audits tool-axis alignment, computes diagnostic target
-orientations for all planned waypoints, including `staging_pose`, on
-`/cartesian_orientation_targets`, assembles the full no-motion Cartesian dry-run
-plan on `/cartesian_insertion_dry_run_plan`, combines the execution gates on
-`/execution_gate_status`, and publishes the IK backend decision report on
-`/ik_backend_audit` plus the MoveIt configuration and launch readiness audits
-on `/moveit_config_audit` and `/moveit_launch_readiness_audit`, the MoveIt
-diagnostic input bundle on `/moveit_diagnostic_inputs`, plus the semantic
-candidate validation reports on `/semantic_model_validation` and
-`/robot_description_semantic_diagnostics`. It does not
-start `task_trajectory_executor`, does not send trajectory goals, and does not
-command robot motion. Controller execution remains blocked until geometry, IK,
-real IK solutions for every waypoint, exact semantic model compatibility,
-MoveIt configuration readiness, tool-axis validation, diagnostic tool-link
-validation, safety, and force/contact gates all pass.
+Main package roles:
 
-### MoveIt IK diagnostic preparation
+| Package | Role |
+|---|---|
+| `thesis_bringup` | Main launch orchestration for research scenarios |
+| `safety_layer` | Runtime safety monitoring and safety-state logic |
+| `perception_pipeline` | Sensor topic handling and observation support |
+| `experiment_manager` | Scenario execution, validation, and evidence logging |
+| `kuka_task_control` | Task-level control and trajectory configuration |
+| `peg_in_hole_description` | Assembly-cell description assets and simulation models |
+
+---
+
+## 7. Build Instructions
+
+From the ROS 2 workspace:
 
 ```bash
-cd ~/code/robotics_project/ros2_ws
+cd /home/omar/code/robotics_project/ros2_ws
 source /opt/ros/jazzy/setup.bash
+colcon build
 source install/setup.bash
-ros2 launch thesis_bringup run_moveit_ik_diagnostic.launch.py
 ```
 
-For the v2.14 move-group diagnostic path:
+Expected latest reported build result:
+
+```text
+Build: success, 4 packages finished.
+```
+
+---
+
+## 8. Run Latest Validated Sprint
+
+Use the following launch command:
 
 ```bash
-cd ~/code/robotics_project/ros2_ws
-source /opt/ros/jazzy/setup.bash
+cd /home/omar/code/robotics_project/ros2_ws
 source install/setup.bash
-ros2 launch thesis_bringup run_move_group_ik_diagnostic.launch.py
+ros2 launch thesis_bringup proposal_simulation_cell_v2_11_multimodal_contact_observation_logging.launch.py
 ```
 
-By default this launch starts only diagnostics:
-`move_group_diagnostic_config_builder`, `moveit_diagnostic_input_builder`,
-`robot_description_semantic_diagnostics`, `semantic_model_validator`,
-`tool_link_validator`, `moveit_launch_readiness_audit`, `moveit_config_audit`,
-`ik_backend_audit`, and `move_group_runtime_audit`. It does not launch
-`move_group`, `task_trajectory_executor`, Gazebo, or any trajectory client.
-The optional `launch_move_group:=true` path is diagnostic-only and sets
-`allow_trajectory_execution=false`; it must not execute plans or send
-controller goals.
+Expected high-level outcome:
 
-v2.10 adds a project-local semantic candidate for `lbr_iisy6_r1300` under
-`ros2_ws/src/kuka_task_control/config/moveit_lbr_iisy6_r1300/`. It is derived
-from the same-family iisy11 R1300 template, marked
-`candidate_requires_validation`, and is not approved for robot motion.
+```text
+5 scenarios attempted.
+5 scenarios validated.
+RGB-D was available.
+Observation rows: 65.
+Contact transition rows: 5.
+No fake dataset.
+No fake result.
+No real robot.
+No physical endpoint.
+No peg insertion.
+No forceful contact.
+```
 
-v2.11 adds `robot_description_semantic_diagnostics` on
-`/robot_description_semantic_diagnostics` to report the SRDF candidate as a
-future `robot_description_semantic` source. The SRDF can be structurally valid
-while still not approved for motion; `/compute_ik` is not called and controller
-execution remains blocked.
+---
 
-v2.12 adds `tool_link_validator` on `/tool_link_validation` to validate `tool0`
-as a diagnostic tool/planning link candidate using TF, `robot_description` URDF
-links, the project-local SRDF candidate, and optional tool-axis/orientation
-diagnostics. A valid result prepares move-group diagnostic launch inputs only;
-motion approval remains false.
+## 9. Evidence and Diagnostics
 
-v2.13 adds `moveit_diagnostic_input_builder` on `/moveit_diagnostic_inputs` to
-assemble the future diagnostic `move_group` input bundle without launching
-`move_group` or calling `/compute_ik`. It reports `robot_description`, SRDF,
-MoveIt YAML, planning-frame, tool-link, and safety readiness while keeping
-`approved_for_motion=false`, `move_group_launch_allowed=false`,
-`controller_motion_allowed=false`, and `trajectory_execution_allowed=false`.
+The latest sprint should produce validation evidence similar to:
 
-v2.14 adds `move_group_diagnostic_config_builder` on
-`/move_group_diagnostic_config` and `move_group_runtime_audit` on
-`/move_group_runtime_audit`. The default move-group diagnostic launch remains
-blocked. If explicitly enabled, `move_group` is launched only to expose service
-availability, with trajectory execution disabled and motion still disallowed.
+```text
+multimodal_contact_observation_status.json
+observation logs / CSV records
+contact transition logs / CSV records
+ROS 2 launch logs
+Gazebo / MoveIt runtime logs
+```
 
-# Robotics Project
+The key status artifact is:
 
-This repository is being developed as the main PhD robotics project, focused on
-KUKA robot simulation for contact-rich manipulation and adaptive control.
+```text
+multimodal_contact_observation_status.json
+```
 
-The early mobile robot ROS 2 packages remain in the repository as infrastructure
-validation work. They were used to verify the ROS 2 workspace, package creation,
-basic publisher/subscriber workflows, and simulation organization before moving
-to the main KUKA manipulation research direction. They should not be treated as
-the primary research target.
+The most important validation fields are:
 
-## PhD Research Direction
+- `status`
+- `scenario_count`
+- `scenarios_attempted`
+- `scenarios_validated`
+- `rgb_topic_available`
+- `depth_topic_available`
+- `camera_info_available`
+- `observation_row_count`
+- `contact_transition_row_count`
 
-The current project direction is practical, simulation-first research around:
+---
 
-- ROS 2-based control and experiment orchestration.
-- Gazebo simulation for repeatable manipulation scenarios.
-- KUKA robot descriptions, launch files, and baseline controllers.
-- Contact-rich tasks such as surface interaction, constrained motion, insertion,
-  pushing, and force-sensitive manipulation.
-- Data logging pipelines for robot state, command signals, contact events,
-  task outcomes, and environment metadata.
-- Future AI-based adaptation for improving controller behavior under contact,
-  uncertainty, and changing task conditions.
+## 10. What This Repository Currently Claims
 
-## Repository Layout
+This repository currently claims:
 
-- `ros2_ws/`: ROS 2 workspace containing existing validation packages and future
-  KUKA simulation packages.
-- `docs/phd_plan/`: Research planning, roadmap, and design notes.
-- `experiments/kuka_baseline/`: Baseline KUKA simulation and control experiments.
-- `experiments/contact_tasks/`: Contact-rich manipulation task experiments.
-- `experiments/data_logging/`: Data collection and logging experiments.
-- `scripts/kuka_tools/`: Helper scripts for KUKA simulation, experiment setup,
-  and analysis support.
+- A ROS 2 / Gazebo simulation cell has been built and launched.
+- The latest multimodal contact-observation sprint was validated.
+- RGB-D topic availability was confirmed.
+- Five simulation scenarios were attempted and validated.
+- Observation and contact-transition logs were generated.
+- The project has a reproducible launch command for the latest sprint.
+
+This repository does **not** currently claim:
+
+- Real-robot execution.
+- Physical peg insertion.
+- Physical endpoint validation.
+- Forceful real-world contact.
+- Final trained meta-RL policy performance.
+- Safety guarantees beyond specified simulation assumptions and logged empirical checks.
+
+---
+
+## 11. Planned Next Steps
+
+Recommended next development stages:
+
+1. Stabilize the latest simulation launch and archive its validation artifacts.
+2. Add structured evidence folders for every sprint.
+3. Add scenario configuration files for controlled tolerance and misalignment variation.
+4. Add baseline controller comparisons.
+5. Add safe-success metrics.
+6. Add context encoder experiments.
+7. Add domain-randomization protocols.
+8. Add simulation-to-real transfer gates.
+9. Only then proceed to physical robot validation.
+
+---
+
+## 12. Suggested Evidence Folder Convention
+
+Recommended structure for future sprints:
+
+```text
+evidence/
+└── proposal_simulation_cell_v2_11_multimodal_contact_observation_logging/
+    ├── multimodal_contact_observation_status.json
+    ├── observations.csv
+    ├── contact_transitions.csv
+    ├── launch_command.txt
+    ├── build_summary.txt
+    └── notes.md
+```
+
+Each sprint should include:
+
+- Exact launch command.
+- Build status.
+- Number of scenarios attempted.
+- Number of scenarios validated.
+- Important ROS topic availability checks.
+- Any known runtime warnings.
+- Clear statement of what is and is not claimed.
+
+---
+
+## 13. Recommended Git Workflow
+
+Before pushing a new sprint, update this `README.md` first.
+
+Recommended commit sequence:
+
+```bash
+git add README.md
+git commit -m "docs: update README for v2.11 multimodal contact observation sprint"
+
+git add .
+git status
+git commit -m "feat: add v2.11 multimodal contact observation logging evidence"
+
+git push origin main
+```
+
+If this is the first push to a new GitHub repository:
+
+```bash
+git init
+git branch -M main
+git remote add origin https://github.com/USERNAME/REPOSITORY_NAME.git
+
+git add README.md
+git commit -m "docs: add main README with latest sprint status"
+
+git add .
+git commit -m "feat: add ROS 2 simulation workspace"
+
+git push -u origin main
+```
+
+---
+
+## 14. Citation and Proposal Alignment Notes
+
+The implementation aligns with the doctoral proposal direction:
+
+- Smart manufacturing robotic assembly.
+- Peg-in-hole contact uncertainty.
+- Multi-modal sensing.
+- Context-based adaptation.
+- Safety-constrained execution.
+- Simulation-backed validation.
+
+The wording intentionally avoids overclaiming. Use terms such as:
+
+- “safety constraints under specified assumptions”
+- “empirical safety gates”
+- “bounded operational constraints”
+- “simulation-backed validation”
+- “validated simulation evidence”
+
+Avoid unsupported claims such as:
+
+- “guaranteed safe”
+- “fully solved peg-in-hole”
+- “real-robot validated”
+- “physical endpoint proven”
+
+unless those claims are supported by future evidence.
+
+---
+
+## 15. Maintainer Notes
+
+Keep the README synchronized with the latest validated sprint. Every future push should update:
+
+- Latest sprint name.
+- Build status.
+- Launch command.
+- Validation artifact names.
+- Scenario counts.
+- Topic availability.
+- Known runtime notes.
+- Clear claims and non-claims.
+
