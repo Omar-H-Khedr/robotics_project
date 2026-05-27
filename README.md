@@ -170,6 +170,12 @@ Added context-conditioned guarded action validation using the real v2.13 determi
 
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_14/`. This sprint does not train a policy, run RL training, create a fake learning result, use a real robot, use a physical endpoint, execute peg insertion, or perform forceful contact.
 
+### proposal_simulation_cell_v2_15_context_action_ablation_validation
+
+Added a context-conditioned versus fixed-baseline guarded action ablation. The sprint runs the same five scenarios under two action modes, records paired Gazebo-only diagnostic runs, and generates comparison reports for trigger step, max force, final return error, safety violations, and action parameter differences.
+
+Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_15/`. This is diagnostic ablation only: no RL training, no policy training, no fake learning result, no real robot execution, no physical endpoint, no peg insertion, and no forceful contact.
+
 ## Current Stable Milestones
 
 | Version | Description | Status |
@@ -208,6 +214,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_14/`. Thi
 | v2.12 | Context vector extraction | Completed |
 | v2.13 | Deterministic context encoder prototype | Completed |
 | v2.14 | Context-conditioned guarded action validation | Completed |
+| v2.15 | Context action ablation validation | Completed |
 | v2.5c | Unified execution gates and tool-axis audit | In progress |
 | v2.5d | Diagnostic Cartesian orientation target calculation | In progress |
 | v2.5e/v2.5f | Orientation-aware IK diagnostics and full-pose waypoint policy | In progress |

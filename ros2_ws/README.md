@@ -38,6 +38,15 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v2_12_context_vector_extraction | Completed |
 | proposal_simulation_cell_v2_13_context_encoder_prototype | Completed |
 | proposal_simulation_cell_v2_14_context_conditioned_guarded_action_validation | Completed |
+| proposal_simulation_cell_v2_15_context_action_ablation_validation | Completed |
+
+## proposal_simulation_cell_v2_15_context_action_ablation_validation
+
+Status: `context_action_ablation_validated`
+
+The v2.15 proposal simulation sprint adds a paired diagnostic ablation comparing fixed-baseline guarded action parameters with deterministic context-conditioned guarded action parameters. The five validated scenarios are tested under two action modes, and paired comparison reports are generated for trigger step, max force, final return error, safety violations, and action parameter differences.
+
+This sprint is diagnostic ablation only. It does not run RL training, train a policy, create fake learning results, use a real robot, use a physical endpoint, execute peg insertion, or perform forceful contact. Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_15/`.
 
 ## proposal_simulation_cell_v2_14_context_conditioned_guarded_action_validation
 
