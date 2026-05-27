@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: kuka-description
+Version: 0.0.0
+Summary: Project-local launch and visualization assets for KUKA LBR iisy robots.
+Maintainer: omar
+Maintainer-email: omar.khedr@gu.edu.eg
+License: Apache-2.0

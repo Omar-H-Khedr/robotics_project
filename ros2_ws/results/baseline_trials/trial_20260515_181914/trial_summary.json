@@ -1,0 +1,43 @@
+{
+  "completed_phases_count": 0,
+  "contact_events_count": 361,
+  "contact_messages_observed": true,
+  "contact_metrics_available": true,
+  "contact_samples_count": 275053,
+  "contact_topics_configured": {
+    "validation": "/gazebo/contacts/validation",
+    "validation_sensor": "/world/minimal_contact_validation_world/model/contact_validation_pad/link/pad_link/sensor/contact_validation_sensor/contact"
+  },
+  "contact_topics_connected": [
+    "validation_sensor"
+  ],
+  "contact_topics_seen": [
+    "validation_sensor"
+  ],
+  "execution_time_sec": 317.320693755,
+  "final_task_phase": "uninitialized",
+  "final_trial_status": "idle",
+  "force_extraction_available": true,
+  "force_extraction_method": "ros_gz_interfaces Contacts.wrenches force magnitude",
+  "insertion_attempted": false,
+  "insertion_hold_reached": false,
+  "insertion_success": null,
+  "insertion_success_estimate": null,
+  "max_contact_force": 1.080989190108099,
+  "notes": "Physical contacts observed. insertion_success remains null until a validated success rule is implemented. insertion_success_estimate is a heuristic based on insertion_hold, completed trial status, and absence of explicit failure. contact_probe_validation validates Gazebo contact instrumentation only; task_completed is not required. insertion_success is null because no validated contact-based success rule is implemented.",
+  "physical_contact_observed": true,
+  "positive_contact_counts": {
+    "validation": 0,
+    "validation_sensor": 275053
+  },
+  "safe_success": null,
+  "safety_status_observed": false,
+  "safety_violations_count": 0,
+  "safety_warnings_count": 0,
+  "task_completed": false,
+  "task_started": false,
+  "total_task_events": 0,
+  "trial_failed": false,
+  "trial_id": "trial_20260515_181914",
+  "trial_mode": "contact_probe_validation"
+}

@@ -1,0 +1,48 @@
+{
+  "completed_phases_count": 6,
+  "contact_events_count": 0,
+  "contact_messages_observed": false,
+  "contact_metrics_available": true,
+  "contact_samples_count": 0,
+  "contact_topics_configured": {
+    "hole": "/gazebo/contacts/hole",
+    "peg": "/gazebo/contacts/peg",
+    "robot_validation": "/gazebo/contacts/robot_validation",
+    "target": "/gazebo/contacts/target",
+    "validation": "/gazebo/contacts/validation"
+  },
+  "contact_topics_connected": [
+    "hole",
+    "peg",
+    "robot_validation",
+    "target"
+  ],
+  "contact_topics_seen": [],
+  "execution_time_sec": 169.368380086,
+  "final_task_phase": "sequence_complete",
+  "final_trial_status": "completed",
+  "insertion_attempted": false,
+  "insertion_hold_reached": false,
+  "insertion_success": null,
+  "insertion_success_estimate": null,
+  "max_contact_force": null,
+  "notes": "Contact topics are connected but no contact messages were observed. max_contact_force is null because force extraction is disabled/unvalidated. insertion_success remains null until a validated success rule is implemented. insertion_success_estimate is a heuristic based on insertion_hold, completed trial status, and absence of explicit failure. robot_contact_validation completed without robot_validation contact; tune the joint-space contact pose after Gazebo observation if needed. Contact instrumentation is connected; zero physical contact events can be expected when the scripted joint-space sequence does not touch instrumented objects. max_contact_force is null unless validated force extraction is enabled. insertion_success is null because no validated contact-based success rule is implemented.",
+  "physical_contact_observed": false,
+  "positive_contact_counts": {
+    "hole": 0,
+    "peg": 0,
+    "robot_validation": 0,
+    "target": 0,
+    "validation": 0
+  },
+  "safe_success": false,
+  "safety_status_observed": true,
+  "safety_violations_count": 1,
+  "safety_warnings_count": 47,
+  "task_completed": true,
+  "task_started": true,
+  "total_task_events": 26,
+  "trial_failed": false,
+  "trial_id": "trial_20260515_172035",
+  "trial_mode": "robot_contact_validation"
+}

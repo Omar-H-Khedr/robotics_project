@@ -1,0 +1,15 @@
+/home/omar/code/robotics_project/ros2_ws/install/kuka_robot_descriptions/share/ament_index/resource_index/package_run_dependencies/kuka_robot_descriptions
+/home/omar/code/robotics_project/ros2_ws/install/kuka_robot_descriptions/share/ament_index/resource_index/parent_prefix_path/kuka_robot_descriptions
+/home/omar/code/robotics_project/ros2_ws/install/kuka_robot_descriptions/share/kuka_robot_descriptions/environment/ament_prefix_path.sh
+/home/omar/code/robotics_project/ros2_ws/install/kuka_robot_descriptions/share/kuka_robot_descriptions/environment/ament_prefix_path.dsv
+/home/omar/code/robotics_project/ros2_ws/install/kuka_robot_descriptions/share/kuka_robot_descriptions/environment/path.sh
+/home/omar/code/robotics_project/ros2_ws/install/kuka_robot_descriptions/share/kuka_robot_descriptions/environment/path.dsv
+/home/omar/code/robotics_project/ros2_ws/install/kuka_robot_descriptions/share/kuka_robot_descriptions/local_setup.bash
+/home/omar/code/robotics_project/ros2_ws/install/kuka_robot_descriptions/share/kuka_robot_descriptions/local_setup.sh
+/home/omar/code/robotics_project/ros2_ws/install/kuka_robot_descriptions/share/kuka_robot_descriptions/local_setup.zsh
+/home/omar/code/robotics_project/ros2_ws/install/kuka_robot_descriptions/share/kuka_robot_descriptions/local_setup.dsv
+/home/omar/code/robotics_project/ros2_ws/install/kuka_robot_descriptions/share/kuka_robot_descriptions/package.dsv
+/home/omar/code/robotics_project/ros2_ws/install/kuka_robot_descriptions/share/ament_index/resource_index/packages/kuka_robot_descriptions
+/home/omar/code/robotics_project/ros2_ws/install/kuka_robot_descriptions/share/kuka_robot_descriptions/cmake/kuka_robot_descriptionsConfig.cmake
+/home/omar/code/robotics_project/ros2_ws/install/kuka_robot_descriptions/share/kuka_robot_descriptions/cmake/kuka_robot_descriptionsConfig-version.cmake
+/home/omar/code/robotics_project/ros2_ws/install/kuka_robot_descriptions/share/kuka_robot_descriptions/package.xml

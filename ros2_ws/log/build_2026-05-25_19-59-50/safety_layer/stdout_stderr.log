@@ -1,0 +1,21 @@
+running develop
+running egg_info
+writing safety_layer.egg-info/PKG-INFO
+writing dependency_links to safety_layer.egg-info/dependency_links.txt
+writing entry points to safety_layer.egg-info/entry_points.txt
+writing requirements to safety_layer.egg-info/requires.txt
+writing top-level names to safety_layer.egg-info/top_level.txt
+reading manifest file 'safety_layer.egg-info/SOURCES.txt'
+writing manifest file 'safety_layer.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages/safety-layer.egg-link (link to .)
+Installing safety_monitor script to /home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/safety_layer
+
+Installed /home/omar/code/robotics_project/ros2_ws/build/safety_layer
+running symlink_data
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/safety_layer/resource/safety_layer -> /home/omar/code/robotics_project/ros2_ws/install/safety_layer/share/ament_index/resource_index/packages
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/safety_layer/package.xml -> /home/omar/code/robotics_project/ros2_ws/install/safety_layer/share/safety_layer
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/safety_layer/README.md -> /home/omar/code/robotics_project/ros2_ws/install/safety_layer/share/safety_layer
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/safety_layer/launch/safety_layer.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/safety_layer/share/safety_layer/launch
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/safety_layer/launch/safety_monitor.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/safety_layer/share/safety_layer/launch
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/safety_layer/config/safety_limits.yaml -> /home/omar/code/robotics_project/ros2_ws/install/safety_layer/share/safety_layer/config

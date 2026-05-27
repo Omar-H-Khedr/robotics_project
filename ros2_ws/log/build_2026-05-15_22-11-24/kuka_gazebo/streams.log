@@ -1,0 +1,37 @@
+[0.035s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_gazebo': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --build /home/omar/code/robotics_project/ros2_ws/build/kuka_gazebo -- -j8 -l8
+[0.849s] [100%] Built target test_keep_alive
+[1.070s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_gazebo' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --build /home/omar/code/robotics_project/ros2_ws/build/kuka_gazebo -- -j8 -l8
+[1.071s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_gazebo': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --install /home/omar/code/robotics_project/ros2_ws/build/kuka_gazebo
+[1.084s] -- Install configuration: ""
+[1.084s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/gazebo
+[1.084s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/gazebo/kuka_gazebo.xacro
+[1.084s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/launch
+[1.084s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/launch/gazebo_startup.launch.py
+[1.085s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/launch/__pycache__
+[1.085s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/launch/__pycache__/gazebo_startup.launch.cpython-312.pyc
+[1.085s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/world
+[1.086s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/world/empty_world.sdf
+[1.087s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/world/box.sdf
+[1.087s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/config
+[1.087s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/config/bridge_config.yaml
+[1.087s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/lib/kuka_gazebo/gazebo_support_test.py
+[1.087s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/lib/kuka_gazebo/run_gazebo_tests.py
+[1.087s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/lib/kuka_gazebo/test_gazebo_robot_support.py
+[1.087s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/README.md
+[1.088s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/lib/kuka_gazebo/test_keep_alive
+[1.088s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/ament_index/resource_index/package_run_dependencies/kuka_gazebo
+[1.088s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/ament_index/resource_index/parent_prefix_path/kuka_gazebo
+[1.088s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/environment/ament_prefix_path.sh
+[1.088s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/environment/ament_prefix_path.dsv
+[1.088s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/environment/path.sh
+[1.089s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/environment/path.dsv
+[1.089s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/local_setup.bash
+[1.089s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/local_setup.sh
+[1.089s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/local_setup.zsh
+[1.089s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/local_setup.dsv
+[1.089s] -- Installing: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/package.dsv
+[1.090s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/ament_index/resource_index/packages/kuka_gazebo
+[1.090s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/cmake/kuka_gazeboConfig.cmake
+[1.090s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/cmake/kuka_gazeboConfig-version.cmake
+[1.090s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo/share/kuka_gazebo/package.xml
+[1.117s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_gazebo' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --install /home/omar/code/robotics_project/ros2_ws/build/kuka_gazebo

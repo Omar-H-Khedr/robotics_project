@@ -1,0 +1,21 @@
+{
+  "controller": "joint_trajectory_controller",
+  "end_effector": "simplified research gripper",
+  "framework_version": "v0.4",
+  "notes": "Research Baseline v0.4 logs task events, safety events, trial status, joint states, contact events, and insertion metrics. Contact-force values remain null unless force extraction is validated and enabled. The contact_probe_validation mode validates instrumentation with a passive Gazebo probe and does not require task sequence completion.",
+  "robot": "KUKA LBR iisy 3 R760",
+  "simulator": "Gazebo",
+  "task": "peg-in-hole baseline",
+  "timestamp": "20260515_102300",
+  "topics": {
+    "contact_event": "/contact_event",
+    "insertion_metrics": "/insertion_metrics",
+    "joint_states": "/joint_states",
+    "safety_status": "/safety_status",
+    "task_event": "/task_event",
+    "task_phase": "/task_phase",
+    "trial_status": "/trial_status"
+  },
+  "trial_id": "trial_20260515_102300",
+  "trial_mode": "contact_probe_validation"
+}

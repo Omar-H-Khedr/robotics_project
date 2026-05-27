@@ -1,0 +1,30 @@
+contact_metrics_node:
+  ros__parameters:
+    contact_topics:
+      - name: peg
+        topic: /gazebo/contacts/peg
+      - name: hole
+        topic: /gazebo/contacts/hole
+      - name: target
+        topic: /gazebo/contacts/target
+      - name: validation_sensor
+        topic: /world/minimal_contact_validation_world/model/contact_validation_pad/link/pad_link/sensor/contact_validation_sensor/contact
+      - name: validation
+        topic: /gazebo/contacts/validation
+      - name: robot_validation
+        topic: /world/peg_in_hole_robot_contact_validation_world/model/robot_contact_validation_pad/link/robot_contact_validation_pad_link/sensor/robot_contact_validation_sensor/contact
+      - name: peg_validation
+        topic: /world/peg_in_hole_insertion_validation_world/model/peg/link/peg_link/sensor/peg_contact_sensor/contact
+      - name: hole_validation
+        topic: /world/peg_in_hole_insertion_validation_world/model/hole_block/link/hole_block_link/sensor/hole_contact_sensor/contact
+    insertion_phase_name: insertion_hold
+    contact_enabled: true
+    publish_rate_hz: 2.0
+    max_contact_force_available: true
+    positive_contact_event_throttle_sec: 0.2
+    contact_force_update_epsilon: 1.0e-6
+    zero_contact_event_throttle_sec: 2.0
+    robot_validation_warning_force_n: 50.0
+    robot_validation_violation_force_n: 100.0
+    physical_contact_sources:
+      - ""

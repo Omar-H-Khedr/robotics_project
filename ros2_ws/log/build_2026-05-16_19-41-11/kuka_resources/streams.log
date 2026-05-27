@@ -1,0 +1,36 @@
+[0.076s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_resources': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --build /home/omar/code/robotics_project/ros2_ws/build/kuka_resources -- -j8 -l8
+[1.524s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_resources' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --build /home/omar/code/robotics_project/ros2_ws/build/kuka_resources -- -j8 -l8
+[1.533s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_resources': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --install /home/omar/code/robotics_project/ros2_ws/build/kuka_resources
+[1.549s] -- Install configuration: ""
+[1.550s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/urdf
+[1.550s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/urdf/common_constants.xacro
+[1.550s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/urdf/common_colours.xacro
+[1.550s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/urdf/common_materials.xacro
+[1.550s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/config
+[1.550s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/config/planning_7_axis.rviz
+[1.550s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/config/view_7_axis_planning_scene.rviz
+[1.551s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/config/view_6_axis_planning_scene.rviz
+[1.551s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/config/fake_hardware_config_7_axis.yaml
+[1.551s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/config/planning_6_axis.rviz
+[1.552s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/config/fake_hardware_config_6_axis.yaml
+[1.552s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/config/view_7_axis_urdf.rviz
+[1.552s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/config/view_6_axis_urdf.rviz
+[1.552s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/launch
+[1.552s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/launch/moveit_server_template.launch.py
+[1.553s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/launch/fake_hardware_planning_template.launch.py
+[1.553s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/ament_index/resource_index/package_run_dependencies/kuka_resources
+[1.553s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/ament_index/resource_index/parent_prefix_path/kuka_resources
+[1.555s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/environment/ament_prefix_path.sh
+[1.556s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/environment/ament_prefix_path.dsv
+[1.556s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/environment/path.sh
+[1.556s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/environment/path.dsv
+[1.556s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/local_setup.bash
+[1.556s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/local_setup.sh
+[1.556s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/local_setup.zsh
+[1.557s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/local_setup.dsv
+[1.557s] -- Installing: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/package.dsv
+[1.557s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/ament_index/resource_index/packages/kuka_resources
+[1.557s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/cmake/kuka_resourcesConfig.cmake
+[1.557s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/cmake/kuka_resourcesConfig-version.cmake
+[1.558s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/package.xml
+[1.591s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_resources' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --install /home/omar/code/robotics_project/ros2_ws/build/kuka_resources

@@ -1,0 +1,8 @@
+Metadata-Version: 2.1
+Name: safety-layer
+Version: 0.1.0
+Summary: Safety filtering and constraint monitoring package for adaptive peg-in-hole control.
+Maintainer: Omar Khedr
+Maintainer-email: omar.khedr@gu.edu.eg
+License: Apache-2.0
+Provides-Extra: test

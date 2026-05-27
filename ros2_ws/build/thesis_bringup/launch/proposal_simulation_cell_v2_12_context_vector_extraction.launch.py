@@ -1,0 +1,1 @@
+/home/omar/code/robotics_project/ros2_ws/src/thesis_bringup/launch/proposal_simulation_cell_v2_12_context_vector_extraction.launch.py

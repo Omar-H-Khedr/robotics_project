@@ -1,0 +1,61 @@
+{
+  "completed_phases_count": 3,
+  "contact_episode_count": 1,
+  "contact_events_count": 1,
+  "contact_messages_observed": true,
+  "contact_metrics_available": true,
+  "contact_samples_count": 124561,
+  "contact_topics_configured": {
+    "hole": "/gazebo/contacts/hole",
+    "peg": "/gazebo/contacts/peg",
+    "robot_validation": "/world/peg_in_hole_robot_contact_validation_world/model/robot_contact_validation_pad/link/robot_contact_validation_pad_link/sensor/robot_contact_validation_sensor/contact",
+    "target": "/gazebo/contacts/target",
+    "validation": "/gazebo/contacts/validation",
+    "validation_sensor": "/world/minimal_contact_validation_world/model/contact_validation_pad/link/pad_link/sensor/contact_validation_sensor/contact"
+  },
+  "contact_topics_connected": [
+    "hole",
+    "peg",
+    "robot_validation",
+    "target"
+  ],
+  "contact_topics_seen": [
+    "robot_validation"
+  ],
+  "execution_time_sec": 178.910472236,
+  "final_task_phase": "robot_contact_pre_approach",
+  "final_trial_status": "guarded_stop",
+  "force_extraction_available": true,
+  "force_extraction_method": "ros_gz_interfaces Contacts.wrenches force magnitude",
+  "force_guard_threshold": 100.0,
+  "force_guard_trigger_force": 213.34111088631593,
+  "force_guard_triggered": true,
+  "force_threshold_violation": true,
+  "force_threshold_warning": true,
+  "insertion_attempted": false,
+  "insertion_hold_reached": false,
+  "insertion_success": null,
+  "insertion_success_estimate": false,
+  "max_contact_force": 237.5800204122624,
+  "notes": "Physical contacts observed. Robot validation contact force exceeded the configured simulation violation threshold. insertion_success remains null until a validated success rule is implemented. insertion_success_estimate is a heuristic based on insertion_hold, completed trial status, and absence of explicit failure. robot_contact_validation observed positive robot_validation contact samples. High contact force exceeded the configured simulation violation threshold; robot_contact_validation_success is false. Force guard triggered and canceled the active robot trajectory; robot_contact_validation_success is false for this guarded stop. insertion_success is null because no validated contact-based success rule is implemented.",
+  "physical_contact_observed": true,
+  "positive_contact_counts": {
+    "hole": 0,
+    "peg": 0,
+    "robot_validation": 124561,
+    "target": 0,
+    "validation": 0,
+    "validation_sensor": 0
+  },
+  "robot_contact_validation_success": false,
+  "safe_success": false,
+  "safety_status_observed": true,
+  "safety_violations_count": 0,
+  "safety_warnings_count": 60,
+  "task_completed": false,
+  "task_started": true,
+  "total_task_events": 18,
+  "trial_failed": true,
+  "trial_id": "trial_20260515_191138",
+  "trial_mode": "robot_contact_validation"
+}

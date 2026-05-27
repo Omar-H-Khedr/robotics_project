@@ -1,0 +1,1 @@
+/home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/launch/run_full_robot_contact_validation_trial.launch.py

@@ -1,0 +1,1 @@
+/home/omar/code/robotics_project/ros2_ws/src/thesis_bringup/launch/run_minimal_contact_validation.launch.py

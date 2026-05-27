@@ -1,0 +1,1 @@
+/home/omar/code/robotics_project/ros2_ws/src/thesis_bringup/launch/proposal_simulation_cell_v2_11_multimodal_contact_observation_logging.launch.py

@@ -1,0 +1,1 @@
+/home/omar/code/robotics_project/ros2_ws/src/thesis_bringup/launch/proposal_simulation_cell_v1_12_scenario_batch_selector.launch.py

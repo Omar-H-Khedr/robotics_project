@@ -1,0 +1,25 @@
+[2.833s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/build/experiment_manager': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/experiment_manager/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/experiment_manager/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/omar/code/robotics_project/ros2_ws/build/experiment_manager/build --no-deps symlink_data --force
+[3.232s] running develop
+[3.414s] running egg_info
+[3.437s] writing experiment_manager.egg-info/PKG-INFO
+[3.684s] writing dependency_links to experiment_manager.egg-info/dependency_links.txt
+[3.684s] writing entry points to experiment_manager.egg-info/entry_points.txt
+[3.685s] writing requirements to experiment_manager.egg-info/requires.txt
+[3.685s] writing top-level names to experiment_manager.egg-info/top_level.txt
+[3.731s] reading manifest file 'experiment_manager.egg-info/SOURCES.txt'
+[3.750s] writing manifest file 'experiment_manager.egg-info/SOURCES.txt'
+[3.773s] running build_ext
+[3.773s] Creating /home/omar/code/robotics_project/ros2_ws/install/experiment_manager/lib/python3.12/site-packages/experiment-manager.egg-link (link to .)
+[3.774s] Installing baseline_trial_manager script to /home/omar/code/robotics_project/ros2_ws/install/experiment_manager/lib/experiment_manager
+[3.774s] Installing research_baseline_v2_4_experiment_runner script to /home/omar/code/robotics_project/ros2_ws/install/experiment_manager/lib/experiment_manager
+[3.774s] 
+[3.774s] Installed /home/omar/code/robotics_project/ros2_ws/build/experiment_manager
+[3.774s] running symlink_data
+[3.775s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/experiment_manager/resource/experiment_manager -> /home/omar/code/robotics_project/ros2_ws/install/experiment_manager/share/ament_index/resource_index/packages
+[3.775s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/experiment_manager/package.xml -> /home/omar/code/robotics_project/ros2_ws/install/experiment_manager/share/experiment_manager
+[3.775s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/experiment_manager/README.md -> /home/omar/code/robotics_project/ros2_ws/install/experiment_manager/share/experiment_manager
+[3.775s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/experiment_manager/launch/experiment_manager.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/experiment_manager/share/experiment_manager/launch
+[3.775s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/experiment_manager/launch/run_baseline_logging.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/experiment_manager/share/experiment_manager/launch
+[3.776s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/experiment_manager/config/logging.yaml -> /home/omar/code/robotics_project/ros2_ws/install/experiment_manager/share/experiment_manager/config
+[3.776s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/experiment_manager/experiments/baseline_trials.yaml -> /home/omar/code/robotics_project/ros2_ws/install/experiment_manager/share/experiment_manager/experiments
+[3.810s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/build/experiment_manager' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/experiment_manager/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/experiment_manager/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/omar/code/robotics_project/ros2_ws/build/experiment_manager/build --no-deps symlink_data --force

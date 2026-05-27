@@ -1,0 +1,50 @@
+[7.163s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/src/kuka_task_control': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/kuka_task_control build --build-base /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/build install --record /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/install.log --single-version-externally-managed install_data
+[7.444s] running egg_info
+[7.465s] writing ../../build/kuka_task_control/kuka_task_control.egg-info/PKG-INFO
+[7.465s] writing dependency_links to ../../build/kuka_task_control/kuka_task_control.egg-info/dependency_links.txt
+[7.466s] writing entry points to ../../build/kuka_task_control/kuka_task_control.egg-info/entry_points.txt
+[7.466s] writing requirements to ../../build/kuka_task_control/kuka_task_control.egg-info/requires.txt
+[7.466s] writing top-level names to ../../build/kuka_task_control/kuka_task_control.egg-info/top_level.txt
+[7.509s] reading manifest file '../../build/kuka_task_control/kuka_task_control.egg-info/SOURCES.txt'
+[7.531s] writing manifest file '../../build/kuka_task_control/kuka_task_control.egg-info/SOURCES.txt'
+[7.531s] running build
+[7.532s] running build_py
+[7.533s] copying kuka_task_control/tool_link_validator.py -> /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/build/lib/kuka_task_control
+[7.553s] copying kuka_task_control/moveit_diagnostic_input_builder.py -> /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/build/lib/kuka_task_control
+[7.554s] copying kuka_task_control/moveit_launch_readiness_audit.py -> /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/build/lib/kuka_task_control
+[7.556s] running install
+[7.575s] running install_lib
+[7.614s] copying /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/build/lib/kuka_task_control/tool_link_validator.py -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages/kuka_task_control
+[7.633s] copying /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/build/lib/kuka_task_control/moveit_diagnostic_input_builder.py -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages/kuka_task_control
+[7.633s] copying /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/build/lib/kuka_task_control/moveit_launch_readiness_audit.py -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages/kuka_task_control
+[7.649s] byte-compiling /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages/kuka_task_control/tool_link_validator.py to tool_link_validator.cpython-312.pyc
+[7.662s] byte-compiling /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages/kuka_task_control/moveit_diagnostic_input_builder.py to moveit_diagnostic_input_builder.cpython-312.pyc
+[7.667s] byte-compiling /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages/kuka_task_control/moveit_launch_readiness_audit.py to moveit_launch_readiness_audit.cpython-312.pyc
+[7.676s] running install_data
+[7.676s] running install_egg_info
+[7.698s] removing '/home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages/kuka_task_control-0.1.0-py3.12.egg-info' (and everything under it)
+[7.723s] Copying ../../build/kuka_task_control/kuka_task_control.egg-info to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages/kuka_task_control-0.1.0-py3.12.egg-info
+[7.738s] running install_scripts
+[7.875s] Installing baseline_joint_sequence_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.875s] Installing baseline_trajectory_client script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.875s] Installing cartesian_insertion_diagnostics script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.876s] Installing cartesian_insertion_dry_run_planner script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.876s] Installing cartesian_orientation_target_calculator script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.876s] Installing execution_gate_monitor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.876s] Installing ik_backend_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.876s] Installing ik_feasibility_diagnostics script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.877s] Installing move_group_diagnostic_config_builder script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.877s] Installing move_group_runtime_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.877s] Installing moveit_config_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.877s] Installing moveit_diagnostic_input_builder script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.877s] Installing moveit_launch_readiness_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.877s] Installing peg_hole_frame_publisher script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.877s] Installing robot_description_semantic_diagnostics script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.884s] Installing segmented_contact_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.885s] Installing segmented_guarded_contact_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.885s] Installing semantic_model_validator script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.892s] Installing task_trajectory_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.893s] Installing tool_axis_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.893s] Installing tool_link_validator script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[7.893s] writing list of installed files to '/home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/install.log'
+[8.772s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/src/kuka_task_control' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/kuka_task_control build --build-base /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/build install --record /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/install.log --single-version-externally-managed install_data

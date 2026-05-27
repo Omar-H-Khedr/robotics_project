@@ -1,0 +1,8 @@
+Metadata-Version: 2.1
+Name: perception-pipeline
+Version: 0.1.0
+Summary: Gazebo RGB-D and perception interface package for peg-in-hole state estimation.
+Maintainer: Omar Khedr
+Maintainer-email: omar.khedr@gu.edu.eg
+License: Apache-2.0
+Provides-Extra: test

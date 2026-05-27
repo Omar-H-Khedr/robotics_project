@@ -1,0 +1,42 @@
+running develop
+running egg_info
+writing peg_in_hole_description.egg-info/PKG-INFO
+writing dependency_links to peg_in_hole_description.egg-info/dependency_links.txt
+writing requirements to peg_in_hole_description.egg-info/requires.txt
+writing top-level names to peg_in_hole_description.egg-info/top_level.txt
+reading manifest file 'peg_in_hole_description.egg-info/SOURCES.txt'
+writing manifest file 'peg_in_hole_description.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages/peg-in-hole-description.egg-link (link to .)
+
+Installed /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description
+running symlink_data
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/resource/peg_in_hole_description -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/ament_index/resource_index/packages
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/package.xml -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/README.md -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/launch/peg_in_hole_scene.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/launch
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/config/task_geometry.yaml -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/config
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/urdf/peg_in_hole_task.urdf.xacro -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/urdf
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/urdf/lbr_iisy3_r760_research_gripper.urdf.xacro -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/urdf
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/urdf/research_parallel_gripper.xacro -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/urdf
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/urdf/proposal_lbr_iisy6_r1300_cell.urdf.xacro -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/urdf
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/worlds/proposal_simulation_cell_v1_2_rgbd_image_bridge_fix.world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/worlds/peg_in_hole_robot_contact_validation_world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/worlds/proposal_simulation_cell_v1_0.world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/worlds/peg_in_hole_world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/worlds/peg_in_hole_contact_validation_world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/worlds/proposal_simulation_cell_v1_3_contact_physics_validation.world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/worlds/minimal_contact_validation_world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/worlds/peg_in_hole_insertion_validation_world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/models/hole_fixture/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/hole_fixture
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/models/hole_fixture/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/hole_fixture
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/models/work_table/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/work_table
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/models/work_table/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/work_table
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/models/contact_validation_pad/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/contact_validation_pad
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/models/contact_validation_pad/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/contact_validation_pad
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/models/target_plate/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/target_plate
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/models/target_plate/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/target_plate
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/models/robot_pedestal/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/robot_pedestal
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/models/robot_pedestal/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/robot_pedestal
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/models/cylindrical_peg/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/cylindrical_peg
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/models/cylindrical_peg/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/cylindrical_peg

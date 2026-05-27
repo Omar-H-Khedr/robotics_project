@@ -1,0 +1,35 @@
+[1.288s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/build/safety_layer': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/safety_layer/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --uninstall --editable --build-directory /home/omar/code/robotics_project/ros2_ws/build/safety_layer/build
+[1.593s] running develop
+[1.809s] Removing /home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages/safety-layer.egg-link (link to .)
+[1.854s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/build/safety_layer' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/safety_layer/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --uninstall --editable --build-directory /home/omar/code/robotics_project/ros2_ws/build/safety_layer/build
+[1.856s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/src/safety_layer': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/safety_layer/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/safety_layer build --build-base /home/omar/code/robotics_project/ros2_ws/build/safety_layer/build install --record /home/omar/code/robotics_project/ros2_ws/build/safety_layer/install.log --single-version-externally-managed install_data --force
+[2.133s] running egg_info
+[2.155s] writing ../../build/safety_layer/safety_layer.egg-info/PKG-INFO
+[2.155s] writing dependency_links to ../../build/safety_layer/safety_layer.egg-info/dependency_links.txt
+[2.155s] writing entry points to ../../build/safety_layer/safety_layer.egg-info/entry_points.txt
+[2.155s] writing requirements to ../../build/safety_layer/safety_layer.egg-info/requires.txt
+[2.155s] writing top-level names to ../../build/safety_layer/safety_layer.egg-info/top_level.txt
+[2.200s] reading manifest file '../../build/safety_layer/safety_layer.egg-info/SOURCES.txt'
+[2.201s] writing manifest file '../../build/safety_layer/safety_layer.egg-info/SOURCES.txt'
+[2.201s] running build
+[2.201s] running build_py
+[2.201s] running install
+[2.207s] running install_lib
+[2.230s] creating /home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages/safety_layer
+[2.230s] copying /home/omar/code/robotics_project/ros2_ws/build/safety_layer/build/lib/safety_layer/__init__.py -> /home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages/safety_layer
+[2.230s] copying /home/omar/code/robotics_project/ros2_ws/build/safety_layer/build/lib/safety_layer/safety_monitor.py -> /home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages/safety_layer
+[2.231s] byte-compiling /home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages/safety_layer/__init__.py to __init__.cpython-312.pyc
+[2.231s] byte-compiling /home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages/safety_layer/safety_monitor.py to safety_monitor.cpython-312.pyc
+[2.236s] running install_data
+[2.236s] copying resource/safety_layer -> /home/omar/code/robotics_project/ros2_ws/install/safety_layer/share/ament_index/resource_index/packages
+[2.236s] copying package.xml -> /home/omar/code/robotics_project/ros2_ws/install/safety_layer/share/safety_layer
+[2.236s] copying README.md -> /home/omar/code/robotics_project/ros2_ws/install/safety_layer/share/safety_layer
+[2.236s] copying launch/safety_layer.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/safety_layer/share/safety_layer/launch
+[2.236s] copying launch/safety_monitor.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/safety_layer/share/safety_layer/launch
+[2.236s] copying config/safety_limits.yaml -> /home/omar/code/robotics_project/ros2_ws/install/safety_layer/share/safety_layer/config
+[2.236s] running install_egg_info
+[2.259s] Copying ../../build/safety_layer/safety_layer.egg-info to /home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages/safety_layer-0.1.0-py3.12.egg-info
+[2.259s] running install_scripts
+[2.394s] Installing safety_monitor script to /home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/safety_layer
+[2.394s] writing list of installed files to '/home/omar/code/robotics_project/ros2_ws/build/safety_layer/install.log'
+[2.428s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/src/safety_layer' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/safety_layer/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/safety_layer build --build-base /home/omar/code/robotics_project/ros2_ws/build/safety_layer/build install --record /home/omar/code/robotics_project/ros2_ws/build/safety_layer/install.log --single-version-externally-managed install_data --force

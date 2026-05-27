@@ -1,0 +1,1 @@
+/home/omar/code/robotics_project/ros2_ws/src/kuka_task_control/launch/run_segmented_guarded_contact.launch.py

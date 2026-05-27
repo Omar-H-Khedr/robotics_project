@@ -1,0 +1,17 @@
+[1.266s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/build/safety_layer': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/safety_layer/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/omar/code/robotics_project/ros2_ws/build/safety_layer/build --no-deps symlink_data
+[1.596s] running develop
+[1.812s] running egg_info
+[1.834s] writing safety_layer.egg-info/PKG-INFO
+[1.834s] writing dependency_links to safety_layer.egg-info/dependency_links.txt
+[1.834s] writing entry points to safety_layer.egg-info/entry_points.txt
+[1.834s] writing requirements to safety_layer.egg-info/requires.txt
+[1.834s] writing top-level names to safety_layer.egg-info/top_level.txt
+[1.880s] reading manifest file 'safety_layer.egg-info/SOURCES.txt'
+[1.880s] writing manifest file 'safety_layer.egg-info/SOURCES.txt'
+[1.904s] running build_ext
+[1.904s] Creating /home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages/safety-layer.egg-link (link to .)
+[1.905s] Installing safety_monitor script to /home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/safety_layer
+[1.905s] 
+[1.905s] Installed /home/omar/code/robotics_project/ros2_ws/build/safety_layer
+[1.906s] running symlink_data
+[1.952s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/build/safety_layer' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/safety_layer/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/omar/code/robotics_project/ros2_ws/build/safety_layer/build --no-deps symlink_data

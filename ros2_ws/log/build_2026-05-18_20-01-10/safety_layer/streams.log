@@ -1,0 +1,21 @@
+[1.673s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/src/safety_layer': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/safety_layer/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/safety_layer build --build-base /home/omar/code/robotics_project/ros2_ws/build/safety_layer/build install --record /home/omar/code/robotics_project/ros2_ws/build/safety_layer/install.log --single-version-externally-managed install_data
+[1.941s] running egg_info
+[1.962s] writing ../../build/safety_layer/safety_layer.egg-info/PKG-INFO
+[1.963s] writing dependency_links to ../../build/safety_layer/safety_layer.egg-info/dependency_links.txt
+[1.963s] writing entry points to ../../build/safety_layer/safety_layer.egg-info/entry_points.txt
+[1.963s] writing requirements to ../../build/safety_layer/safety_layer.egg-info/requires.txt
+[1.963s] writing top-level names to ../../build/safety_layer/safety_layer.egg-info/top_level.txt
+[2.005s] reading manifest file '../../build/safety_layer/safety_layer.egg-info/SOURCES.txt'
+[2.006s] writing manifest file '../../build/safety_layer/safety_layer.egg-info/SOURCES.txt'
+[2.006s] running build
+[2.006s] running build_py
+[2.007s] running install
+[2.012s] running install_lib
+[2.034s] running install_data
+[2.034s] running install_egg_info
+[2.056s] removing '/home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages/safety_layer-0.1.0-py3.12.egg-info' (and everything under it)
+[2.056s] Copying ../../build/safety_layer/safety_layer.egg-info to /home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages/safety_layer-0.1.0-py3.12.egg-info
+[2.057s] running install_scripts
+[2.192s] Installing safety_monitor script to /home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/safety_layer
+[2.193s] writing list of installed files to '/home/omar/code/robotics_project/ros2_ws/build/safety_layer/install.log'
+[2.266s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/src/safety_layer' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/safety_layer/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/safety_layer build --build-base /home/omar/code/robotics_project/ros2_ws/build/safety_layer/build install --record /home/omar/code/robotics_project/ros2_ws/build/safety_layer/install.log --single-version-externally-managed install_data

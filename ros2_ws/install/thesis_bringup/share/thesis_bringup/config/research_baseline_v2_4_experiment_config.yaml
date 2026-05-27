@@ -1,0 +1,27 @@
+baseline_name: research_baseline_v2_4_experiment_runner
+mode: diagnostic_dry_run
+phase_sleep_sec: 0.01
+single_run:
+  run_id: v2_4_single_001
+  x_offset_mm: 0.8
+  y_offset_mm: -1.1
+  angular_error_deg: 1.5
+  hole_tolerance_mm: 2.0
+thresholds:
+  success_xy_mm: 2.0
+  success_angular_error_deg: 3.0
+  safe_offset_mm: 5.0
+  safe_angular_error_deg: 8.0
+randomization:
+  x_offset_mm:
+    - -4.0
+    - 4.0
+  y_offset_mm:
+    - -4.0
+    - 4.0
+  angular_error_deg:
+    - -6.0
+    - 6.0
+  hole_tolerance_mm:
+    - 1.0
+    - 3.0

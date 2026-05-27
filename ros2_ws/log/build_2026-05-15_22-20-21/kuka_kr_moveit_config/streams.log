@@ -1,0 +1,93 @@
+[0.122s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_kr_moveit_config': AMENT_PREFIX_PATH=/home/omar/code/robotics_project/ros2_ws/install/kuka_resources:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/omar/code/robotics_project/ros2_ws/install/kuka_resources:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor:/opt/ros/jazzy /usr/bin/cmake --build /home/omar/code/robotics_project/ros2_ws/build/kuka_kr_moveit_config -- -j8 -l8
+[0.220s] [  3%] Built target kuka_kr_moveit_config_kr4_r600
+[0.227s] [  6%] Built target kuka_kr_moveit_config_kr6_r900_2
+[0.230s] [ 10%] Built target kuka_kr_moveit_config_kr6_r900_sixx
+[0.237s] [ 13%] Built target kuka_kr_moveit_config_kr6_r700_sixx
+[0.251s] [ 16%] Built target kuka_kr_moveit_config_kr6_r700_2
+[0.266s] [ 20%] Built target kuka_kr_moveit_config_kr8_r1440_2_arc_hw
+[0.277s] [ 23%] Built target kuka_kr_moveit_config_kr8_r2100_2_arc_hw
+[0.282s] [ 26%] Built target kuka_kr_moveit_config_kr10_r900_2
+[0.294s] [ 30%] Built target kuka_kr_moveit_config_kr10_r1100_2
+[0.295s] [ 33%] Built target kuka_kr_moveit_config_kr12_r1450_3_hw
+[0.302s] [ 36%] Built target kuka_kr_moveit_config_kr16_r1610_2
+[0.336s] [ 40%] Built target kuka_kr_moveit_config_kr16_r2010_2
+[0.348s] [ 43%] Built target kuka_kr_moveit_config_kr20_r1810_2
+[0.355s] [ 46%] Built target kuka_kr_moveit_config_kr70_r2100
+[0.359s] [ 50%] Built target kuka_kr_moveit_config_kr30_r2100
+[0.359s] [ 53%] Built target kuka_kr_moveit_config_kr50_r2500
+[0.374s] [ 56%] Built target kuka_kr_moveit_config_kr20_r3100
+[0.403s] [ 60%] Built target kuka_kr_moveit_config_kr210_r3100_2
+[0.406s] [ 63%] Built target kuka_kr_moveit_config_kr210_r2700_2
+[0.408s] [ 66%] Built target kuka_kr_moveit_config_kr150_r3100_2
+[0.422s] [ 70%] Built target kuka_kr_moveit_config_kr210_r3100_ultra
+[0.431s] [ 73%] Built target kuka_kr_moveit_config_kr210_r3300_2_k
+[0.444s] [ 76%] Built target kuka_kr_moveit_config_kr240_r2900_2
+[0.463s] [ 80%] Built target kuka_kr_moveit_config_kr240_r3330
+[0.472s] [ 83%] Built target kuka_kr_moveit_config_kr300_r2700_2
+[0.488s] [ 86%] Built target kuka_kr_moveit_config_kr300_r2800_2_mt
+[0.500s] [ 90%] Built target kuka_kr_moveit_config_kr360_r2830
+[0.508s] [ 93%] Built target kuka_kr_moveit_config_kr500_r2800_2
+[0.524s] [ 96%] Built target kuka_kr_moveit_config_kr560_r3100_2
+[0.536s] [100%] Built target kuka_kr_moveit_config_kr800_r2800_2
+[0.581s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_kr_moveit_config' returned '0': AMENT_PREFIX_PATH=/home/omar/code/robotics_project/ros2_ws/install/kuka_resources:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/omar/code/robotics_project/ros2_ws/install/kuka_resources:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor:/opt/ros/jazzy /usr/bin/cmake --build /home/omar/code/robotics_project/ros2_ws/build/kuka_kr_moveit_config -- -j8 -l8
+[0.583s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_kr_moveit_config': AMENT_PREFIX_PATH=/home/omar/code/robotics_project/ros2_ws/install/kuka_resources:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/omar/code/robotics_project/ros2_ws/install/kuka_resources:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor:/opt/ros/jazzy /usr/bin/cmake --install /home/omar/code/robotics_project/ros2_ws/build/kuka_kr_moveit_config
+[0.591s] -- Install configuration: ""
+[0.592s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr4_r600.srdf
+[0.592s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr6_r700_sixx.srdf
+[0.592s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr6_r700_2.srdf
+[0.592s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr6_r900_sixx.srdf
+[0.593s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr6_r900_2.srdf
+[0.593s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr8_r1440_2_arc_hw.srdf
+[0.593s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr8_r2100_2_arc_hw.srdf
+[0.594s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr10_r900_2.srdf
+[0.594s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr10_r1100_2.srdf
+[0.594s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr12_r1450_3_hw.srdf
+[0.594s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr16_r1610_2.srdf
+[0.594s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr16_r2010_2.srdf
+[0.594s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr20_r1810_2.srdf
+[0.594s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr20_r3100.srdf
+[0.594s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr30_r2100.srdf
+[0.595s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr50_r2500.srdf
+[0.595s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr70_r2100.srdf
+[0.595s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr150_r3100_2.srdf
+[0.595s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr210_r2700_2.srdf
+[0.595s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr210_r3100_2.srdf
+[0.595s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr210_r3100_ultra.srdf
+[0.595s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr210_r3300_2_k.srdf
+[0.595s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr240_r2900_2.srdf
+[0.596s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr240_r3330.srdf
+[0.596s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr300_r2700_2.srdf
+[0.596s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr300_r2800_2_mt.srdf
+[0.596s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr360_r2830.srdf
+[0.596s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr500_r2800_2.srdf
+[0.596s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr560_r3100_2.srdf
+[0.596s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/urdf/kr800_r2800_2.srdf
+[0.596s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/config
+[0.596s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/config/chomp_planning.yaml
+[0.597s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/config/kinematics.yaml
+[0.597s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/config/pilz_cartesian_limits.yaml
+[0.597s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/config/ompl_planning.yaml
+[0.597s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/config/moveit_controllers.yaml
+[0.597s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/config/stomp_planning.yaml
+[0.597s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/srdf
+[0.597s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/srdf/kr_arm_macro.xacro
+[0.597s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/srdf/kr_arm.srdf.xacro
+[0.597s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/launch
+[0.597s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/launch/moveit_planning_fake_hardware.launch.py
+[0.597s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/launch/moveit_server.launch.py
+[0.597s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/ament_index/resource_index/package_run_dependencies/kuka_kr_moveit_config
+[0.597s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/ament_index/resource_index/parent_prefix_path/kuka_kr_moveit_config
+[0.597s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/environment/ament_prefix_path.sh
+[0.598s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/environment/ament_prefix_path.dsv
+[0.598s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/environment/path.sh
+[0.598s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/environment/path.dsv
+[0.598s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/local_setup.bash
+[0.598s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/local_setup.sh
+[0.598s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/local_setup.zsh
+[0.598s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/local_setup.dsv
+[0.598s] -- Installing: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/package.dsv
+[0.598s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/ament_index/resource_index/packages/kuka_kr_moveit_config
+[0.598s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/cmake/kuka_kr_moveit_configConfig.cmake
+[0.598s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/cmake/kuka_kr_moveit_configConfig-version.cmake
+[0.598s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_kr_moveit_config/share/kuka_kr_moveit_config/package.xml
+[0.811s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_kr_moveit_config' returned '0': AMENT_PREFIX_PATH=/home/omar/code/robotics_project/ros2_ws/install/kuka_resources:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/omar/code/robotics_project/ros2_ws/install/kuka_resources:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor:/opt/ros/jazzy /usr/bin/cmake --install /home/omar/code/robotics_project/ros2_ws/build/kuka_kr_moveit_config

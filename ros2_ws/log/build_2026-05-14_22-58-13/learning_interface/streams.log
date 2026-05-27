@@ -1,0 +1,19 @@
+[4.464s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/src/learning_interface': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/learning_interface/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/learning_interface/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/learning_interface build --build-base /home/omar/code/robotics_project/ros2_ws/build/learning_interface/build install --record /home/omar/code/robotics_project/ros2_ws/build/learning_interface/install.log --single-version-externally-managed install_data
+[4.745s] running egg_info
+[4.768s] writing ../../build/learning_interface/learning_interface.egg-info/PKG-INFO
+[4.769s] writing dependency_links to ../../build/learning_interface/learning_interface.egg-info/dependency_links.txt
+[4.769s] writing requirements to ../../build/learning_interface/learning_interface.egg-info/requires.txt
+[4.769s] writing top-level names to ../../build/learning_interface/learning_interface.egg-info/top_level.txt
+[4.811s] reading manifest file '../../build/learning_interface/learning_interface.egg-info/SOURCES.txt'
+[4.963s] writing manifest file '../../build/learning_interface/learning_interface.egg-info/SOURCES.txt'
+[4.963s] running build
+[4.963s] running build_py
+[4.963s] running install
+[4.969s] running install_lib
+[5.021s] running install_data
+[5.021s] running install_egg_info
+[5.043s] removing '/home/omar/code/robotics_project/ros2_ws/install/learning_interface/lib/python3.12/site-packages/learning_interface-0.1.0-py3.12.egg-info' (and everything under it)
+[5.044s] Copying ../../build/learning_interface/learning_interface.egg-info to /home/omar/code/robotics_project/ros2_ws/install/learning_interface/lib/python3.12/site-packages/learning_interface-0.1.0-py3.12.egg-info
+[5.082s] running install_scripts
+[5.216s] writing list of installed files to '/home/omar/code/robotics_project/ros2_ws/build/learning_interface/install.log'
+[5.743s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/src/learning_interface' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/learning_interface/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/learning_interface/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/learning_interface build --build-base /home/omar/code/robotics_project/ros2_ws/build/learning_interface/build install --record /home/omar/code/robotics_project/ros2_ws/build/learning_interface/install.log --single-version-externally-managed install_data

@@ -1,0 +1,22 @@
+[0.944s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/src/first_robot_demo': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/first_robot_demo/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/first_robot_demo/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/first_robot_demo build --build-base /home/omar/code/robotics_project/ros2_ws/build/first_robot_demo/build install --record /home/omar/code/robotics_project/ros2_ws/build/first_robot_demo/install.log --single-version-externally-managed install_data
+[1.224s] running egg_info
+[1.247s] writing ../../build/first_robot_demo/first_robot_demo.egg-info/PKG-INFO
+[1.247s] writing dependency_links to ../../build/first_robot_demo/first_robot_demo.egg-info/dependency_links.txt
+[1.247s] writing entry points to ../../build/first_robot_demo/first_robot_demo.egg-info/entry_points.txt
+[1.247s] writing requirements to ../../build/first_robot_demo/first_robot_demo.egg-info/requires.txt
+[1.248s] writing top-level names to ../../build/first_robot_demo/first_robot_demo.egg-info/top_level.txt
+[1.292s] reading manifest file '../../build/first_robot_demo/first_robot_demo.egg-info/SOURCES.txt'
+[1.292s] writing manifest file '../../build/first_robot_demo/first_robot_demo.egg-info/SOURCES.txt'
+[1.292s] running build
+[1.292s] running build_py
+[1.293s] running install
+[1.298s] running install_lib
+[1.321s] running install_data
+[1.321s] running install_egg_info
+[1.344s] removing '/home/omar/code/robotics_project/ros2_ws/install/first_robot_demo/lib/python3.12/site-packages/first_robot_demo-0.0.0-py3.12.egg-info' (and everything under it)
+[1.344s] Copying ../../build/first_robot_demo/first_robot_demo.egg-info to /home/omar/code/robotics_project/ros2_ws/install/first_robot_demo/lib/python3.12/site-packages/first_robot_demo-0.0.0-py3.12.egg-info
+[1.345s] running install_scripts
+[1.480s] Installing simple_listener script to /home/omar/code/robotics_project/ros2_ws/install/first_robot_demo/lib/first_robot_demo
+[1.480s] Installing simple_talker script to /home/omar/code/robotics_project/ros2_ws/install/first_robot_demo/lib/first_robot_demo
+[1.481s] writing list of installed files to '/home/omar/code/robotics_project/ros2_ws/build/first_robot_demo/install.log'
+[1.571s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/src/first_robot_demo' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/first_robot_demo/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/first_robot_demo/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/first_robot_demo build --build-base /home/omar/code/robotics_project/ros2_ws/build/first_robot_demo/build install --record /home/omar/code/robotics_project/ros2_ws/build/first_robot_demo/install.log --single-version-externally-managed install_data

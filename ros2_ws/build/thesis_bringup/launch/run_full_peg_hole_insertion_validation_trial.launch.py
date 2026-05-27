@@ -1,0 +1,1 @@
+/home/omar/code/robotics_project/ros2_ws/src/thesis_bringup/launch/run_full_peg_hole_insertion_validation_trial.launch.py

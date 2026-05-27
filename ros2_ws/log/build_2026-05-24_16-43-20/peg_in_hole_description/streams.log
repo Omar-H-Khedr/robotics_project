@@ -1,0 +1,53 @@
+[1.378s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --uninstall --editable --build-directory /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/build
+[1.688s] running develop
+[1.903s] Removing /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages/peg-in-hole-description.egg-link (link to .)
+[1.947s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --uninstall --editable --build-directory /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/build
+[1.948s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/src/peg_in_hole_description': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/peg_in_hole_description build --build-base /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/build install --record /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/install.log --single-version-externally-managed install_data --force
+[2.227s] running egg_info
+[2.249s] writing ../../build/peg_in_hole_description/peg_in_hole_description.egg-info/PKG-INFO
+[2.249s] writing dependency_links to ../../build/peg_in_hole_description/peg_in_hole_description.egg-info/dependency_links.txt
+[2.249s] writing requirements to ../../build/peg_in_hole_description/peg_in_hole_description.egg-info/requires.txt
+[2.249s] writing top-level names to ../../build/peg_in_hole_description/peg_in_hole_description.egg-info/top_level.txt
+[2.294s] reading manifest file '../../build/peg_in_hole_description/peg_in_hole_description.egg-info/SOURCES.txt'
+[2.295s] writing manifest file '../../build/peg_in_hole_description/peg_in_hole_description.egg-info/SOURCES.txt'
+[2.296s] running build
+[2.296s] running build_py
+[2.310s] running install
+[2.315s] running install_lib
+[2.338s] creating /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages/peg_in_hole_description
+[2.338s] copying /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/build/lib/peg_in_hole_description/__init__.py -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages/peg_in_hole_description
+[2.348s] byte-compiling /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages/peg_in_hole_description/__init__.py to __init__.cpython-312.pyc
+[2.348s] running install_data
+[2.348s] copying resource/peg_in_hole_description -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/ament_index/resource_index/packages
+[2.356s] copying package.xml -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description
+[2.362s] copying README.md -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description
+[2.400s] copying launch/peg_in_hole_scene.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/launch
+[2.412s] copying config/task_geometry.yaml -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/config
+[2.429s] copying urdf/lbr_iisy6_r1300_moveit_diagnostic.urdf.xacro -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/urdf
+[2.543s] copying urdf/peg_in_hole_task.urdf.xacro -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/urdf
+[2.629s] copying urdf/lbr_iisy3_r760_research_gripper.urdf.xacro -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/urdf
+[2.750s] copying urdf/research_parallel_gripper.xacro -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/urdf
+[2.851s] copying urdf/proposal_lbr_iisy6_r1300_cell.urdf.xacro -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/urdf
+[2.851s] copying worlds/peg_in_hole_robot_contact_validation_world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+[2.862s] copying worlds/proposal_simulation_cell_v1_0.world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+[2.862s] copying worlds/peg_in_hole_world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+[2.880s] copying worlds/peg_in_hole_contact_validation_world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+[2.891s] copying worlds/minimal_contact_validation_world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+[2.905s] copying worlds/peg_in_hole_insertion_validation_world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+[2.905s] copying models/hole_fixture/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/hole_fixture
+[2.966s] copying models/hole_fixture/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/hole_fixture
+[2.978s] copying models/work_table/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/work_table
+[2.995s] copying models/work_table/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/work_table
+[2.996s] copying models/contact_validation_pad/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/contact_validation_pad
+[2.996s] copying models/contact_validation_pad/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/contact_validation_pad
+[3.023s] copying models/target_plate/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/target_plate
+[3.024s] copying models/target_plate/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/target_plate
+[3.034s] copying models/robot_pedestal/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/robot_pedestal
+[3.050s] copying models/robot_pedestal/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/robot_pedestal
+[3.053s] copying models/cylindrical_peg/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/cylindrical_peg
+[3.065s] copying models/cylindrical_peg/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/cylindrical_peg
+[3.091s] running install_egg_info
+[3.116s] Copying ../../build/peg_in_hole_description/peg_in_hole_description.egg-info to /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages/peg_in_hole_description-0.1.0-py3.12.egg-info
+[3.117s] running install_scripts
+[3.252s] writing list of installed files to '/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/install.log'
+[3.286s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/src/peg_in_hole_description' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/peg_in_hole_description build --build-base /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/build install --record /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/install.log --single-version-externally-managed install_data --force

@@ -1,0 +1,296 @@
+[0.000000] (-) TimerEvent: {}
+[0.000078] (-) JobUnselected: {'identifier': 'experiment_manager'}
+[0.000107] (-) JobUnselected: {'identifier': 'first_robot_demo'}
+[0.000124] (-) JobUnselected: {'identifier': 'kuka_agilus_support'}
+[0.000136] (-) JobUnselected: {'identifier': 'kuka_cybertech_support'}
+[0.000147] (-) JobUnselected: {'identifier': 'kuka_fortec_support'}
+[0.000158] (-) JobUnselected: {'identifier': 'kuka_gazebo'}
+[0.000168] (-) JobUnselected: {'identifier': 'kuka_iontec_support'}
+[0.000178] (-) JobUnselected: {'identifier': 'kuka_kl_support'}
+[0.000188] (-) JobUnselected: {'identifier': 'kuka_kr_moveit_config'}
+[0.000198] (-) JobUnselected: {'identifier': 'kuka_lbr_iisy_moveit_config'}
+[0.000209] (-) JobUnselected: {'identifier': 'kuka_lbr_iisy_support'}
+[0.000219] (-) JobUnselected: {'identifier': 'kuka_lbr_iiwa_moveit_config'}
+[0.000229] (-) JobUnselected: {'identifier': 'kuka_lbr_iiwa_support'}
+[0.000239] (-) JobUnselected: {'identifier': 'kuka_mock_hardware_interface'}
+[0.000249] (-) JobUnselected: {'identifier': 'kuka_quantec_support'}
+[0.000259] (-) JobUnselected: {'identifier': 'kuka_resources'}
+[0.000269] (-) JobUnselected: {'identifier': 'kuka_robot_descriptions'}
+[0.000279] (-) JobUnselected: {'identifier': 'learning_interface'}
+[0.000289] (-) JobUnselected: {'identifier': 'peg_in_hole_metrics'}
+[0.000302] (-) JobUnselected: {'identifier': 'perception_pipeline'}
+[0.000316] (kuka_task_control) JobQueued: {'identifier': 'kuka_task_control', 'dependencies': OrderedDict()}
+[0.000331] (peg_in_hole_description) JobQueued: {'identifier': 'peg_in_hole_description', 'dependencies': OrderedDict()}
+[0.000345] (safety_layer) JobQueued: {'identifier': 'safety_layer', 'dependencies': OrderedDict()}
+[0.000357] (thesis_bringup) JobQueued: {'identifier': 'thesis_bringup', 'dependencies': OrderedDict({'experiment_manager': '/home/omar/code/robotics_project/ros2_ws/install/experiment_manager', 'kuka_gazebo': '/home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo', 'kuka_task_control': '/home/omar/code/robotics_project/ros2_ws/install/kuka_task_control', 'peg_in_hole_description': '/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description', 'peg_in_hole_metrics': '/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_metrics', 'safety_layer': '/home/omar/code/robotics_project/ros2_ws/install/safety_layer'})}
+[0.000391] (kuka_task_control) JobStarted: {'identifier': 'kuka_task_control'}
+[0.098871] (-) TimerEvent: {}
+[0.142616] (peg_in_hole_description) JobStarted: {'identifier': 'peg_in_hole_description'}
+[0.148925] (safety_layer) JobStarted: {'identifier': 'safety_layer'}
+[0.199030] (-) TimerEvent: {}
+[0.299247] (-) TimerEvent: {}
+[0.399418] (-) TimerEvent: {}
+[0.499618] (-) TimerEvent: {}
+[0.599824] (-) TimerEvent: {}
+[0.700004] (-) TimerEvent: {}
+[0.800214] (-) TimerEvent: {}
+[0.900888] (-) TimerEvent: {}
+[1.001100] (-) TimerEvent: {}
+[1.101295] (-) TimerEvent: {}
+[1.201644] (-) TimerEvent: {}
+[1.302039] (-) TimerEvent: {}
+[1.402275] (-) TimerEvent: {}
+[1.502544] (-) TimerEvent: {}
+[1.602780] (-) TimerEvent: {}
+[1.703119] (-) TimerEvent: {}
+[1.803472] (-) TimerEvent: {}
+[1.903691] (-) TimerEvent: {}
+[2.004268] (-) TimerEvent: {}
+[2.104555] (-) TimerEvent: {}
+[2.204863] (-) TimerEvent: {}
+[2.305458] (-) TimerEvent: {}
+[2.405983] (-) TimerEvent: {}
+[2.506603] (-) TimerEvent: {}
+[2.606943] (-) TimerEvent: {}
+[2.707243] (-) TimerEvent: {}
+[2.807709] (-) TimerEvent: {}
+[2.908054] (-) TimerEvent: {}
+[3.008381] (-) TimerEvent: {}
+[3.108579] (-) TimerEvent: {}
+[3.208785] (-) TimerEvent: {}
+[3.308987] (-) TimerEvent: {}
+[3.409203] (-) TimerEvent: {}
+[3.509415] (-) TimerEvent: {}
+[3.609616] (-) TimerEvent: {}
+[3.709800] (-) TimerEvent: {}
+[3.810002] (-) TimerEvent: {}
+[3.910434] (-) TimerEvent: {}
+[4.010791] (-) TimerEvent: {}
+[4.111089] (-) TimerEvent: {}
+[4.211398] (-) TimerEvent: {}
+[4.311638] (-) TimerEvent: {}
+[4.411857] (-) TimerEvent: {}
+[4.512114] (-) TimerEvent: {}
+[4.612364] (-) TimerEvent: {}
+[4.712892] (-) TimerEvent: {}
+[4.813293] (-) TimerEvent: {}
+[4.913729] (-) TimerEvent: {}
+[5.014185] (-) TimerEvent: {}
+[5.114714] (-) TimerEvent: {}
+[5.214966] (-) TimerEvent: {}
+[5.315181] (-) TimerEvent: {}
+[5.415389] (-) TimerEvent: {}
+[5.515600] (-) TimerEvent: {}
+[5.615837] (-) TimerEvent: {}
+[5.716073] (-) TimerEvent: {}
+[5.816436] (-) TimerEvent: {}
+[5.917104] (-) TimerEvent: {}
+[6.017819] (-) TimerEvent: {}
+[6.118220] (-) TimerEvent: {}
+[6.218656] (-) TimerEvent: {}
+[6.318963] (-) TimerEvent: {}
+[6.419264] (-) TimerEvent: {}
+[6.519468] (-) TimerEvent: {}
+[6.619647] (-) TimerEvent: {}
+[6.719825] (-) TimerEvent: {}
+[6.820034] (-) TimerEvent: {}
+[6.920229] (-) TimerEvent: {}
+[7.020482] (-) TimerEvent: {}
+[7.120818] (-) TimerEvent: {}
+[7.221485] (-) TimerEvent: {}
+[7.322021] (-) TimerEvent: {}
+[7.422727] (-) TimerEvent: {}
+[7.523152] (-) TimerEvent: {}
+[7.623372] (-) TimerEvent: {}
+[7.723633] (-) TimerEvent: {}
+[7.823946] (-) TimerEvent: {}
+[7.924568] (-) TimerEvent: {}
+[8.024816] (-) TimerEvent: {}
+[8.125153] (-) TimerEvent: {}
+[8.225431] (-) TimerEvent: {}
+[8.325804] (-) TimerEvent: {}
+[8.353795] (kuka_task_control) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'develop', '--editable', '--build-directory', '/home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/build', '--no-deps', 'symlink_data'], 'cwd': '/home/omar/code/robotics_project/ros2_ws/build/kuka_task_control', 'env': {'LESSOPEN': '| /usr/bin/lesspipe %s', 'CODEX_CI': '1', 'GZ_SIM_RESOURCE_PATH': '/opt/ros/jazzy/share', 'USER': 'omar', 'GZ_CONFIG_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/share/gz:/opt/ros/jazzy/opt/sdformat_vendor/share/gz:/opt/ros/jazzy/opt/gz_gui_vendor/share/gz:/opt/ros/jazzy/opt/gz_transport_vendor/share/gz:/opt/ros/jazzy/opt/gz_rendering_vendor/share/gz:/opt/ros/jazzy/opt/gz_plugin_vendor/share/gz:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/share/gz:/opt/ros/jazzy/opt/gz_msgs_vendor/share/gz:/opt/ros/jazzy/opt/gz_common_vendor/share/gz', 'SHLVL': '2', 'LD_LIBRARY_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/lib:/opt/ros/jazzy/opt/gz_sensors_vendor/lib:/opt/ros/jazzy/opt/gz_physics_vendor/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_gui_vendor/lib:/opt/ros/jazzy/opt/gz_transport_vendor/lib:/opt/ros/jazzy/opt/gz_rendering_vendor/lib:/opt/ros/jazzy/opt/gz_plugin_vendor/lib:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/lib:/opt/ros/jazzy/opt/gz_msgs_vendor/lib:/opt/ros/jazzy/opt/gz_common_vendor/lib:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_ogre_next_vendor/lib:/opt/ros/jazzy/opt/gz_dartsim_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'MOTD_SHOWN': 'update-motd', 'HOME': '/home/omar', 'NVM_BIN': '/home/omar/.nvm/versions/node/v22.22.2/bin', 'NVM_INC': '/home/omar/.nvm/versions/node/v22.22.2/include/node', 'ROS_PYTHON_VERSION': '3', 'PAGER': 'cat', 'LC_CTYPE': 'C.UTF-8', 'NO_COLOR': '1', 'COLORTERM': '', 'WSL_DISTRO_NAME': 'Ubuntu-24.04', 'NVM_DIR': '/home/omar/.nvm', 'WAYLAND_DISPLAY': 'wayland-0', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'omar', 'NAME': 'DESKTOP-GVPFGND', 'WSL_INTEROP': '/run/WSL/9_interop', 'PULSE_SERVER': 'unix:/mnt/wslg/PulseServer', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'TERM': 'dumb', 'PATH': '/home/omar/.local/bin:/home/omar/.codex/tmp/arg0/codex-arg0yl1HtK:/home/omar/.nvm/versions/node/v22.22.2/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path:/home/omar/.local/bin:/home/omar/.local/bin:/opt/ros/jazzy/opt/gz_msgs_vendor/bin:/opt/ros/jazzy/opt/gz_tools_vendor/bin:/opt/ros/jazzy/opt/gz_ogre_next_vendor/bin:/opt/ros/jazzy/bin:/home/omar/.nvm/versions/node/v22.22.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files/WindowsApps/MicrosoftCorporationII.WindowsSubsystemForLinux_2.4.13.0_x64__8wekyb3d8bbwe:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/bin:/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/libnvvp:/mnt/c/windows/system32:/mnt/c/windows:/mnt/c/windows/System32/Wbem:/mnt/c/windows/System32/WindowsPowerShell/v1.0/:/mnt/c/windows/System32/OpenSSH/:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA NvDLISR:/mnt/c/Program Files (x86)/HP/HP Performance Advisor:/mnt/c/Program Files/NVIDIA Corporation/Nsight Compute 2024.2.0/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files (x86)/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/150/DTS/Binn/:/mnt/c/Program Files (x86)/Windows Kits/8.1/Windows Performance Toolkit/:/mnt/c/Program Files/PuTTY/:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/MATLAB/R2017b/runtime/win64:/mnt/c/Program Files/MATLAB/R2017b/bin:/mnt/c/Program Files/dotnet/:/mnt/c/Users/F.of Engineering/AppData/Local/Programs/Python/Launcher/:/mnt/c/Users/F.of Engineering/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/F.of Engineering/AppData/Local/Programs/Microsoft VS Code/bin:/snap/bin', 'XDG_RUNTIME_DIR': '/mnt/wslg/runtime-dir', 'DISPLAY': ':0', 'CODEX_SANDBOX_NETWORK_DISABLED': '1', 'LANG': 'C.UTF-8', 'GH_PAGER': 'cat', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'AMENT_PREFIX_PATH': '/opt/ros/jazzy', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'CODEX_THREAD_ID': '019e610b-e528-77b0-8086-6ca5c7043afd', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'GIT_PAGER': 'cat', 'PWD': '/home/omar/code/robotics_project/ros2_ws/build/kuka_task_control', 'LC_ALL': 'C.UTF-8', 'CODEX_MANAGED_PACKAGE_ROOT': '/home/omar/.nvm/versions/node/v22.22.2/lib/node_modules/@openai/codex', 'NVM_CD_FLAGS': '', 'XDG_DATA_DIRS': '/usr/local/share:/usr/share:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'WSL2_GUI_APPS_ENABLED': '1', 'CODEX_MANAGED_BY_NPM': '1', 'HOSTTYPE': 'x86_64', 'CMAKE_PREFIX_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor', 'WSLENV': ''}, 'shell': False}
+[8.425939] (-) TimerEvent: {}
+[8.526153] (-) TimerEvent: {}
+[8.605525] (peg_in_hole_description) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'develop', '--editable', '--build-directory', '/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/build', '--no-deps', 'symlink_data'], 'cwd': '/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description', 'env': {'LESSOPEN': '| /usr/bin/lesspipe %s', 'CODEX_CI': '1', 'GZ_SIM_RESOURCE_PATH': '/opt/ros/jazzy/share', 'USER': 'omar', 'GZ_CONFIG_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/share/gz:/opt/ros/jazzy/opt/sdformat_vendor/share/gz:/opt/ros/jazzy/opt/gz_gui_vendor/share/gz:/opt/ros/jazzy/opt/gz_transport_vendor/share/gz:/opt/ros/jazzy/opt/gz_rendering_vendor/share/gz:/opt/ros/jazzy/opt/gz_plugin_vendor/share/gz:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/share/gz:/opt/ros/jazzy/opt/gz_msgs_vendor/share/gz:/opt/ros/jazzy/opt/gz_common_vendor/share/gz', 'SHLVL': '2', 'LD_LIBRARY_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/lib:/opt/ros/jazzy/opt/gz_sensors_vendor/lib:/opt/ros/jazzy/opt/gz_physics_vendor/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_gui_vendor/lib:/opt/ros/jazzy/opt/gz_transport_vendor/lib:/opt/ros/jazzy/opt/gz_rendering_vendor/lib:/opt/ros/jazzy/opt/gz_plugin_vendor/lib:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/lib:/opt/ros/jazzy/opt/gz_msgs_vendor/lib:/opt/ros/jazzy/opt/gz_common_vendor/lib:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_ogre_next_vendor/lib:/opt/ros/jazzy/opt/gz_dartsim_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'MOTD_SHOWN': 'update-motd', 'HOME': '/home/omar', 'NVM_BIN': '/home/omar/.nvm/versions/node/v22.22.2/bin', 'NVM_INC': '/home/omar/.nvm/versions/node/v22.22.2/include/node', 'ROS_PYTHON_VERSION': '3', 'PAGER': 'cat', 'LC_CTYPE': 'C.UTF-8', 'NO_COLOR': '1', 'COLORTERM': '', 'WSL_DISTRO_NAME': 'Ubuntu-24.04', 'NVM_DIR': '/home/omar/.nvm', 'WAYLAND_DISPLAY': 'wayland-0', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'omar', 'NAME': 'DESKTOP-GVPFGND', 'WSL_INTEROP': '/run/WSL/9_interop', 'PULSE_SERVER': 'unix:/mnt/wslg/PulseServer', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'TERM': 'dumb', 'PATH': '/home/omar/.local/bin:/home/omar/.codex/tmp/arg0/codex-arg0yl1HtK:/home/omar/.nvm/versions/node/v22.22.2/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path:/home/omar/.local/bin:/home/omar/.local/bin:/opt/ros/jazzy/opt/gz_msgs_vendor/bin:/opt/ros/jazzy/opt/gz_tools_vendor/bin:/opt/ros/jazzy/opt/gz_ogre_next_vendor/bin:/opt/ros/jazzy/bin:/home/omar/.nvm/versions/node/v22.22.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files/WindowsApps/MicrosoftCorporationII.WindowsSubsystemForLinux_2.4.13.0_x64__8wekyb3d8bbwe:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/bin:/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/libnvvp:/mnt/c/windows/system32:/mnt/c/windows:/mnt/c/windows/System32/Wbem:/mnt/c/windows/System32/WindowsPowerShell/v1.0/:/mnt/c/windows/System32/OpenSSH/:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA NvDLISR:/mnt/c/Program Files (x86)/HP/HP Performance Advisor:/mnt/c/Program Files/NVIDIA Corporation/Nsight Compute 2024.2.0/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files (x86)/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/150/DTS/Binn/:/mnt/c/Program Files (x86)/Windows Kits/8.1/Windows Performance Toolkit/:/mnt/c/Program Files/PuTTY/:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/MATLAB/R2017b/runtime/win64:/mnt/c/Program Files/MATLAB/R2017b/bin:/mnt/c/Program Files/dotnet/:/mnt/c/Users/F.of Engineering/AppData/Local/Programs/Python/Launcher/:/mnt/c/Users/F.of Engineering/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/F.of Engineering/AppData/Local/Programs/Microsoft VS Code/bin:/snap/bin', 'XDG_RUNTIME_DIR': '/mnt/wslg/runtime-dir', 'DISPLAY': ':0', 'CODEX_SANDBOX_NETWORK_DISABLED': '1', 'LANG': 'C.UTF-8', 'GH_PAGER': 'cat', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'AMENT_PREFIX_PATH': '/opt/ros/jazzy', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'CODEX_THREAD_ID': '019e610b-e528-77b0-8086-6ca5c7043afd', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'GIT_PAGER': 'cat', 'PWD': '/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description', 'LC_ALL': 'C.UTF-8', 'CODEX_MANAGED_PACKAGE_ROOT': '/home/omar/.nvm/versions/node/v22.22.2/lib/node_modules/@openai/codex', 'NVM_CD_FLAGS': '', 'XDG_DATA_DIRS': '/usr/local/share:/usr/share:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'WSL2_GUI_APPS_ENABLED': '1', 'CODEX_MANAGED_BY_NPM': '1', 'HOSTTYPE': 'x86_64', 'CMAKE_PREFIX_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor', 'WSLENV': ''}, 'shell': False}
+[8.626303] (-) TimerEvent: {}
+[8.705632] (safety_layer) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'develop', '--editable', '--build-directory', '/home/omar/code/robotics_project/ros2_ws/build/safety_layer/build', '--no-deps', 'symlink_data'], 'cwd': '/home/omar/code/robotics_project/ros2_ws/build/safety_layer', 'env': {'LESSOPEN': '| /usr/bin/lesspipe %s', 'CODEX_CI': '1', 'GZ_SIM_RESOURCE_PATH': '/opt/ros/jazzy/share', 'USER': 'omar', 'GZ_CONFIG_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/share/gz:/opt/ros/jazzy/opt/sdformat_vendor/share/gz:/opt/ros/jazzy/opt/gz_gui_vendor/share/gz:/opt/ros/jazzy/opt/gz_transport_vendor/share/gz:/opt/ros/jazzy/opt/gz_rendering_vendor/share/gz:/opt/ros/jazzy/opt/gz_plugin_vendor/share/gz:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/share/gz:/opt/ros/jazzy/opt/gz_msgs_vendor/share/gz:/opt/ros/jazzy/opt/gz_common_vendor/share/gz', 'SHLVL': '2', 'LD_LIBRARY_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/lib:/opt/ros/jazzy/opt/gz_sensors_vendor/lib:/opt/ros/jazzy/opt/gz_physics_vendor/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_gui_vendor/lib:/opt/ros/jazzy/opt/gz_transport_vendor/lib:/opt/ros/jazzy/opt/gz_rendering_vendor/lib:/opt/ros/jazzy/opt/gz_plugin_vendor/lib:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/lib:/opt/ros/jazzy/opt/gz_msgs_vendor/lib:/opt/ros/jazzy/opt/gz_common_vendor/lib:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_ogre_next_vendor/lib:/opt/ros/jazzy/opt/gz_dartsim_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'MOTD_SHOWN': 'update-motd', 'HOME': '/home/omar', 'NVM_BIN': '/home/omar/.nvm/versions/node/v22.22.2/bin', 'NVM_INC': '/home/omar/.nvm/versions/node/v22.22.2/include/node', 'ROS_PYTHON_VERSION': '3', 'PAGER': 'cat', 'LC_CTYPE': 'C.UTF-8', 'NO_COLOR': '1', 'COLORTERM': '', 'WSL_DISTRO_NAME': 'Ubuntu-24.04', 'NVM_DIR': '/home/omar/.nvm', 'WAYLAND_DISPLAY': 'wayland-0', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'omar', 'NAME': 'DESKTOP-GVPFGND', 'WSL_INTEROP': '/run/WSL/9_interop', 'PULSE_SERVER': 'unix:/mnt/wslg/PulseServer', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'TERM': 'dumb', 'PATH': '/home/omar/.local/bin:/home/omar/.codex/tmp/arg0/codex-arg0yl1HtK:/home/omar/.nvm/versions/node/v22.22.2/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path:/home/omar/.local/bin:/home/omar/.local/bin:/opt/ros/jazzy/opt/gz_msgs_vendor/bin:/opt/ros/jazzy/opt/gz_tools_vendor/bin:/opt/ros/jazzy/opt/gz_ogre_next_vendor/bin:/opt/ros/jazzy/bin:/home/omar/.nvm/versions/node/v22.22.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files/WindowsApps/MicrosoftCorporationII.WindowsSubsystemForLinux_2.4.13.0_x64__8wekyb3d8bbwe:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/bin:/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/libnvvp:/mnt/c/windows/system32:/mnt/c/windows:/mnt/c/windows/System32/Wbem:/mnt/c/windows/System32/WindowsPowerShell/v1.0/:/mnt/c/windows/System32/OpenSSH/:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA NvDLISR:/mnt/c/Program Files (x86)/HP/HP Performance Advisor:/mnt/c/Program Files/NVIDIA Corporation/Nsight Compute 2024.2.0/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files (x86)/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/150/DTS/Binn/:/mnt/c/Program Files (x86)/Windows Kits/8.1/Windows Performance Toolkit/:/mnt/c/Program Files/PuTTY/:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/MATLAB/R2017b/runtime/win64:/mnt/c/Program Files/MATLAB/R2017b/bin:/mnt/c/Program Files/dotnet/:/mnt/c/Users/F.of Engineering/AppData/Local/Programs/Python/Launcher/:/mnt/c/Users/F.of Engineering/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/F.of Engineering/AppData/Local/Programs/Microsoft VS Code/bin:/snap/bin', 'XDG_RUNTIME_DIR': '/mnt/wslg/runtime-dir', 'DISPLAY': ':0', 'CODEX_SANDBOX_NETWORK_DISABLED': '1', 'LANG': 'C.UTF-8', 'GH_PAGER': 'cat', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'AMENT_PREFIX_PATH': '/opt/ros/jazzy', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'CODEX_THREAD_ID': '019e610b-e528-77b0-8086-6ca5c7043afd', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'GIT_PAGER': 'cat', 'PWD': '/home/omar/code/robotics_project/ros2_ws/build/safety_layer', 'LC_ALL': 'C.UTF-8', 'CODEX_MANAGED_PACKAGE_ROOT': '/home/omar/.nvm/versions/node/v22.22.2/lib/node_modules/@openai/codex', 'NVM_CD_FLAGS': '', 'XDG_DATA_DIRS': '/usr/local/share:/usr/share:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/omar/code/robotics_project/ros2_ws/build/safety_layer/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'WSL2_GUI_APPS_ENABLED': '1', 'CODEX_MANAGED_BY_NPM': '1', 'HOSTTYPE': 'x86_64', 'CMAKE_PREFIX_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor', 'WSLENV': ''}, 'shell': False}
+[8.726478] (-) TimerEvent: {}
+[8.737967] (kuka_task_control) StdoutLine: {'line': b'running develop\n'}
+[8.826655] (-) TimerEvent: {}
+[8.926935] (-) TimerEvent: {}
+[9.027166] (-) TimerEvent: {}
+[9.103764] (safety_layer) StdoutLine: {'line': b'running develop\n'}
+[9.116618] (peg_in_hole_description) StdoutLine: {'line': b'running develop\n'}
+[9.127295] (-) TimerEvent: {}
+[9.135821] (kuka_task_control) StdoutLine: {'line': b'running egg_info\n'}
+[9.160722] (kuka_task_control) StdoutLine: {'line': b'writing kuka_task_control.egg-info/PKG-INFO\n'}
+[9.161027] (kuka_task_control) StdoutLine: {'line': b'writing dependency_links to kuka_task_control.egg-info/dependency_links.txt\n'}
+[9.161260] (kuka_task_control) StdoutLine: {'line': b'writing entry points to kuka_task_control.egg-info/entry_points.txt\n'}
+[9.161484] (kuka_task_control) StdoutLine: {'line': b'writing requirements to kuka_task_control.egg-info/requires.txt\n'}
+[9.161760] (kuka_task_control) StdoutLine: {'line': b'writing top-level names to kuka_task_control.egg-info/top_level.txt\n'}
+[9.211086] (kuka_task_control) StdoutLine: {'line': b"reading manifest file 'kuka_task_control.egg-info/SOURCES.txt'\n"}
+[9.227500] (-) TimerEvent: {}
+[9.252013] (kuka_task_control) StdoutLine: {'line': b"writing manifest file 'kuka_task_control.egg-info/SOURCES.txt'\n"}
+[9.274634] (kuka_task_control) StdoutLine: {'line': b'running build_ext\n'}
+[9.274776] (kuka_task_control) StdoutLine: {'line': b'Creating /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages/kuka-task-control.egg-link (link to .)\n'}
+[9.275420] (kuka_task_control) StdoutLine: {'line': b'Installing baseline_joint_sequence_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.327624] (-) TimerEvent: {}
+[9.427867] (-) TimerEvent: {}
+[9.487447] (kuka_task_control) StdoutLine: {'line': b'Installing baseline_trajectory_client script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.495717] (kuka_task_control) StdoutLine: {'line': b'Installing cartesian_insertion_diagnostics script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.496057] (kuka_task_control) StdoutLine: {'line': b'Installing cartesian_insertion_dry_run_planner script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.496158] (kuka_task_control) StdoutLine: {'line': b'Installing cartesian_orientation_target_calculator script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.496957] (kuka_task_control) StdoutLine: {'line': b'Installing execution_gate_monitor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.497247] (kuka_task_control) StdoutLine: {'line': b'Installing ik_backend_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.497346] (kuka_task_control) StdoutLine: {'line': b'Installing ik_feasibility_diagnostics script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.497454] (kuka_task_control) StdoutLine: {'line': b'Installing move_group_diagnostic_config_builder script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.497751] (kuka_task_control) StdoutLine: {'line': b'Installing move_group_runtime_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.497850] (kuka_task_control) StdoutLine: {'line': b'Installing moveit_config_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.498009] (kuka_task_control) StdoutLine: {'line': b'Installing moveit_diagnostic_input_builder script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.498139] (kuka_task_control) StdoutLine: {'line': b'Installing moveit_launch_readiness_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.498454] (kuka_task_control) StdoutLine: {'line': b'Installing peg_hole_frame_publisher script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.498618] (kuka_task_control) StdoutLine: {'line': b'Installing robot_description_semantic_diagnostics script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.498748] (kuka_task_control) StdoutLine: {'line': b'Installing segmented_contact_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.498866] (kuka_task_control) StdoutLine: {'line': b'Installing segmented_guarded_contact_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.499044] (kuka_task_control) StdoutLine: {'line': b'Installing semantic_model_validator script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.499167] (kuka_task_control) StdoutLine: {'line': b'Installing task_trajectory_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.499431] (kuka_task_control) StdoutLine: {'line': b'Installing tool_axis_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.499533] (kuka_task_control) StdoutLine: {'line': b'Installing tool_link_validator script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control\n'}
+[9.499602] (kuka_task_control) StdoutLine: {'line': b'\n'}
+[9.499667] (kuka_task_control) StdoutLine: {'line': b'Installed /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control\n'}
+[9.499730] (kuka_task_control) StdoutLine: {'line': b'running symlink_data\n'}
+[9.528038] (-) TimerEvent: {}
+[9.572134] (peg_in_hole_description) StdoutLine: {'line': b'running egg_info\n'}
+[9.593629] (peg_in_hole_description) StdoutLine: {'line': b'writing peg_in_hole_description.egg-info/PKG-INFO\n'}
+[9.594126] (peg_in_hole_description) StdoutLine: {'line': b'writing dependency_links to peg_in_hole_description.egg-info/dependency_links.txt\n'}
+[9.594236] (peg_in_hole_description) StdoutLine: {'line': b'writing requirements to peg_in_hole_description.egg-info/requires.txt\n'}
+[9.594305] (peg_in_hole_description) StdoutLine: {'line': b'writing top-level names to peg_in_hole_description.egg-info/top_level.txt\n'}
+[9.604015] (safety_layer) StdoutLine: {'line': b'running egg_info\n'}
+[9.625601] (safety_layer) StdoutLine: {'line': b'writing safety_layer.egg-info/PKG-INFO\n'}
+[9.625952] (safety_layer) StdoutLine: {'line': b'writing dependency_links to safety_layer.egg-info/dependency_links.txt\n'}
+[9.626088] (safety_layer) StdoutLine: {'line': b'writing entry points to safety_layer.egg-info/entry_points.txt\n'}
+[9.626392] (safety_layer) StdoutLine: {'line': b'writing requirements to safety_layer.egg-info/requires.txt\n'}
+[9.626500] (safety_layer) StdoutLine: {'line': b'writing top-level names to safety_layer.egg-info/top_level.txt\n'}
+[9.628128] (-) TimerEvent: {}
+[9.640119] (peg_in_hole_description) StdoutLine: {'line': b"reading manifest file 'peg_in_hole_description.egg-info/SOURCES.txt'\n"}
+[9.641559] (peg_in_hole_description) StdoutLine: {'line': b"writing manifest file 'peg_in_hole_description.egg-info/SOURCES.txt'\n"}
+[9.665350] (peg_in_hole_description) StdoutLine: {'line': b'running build_ext\n'}
+[9.665507] (peg_in_hole_description) StdoutLine: {'line': b'Creating /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages/peg-in-hole-description.egg-link (link to .)\n'}
+[9.665988] (peg_in_hole_description) StdoutLine: {'line': b'\n'}
+[9.666220] (peg_in_hole_description) StdoutLine: {'line': b'Installed /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description\n'}
+[9.666292] (peg_in_hole_description) StdoutLine: {'line': b'running symlink_data\n'}
+[9.670762] (safety_layer) StdoutLine: {'line': b"reading manifest file 'safety_layer.egg-info/SOURCES.txt'\n"}
+[9.671821] (safety_layer) StdoutLine: {'line': b"writing manifest file 'safety_layer.egg-info/SOURCES.txt'\n"}
+[9.695516] (safety_layer) StdoutLine: {'line': b'running build_ext\n'}
+[9.695917] (safety_layer) StdoutLine: {'line': b'Creating /home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages/safety-layer.egg-link (link to .)\n'}
+[9.696280] (safety_layer) StdoutLine: {'line': b'Installing safety_monitor script to /home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/safety_layer\n'}
+[9.696567] (safety_layer) StdoutLine: {'line': b'\n'}
+[9.696756] (safety_layer) StdoutLine: {'line': b'Installed /home/omar/code/robotics_project/ros2_ws/build/safety_layer\n'}
+[9.697038] (safety_layer) StdoutLine: {'line': b'running symlink_data\n'}
+[9.727567] (kuka_task_control) CommandEnded: {'returncode': 0}
+[9.728372] (-) TimerEvent: {}
+[9.828650] (-) TimerEvent: {}
+[9.928951] (-) TimerEvent: {}
+[10.029192] (-) TimerEvent: {}
+[10.129460] (-) TimerEvent: {}
+[10.174925] (kuka_task_control) JobEnded: {'identifier': 'kuka_task_control', 'rc': 0}
+[10.177110] (safety_layer) CommandEnded: {'returncode': 0}
+[10.229637] (-) TimerEvent: {}
+[10.327384] (safety_layer) JobEnded: {'identifier': 'safety_layer', 'rc': 0}
+[10.328122] (peg_in_hole_description) CommandEnded: {'returncode': 0}
+[10.329796] (-) TimerEvent: {}
+[10.430363] (-) TimerEvent: {}
+[10.530625] (-) TimerEvent: {}
+[10.547341] (peg_in_hole_description) JobEnded: {'identifier': 'peg_in_hole_description', 'rc': 0}
+[10.548488] (thesis_bringup) JobStarted: {'identifier': 'thesis_bringup'}
+[10.630958] (-) TimerEvent: {}
+[10.731152] (-) TimerEvent: {}
+[10.831411] (-) TimerEvent: {}
+[10.931622] (-) TimerEvent: {}
+[11.031832] (-) TimerEvent: {}
+[11.132057] (-) TimerEvent: {}
+[11.232306] (-) TimerEvent: {}
+[11.332559] (-) TimerEvent: {}
+[11.432770] (-) TimerEvent: {}
+[11.533019] (-) TimerEvent: {}
+[11.633240] (-) TimerEvent: {}
+[11.733456] (-) TimerEvent: {}
+[11.833699] (-) TimerEvent: {}
+[11.933943] (-) TimerEvent: {}
+[12.034168] (-) TimerEvent: {}
+[12.134367] (-) TimerEvent: {}
+[12.234567] (-) TimerEvent: {}
+[12.334764] (-) TimerEvent: {}
+[12.434977] (-) TimerEvent: {}
+[12.535142] (-) TimerEvent: {}
+[12.635377] (-) TimerEvent: {}
+[12.735618] (-) TimerEvent: {}
+[12.835875] (-) TimerEvent: {}
+[12.936078] (-) TimerEvent: {}
+[13.036435] (-) TimerEvent: {}
+[13.137000] (-) TimerEvent: {}
+[13.237335] (-) TimerEvent: {}
+[13.337758] (-) TimerEvent: {}
+[13.438057] (-) TimerEvent: {}
+[13.479043] (thesis_bringup) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'develop', '--editable', '--build-directory', '/home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/build', '--no-deps', 'symlink_data'], 'cwd': '/home/omar/code/robotics_project/ros2_ws/build/thesis_bringup', 'env': {'LESSOPEN': '| /usr/bin/lesspipe %s', 'CODEX_CI': '1', 'GZ_SIM_RESOURCE_PATH': '/opt/ros/jazzy/share', 'USER': 'omar', 'GZ_CONFIG_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/share/gz:/opt/ros/jazzy/opt/sdformat_vendor/share/gz:/opt/ros/jazzy/opt/gz_gui_vendor/share/gz:/opt/ros/jazzy/opt/gz_transport_vendor/share/gz:/opt/ros/jazzy/opt/gz_rendering_vendor/share/gz:/opt/ros/jazzy/opt/gz_plugin_vendor/share/gz:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/share/gz:/opt/ros/jazzy/opt/gz_msgs_vendor/share/gz:/opt/ros/jazzy/opt/gz_common_vendor/share/gz', 'SHLVL': '2', 'LD_LIBRARY_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/lib:/opt/ros/jazzy/opt/gz_sensors_vendor/lib:/opt/ros/jazzy/opt/gz_physics_vendor/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_gui_vendor/lib:/opt/ros/jazzy/opt/gz_transport_vendor/lib:/opt/ros/jazzy/opt/gz_rendering_vendor/lib:/opt/ros/jazzy/opt/gz_plugin_vendor/lib:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/lib:/opt/ros/jazzy/opt/gz_msgs_vendor/lib:/opt/ros/jazzy/opt/gz_common_vendor/lib:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_ogre_next_vendor/lib:/opt/ros/jazzy/opt/gz_dartsim_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'MOTD_SHOWN': 'update-motd', 'HOME': '/home/omar', 'NVM_BIN': '/home/omar/.nvm/versions/node/v22.22.2/bin', 'NVM_INC': '/home/omar/.nvm/versions/node/v22.22.2/include/node', 'ROS_PYTHON_VERSION': '3', 'PAGER': 'cat', 'LC_CTYPE': 'C.UTF-8', 'NO_COLOR': '1', 'COLORTERM': '', 'WSL_DISTRO_NAME': 'Ubuntu-24.04', 'NVM_DIR': '/home/omar/.nvm', 'WAYLAND_DISPLAY': 'wayland-0', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'omar', 'NAME': 'DESKTOP-GVPFGND', 'WSL_INTEROP': '/run/WSL/9_interop', 'PULSE_SERVER': 'unix:/mnt/wslg/PulseServer', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'TERM': 'dumb', 'PATH': '/home/omar/.local/bin:/home/omar/.codex/tmp/arg0/codex-arg0yl1HtK:/home/omar/.nvm/versions/node/v22.22.2/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path:/home/omar/.local/bin:/home/omar/.local/bin:/opt/ros/jazzy/opt/gz_msgs_vendor/bin:/opt/ros/jazzy/opt/gz_tools_vendor/bin:/opt/ros/jazzy/opt/gz_ogre_next_vendor/bin:/opt/ros/jazzy/bin:/home/omar/.nvm/versions/node/v22.22.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files/WindowsApps/MicrosoftCorporationII.WindowsSubsystemForLinux_2.4.13.0_x64__8wekyb3d8bbwe:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/bin:/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/libnvvp:/mnt/c/windows/system32:/mnt/c/windows:/mnt/c/windows/System32/Wbem:/mnt/c/windows/System32/WindowsPowerShell/v1.0/:/mnt/c/windows/System32/OpenSSH/:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA NvDLISR:/mnt/c/Program Files (x86)/HP/HP Performance Advisor:/mnt/c/Program Files/NVIDIA Corporation/Nsight Compute 2024.2.0/:/mnt/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/:/mnt/c/Program Files (x86)/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/150/Tools/Binn/:/mnt/c/Program Files/Microsoft SQL Server/150/DTS/Binn/:/mnt/c/Program Files (x86)/Windows Kits/8.1/Windows Performance Toolkit/:/mnt/c/Program Files/PuTTY/:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/MATLAB/R2017b/runtime/win64:/mnt/c/Program Files/MATLAB/R2017b/bin:/mnt/c/Program Files/dotnet/:/mnt/c/Users/F.of Engineering/AppData/Local/Programs/Python/Launcher/:/mnt/c/Users/F.of Engineering/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/F.of Engineering/AppData/Local/Programs/Microsoft VS Code/bin:/snap/bin', 'XDG_RUNTIME_DIR': '/mnt/wslg/runtime-dir', 'DISPLAY': ':0', 'CODEX_SANDBOX_NETWORK_DISABLED': '1', 'LANG': 'C.UTF-8', 'GH_PAGER': 'cat', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'AMENT_PREFIX_PATH': '/home/omar/code/robotics_project/ros2_ws/install/safety_layer:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_metrics:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description:/home/omar/code/robotics_project/ros2_ws/install/kuka_task_control:/home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo:/home/omar/code/robotics_project/ros2_ws/install/experiment_manager:/opt/ros/jazzy', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'CODEX_THREAD_ID': '019e610b-e528-77b0-8086-6ca5c7043afd', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'GIT_PAGER': 'cat', 'PWD': '/home/omar/code/robotics_project/ros2_ws/build/thesis_bringup', 'LC_ALL': 'C.UTF-8', 'CODEX_MANAGED_PACKAGE_ROOT': '/home/omar/.nvm/versions/node/v22.22.2/lib/node_modules/@openai/codex', 'NVM_CD_FLAGS': '', 'XDG_DATA_DIRS': '/usr/local/share:/usr/share:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/python3.12/site-packages:/home/omar/code/robotics_project/ros2_ws/build/safety_layer:/home/omar/code/robotics_project/ros2_ws/install/safety_layer/lib/python3.12/site-packages:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_metrics/lib/python3.12/site-packages:/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages:/home/omar/code/robotics_project/ros2_ws/build/kuka_task_control:/home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages:/home/omar/code/robotics_project/ros2_ws/build/experiment_manager:/home/omar/code/robotics_project/ros2_ws/install/experiment_manager/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'WSL2_GUI_APPS_ENABLED': '1', 'CODEX_MANAGED_BY_NPM': '1', 'HOSTTYPE': 'x86_64', 'CMAKE_PREFIX_PATH': '/home/omar/code/robotics_project/ros2_ws/install/kuka_gazebo:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor', 'WSLENV': ''}, 'shell': False}
+[13.538171] (-) TimerEvent: {}
+[13.638356] (-) TimerEvent: {}
+[13.738617] (-) TimerEvent: {}
+[13.838819] (-) TimerEvent: {}
+[13.840315] (thesis_bringup) StdoutLine: {'line': b'running develop\n'}
+[13.938969] (-) TimerEvent: {}
+[14.039183] (-) TimerEvent: {}
+[14.114971] (thesis_bringup) StdoutLine: {'line': b'running egg_info\n'}
+[14.139319] (-) TimerEvent: {}
+[14.151943] (thesis_bringup) StdoutLine: {'line': b'writing thesis_bringup.egg-info/PKG-INFO\n'}
+[14.152280] (thesis_bringup) StdoutLine: {'line': b'writing dependency_links to thesis_bringup.egg-info/dependency_links.txt\n'}
+[14.152561] (thesis_bringup) StdoutLine: {'line': b'writing entry points to thesis_bringup.egg-info/entry_points.txt\n'}
+[14.171265] (thesis_bringup) StdoutLine: {'line': b'writing requirements to thesis_bringup.egg-info/requires.txt\n'}
+[14.171686] (thesis_bringup) StdoutLine: {'line': b'writing top-level names to thesis_bringup.egg-info/top_level.txt\n'}
+[14.217398] (thesis_bringup) StdoutLine: {'line': b"reading manifest file 'thesis_bringup.egg-info/SOURCES.txt'\n"}
+[14.219715] (thesis_bringup) StdoutLine: {'line': b"writing manifest file 'thesis_bringup.egg-info/SOURCES.txt'\n"}
+[14.239472] (-) TimerEvent: {}
+[14.242718] (thesis_bringup) StdoutLine: {'line': b'running build_ext\n'}
+[14.242864] (thesis_bringup) StdoutLine: {'line': b'Creating /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/python3.12/site-packages/thesis-bringup.egg-link (link to .)\n'}
+[14.243542] (thesis_bringup) StdoutLine: {'line': b'Installing controller_readiness_gate script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.249080] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_monitor script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.254323] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v1_10_experiment_matrix_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.256544] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v1_11_single_scenario_loader_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.256941] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v1_12_scenario_batch_selector_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.257056] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v1_13_batch_execution_plan_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.257128] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v1_14_batch_dry_run_orchestrator_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.257877] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v1_15_evidence_package_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.258196] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v1_16_reproducibility_checklist_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.258404] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v1_17_release_index_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.258736] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v1_1_validator script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.258866] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v1_2_rgbd_validator script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.259010] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v1_3_contact_validator script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.259214] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v1_5_safety_virtual_force_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.259628] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v1_6_readiness_gate_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.259747] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v1_7_pre_control_contract_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.259874] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v1_8_control_scaffold_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.259988] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v1_9_control_law_dry_run_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.260259] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v2_0_motion_smoke_test_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.260361] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v2_1_motion_validation_suite_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.260462] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v2_2_moveit_ik_diagnostic_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.260530] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v2_3_model_alignment_plan_only_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.260597] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v2_4_moveit_gazebo_execution_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.260672] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v2_5_guarded_task_sequence_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.260737] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v2_6_contact_gated_guarded_approach_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.266925] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v2_7_contact_triggered_guarded_touch_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.267130] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v2_8_contact_reachability_trigger_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.267400] (thesis_bringup) StdoutLine: {'line': b'Installing proposal_simulation_cell_v2_9_non_overlapping_contact_node script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup\n'}
+[14.267505] (thesis_bringup) StdoutLine: {'line': b'\n'}
+[14.267577] (thesis_bringup) StdoutLine: {'line': b'Installed /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup\n'}
+[14.267644] (thesis_bringup) StdoutLine: {'line': b'running symlink_data\n'}
+[14.339639] (-) TimerEvent: {}
+[14.342051] (thesis_bringup) StdoutLine: {'line': b'symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/launch/proposal_simulation_cell_v2_9_non_overlapping_approach_to_contact_validation.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/launch\n'}
+[14.440109] (-) TimerEvent: {}
+[14.540464] (-) TimerEvent: {}
+[14.566148] (thesis_bringup) StdoutLine: {'line': b'symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/config/proposal_simulation_cell_v2_9.yaml -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/config\n'}
+[14.640668] (-) TimerEvent: {}
+[14.653491] (thesis_bringup) CommandEnded: {'returncode': 0}
+[14.740826] (-) TimerEvent: {}
+[14.757671] (thesis_bringup) JobEnded: {'identifier': 'thesis_bringup', 'rc': 0}
+[14.758356] (-) EventReactorShutdown: {}

@@ -1,0 +1,15 @@
+[8.464s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/build --no-deps symlink_data
+[8.974s] running develop
+[9.430s] running egg_info
+[9.451s] writing peg_in_hole_description.egg-info/PKG-INFO
+[9.452s] writing dependency_links to peg_in_hole_description.egg-info/dependency_links.txt
+[9.452s] writing requirements to peg_in_hole_description.egg-info/requires.txt
+[9.452s] writing top-level names to peg_in_hole_description.egg-info/top_level.txt
+[9.498s] reading manifest file 'peg_in_hole_description.egg-info/SOURCES.txt'
+[9.499s] writing manifest file 'peg_in_hole_description.egg-info/SOURCES.txt'
+[9.523s] running build_ext
+[9.523s] Creating /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages/peg-in-hole-description.egg-link (link to .)
+[9.524s] 
+[9.524s] Installed /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description
+[9.524s] running symlink_data
+[10.186s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/build --no-deps symlink_data

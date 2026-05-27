@@ -1,0 +1,15 @@
+running develop
+running egg_info
+writing thesis_bringup.egg-info/PKG-INFO
+writing dependency_links to thesis_bringup.egg-info/dependency_links.txt
+writing entry points to thesis_bringup.egg-info/entry_points.txt
+writing requirements to thesis_bringup.egg-info/requires.txt
+writing top-level names to thesis_bringup.egg-info/top_level.txt
+reading manifest file 'thesis_bringup.egg-info/SOURCES.txt'
+writing manifest file 'thesis_bringup.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/python3.12/site-packages/thesis-bringup.egg-link (link to .)
+Installing controller_readiness_gate script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup
+
+Installed /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup
+running symlink_data

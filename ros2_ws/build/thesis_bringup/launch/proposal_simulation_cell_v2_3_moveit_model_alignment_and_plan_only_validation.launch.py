@@ -1,0 +1,1 @@
+/home/omar/code/robotics_project/ros2_ws/src/thesis_bringup/launch/proposal_simulation_cell_v2_3_moveit_model_alignment_and_plan_only_validation.launch.py

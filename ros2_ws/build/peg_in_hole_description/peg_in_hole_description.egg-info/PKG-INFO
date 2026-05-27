@@ -1,0 +1,8 @@
+Metadata-Version: 2.1
+Name: peg-in-hole-description
+Version: 0.1.0
+Summary: Task-scene description package for KUKA peg-in-hole assembly in Gazebo.
+Maintainer: Omar Khedr
+Maintainer-email: omar.khedr@gu.edu.eg
+License: Apache-2.0
+Provides-Extra: test

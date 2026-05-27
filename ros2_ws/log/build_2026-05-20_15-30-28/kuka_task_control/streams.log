@@ -1,0 +1,66 @@
+[0.869s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_task_control': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/build --no-deps symlink_data --force
+[1.201s] running develop
+[1.421s] running egg_info
+[1.444s] writing kuka_task_control.egg-info/PKG-INFO
+[1.444s] writing dependency_links to kuka_task_control.egg-info/dependency_links.txt
+[1.444s] writing entry points to kuka_task_control.egg-info/entry_points.txt
+[1.445s] writing requirements to kuka_task_control.egg-info/requires.txt
+[1.445s] writing top-level names to kuka_task_control.egg-info/top_level.txt
+[1.490s] reading manifest file 'kuka_task_control.egg-info/SOURCES.txt'
+[1.491s] writing manifest file 'kuka_task_control.egg-info/SOURCES.txt'
+[1.515s] running build_ext
+[1.515s] Creating /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages/kuka-task-control.egg-link (link to .)
+[1.515s] Installing baseline_joint_sequence_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.516s] Installing baseline_trajectory_client script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.516s] Installing cartesian_insertion_diagnostics script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.516s] Installing cartesian_insertion_dry_run_planner script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.516s] Installing cartesian_orientation_target_calculator script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.516s] Installing execution_gate_monitor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.517s] Installing ik_backend_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.517s] Installing ik_feasibility_diagnostics script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.517s] Installing move_group_diagnostic_config_builder script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.517s] Installing move_group_runtime_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.517s] Installing moveit_config_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.518s] Installing moveit_diagnostic_input_builder script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.518s] Installing moveit_launch_readiness_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.518s] Installing peg_hole_frame_publisher script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.518s] Installing robot_description_semantic_diagnostics script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.518s] Installing segmented_contact_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.518s] Installing segmented_guarded_contact_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.518s] Installing semantic_model_validator script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.519s] Installing task_trajectory_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.519s] Installing tool_axis_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.519s] Installing tool_link_validator script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[1.519s] 
+[1.519s] Installed /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control
+[1.519s] running symlink_data
+[1.519s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/resource/kuka_task_control -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/ament_index/resource_index/packages
+[1.520s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/package.xml -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control
+[1.520s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/README.md -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control
+[1.520s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/launch/run_cartesian_insertion_diagnostics.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/launch
+[1.520s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/launch/run_baseline_sequence.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/launch
+[1.520s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/launch/run_robot_contact_validation_sequence.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/launch
+[1.521s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/launch/run_ik_backend_audit.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/launch
+[1.521s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/launch/run_peg_hole_insertion_validation_sequence.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/launch
+[1.521s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/launch/run_segmented_guarded_contact.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/launch
+[1.521s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/launch/run_task_sequence.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/launch
+[1.521s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/launch/run_ik_feasibility_diagnostics.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/launch
+[1.521s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/launch/baseline_trajectory.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/launch
+[1.522s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/launch/task_control.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/launch
+[1.522s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/launch/run_segmented_robot_contact_approach.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/launch
+[1.522s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/launch/run_contact_validation_sequence.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/launch
+[1.522s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/config/baseline_task_sequence.yaml -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/config
+[1.523s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/config/peg_hole_insertion_validation_sequence.yaml -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/config
+[1.523s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/config/kuka_joint_trajectory.yaml -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/config
+[1.523s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/config/contact_validation_sequence.yaml -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/config
+[1.523s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/config/robot_contact_validation_sequence.yaml -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/config
+[1.524s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/config/baseline_task_poses.yaml -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/config
+[1.524s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/config/baseline_trajectory.yaml -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/config
+[1.524s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/config/segmented_robot_contact_approach.yaml -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/config
+[1.524s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/config/peg_hole_cartesian_targets.yaml -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/config
+[1.524s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/config/moveit_lbr_iisy6_r1300/moveit_config_metadata.yaml -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/config/moveit_lbr_iisy6_r1300
+[1.524s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/config/moveit_lbr_iisy6_r1300/lbr_iisy6_r1300.srdf -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/config/moveit_lbr_iisy6_r1300
+[1.525s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/config/moveit_lbr_iisy6_r1300/kinematics.yaml -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/config/moveit_lbr_iisy6_r1300
+[1.525s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/config/moveit_lbr_iisy6_r1300/sensors_3d.yaml -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/config/moveit_lbr_iisy6_r1300
+[1.525s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/config/moveit_lbr_iisy6_r1300/ompl_planning.yaml -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/config/moveit_lbr_iisy6_r1300
+[1.554s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_task_control' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/build --no-deps symlink_data --force

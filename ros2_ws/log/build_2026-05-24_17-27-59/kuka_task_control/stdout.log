@@ -1,0 +1,36 @@
+running develop
+running egg_info
+writing kuka_task_control.egg-info/PKG-INFO
+writing dependency_links to kuka_task_control.egg-info/dependency_links.txt
+writing entry points to kuka_task_control.egg-info/entry_points.txt
+writing requirements to kuka_task_control.egg-info/requires.txt
+writing top-level names to kuka_task_control.egg-info/top_level.txt
+reading manifest file 'kuka_task_control.egg-info/SOURCES.txt'
+writing manifest file 'kuka_task_control.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages/kuka-task-control.egg-link (link to .)
+Installing baseline_joint_sequence_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing baseline_trajectory_client script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing cartesian_insertion_diagnostics script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing cartesian_insertion_dry_run_planner script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing cartesian_orientation_target_calculator script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing execution_gate_monitor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing ik_backend_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing ik_feasibility_diagnostics script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing move_group_diagnostic_config_builder script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing move_group_runtime_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing moveit_config_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing moveit_diagnostic_input_builder script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing moveit_launch_readiness_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing peg_hole_frame_publisher script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing robot_description_semantic_diagnostics script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing segmented_contact_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing segmented_guarded_contact_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing semantic_model_validator script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing task_trajectory_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing tool_axis_audit script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+Installing tool_link_validator script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+
+Installed /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control
+running symlink_data
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/config/moveit_lbr_iisy6_r1300/ompl_planning.yaml -> /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/share/kuka_task_control/config/moveit_lbr_iisy6_r1300

@@ -1,0 +1,50 @@
+running develop
+Removing /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages/peg-in-hole-description.egg-link (link to .)
+running egg_info
+writing ../../build/peg_in_hole_description/peg_in_hole_description.egg-info/PKG-INFO
+writing dependency_links to ../../build/peg_in_hole_description/peg_in_hole_description.egg-info/dependency_links.txt
+writing requirements to ../../build/peg_in_hole_description/peg_in_hole_description.egg-info/requires.txt
+writing top-level names to ../../build/peg_in_hole_description/peg_in_hole_description.egg-info/top_level.txt
+reading manifest file '../../build/peg_in_hole_description/peg_in_hole_description.egg-info/SOURCES.txt'
+writing manifest file '../../build/peg_in_hole_description/peg_in_hole_description.egg-info/SOURCES.txt'
+running build
+running build_py
+running install
+running install_lib
+creating /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages/peg_in_hole_description
+copying /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/build/lib/peg_in_hole_description/__init__.py -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages/peg_in_hole_description
+byte-compiling /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages/peg_in_hole_description/__init__.py to __init__.cpython-312.pyc
+running install_data
+copying resource/peg_in_hole_description -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/ament_index/resource_index/packages
+copying package.xml -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description
+copying README.md -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description
+copying launch/peg_in_hole_scene.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/launch
+copying config/task_geometry.yaml -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/config
+copying urdf/peg_in_hole_task.urdf.xacro -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/urdf
+copying urdf/lbr_iisy3_r760_research_gripper.urdf.xacro -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/urdf
+copying urdf/research_parallel_gripper.xacro -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/urdf
+copying urdf/proposal_lbr_iisy6_r1300_cell.urdf.xacro -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/urdf
+copying worlds/proposal_simulation_cell_v1_2_rgbd_image_bridge_fix.world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+copying worlds/peg_in_hole_robot_contact_validation_world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+copying worlds/proposal_simulation_cell_v1_0.world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+copying worlds/peg_in_hole_world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+copying worlds/peg_in_hole_contact_validation_world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+copying worlds/proposal_simulation_cell_v1_3_contact_physics_validation.world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+copying worlds/minimal_contact_validation_world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+copying worlds/peg_in_hole_insertion_validation_world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+copying models/hole_fixture/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/hole_fixture
+copying models/hole_fixture/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/hole_fixture
+copying models/work_table/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/work_table
+copying models/work_table/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/work_table
+copying models/contact_validation_pad/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/contact_validation_pad
+copying models/contact_validation_pad/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/contact_validation_pad
+copying models/target_plate/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/target_plate
+copying models/target_plate/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/target_plate
+copying models/robot_pedestal/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/robot_pedestal
+copying models/robot_pedestal/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/robot_pedestal
+copying models/cylindrical_peg/model.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/cylindrical_peg
+copying models/cylindrical_peg/model.config -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/models/cylindrical_peg
+running install_egg_info
+Copying ../../build/peg_in_hole_description/peg_in_hole_description.egg-info to /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages/peg_in_hole_description-0.1.0-py3.12.egg-info
+running install_scripts
+writing list of installed files to '/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/install.log'

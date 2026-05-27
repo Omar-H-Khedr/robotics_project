@@ -1,0 +1,24 @@
+[0.387s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_mock_hardware_interface': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --build /home/omar/code/robotics_project/ros2_ws/build/kuka_mock_hardware_interface -- -j8 -l8
+[1.499s] [100%] Built target kuka_mock_hardware_interface
+[1.520s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_mock_hardware_interface' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --build /home/omar/code/robotics_project/ros2_ws/build/kuka_mock_hardware_interface -- -j8 -l8
+[1.521s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_mock_hardware_interface': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --install /home/omar/code/robotics_project/ros2_ws/build/kuka_mock_hardware_interface
+[1.534s] -- Install configuration: ""
+[1.541s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/share/kuka_mock_hardware_interface/hardware_interface.xml
+[1.541s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/lib/kuka_mock_hardware_interface/libkuka_mock_hardware_interface.so
+[1.542s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/share/ament_index/resource_index/package_run_dependencies/kuka_mock_hardware_interface
+[1.542s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/share/ament_index/resource_index/parent_prefix_path/kuka_mock_hardware_interface
+[1.542s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/share/kuka_mock_hardware_interface/environment/ament_prefix_path.sh
+[1.542s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/share/kuka_mock_hardware_interface/environment/ament_prefix_path.dsv
+[1.542s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/share/kuka_mock_hardware_interface/environment/path.sh
+[1.543s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/share/kuka_mock_hardware_interface/environment/path.dsv
+[1.543s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/share/kuka_mock_hardware_interface/local_setup.bash
+[1.543s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/share/kuka_mock_hardware_interface/local_setup.sh
+[1.543s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/share/kuka_mock_hardware_interface/local_setup.zsh
+[1.543s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/share/kuka_mock_hardware_interface/local_setup.dsv
+[1.544s] -- Installing: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/share/kuka_mock_hardware_interface/package.dsv
+[1.544s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/share/ament_index/resource_index/packages/kuka_mock_hardware_interface
+[1.544s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/share/ament_index/resource_index/hardware_interface__pluginlib__plugin/kuka_mock_hardware_interface
+[1.544s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/share/kuka_mock_hardware_interface/cmake/kuka_mock_hardware_interfaceConfig.cmake
+[1.544s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/share/kuka_mock_hardware_interface/cmake/kuka_mock_hardware_interfaceConfig-version.cmake
+[1.544s] -- Up-to-date: /home/omar/code/robotics_project/ros2_ws/install/kuka_mock_hardware_interface/share/kuka_mock_hardware_interface/package.xml
+[1.601s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/build/kuka_mock_hardware_interface' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --install /home/omar/code/robotics_project/ros2_ws/build/kuka_mock_hardware_interface

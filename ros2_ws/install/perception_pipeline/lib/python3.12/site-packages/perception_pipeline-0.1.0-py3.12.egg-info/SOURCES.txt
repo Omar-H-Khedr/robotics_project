@@ -1,0 +1,13 @@
+README.md
+package.xml
+setup.py
+../../build/perception_pipeline/perception_pipeline.egg-info/PKG-INFO
+../../build/perception_pipeline/perception_pipeline.egg-info/SOURCES.txt
+../../build/perception_pipeline/perception_pipeline.egg-info/dependency_links.txt
+../../build/perception_pipeline/perception_pipeline.egg-info/requires.txt
+../../build/perception_pipeline/perception_pipeline.egg-info/top_level.txt
+../../build/perception_pipeline/perception_pipeline.egg-info/zip-safe
+config/rgbd_pipeline.yaml
+launch/perception_pipeline.launch.py
+perception_pipeline/__init__.py
+resource/perception_pipeline

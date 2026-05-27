@@ -1,0 +1,25 @@
+[1.778s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/src/kuka_task_control': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/kuka_task_control build --build-base /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/build install --record /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/install.log --single-version-externally-managed install_data
+[2.146s] running egg_info
+[2.167s] writing ../../build/kuka_task_control/kuka_task_control.egg-info/PKG-INFO
+[2.167s] writing dependency_links to ../../build/kuka_task_control/kuka_task_control.egg-info/dependency_links.txt
+[2.167s] writing entry points to ../../build/kuka_task_control/kuka_task_control.egg-info/entry_points.txt
+[2.167s] writing requirements to ../../build/kuka_task_control/kuka_task_control.egg-info/requires.txt
+[2.167s] writing top-level names to ../../build/kuka_task_control/kuka_task_control.egg-info/top_level.txt
+[2.210s] reading manifest file '../../build/kuka_task_control/kuka_task_control.egg-info/SOURCES.txt'
+[2.211s] writing manifest file '../../build/kuka_task_control/kuka_task_control.egg-info/SOURCES.txt'
+[2.211s] running build
+[2.211s] running build_py
+[2.212s] running install
+[2.217s] running install_lib
+[2.239s] running install_data
+[2.240s] running install_egg_info
+[2.262s] removing '/home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages/kuka_task_control-0.1.0-py3.12.egg-info' (and everything under it)
+[2.263s] Copying ../../build/kuka_task_control/kuka_task_control.egg-info to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages/kuka_task_control-0.1.0-py3.12.egg-info
+[2.263s] running install_scripts
+[2.395s] Installing baseline_joint_sequence_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[2.395s] Installing baseline_trajectory_client script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[2.395s] Installing segmented_contact_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[2.395s] Installing segmented_guarded_contact_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[2.395s] Installing task_trajectory_executor script to /home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/kuka_task_control
+[2.395s] writing list of installed files to '/home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/install.log'
+[2.485s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/src/kuka_task_control' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/kuka_task_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/kuka_task_control build --build-base /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/build install --record /home/omar/code/robotics_project/ros2_ws/build/kuka_task_control/install.log --single-version-externally-managed install_data

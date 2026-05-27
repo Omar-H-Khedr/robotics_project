@@ -1,0 +1,40 @@
+simulation_cell_name: proposal_simulation_cell_v1_0
+robot_model: KUKA LBR iisy 6 R1300
+simulation_engine_priority:
+  - isaac_sim
+  - gazebo
+isaac_sim:
+  required: false
+  expected_install_names:
+    - isaac-sim
+    - isaacsim
+gazebo:
+  fallback_world: proposal_simulation_cell_v1_0.world.sdf
+  headless: true
+camera:
+  model: Intel RealSense D405 equivalent
+  width: 848
+  height: 480
+  fps: 30
+  fx: 430.0
+  fy: 430.0
+  cx: 424.0
+  cy: 240.0
+  pose_xyz: [0.42, -0.65, 1.18]
+contact_interface:
+  topic: /proposal_simulation_cell/contact_wrench
+  frame_id: peg_tip
+joint_state_interface:
+  topic: /joint_states
+task_frames:
+  world_frame: world
+  peg_tip_frame: peg_tip
+  hole_center_frame: hole_center
+  insertion_axis_frame: insertion_axis_z
+  table_work_surface_xyz: [0.8, 0.0, 0.75]
+  hole_center_xyz: [0.52, -0.20, 0.83]
+safety:
+  motion_execution_enabled: false
+  real_robot_used: false
+  moveit_used: false
+  compute_ik_called: false

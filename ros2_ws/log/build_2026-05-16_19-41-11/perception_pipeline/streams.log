@@ -1,0 +1,19 @@
+[1.968s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/src/perception_pipeline': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/perception_pipeline/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/perception_pipeline/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/perception_pipeline build --build-base /home/omar/code/robotics_project/ros2_ws/build/perception_pipeline/build install --record /home/omar/code/robotics_project/ros2_ws/build/perception_pipeline/install.log --single-version-externally-managed install_data
+[2.319s] running egg_info
+[2.346s] writing ../../build/perception_pipeline/perception_pipeline.egg-info/PKG-INFO
+[2.346s] writing dependency_links to ../../build/perception_pipeline/perception_pipeline.egg-info/dependency_links.txt
+[2.346s] writing requirements to ../../build/perception_pipeline/perception_pipeline.egg-info/requires.txt
+[2.346s] writing top-level names to ../../build/perception_pipeline/perception_pipeline.egg-info/top_level.txt
+[2.399s] reading manifest file '../../build/perception_pipeline/perception_pipeline.egg-info/SOURCES.txt'
+[2.402s] writing manifest file '../../build/perception_pipeline/perception_pipeline.egg-info/SOURCES.txt'
+[2.402s] running build
+[2.402s] running build_py
+[2.402s] running install
+[2.409s] running install_lib
+[2.438s] running install_data
+[2.438s] running install_egg_info
+[2.470s] removing '/home/omar/code/robotics_project/ros2_ws/install/perception_pipeline/lib/python3.12/site-packages/perception_pipeline-0.1.0-py3.12.egg-info' (and everything under it)
+[2.470s] Copying ../../build/perception_pipeline/perception_pipeline.egg-info to /home/omar/code/robotics_project/ros2_ws/install/perception_pipeline/lib/python3.12/site-packages/perception_pipeline-0.1.0-py3.12.egg-info
+[2.471s] running install_scripts
+[2.638s] writing list of installed files to '/home/omar/code/robotics_project/ros2_ws/build/perception_pipeline/install.log'
+[2.702s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/src/perception_pipeline' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/perception_pipeline/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/perception_pipeline/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/perception_pipeline build --build-base /home/omar/code/robotics_project/ros2_ws/build/perception_pipeline/build install --record /home/omar/code/robotics_project/ros2_ws/build/perception_pipeline/install.log --single-version-externally-managed install_data

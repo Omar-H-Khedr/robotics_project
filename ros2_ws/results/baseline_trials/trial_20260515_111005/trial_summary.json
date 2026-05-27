@@ -1,0 +1,42 @@
+{
+  "completed_phases_count": 0,
+  "contact_events_count": 53253,
+  "contact_messages_observed": true,
+  "contact_metrics_available": true,
+  "contact_topics_configured": {
+    "hole": "/gazebo/contacts/hole",
+    "peg": "/gazebo/contacts/peg",
+    "target": "/gazebo/contacts/target",
+    "validation": "/gazebo/contacts/validation"
+  },
+  "contact_topics_connected": [
+    "hole",
+    "peg",
+    "target",
+    "validation"
+  ],
+  "contact_topics_seen": [
+    "peg",
+    "validation"
+  ],
+  "execution_time_sec": 41.230379636,
+  "final_task_phase": "uninitialized",
+  "final_trial_status": "idle",
+  "insertion_attempted": false,
+  "insertion_hold_reached": false,
+  "insertion_success": null,
+  "insertion_success_estimate": null,
+  "max_contact_force": null,
+  "notes": "Physical contacts observed. max_contact_force is null because force extraction is disabled/unvalidated. insertion_success remains null until a validated success rule is implemented. insertion_success_estimate is a heuristic based on insertion_hold, completed trial status, and absence of explicit failure. contact_probe_validation validates Gazebo contact instrumentation only; task_completed is not required. max_contact_force is null unless validated force extraction is enabled. insertion_success is null because no validated contact-based success rule is implemented.",
+  "physical_contact_observed": true,
+  "safe_success": true,
+  "safety_status_observed": true,
+  "safety_violations_count": 0,
+  "safety_warnings_count": 18,
+  "task_completed": false,
+  "task_started": false,
+  "total_task_events": 0,
+  "trial_failed": false,
+  "trial_id": "trial_20260515_111005",
+  "trial_mode": "contact_probe_validation"
+}

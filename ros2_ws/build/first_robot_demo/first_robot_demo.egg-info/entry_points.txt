@@ -1,0 +1,3 @@
+[console_scripts]
+simple_listener = first_robot_demo.simple_listener:main
+simple_talker = first_robot_demo.simple_talker:main

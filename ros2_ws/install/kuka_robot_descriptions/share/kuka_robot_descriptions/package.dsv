@@ -1,0 +1,8 @@
+source;share/kuka_robot_descriptions/hook/cmake_prefix_path.ps1
+source;share/kuka_robot_descriptions/hook/cmake_prefix_path.dsv
+source;share/kuka_robot_descriptions/hook/cmake_prefix_path.sh
+source;share/kuka_robot_descriptions/local_setup.bash
+source;share/kuka_robot_descriptions/local_setup.dsv
+source;share/kuka_robot_descriptions/local_setup.ps1
+source;share/kuka_robot_descriptions/local_setup.sh
+source;share/kuka_robot_descriptions/local_setup.zsh

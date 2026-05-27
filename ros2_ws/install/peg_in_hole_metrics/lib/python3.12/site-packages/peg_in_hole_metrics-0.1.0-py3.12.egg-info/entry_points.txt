@@ -1,0 +1,2 @@
+[console_scripts]
+contact_metrics_node = peg_in_hole_metrics.contact_metrics_node:main

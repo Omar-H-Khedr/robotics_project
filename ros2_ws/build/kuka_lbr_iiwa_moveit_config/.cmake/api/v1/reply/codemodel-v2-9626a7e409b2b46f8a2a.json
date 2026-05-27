@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-9f50c0c2b5d0890da813.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.15"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "kuka_lbr_iiwa_moveit_config",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "kuka_lbr_iiwa_moveit_config_iiwa14::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-kuka_lbr_iiwa_moveit_config_iiwa14-599517e21178ae67d449.json",
+					"name" : "kuka_lbr_iiwa_moveit_config_iiwa14",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "kuka_lbr_iiwa_moveit_config_uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-kuka_lbr_iiwa_moveit_config_uninstall-6d792d1dd1c08bfdf0fb.json",
+					"name" : "kuka_lbr_iiwa_moveit_config_uninstall",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-uninstall-c35e0cf41537a8d47242.json",
+					"name" : "uninstall",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/omar/code/robotics_project/ros2_ws/build/kuka_lbr_iiwa_moveit_config",
+		"source" : "/home/omar/code/robotics_project/ros2_ws/src/external/kuka_robot_descriptions/kuka_lbr_iiwa_moveit_config"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

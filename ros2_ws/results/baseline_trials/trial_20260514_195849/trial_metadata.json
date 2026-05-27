@@ -1,0 +1,20 @@
+{
+  "controller": "joint_trajectory_controller",
+  "end_effector": "simplified research gripper",
+  "framework_version": "v0.3",
+  "notes": "Research Baseline v0.3 logs task events, safety events, trial status, joint states, contact events, and insertion metrics. Contact-force values remain null unless force extraction is validated and enabled.",
+  "robot": "KUKA LBR iisy 3 R760",
+  "simulator": "Gazebo",
+  "task": "peg-in-hole baseline",
+  "timestamp": "20260514_195849",
+  "topics": {
+    "contact_event": "/contact_event",
+    "insertion_metrics": "/insertion_metrics",
+    "joint_states": "/joint_states",
+    "safety_status": "/safety_status",
+    "task_event": "/task_event",
+    "task_phase": "/task_phase",
+    "trial_status": "/trial_status"
+  },
+  "trial_id": "trial_20260514_195849"
+}

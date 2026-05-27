@@ -1,0 +1,21 @@
+[7.347s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/src/experiment_manager': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/experiment_manager/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/experiment_manager/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/experiment_manager build --build-base /home/omar/code/robotics_project/ros2_ws/build/experiment_manager/build install --record /home/omar/code/robotics_project/ros2_ws/build/experiment_manager/install.log --single-version-externally-managed install_data
+[7.600s] running egg_info
+[7.621s] writing ../../build/experiment_manager/experiment_manager.egg-info/PKG-INFO
+[7.622s] writing dependency_links to ../../build/experiment_manager/experiment_manager.egg-info/dependency_links.txt
+[7.622s] writing entry points to ../../build/experiment_manager/experiment_manager.egg-info/entry_points.txt
+[7.622s] writing requirements to ../../build/experiment_manager/experiment_manager.egg-info/requires.txt
+[7.622s] writing top-level names to ../../build/experiment_manager/experiment_manager.egg-info/top_level.txt
+[7.669s] reading manifest file '../../build/experiment_manager/experiment_manager.egg-info/SOURCES.txt'
+[7.706s] writing manifest file '../../build/experiment_manager/experiment_manager.egg-info/SOURCES.txt'
+[7.706s] running build
+[7.706s] running build_py
+[7.706s] running install
+[7.712s] running install_lib
+[7.750s] running install_data
+[7.750s] running install_egg_info
+[7.772s] removing '/home/omar/code/robotics_project/ros2_ws/install/experiment_manager/lib/python3.12/site-packages/experiment_manager-0.1.0-py3.12.egg-info' (and everything under it)
+[7.779s] Copying ../../build/experiment_manager/experiment_manager.egg-info to /home/omar/code/robotics_project/ros2_ws/install/experiment_manager/lib/python3.12/site-packages/experiment_manager-0.1.0-py3.12.egg-info
+[7.795s] running install_scripts
+[7.926s] Installing baseline_trial_manager script to /home/omar/code/robotics_project/ros2_ws/install/experiment_manager/lib/experiment_manager
+[7.926s] writing list of installed files to '/home/omar/code/robotics_project/ros2_ws/build/experiment_manager/install.log'
+[8.612s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/src/experiment_manager' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/experiment_manager/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/experiment_manager/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/experiment_manager build --build-base /home/omar/code/robotics_project/ros2_ws/build/experiment_manager/build install --record /home/omar/code/robotics_project/ros2_ws/build/experiment_manager/install.log --single-version-externally-managed install_data

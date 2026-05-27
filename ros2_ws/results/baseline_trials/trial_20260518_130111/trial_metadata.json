@@ -1,0 +1,22 @@
+{
+  "controller": "joint_trajectory_controller",
+  "end_effector": "simplified research gripper",
+  "framework_version": "v1.0",
+  "notes": "Research Baseline logging records task events, safety events, trial status, joint states, contact events, and insertion metrics. Contact-force values are extracted from validated ros_gz_interfaces Contacts.wrenches force vectors when present. The contact_probe_validation mode validates instrumentation with a passive Gazebo probe. The robot_contact_validation mode runs a separate scripted robot approach toward a dedicated contact target; contact absence is reported without failing the trial. The segmented_robot_contact_validation mode replaces the long contact approach with short checked joint-space segments and stops before sending additional approach motion after contact is observed.",
+  "robot": "KUKA LBR iisy 3 R760",
+  "simulator": "Gazebo",
+  "task": "segmented guarded robot-to-object contact validation",
+  "timestamp": "20260518_130111",
+  "topics": {
+    "contact_event": "/contact_event",
+    "force_guard_status": "/force_guard_status",
+    "insertion_metrics": "/insertion_metrics",
+    "joint_states": "/joint_states",
+    "safety_status": "/safety_status",
+    "task_event": "/task_event",
+    "task_phase": "/task_phase",
+    "trial_status": "/trial_status"
+  },
+  "trial_id": "trial_20260518_130111",
+  "trial_mode": "segmented_robot_contact_validation"
+}

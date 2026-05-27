@@ -1,0 +1,20 @@
+[7.040s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/src/peg_in_hole_description': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/peg_in_hole_description build --build-base /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/build install --record /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/install.log --single-version-externally-managed install_data
+[7.323s] running egg_info
+[7.346s] writing ../../build/peg_in_hole_description/peg_in_hole_description.egg-info/PKG-INFO
+[7.348s] writing dependency_links to ../../build/peg_in_hole_description/peg_in_hole_description.egg-info/dependency_links.txt
+[7.348s] writing requirements to ../../build/peg_in_hole_description/peg_in_hole_description.egg-info/requires.txt
+[7.348s] writing top-level names to ../../build/peg_in_hole_description/peg_in_hole_description.egg-info/top_level.txt
+[7.394s] reading manifest file '../../build/peg_in_hole_description/peg_in_hole_description.egg-info/SOURCES.txt'
+[7.427s] writing manifest file '../../build/peg_in_hole_description/peg_in_hole_description.egg-info/SOURCES.txt'
+[7.427s] running build
+[7.427s] running build_py
+[7.427s] running install
+[7.433s] running install_lib
+[7.476s] running install_data
+[7.484s] copying worlds/proposal_simulation_cell_v1_3_contact_physics_validation.world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+[7.484s] running install_egg_info
+[7.509s] removing '/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages/peg_in_hole_description-0.1.0-py3.12.egg-info' (and everything under it)
+[7.509s] Copying ../../build/peg_in_hole_description/peg_in_hole_description.egg-info to /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages/peg_in_hole_description-0.1.0-py3.12.egg-info
+[7.522s] running install_scripts
+[7.655s] writing list of installed files to '/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/install.log'
+[7.959s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/src/peg_in_hole_description' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/peg_in_hole_description build --build-base /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/build install --record /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/install.log --single-version-externally-managed install_data

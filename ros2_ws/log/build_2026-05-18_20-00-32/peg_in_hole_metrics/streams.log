@@ -1,0 +1,21 @@
+[1.726s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/src/peg_in_hole_metrics': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_metrics/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_metrics/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/peg_in_hole_metrics build --build-base /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_metrics/build install --record /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_metrics/install.log --single-version-externally-managed install_data
+[2.004s] running egg_info
+[2.028s] writing ../../build/peg_in_hole_metrics/peg_in_hole_metrics.egg-info/PKG-INFO
+[2.029s] writing dependency_links to ../../build/peg_in_hole_metrics/peg_in_hole_metrics.egg-info/dependency_links.txt
+[2.029s] writing entry points to ../../build/peg_in_hole_metrics/peg_in_hole_metrics.egg-info/entry_points.txt
+[2.029s] writing requirements to ../../build/peg_in_hole_metrics/peg_in_hole_metrics.egg-info/requires.txt
+[2.029s] writing top-level names to ../../build/peg_in_hole_metrics/peg_in_hole_metrics.egg-info/top_level.txt
+[2.073s] reading manifest file '../../build/peg_in_hole_metrics/peg_in_hole_metrics.egg-info/SOURCES.txt'
+[2.074s] writing manifest file '../../build/peg_in_hole_metrics/peg_in_hole_metrics.egg-info/SOURCES.txt'
+[2.075s] running build
+[2.075s] running build_py
+[2.075s] running install
+[2.080s] running install_lib
+[2.102s] running install_data
+[2.102s] running install_egg_info
+[2.124s] removing '/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_metrics/lib/python3.12/site-packages/peg_in_hole_metrics-0.1.0-py3.12.egg-info' (and everything under it)
+[2.125s] Copying ../../build/peg_in_hole_metrics/peg_in_hole_metrics.egg-info to /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_metrics/lib/python3.12/site-packages/peg_in_hole_metrics-0.1.0-py3.12.egg-info
+[2.125s] running install_scripts
+[2.261s] Installing contact_metrics_node script to /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_metrics/lib/peg_in_hole_metrics
+[2.261s] writing list of installed files to '/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_metrics/install.log'
+[2.361s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/src/peg_in_hole_metrics' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_metrics/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_metrics/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/peg_in_hole_metrics build --build-base /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_metrics/build install --record /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_metrics/install.log --single-version-externally-managed install_data

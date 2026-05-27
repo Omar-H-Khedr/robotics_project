@@ -1,0 +1,34 @@
+running develop
+running egg_info
+writing thesis_bringup.egg-info/PKG-INFO
+writing dependency_links to thesis_bringup.egg-info/dependency_links.txt
+writing entry points to thesis_bringup.egg-info/entry_points.txt
+writing requirements to thesis_bringup.egg-info/requires.txt
+writing top-level names to thesis_bringup.egg-info/top_level.txt
+reading manifest file 'thesis_bringup.egg-info/SOURCES.txt'
+writing manifest file 'thesis_bringup.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/python3.12/site-packages/thesis-bringup.egg-link (link to .)
+Installing controller_readiness_gate script to /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/lib/thesis_bringup
+
+Installed /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup
+running symlink_data
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/resource/thesis_bringup -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/ament_index/resource_index/packages
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/package.xml -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/README.md -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/launch/run_full_robot_contact_validation_trial.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/launch
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/launch/run_move_group_ik_diagnostic.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/launch
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/launch/run_contact_probe_validation_trial.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/launch
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/launch/run_moveit_ik_diagnostic.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/launch
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/launch/run_full_cartesian_insertion_diagnostics.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/launch
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/launch/research_baseline.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/launch
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/launch/run_full_segmented_guarded_contact_trial.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/launch
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/launch/run_full_segmented_robot_contact_trial.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/launch
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/launch/run_full_contact_validation_trial.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/launch
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/launch/run_full_peg_hole_insertion_validation_trial.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/launch
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/launch/run_research_trial.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/launch
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/launch/run_full_research_trial.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/launch
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/launch/run_minimal_contact_validation.launch.py -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/launch
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/config/contact_validation_bridge.yaml -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/config
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/config/research_baseline.yaml -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/config
+symbolically linking /home/omar/code/robotics_project/ros2_ws/build/thesis_bringup/config/contact_bridge.yaml -> /home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/config

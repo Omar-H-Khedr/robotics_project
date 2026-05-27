@@ -1,0 +1,16 @@
+[1.315s] Invoking command in '/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/build --no-deps symlink_data
+[1.651s] running develop
+[1.871s] running egg_info
+[1.894s] writing peg_in_hole_description.egg-info/PKG-INFO
+[1.894s] writing dependency_links to peg_in_hole_description.egg-info/dependency_links.txt
+[1.894s] writing requirements to peg_in_hole_description.egg-info/requires.txt
+[1.894s] writing top-level names to peg_in_hole_description.egg-info/top_level.txt
+[1.941s] reading manifest file 'peg_in_hole_description.egg-info/SOURCES.txt'
+[1.942s] writing manifest file 'peg_in_hole_description.egg-info/SOURCES.txt'
+[1.969s] running build_ext
+[1.969s] Creating /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages/peg-in-hole-description.egg-link (link to .)
+[1.969s] 
+[1.969s] Installed /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description
+[1.969s] running symlink_data
+[1.969s] symbolically linking /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/worlds/proposal_simulation_cell_v1_2_rgbd_image_bridge_fix.world.sdf -> /home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds
+[2.064s] Invoked command in '/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description' returned '0': PYTHONPATH=/home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/omar/code/robotics_project/ros2_ws/build/peg_in_hole_description/build --no-deps symlink_data

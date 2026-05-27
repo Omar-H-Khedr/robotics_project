@@ -1,0 +1,8 @@
+Metadata-Version: 2.1
+Name: experiment-manager
+Version: 0.1.0
+Summary: Reproducible trial orchestration and logging package for peg-in-hole experiments.
+Maintainer: Omar Khedr
+Maintainer-email: omar.khedr@gu.edu.eg
+License: Apache-2.0
+Provides-Extra: test
