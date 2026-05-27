@@ -1,0 +1,6 @@
+scenario,post_retreat_force_n,contact_detection_force_threshold_n,post_retreat_contact_gate_triggered,raw_contact_message_count,raw_contact_count,robot_pad_contact_count,raw_contact_pairs_sample,robot_contact_pairs_sample,post_retreat_no_contact_verified
+nominal_centered,0.000000,0.020000,false,0,0,0,,,true
+x_positive_offset,0.000000,0.020000,false,0,0,0,,,true
+x_negative_offset,0.000000,0.020000,false,0,0,0,,,true
+y_positive_offset,0.000000,0.020000,false,0,0,0,,,true
+y_negative_offset,0.000000,0.020000,false,0,0,0,,,true

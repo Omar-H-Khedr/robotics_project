@@ -1,0 +1,6 @@
+scenario,context_embedding_loaded,action_parameters_within_bounds,approach_step_distance_m,max_guarded_steps,validated,initial_no_contact_verified,contact_trigger_after_motion,contact_trigger_step_index,stop_on_contact_executed,retreat_completed,post_retreat_no_contact_verified,return_to_ready_completed,max_force_n,max_torque_nm,safety_violation_count,final_return_error_deg,real_robot_used,peg_insertion_executed,forceful_contact_executed
+nominal_centered,true,true,0.004000,12,true,true,true,1,true,true,true,true,0.094287001,0.000000000,0,0.575726329,false,false,false
+x_positive_offset,true,true,0.003000,14,true,true,true,1,true,true,true,true,0.092882942,0.000000000,0,0.422280255,false,false,false
+x_negative_offset,true,true,0.003000,14,true,true,true,1,true,true,true,true,0.094035357,0.000000000,0,0.442872045,false,false,false
+y_positive_offset,true,true,0.003000,14,true,true,true,1,true,true,true,true,0.089976876,0.000000000,0,0.581851647,false,false,false
+y_negative_offset,true,true,0.003000,14,true,true,true,1,true,true,true,true,0.094749695,0.000000000,0,0.561702892,false,false,false
