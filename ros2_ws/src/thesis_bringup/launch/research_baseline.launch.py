@@ -10,17 +10,24 @@ from launch.actions import (
     IncludeLaunchDescription,
     LogInfo,
     OpaqueFunction,
+    RegisterEventHandler,
     SetEnvironmentVariable,
 )
 from launch.conditions import IfCondition, UnlessCondition
+from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import (
+    Command,
+    FindExecutable,
+    LaunchConfiguration,
+    PathJoinSubstitution,
+)
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
 CONFIG_FILE = "research_baseline.yaml"
-RESEARCH_ROBOT_XACRO = "lbr_iisy3_r760_research_gripper.urdf.xacro"
+RESEARCH_ROBOT_XACRO = "lbr_iisy6_r1300_research_gripper.urdf.xacro"
 
 
 def _load_research_baseline_config():
@@ -71,7 +78,8 @@ def launch_setup(context, *args, **kwargs):
     controller_stack = "joint_state_broadcaster + joint_trajectory_controller"
     safe_home_pose = _safe_home_pose(robot)
     namespace = LaunchConfiguration("namespace")
-    tf_prefix = (namespace.perform(context) + "_") if namespace.perform(context) != "" else ""
+    namespace_value = namespace.perform(context)
+    tf_prefix = (namespace_value + "_") if namespace_value != "" else ""
     robot_description_xacro = PathJoinSubstitution(
         [
             FindPackageShare("peg_in_hole_description"),
@@ -190,39 +198,132 @@ def launch_setup(context, *args, **kwargs):
         }.items(),
     )
 
+    ft_sensor_bridge = Node(
+        package="ros_gz_bridge",
+        executable="bridge_node",
+        name="ft_sensor_bridge",
+        output="screen",
+        parameters=[
+            {
+                "config_file": PathJoinSubstitution(
+                    [FindPackageShare("thesis_bringup"), "config", "ft_sensor_bridge.yaml"]
+                ),
+            }
+        ],
+        remappings=[
+            (
+                "/world/peg_in_hole_world/model/lbr_iisy6_r1300/joint/ft_sensor_joint/sensor/ft_sensor/forcetorque",
+                "/ft_sensor_wrench",
+            ),
+        ],
+    )
+
+    # Resolve spawn position from launch configuration
+    spawn_x = LaunchConfiguration("x").perform(context)
+    spawn_y = LaunchConfiguration("y").perform(context)
+    spawn_z = LaunchConfiguration("z").perform(context)
+    spawn_roll = LaunchConfiguration("roll").perform(context)
+    spawn_pitch = LaunchConfiguration("pitch").perform(context)
+    spawn_yaw = LaunchConfiguration("yaw").perform(context)
+    xacro_path = robot_description_xacro.perform(context)
+
     spawn_robot_arguments = [
-        "-topic",
-        "robot_description",
-        "-name",
+        "--xacro",
+        xacro_path,
+        "--name",
         robot_model,
-        "-x",
+        "--xacro-args",
+        "mode:=gazebo",
+        "prefix:=",
+        f"x:={spawn_x}",
+        f"y:={spawn_y}",
+        f"z:={spawn_z}",
+        f"roll:={spawn_roll}",
+        f"pitch:={spawn_pitch}",
+        f"yaw:={spawn_yaw}",
+        f"initial_joint_1:={safe_home_pose[0]}",
+        f"initial_joint_2:={safe_home_pose[1]}",
+        f"initial_joint_3:={safe_home_pose[2]}",
+        f"initial_joint_4:={safe_home_pose[3]}",
+        f"initial_joint_5:={safe_home_pose[4]}",
+        f"initial_joint_6:={safe_home_pose[5]}",
+        "include_camera:=false",
+        "--x",
         "0.0",
-        "-y",
+        "--y",
         "0.0",
-        "-z",
+        "--z",
         "0.0",
-        "-R",
+        "--R",
         "0.0",
-        "-P",
+        "--P",
         "0.0",
-        "-Y",
+        "--Y",
         "0.0",
     ]
     if allow_robot_renaming:
-        spawn_robot_arguments.insert(4, "-allow_renaming")
+        spawn_robot_arguments.append("--allow-renaming")
 
     spawn_robot = Node(
-        package="ros_gz_sim",
-        executable="create",
+        package="thesis_bringup",
+        executable="spawn_robot_sdf",
         arguments=spawn_robot_arguments,
         output="screen",
     )
 
     def controller_spawner(controller_name, activate=False):
-        args = [controller_name, "-c", "controller_manager", "-n", namespace]
+        controller_manager = (
+            f"/{namespace_value}/controller_manager"
+            if namespace_value
+            else "/controller_manager"
+        )
+        args = [
+            controller_name,
+            "-c",
+            controller_manager,
+            "--controller-manager-timeout",
+            "60",
+            "--switch-timeout",
+            "30",
+        ]
+        if namespace_value:
+            args.extend(["-n", namespace])
         if not activate:
             args.append("--inactive")
-        return Node(package="controller_manager", executable="spawner", arguments=args)
+        return Node(
+            package="controller_manager",
+            executable="spawner",
+            name=f"{controller_name}_spawner",
+            arguments=args,
+            output="screen",
+        )
+
+    joint_state_broadcaster = controller_spawner("joint_state_broadcaster", activate=True)
+    joint_trajectory_controller = controller_spawner(
+        "joint_trajectory_controller",
+        activate=True,
+    )
+
+    data_logger = Node(
+        package="kuka_task_control",
+        executable="data_logger_node",
+        parameters=[{"log_rate": 50.0, "log_dir": "/tmp/thesis_logs"}],
+        output="screen",
+    )
+
+    admittance_insertion = Node(
+        package="kuka_task_control",
+        executable="admittance_insertion_node",
+        parameters=[
+            {
+                "contact_threshold": 5.0,
+                "safety_threshold": 350.0,
+                "control_rate": 10.0,
+                "approach_speed": 0.01,
+            }
+        ],
+        output="screen",
+    )
 
     return [
         SetEnvironmentVariable("GZ_SIM_RESOURCE_PATH", _prepend_resource_path(model_path)),
@@ -273,8 +374,26 @@ def launch_setup(context, *args, **kwargs):
         spawn_robot,
         ros_gz_bridge,
         contact_ros_gz_bridge,
-        controller_spawner("joint_state_broadcaster", activate=True),
-        controller_spawner("joint_trajectory_controller", activate=True),
+        ft_sensor_bridge,
+        RegisterEventHandler(
+            OnProcessExit(
+                target_action=spawn_robot,
+                on_exit=[joint_state_broadcaster],
+            )
+        ),
+        RegisterEventHandler(
+            OnProcessExit(
+                target_action=joint_state_broadcaster,
+                on_exit=[joint_trajectory_controller],
+            )
+        ),
+        RegisterEventHandler(
+            OnProcessExit(
+                target_action=joint_trajectory_controller,
+                on_exit=[admittance_insertion],
+            )
+        ),
+        data_logger,
     ]
 
 
@@ -284,7 +403,7 @@ def generate_launch_description():
         [
             DeclareLaunchArgument(
                 "robot_model",
-                default_value="lbr_iisy3_r760",
+                default_value="lbr_iisy6_r1300",
                 description="Gazebo entity name used when spawning the KUKA robot.",
             ),
             DeclareLaunchArgument(
@@ -298,10 +417,11 @@ def generate_launch_description():
             # robot spawn at z=0.0 made the arm appear under the table even
             # when x/y alignment was correct. The research baseline is a
             # pedestal-mounted KUKA with x=0.80 aligned to the table centerline,
-            # y=-0.75 in front of the table, and z=0.75 at table-surface height.
+            # y=-0.75 in front of the table, and z=0.735 at the pedestal top
+            # plate surface (pedestal model top_plate is at z=0.735).
             DeclareLaunchArgument("x", default_value="0.80"),
             DeclareLaunchArgument("y", default_value="-0.75"),
-            DeclareLaunchArgument("z", default_value="0.75"),
+            DeclareLaunchArgument("z", default_value="0.735"),
             DeclareLaunchArgument("roll", default_value="0"),
             DeclareLaunchArgument("pitch", default_value="0"),
             DeclareLaunchArgument("yaw", default_value="1.5708"),

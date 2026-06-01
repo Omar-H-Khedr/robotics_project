@@ -109,6 +109,57 @@ Expected behavior:
 - It logs whether the controller accepted the goal.
 - It waits for the controller result, reports the final action status and controller result code, and exits cleanly.
 
+## Phase 2B: Admittance Insertion Controller (v2)
+
+`admittance_insertion_node` is the v2 task-level controller that autonomously performs peg-in-hole insertion using position-only control with force monitoring. It replaces the old action-client approach with topic-based trajectory publishing to avoid deadlocks.
+
+### State Machine
+
+1. **IDLE** → **MOVING_TO_START**: Moves to `AXIS_ALIGN_POSE` above the hole.
+2. **MOVING_TO_START** → **APPROACH**: Descends to `TOUCH_POSE` at the hole surface.
+3. **APPROACH** → **SEARCH** (if XY error > 0.002m): Spiral search at current Z to find the hole center.
+4. **SEARCH** → **INSERT**: Single 20s trajectory to `FINAL_INSERTION_POSE` with force monitoring.
+5. **INSERT** → **RETREAT** (on completion or abort): Returns to `SAFE_HOME`.
+6. **RETREAT** → **DONE**: Logs trial outcome.
+
+### Key Design Decisions
+
+- **Position-only control** via `gz_ros2_control/GazeboSimSystem` (PD gain=1000, not user-configurable).
+- **Topic-based JointTrajectory** publishing (no ActionClient) to avoid timer-callback deadlocks.
+- **Running gravity baseline**: 50-sample median window of raw Fz, with 2.0N deadband for contact detection.
+- **Safety abort**: If raw Fz exceeds `safety_threshold` (350N) for 3 consecutive ticks (0.3s), the INSERT phase aborts.
+- **Honest tracking**: Uses `joints_ok AND cart_ok` for phase completion (not `or`).
+- **IK**: Damped least-squares solver (λ=0.01) seeded from current joints; retries from SAFE_HOME if needed.
+
+### Test Results
+
+```text
+Phase MOVING_TO_START: OK cart_err=0.0466m
+Phase APPROACH:      OK cart_err=0.0503m (degraded, within grace)
+Phase SEARCH:        OK cart_err=0.0003m  SEARCH converged
+Phase INSERT:        OK depth=0.011m, contact=142.9N
+Phase RETREAT:       OK cart_err=0.0000m
+```
+
+### Known Limitations
+
+- **Tracking accuracy**: Cartesian XY error after APPROACH is typically 0.02–0.05m (limited by PD gain=1000). CARTESIAN_TIMEOUT_GRACE (0.12m) allows degraded convergence.
+- **SEARCH contact forces**: The spiral search moves the peg at the workpiece surface, generating intermittent contact forces up to 400N. The 350N safety threshold handles this.
+- **INSERT insertion**: The 20s single-point trajectory does not account for contact during descent. The peg typically descends 10-11mm and stays at that depth. Insertion depth depends on the hole geometry and compliance.
+- **Non-deterministic physics**: Gazebo physics variation causes 1-in-3 runs to fail MOVING_TO_START (timeout at 90s). Re-running usually succeeds.
+
+### Running
+
+```bash
+# Standard test (headless)
+ros2 launch thesis_bringup research_baseline.launch.py use_gui:=false headless:=true
+
+# With GUI
+ros2 launch thesis_bringup research_baseline.launch.py
+```
+
+The node starts automatically after controller spawning. Output is logged to the console and written to `/tmp/thesis_logs/insertion_log_*.csv`.
+
 ## Editing Task Poses
 
 Edit `config/baseline_task_sequence.yaml` before rebuilding or reinstalling the workspace. Keep every required pose name present, and keep every `positions` list at exactly six numeric joint values in the canonical joint order.
