@@ -1,0 +1,45 @@
+{
+  "trial_outcome": "ABORTED",
+  "reason": "Hard force abort: raw Fz 2990.8N exceeded 1000.0N in state SEARCH.",
+  "phases": [
+    {
+      "phase": "MOVING_TO_START",
+      "success": true,
+      "cart_error_m": 0.099716,
+      "joint_error_rad": 0.129379,
+      "timed_out": true,
+      "duration_s": 44.1,
+      "message": "degraded: no strict convergence after 44.1s; cart_err=0.100m"
+    },
+    {
+      "phase": "APPROACH",
+      "success": true,
+      "cart_error_m": 0.067995,
+      "joint_error_rad": 0.103353,
+      "timed_out": true,
+      "duration_s": 30.0,
+      "message": "degraded: no strict convergence after 30.0s; cart_err=0.068m"
+    },
+    {
+      "phase": "SEARCH",
+      "success": false,
+      "cart_error_m": 0.074228,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 3.0,
+      "message": "Hard force abort: raw Fz 2990.8N exceeded 1000.0N in state SEARCH."
+    }
+  ],
+  "metrics": {
+    "initial_xy_error_m": 0.0997,
+    "pre_insertion_xy_error_m": 0.0636,
+    "insertion_depth_m": 0.0,
+    "max_fz_N": 2990.77,
+    "baseline_fz_N": 16.76,
+    "max_contact_force_N": 2962.19,
+    "contact_threshold_N": 5.0,
+    "gravity_baseline_valid": true,
+    "baseline_window_samples": 50
+  },
+  "status": "DONE"
+}

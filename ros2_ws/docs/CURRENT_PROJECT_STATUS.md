@@ -85,6 +85,14 @@ This confirms the baseline is not robust. It also confirms that the high-force c
 
 ## Next Milestone
 
-`research_baseline_force_safe_insert_stabilization`
+`research_baseline_no_contact_alignment_before_descent`
 
-Reason: repeated runtime evidence shows INSERT produces unsafe force spikes and poor physical task completion. The next milestone should bound SEARCH duration, prevent INSERT unless XY and Z preconditions are stricter than the current degraded grace path, and replace the open-loop INSERT descent with smaller monitored steps that retreat or abort before large force spikes.
+Reason: force-safe insert stabilization blocked unsafe INSERT when peg Z was too high, but validation still failed. The latest 2026-06-01 force-safe validation (`diagnostics/research_baseline_force_safe_insert_v3`) showed:
+
+| Trial | Outcome | Reason |
+|---|---|---|
+| 1 | NO_OUTCOME | Hard-force abort in SEARCH at raw Fz 1164.3 N, then harness timeout before final JSON |
+| 2 | ABORTED | MOVING_TO_START timeout/degraded failure, max raw Fz 77.38 N |
+| 3 | ABORTED | Hard-force abort in SEARCH at raw Fz 2990.77 N |
+
+This means the next technical problem is not just INSERT. SEARCH/approach correction can generate unsafe force before insertion. The next milestone should move lateral alignment above the workpiece, verify no-contact XY convergence, then descend vertically only after XY is stable and peg Z reaches the force-safe precondition.

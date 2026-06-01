@@ -97,6 +97,7 @@ class AdmittanceInsertionNode(Node):
     TOUCH_POSE = np.array([0.520, -0.200, 0.830])
     HOLD_POSE = np.array([0.520, -0.200, 0.810])
     FINAL_INSERTION_POSE = np.array([0.520, -0.200, 0.790])
+    HOLE_TOP_Z = 0.810
 
     # Hole centre XY (used for alignment checks)
     HOLE_CENTRE_XY = np.array([0.520, -0.200])
@@ -119,17 +120,22 @@ class AdmittanceInsertionNode(Node):
     CARTESIAN_TIMEOUT_GRACE = 0.12  # proceed if below this on timeout
     STABILIZE_TICKS = 5
     TRAJECTORY_TIMEOUT_S = 90.0
+    ABORT_RETREAT_TIMEOUT_S = 20.0
     ABORT_SETTLE_TICKS = 3
 
     # Gravity baseline filter
     FZ_WINDOW_SIZE = 50
     FZ_DEADBAND = 2.0
     FZ_HIGH_PASS_THRESHOLD = 5.0
+    HARD_FORCE_ABORT_N = 1000.0
 
     # Search parameters
     SEARCH_RADIUS_INIT = 0.003
     SEARCH_RADIUS_MAX = 0.015
     SEARCH_STEPS = 8
+    SEARCH_TIMEOUT_S = 45.0
+    INSERT_PRECONDITION_XY_TOLERANCE = 0.015
+    INSERT_PRECONDITION_MAX_Z = 0.845
 
     def __init__(self) -> None:
         super().__init__('admittance_insertion_node')
@@ -219,6 +225,7 @@ class AdmittanceInsertionNode(Node):
         self._search_angle: float = 0.0
         self._search_radius: float = self.SEARCH_RADIUS_INIT
         self._search_step: int = 0
+        self._search_total_ticks: int = 0
 
         period = 1.0 / self._control_rate
         self._timer = self.create_timer(period, self._control_loop)
@@ -377,6 +384,33 @@ class AdmittanceInsertionNode(Node):
         self._state_pub.publish(state_msg)
 
         self._update_baseline()
+        if self._wrench_received:
+            fz = self._get_fz()
+            self._max_fz = max(self._max_fz, fz)
+            self._max_contact_force = max(
+                self._max_contact_force,
+                self._get_contact_force(),
+            )
+            if (
+                fz > self.HARD_FORCE_ABORT_N
+                and self._state not in (
+                    self.IDLE,
+                    self.RETREAT,
+                    self.ABORT,
+                    self.DONE,
+                )
+            ):
+                self._abort_reason = (
+                    f'Hard force abort: raw Fz {fz:.1f}N exceeded '
+                    f'{self.HARD_FORCE_ABORT_N:.1f}N in state {self._state}.'
+                )
+                self.get_logger().error(self._abort_reason)
+                if self._current_phase_result is not None:
+                    peg, _ = self._kinematics.pose(self.current_joints)
+                    xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
+                    self._end_phase(False, xy_err, 0.0, False, self._abort_reason)
+                self._set_state(self.ABORT)
+                return
 
         if self._state == self.IDLE:
             self._handle_idle()
@@ -456,7 +490,12 @@ class AdmittanceInsertionNode(Node):
             )
 
         elapsed = self._state_entry_ticks / self._control_rate
-        timed_out = elapsed >= self.TRAJECTORY_TIMEOUT_S
+        timeout_s = (
+            self.ABORT_RETREAT_TIMEOUT_S
+            if self._state == self.ABORT
+            else self.TRAJECTORY_TIMEOUT_S
+        )
+        timed_out = elapsed >= timeout_s
         degraded_ready = (
             elapsed >= self._move_to_start_duration_s + 15.0
             and elapsed >= 20.0
@@ -639,8 +678,11 @@ class AdmittanceInsertionNode(Node):
             self._set_state(self.SEARCH)
             return
 
-        self._begin_phase(self.INSERT)
         self._insert_start_z = current_pos[2]
+        if not self._insert_preconditions_ok(current_pos):
+            self._set_state(self.ABORT)
+            return
+        self._begin_phase(self.INSERT)
         self._progress = 0.0
         self._set_state(self.INSERT)
 
@@ -648,6 +690,34 @@ class AdmittanceInsertionNode(Node):
 
     def _handle_search(self) -> None:
         if not self._joints_received:
+            return
+
+        self._search_total_ticks += 1
+        elapsed = self._search_total_ticks / self._control_rate
+        fz = self._get_fz()
+        contact_force = self._get_contact_force()
+        if self._check_abort(fz):
+            self._abort_reason = (
+                f'SEARCH aborted because Fz ({fz:.1f} N, contact '
+                f'{contact_force:.1f} N) exceeded safety threshold '
+                f'({self._safety_threshold:.1f} N).'
+            )
+            self.get_logger().warn(self._abort_reason)
+            peg, _ = self._kinematics.pose(self.current_joints)
+            xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
+            self._end_phase(False, xy_err, 0.0, False, self._abort_reason)
+            self._set_state(self.ABORT)
+            return
+        if elapsed >= self.SEARCH_TIMEOUT_S:
+            peg, _ = self._kinematics.pose(self.current_joints)
+            xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
+            self._abort_reason = (
+                f'SEARCH timeout ({self.SEARCH_TIMEOUT_S:.0f}s). '
+                f'XY error {xy_err:.4f}m remains above tolerance.'
+            )
+            self.get_logger().error(self._abort_reason)
+            self._end_phase(False, xy_err, 0.0, True, self._abort_reason)
+            self._set_state(self.ABORT)
             return
 
         n_steps = self.SEARCH_STEPS
@@ -664,6 +734,9 @@ class AdmittanceInsertionNode(Node):
                 )
                 self._end_phase(True, xy_err, 0.0, False, 'SEARCH converged')
                 self._pre_insertion_xy_error = xy_err
+                if not self._insert_preconditions_ok(peg):
+                    self._set_state(self.ABORT)
+                    return
                 self._insert_start_z = peg[2]
                 self._progress = 0.0
                 self._begin_phase(self.INSERT)
@@ -725,6 +798,39 @@ class AdmittanceInsertionNode(Node):
 
     # --- INSERT -------------------------------------------------------------
 
+    def _physical_insertion_depth(self, peg_z: float) -> float:
+        """Depth below the hole top, not just relative downward motion."""
+        return max(0.0, self.HOLE_TOP_Z - peg_z)
+
+    def _insert_preconditions_ok(self, peg: np.ndarray) -> bool:
+        xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
+        if xy_err > self.INSERT_PRECONDITION_XY_TOLERANCE:
+            self._abort_reason = (
+                f'INSERT blocked: XY error {xy_err:.4f}m exceeds force-safe '
+                f'precondition {self.INSERT_PRECONDITION_XY_TOLERANCE:.4f}m.'
+            )
+            self.get_logger().error(self._abort_reason)
+            self._end_phase(False, xy_err, 0.0, False, self._abort_reason)
+            return False
+        if peg[2] > self.INSERT_PRECONDITION_MAX_Z:
+            self._abort_reason = (
+                f'INSERT blocked: peg_z {peg[2]:.4f}m is above force-safe '
+                f'precondition {self.INSERT_PRECONDITION_MAX_Z:.4f}m. '
+                f'Approach did not reach the hole surface reliably.'
+            )
+            self.get_logger().error(self._abort_reason)
+            self._end_phase(False, xy_err, 0.0, False, self._abort_reason)
+            return False
+        if self._get_fz() > self._safety_threshold:
+            self._abort_reason = (
+                f'INSERT blocked: current Fz {self._get_fz():.1f}N exceeds '
+                f'safety threshold {self._safety_threshold:.1f}N.'
+            )
+            self.get_logger().error(self._abort_reason)
+            self._end_phase(False, xy_err, 0.0, False, self._abort_reason)
+            return False
+        return True
+
     def _handle_insert(self) -> None:
         self._state_entry_ticks += 1
         contact_force = self._get_contact_force()
@@ -734,8 +840,20 @@ class AdmittanceInsertionNode(Node):
 
         force_active = self._state_entry_ticks >= 5
         peg, _ = self._kinematics.pose(self.current_joints)
-        current_depth = max(0.0, self._insert_start_z - peg[2])
+        current_depth = self._physical_insertion_depth(peg[2])
         self._insertion_depth_m = max(self._insertion_depth_m, current_depth)
+        xy_error = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
+
+        if xy_error > self.INSERT_PRECONDITION_XY_TOLERANCE:
+            self._abort_reason = (
+                f'INSERT aborted: XY error {xy_error:.4f}m exceeded force-safe '
+                f'limit {self.INSERT_PRECONDITION_XY_TOLERANCE:.4f}m '
+                f'at physical depth {current_depth:.4f}m.'
+            )
+            self.get_logger().warn(self._abort_reason)
+            self._end_phase(False, xy_error, 0.0, False, self._abort_reason)
+            self._set_state(self.ABORT)
+            return
 
         # --- SAFETY: abort on excessive force ---
         if force_active and self._check_abort(fz):
@@ -782,16 +900,16 @@ class AdmittanceInsertionNode(Node):
         if self._state_entry_ticks % 10 == 0:
             self.get_logger().info(
                 f'INSERT t={self._state_entry_ticks / self._control_rate:.1f}s  '
-                f'peg_z={peg[2]:.4f}  depth={current_depth:.4f}m  '
+                f'peg_z={peg[2]:.4f}  physical_depth={current_depth:.4f}m  '
                 f'Fz={fz:.1f}N  baseline={self._baseline_fz:.1f}N  '
                 f'contact={contact_force:.1f}N  '
-                f'xy_error={np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY):.4f}m'
+                f'xy_error={xy_error:.4f}m'
             )
 
         # --- Check completion: wait for trajectory to finish then evaluate ---
         settle_ticks = int(self._insert_traj_dur * self._control_rate) + 30
         if self._state_entry_ticks >= settle_ticks:
-            final_depth = max(0.0, self._insert_start_z - peg[2])
+            final_depth = self._physical_insertion_depth(peg[2])
             self._insertion_depth_m = final_depth
             self.get_logger().info(
                 f'INSERT done (trajectory elapsed).  '
@@ -865,7 +983,7 @@ class AdmittanceInsertionNode(Node):
         retreat_ok = joints_ok or not timed_out
         if not retreat_ok:
             self.get_logger().warn(
-                f'RETREAT timeout. joints not at SAFE_HOME.'
+                f'RETREAT timeout after {timeout_s:.0f}s. joints not at SAFE_HOME.'
             )
 
         self._end_phase(retreat_ok, 0.0, 0.0, timed_out)

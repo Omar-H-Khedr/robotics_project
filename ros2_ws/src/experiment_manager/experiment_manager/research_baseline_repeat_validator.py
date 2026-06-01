@@ -43,6 +43,13 @@ def _failed_phase(outcome: dict[str, Any]) -> str:
     for phase in outcome.get("phases", []):
         if isinstance(phase, dict) and not bool(phase.get("success", False)):
             return str(phase.get("phase", "unknown"))
+    reason = str(outcome.get("reason", "")).lower()
+    if reason.startswith("insert blocked"):
+        return "INSERT_PRECONDITION"
+    if "insert" in reason:
+        return "INSERT"
+    if "search" in reason:
+        return "SEARCH"
     return ""
 
 

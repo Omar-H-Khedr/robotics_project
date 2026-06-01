@@ -75,6 +75,6 @@ Robust success requires repeated validation with a documented success rate and f
 
 ## Next Technical Milestone
 
-`research_baseline_force_safe_insert_stabilization`
+`research_baseline_no_contact_alignment_before_descent`
 
-Reason: the project cannot honestly advance to learning or final safety claims until insertion is made force-safe and repeatable. The next milestone must bound SEARCH duration, tighten INSERT preconditions, and replace open-loop INSERT descent with monitored incremental motion that aborts before large force spikes.
+Reason: force-safe insert stabilization prevented some unsafe INSERT attempts, corrected the insertion-depth metric, and added a hard force abort. Validation still failed because unsafe raw force spikes now appear during SEARCH/approach correction before INSERT. The next milestone must perform lateral alignment above the workpiece, prove no-contact XY convergence, and only then descend toward the hole.

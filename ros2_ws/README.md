@@ -250,6 +250,30 @@ Result: `0/3` physical successes.
 
 Current conclusion: the baseline is not robust. The next technical milestone is force-safe insertion stabilization: reduce search/insert contact spikes, prevent unsafe descents when XY tracking is poor, and make SEARCH bounded by explicit timeout/outcome criteria.
 
+### 2026-06-01 Force-Safe Insert Stabilization Result
+
+Implemented after the failed repeat run:
+
+- Physical insertion depth is now measured as depth below the hole top (`hole_top_z - peg_z`), not merely relative downward motion.
+- INSERT is blocked unless XY error is below `0.015 m`, peg tip Z is at or below `0.845 m`, and force is below the safety threshold.
+- SEARCH has a bounded timeout.
+- Raw Fz above `1000 N` now triggers a hard global abort outside INSERT as well.
+- ABORT retreat timeout is shortened so failures can be logged promptly.
+
+Validation command:
+
+```bash
+ros2 run experiment_manager research_baseline_repeat_validator --trials 3 --timeout-s 130 --output-dir diagnostics/research_baseline_force_safe_insert_v3
+```
+
+Result: `0/3` physical successes. The controller is safer about not entering INSERT when the peg is too high, but the baseline remains failed:
+
+- Trial 1: hard-force abort in SEARCH at raw Fz `1164.3 N`; no final outcome JSON before harness timeout.
+- Trial 2: MOVING_TO_START timeout/degraded failure, max raw Fz `77.38 N`.
+- Trial 3: hard-force abort in SEARCH at raw Fz `2990.77 N`, final `ABORTED`.
+
+Current conclusion: high force is not only an INSERT problem; SEARCH/approach correction can generate unsafe contact before insertion. The next milestone is to replace surface-level SEARCH with a no-contact XY alignment strategy above the workpiece, then descend only after XY alignment is stable.
+
 ### Files changed
 
 - `kuka_task_control/kuka_task_control/admittance_insertion_node.py` — Complete rewrite of the state machine with honest tracking, running gravity baseline, multi-point trajectories, SEARCH phase, and comprehensive outcome logging.
