@@ -1,6 +1,16 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="lbr_iisy3_r760_research_gripper">
-  <xacro:include filename="$(find kuka_lbr_iisy_support)/urdf/lbr_iisy3_r760_macro.xacro"/>
+<!--
+  Research baseline URDF for KUKA LBR iisy 6 R1300 (proxied by iisy11 R1300).
+
+  UPSTREAM NOTE: The upstream kuka_lbr_iisy_support package does not include
+  a dedicated lbr_iisy6_r1300 macro. The lbr_iisy11_r1300 shares the same
+  1300 mm reach, 6-axis kinematic chain, and 275×275 mm base footprint.
+  The only specification difference is rated payload (11 kg vs 6 kg), which
+  does not affect simulation kinematics or dynamics for this task.
+  See docs/ROBOT_DATASHEET_CHECK.md for the full datasheet comparison.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="lbr_iisy11_r1300_research_gripper">
+  <xacro:include filename="$(find kuka_lbr_iisy_support)/urdf/lbr_iisy11_r1300_macro.xacro"/>
   <xacro:include filename="$(find kuka_lbr_iisy_support)/urdf/lbr_iisy_ros2_control_macro.xacro"/>
   <xacro:include filename="research_parallel_gripper.xacro"/>
 
@@ -29,7 +39,7 @@
   <xacro:arg name="initial_joint_6" default="0.0"/>
   <xacro:arg name="include_camera" default="true"/>
 
-  <xacro:kuka_lbr_iisy_ros2_control name="$(arg prefix)lbr_iisy3_r760"
+  <xacro:kuka_lbr_iisy_ros2_control name="$(arg prefix)lbr_iisy11_r1300"
     driver_version="$(arg driver_version)"
     client_ip="$(arg client_ip)"
     client_port="$(arg client_port)"
@@ -52,7 +62,7 @@
 
   <link name="world"/>
 
-  <xacro:kuka_lbr_iisy3_r760_robot prefix="$(arg prefix)" package_name="kuka_lbr_iisy_support"/>
+  <xacro:kuka_lbr_iisy11_r1300_robot prefix="$(arg prefix)" package_name="kuka_lbr_iisy_support"/>
   <xacro:research_parallel_gripper prefix="$(arg prefix)" parent_link="$(arg prefix)flange" tcp_frame="gripper_tcp" has_peg="true"/>
 
   <!-- World-fixed D405 camera frame (TF only; sensor simulation is in peg_in_hole_world.sdf). -->

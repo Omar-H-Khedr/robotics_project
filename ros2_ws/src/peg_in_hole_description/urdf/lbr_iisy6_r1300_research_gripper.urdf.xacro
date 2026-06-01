@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="lbr_iisy3_r760_research_gripper">
-  <xacro:include filename="$(find kuka_lbr_iisy_support)/urdf/lbr_iisy3_r760_macro.xacro"/>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="lbr_iisy6_r1300_research_gripper">
+  <xacro:include filename="$(find kuka_lbr_iisy_support)/urdf/lbr_iisy6_r1300_macro.xacro"/>
   <xacro:include filename="$(find kuka_lbr_iisy_support)/urdf/lbr_iisy_ros2_control_macro.xacro"/>
   <xacro:include filename="research_parallel_gripper.xacro"/>
 
@@ -29,7 +29,7 @@
   <xacro:arg name="initial_joint_6" default="0.0"/>
   <xacro:arg name="include_camera" default="true"/>
 
-  <xacro:kuka_lbr_iisy_ros2_control name="$(arg prefix)lbr_iisy3_r760"
+  <xacro:kuka_lbr_iisy_ros2_control name="$(arg prefix)lbr_iisy6_r1300"
     driver_version="$(arg driver_version)"
     client_ip="$(arg client_ip)"
     client_port="$(arg client_port)"
@@ -52,10 +52,34 @@
 
   <link name="world"/>
 
-  <xacro:kuka_lbr_iisy3_r760_robot prefix="$(arg prefix)" package_name="kuka_lbr_iisy_support"/>
-  <xacro:research_parallel_gripper prefix="$(arg prefix)" parent_link="$(arg prefix)flange" tcp_frame="gripper_tcp" has_peg="true"/>
+  <xacro:kuka_lbr_iisy6_r1300_robot prefix="$(arg prefix)" package_name="kuka_lbr_iisy_support"/>
 
-  <!-- World-fixed D405 camera frame (TF only; sensor simulation is in peg_in_hole_world.sdf). -->
+  <!-- FT sensor between flange and gripper -->
+  <link name="$(arg prefix)ft_sensor_link">
+    <visual>
+      <geometry><cylinder radius="0.025" length="0.01"/></geometry>
+      <material name="dark_gray"><color rgba="0.3 0.3 0.3 1"/></material>
+    </visual>
+    <collision>
+      <geometry><cylinder radius="0.025" length="0.01"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.00002" ixy="0" ixz="0" iyy="0.00002" iyz="0" izz="0.00003"/>
+    </inertial>
+  </link>
+  <joint name="$(arg prefix)ft_sensor_joint" type="revolute">
+    <parent link="$(arg prefix)flange"/>
+    <child link="$(arg prefix)ft_sensor_link"/>
+    <origin xyz="0 0 0.005" rpy="0 0 0"/>
+    <limit effort="1" lower="0" upper="0" velocity="0"/>
+    <axis xyz="1 0 0"/>
+    <dynamics damping="1" friction="0"/>
+  </joint>
+
+  <xacro:research_parallel_gripper prefix="$(arg prefix)" parent_link="$(arg prefix)ft_sensor_link" tcp_frame="gripper_tcp" has_peg="true"/>
+
   <xacro:if value="$(arg include_camera)">
     <link name="d405_camera_link">
       <visual>

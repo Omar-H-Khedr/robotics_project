@@ -40,6 +40,161 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v2_14_context_conditioned_guarded_action_validation | Completed |
 | proposal_simulation_cell_v2_15_context_action_ablation_validation | Completed |
 | proposal_simulation_cell_v2_16_guarded_peg_in_hole_objective_validation | Completed |
+| research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes | Completed |
+| research_baseline_v0_2_camera_visual_size_fix | Completed |
+
+## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
+
+Status: `end_to_end_motion_validated`
+
+The research baseline v0.1 sprint fixes three critical issues in the Phase 2B unified research baseline and validates end-to-end Gazebo motion with the correct KUKA LBR iisy 6 R1300 robot model.
+
+### Three Fixes
+
+**Fix 1 — Correct robot model: lbr_iisy3_r760 → lbr_iisy6_r1300**
+The baseline was configured for the wrong KUKA model (3 kg payload, shorter reach). Switched to the correct 6 kg model in:
+- `thesis_bringup/config/research_baseline.yaml`: `robot_name` → `KUKA LBR iisy 6 R1300`
+- `thesis_bringup/launch/research_baseline.launch.py`: `RESEARCH_ROBOT_XACRO` → `lbr_iisy6_r1300_research_gripper.urdf.xacro`, `robot_model` default → `lbr_iisy6_r1300`
+- Added new URDF xacro: `peg_in_hole_description/urdf/lbr_iisy6_r1300_research_gripper.urdf.xacro`
+
+**Fix 2 — Corrected robot spawn position and initial joint injection**
+Previously used `ros_gz_sim create` with no way to pass initial joint positions. Replaced with custom `spawn_robot_sdf` node that processes the xacro with `initial_joint_N` arguments, baking in the SAFE_HOME pose at spawn time. Also:
+- Spawn z adjusted from `0.75` → `0.735` to match the pedestal top_plate surface
+- Cartesian target heights in `kuka_task_control/config/peg_hole_cartesian_targets.yaml` lowered by −0.035 m to compensate
+
+**Fix 3 — Sequential launch ordering with event handlers**
+All nodes previously launched simultaneously, causing controller spawners to fail because the controller manager was not ready. Changed to ordered launch:
+1. `spawn_robot` → on exit → `joint_state_broadcaster` → on exit → `joint_trajectory_controller` → on exit → `admittance_insertion_node`
+2. Added FT sensor bridge (`ft_sensor_bridge.yaml`), `data_logger_node`, and `admittance_insertion_node` to the launch
+3. Added `--controller-manager-timeout 60 --switch-timeout 30` to spawners
+
+### Exact Test Commands
+
+Headless validation (120 s timeout):
+```
+cd /home/omar/code/robotics_project/ros2_ws
+source /opt/ros/jazzy/setup.bash
+source install/setup.bash
+ros2 launch thesis_bringup research_baseline.launch.py headless:=true timeout_seconds:=120 2>&1 | tee /tmp/launch_run.log
+```
+
+Visible GUI test:
+```
+ros2 launch thesis_bringup research_baseline.launch.py
+```
+
+Command motion (second terminal):
+```
+ros2 launch kuka_task_control baseline_trajectory.launch.py
+```
+
+### Controller Status
+
+```
+joint_trajectory_controller  joint_trajectory_controller/JointTrajectoryController  active
+joint_state_broadcaster      joint_state_broadcaster/JointStateBroadcaster          active
+```
+
+Both controllers were loaded, configured, and activated successfully.
+
+### Initial Joint Position Evidence
+
+Hardware interface confirmed SAFE_HOME pose at startup:
+```
+joint_1:  0.000000  (SAFE_HOME:  0.0)
+joint_2: -0.799989  (SAFE_HOME: -0.8) ✓
+joint_3:  1.200006  (SAFE_HOME:  1.2) ✓
+joint_4:  0.000003  (SAFE_HOME:  0.0)
+joint_5:  0.799983  (SAFE_HOME:  0.8) ✓
+joint_6:  0.000002  (SAFE_HOME:  0.0)
+```
+
+### Motion Evidence
+
+The admittance insertion node transitioned `IDLE → MOVING_TO_START` and sent a trajectory goal to the controller. The controller received and executed it:
+
+```
+[joint_trajectory_controller]: Received new action goal
+[joint_trajectory_controller]: Accepted new action goal
+[joint_trajectory_controller]: Goal reached, success!
+[joint_trajectory_controller]: Received new action goal  (second phase)
+[joint_trajectory_controller]: Accepted new action goal
+```
+
+Joint positions changed from SAFE_HOME to:
+```
+Initial: [0.000, -0.800, 1.200, 0.000, 0.800, 0.000]
+Final:   [-0.052, -0.298, 0.841, 0.009, 0.800, 0.044]
+```
+
+The robot moved from the SAFE_HOME posture towards the task start pose.
+
+### Known Limitations
+
+1. **Task did not progress beyond MOVING_TO_START** — The admittance node stayed in MOVING_TO_START for the full 120 s test. The trajectory executed and completed ("Goal reached, success!"), but the automaton did not detect contact or transition to MOVING_TO_CONTACT/INSERTION. The second goal was also accepted.
+2. **Data logger records NaN for velocity** — The Gazebo joint state bridge does not publish velocity data, so the data logger CSV shows `nan` in velocity columns.
+3. **Robot model not in `kuka_robot_descriptions`** — The `lbr_iisy6_r1300_research_gripper.urdf.xacro` is a project-specific variant; the base meshes come from the external submodule.
+4. **Package not found in subshell** — Running `baseline_trajectory.launch.py` from a clean terminal requires sourcing the workspace first.
+
+### Next Milestone
+
+`proposal_simulation_cell_v2_17_contact_gated_moving_to_start_transition`
+
+- Why the admittance node stays in MOVING_TO_START after trajectory completion
+- Debug the contact detection threshold (5.0 N) vs. observed contact wrench (~2.7 N, below threshold)
+- Verify the FT sensor bridge remapping from `/world/peg_in_hole_world/model/lbr_iisy6_r1300/joint/ft_sensor_joint/sensor/ft_sensor/forcetorque` → `/ft_sensor_wrench`
+- Confirm the automaton state machine logic checks for contact after trajectory complete
+
+## research_baseline_v0_2_camera_visual_size_fix
+
+Status: `camera_visual_size_fixed`
+
+The research baseline v0.2 fix reduces the D405 RGB-D camera visual body to a realistic small external camera size.
+
+### Fix — Camera body box size reduced
+
+The camera visual geometry was a 40 mm × 40 mm × 25 mm dark-gray box that appeared too large relative to the robot and workspace. Reduced to 30 mm × 25 mm × 20 mm.
+
+**Files changed:**
+- `peg_in_hole_description/worlds/peg_in_hole_world.sdf:117` — SDF world model box size (the actual Gazebo model)
+- `peg_in_hole_description/urdf/lbr_iisy6_r1300_research_gripper.urdf.xacro:86` — URDF xacro box size (disabled via `include_camera:=false` in the research baseline)
+- `peg_in_hole_description/urdf/lbr_iisy3_r760_research_gripper.urdf.xacro` — same fix for consistency
+- `peg_in_hole_description/urdf/lbr_iisy11_r1300_research_gripper.urdf.xacro` — same fix for consistency
+
+**New approximate camera dimensions:**
+- width: 0.030 m (30 mm)
+- depth: 0.025 m (25 mm)
+- height: 0.020 m (20 mm)
+
+**Camera placement unchanged:**
+- Pose: `0.42 -0.55 1.18 0.95 0 0.35` — outside robot workspace, no collision
+- Orientation: roll=0.95 rad, yaw=0.35 rad — still points toward the peg-hole workspace
+
+**Not changed:**
+- Robot model, joints, initial joint positions, controllers, baseline trajectory, Gazebo spawn logic
+- Table, peg, hole, fixture, or workspace dimensions
+- Camera sensor parameters (resolution, FOV, clip range, topics)
+- Active camera sensor disabled state for WSL/Gazebo stability (remains disabled in URDF, enabled in SDF world model)
+
+### Exact Test Commands
+
+Same as research baseline:
+```
+cd /home/omar/code/robotics_project/ros2_ws
+source /opt/ros/jazzy/setup.bash
+source install/setup.bash
+ros2 launch thesis_bringup research_baseline.launch.py
+```
+
+### Verification
+
+Launch completed successfully:
+- Gazebo loaded the world with the smaller camera model
+- Robot spawned correctly at the pedestal mount pose
+- Controllers loaded and activated: `joint_state_broadcaster`, `joint_trajectory_controller`
+- Camera sensors publishing: `/d405/color/image_raw`, `/d405/depth/image_rect_raw`
+- Admittance insertion node transitioned `IDLE → MOVING_TO_START`
+- No collision issues observed
 
 ## proposal_simulation_cell_v2_16_guarded_peg_in_hole_objective_validation
 

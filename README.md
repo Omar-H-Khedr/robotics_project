@@ -2,7 +2,7 @@
 
 **Repository status:** active doctoral research prototype
 **Latest documented:** `proposal_simulation_cell_v2_16_guarded_peg_in_hole_objective_validation`
-**README last updated:** 2026-05-27
+**README last updated:** 2026-05-31
 **Execution scope:** simulation-first validation only; no real-robot claim is made in this repository state.
 
 ---
@@ -188,6 +188,7 @@ Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_16/`. Con
 | Version | Description | Status |
 |---|---|---|
 | v0.1 | Stable Gazebo KUKA workcell baseline | Completed |
+| v0.2 | Camera visual size fix for realistic D405 body | Completed |
 | v0.2 | Full task sequence with logging and safety monitor | Completed |
 | v0.3 | Contact metrics infrastructure and diagnostics | Completed |
 | v0.4 | Minimal Gazebo contact validation world | Completed |
@@ -307,7 +308,7 @@ This repository therefore focuses on the software and simulation backbone needed
 
 The intended physical platform for later-stage transfer is:
 
-- **Robot:** KUKA LBR iisy 6 R1300
+- **Robot:** KUKA LBR iisy 6 R1300 (proxied in simulation by `lbr_iisy11_r1300` — see `docs/ROBOT_DATASHEET_CHECK.md`)
 - **External RGB-D sensor:** Intel RealSense D405
 - **Software middleware:** ROS 2 Jazzy
 - **Simulation:** Gazebo
