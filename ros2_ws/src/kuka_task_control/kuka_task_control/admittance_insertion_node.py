@@ -165,6 +165,8 @@ class AdmittanceInsertionNode(Node):
         # Action client for FollowJointTrajectory
         self._insert_joints: np.ndarray | None = None
         self._touch_joints: np.ndarray | None = None
+        self._move_to_start_duration_s: float = 0.0
+        self._approach_duration_s: float = 0.0
         self._insert_start_z: float = 0.0
         self._start_ticks: int = -1
         self._retreat_sent: bool = False
@@ -449,10 +451,16 @@ class AdmittanceInsertionNode(Node):
                 self._set_state(self.ABORT)
                 return
             self._insert_joints = q
-            self._send_trajectory_to_target(q, 'MOVING_TO_START')
+            self._move_to_start_duration_s = self._send_trajectory_to_target(
+                q, 'MOVING_TO_START'
+            )
 
         elapsed = self._state_entry_ticks / self._control_rate
         timed_out = elapsed >= self.TRAJECTORY_TIMEOUT_S
+        degraded_ready = (
+            elapsed >= self._move_to_start_duration_s + 15.0
+            and elapsed >= 20.0
+        )
         peg, _ = self._kinematics.pose(self.current_joints)
         cart_err = np.linalg.norm(peg - self.AXIS_ALIGN_POSE)
         joints_ok = bool(
@@ -472,23 +480,33 @@ class AdmittanceInsertionNode(Node):
                 f'stable={self._stable_counter}/{self.STABILIZE_TICKS}'
             )
 
-        if not stabilized and not timed_out:
+        if (
+            not stabilized
+            and not timed_out
+            and not (degraded_ready and cart_err < self.CARTESIAN_TIMEOUT_GRACE)
+        ):
             self._state_entry_ticks += 1
             return
 
         joint_err = np.max(np.abs(self.current_joints - self._insert_joints))
 
-        if timed_out and not stabilized:
+        phase_timed_out = False
+        phase_message = ''
+        if not stabilized:
             if cart_err < self.CARTESIAN_TIMEOUT_GRACE:
-                self.get_logger().warn(
-                    f'MOVING_TO_START degraded (timeout at {cart_err:.3f}m, '
-                    f'within grace {self.CARTESIAN_TIMEOUT_GRACE:.2f}m). Proceeding.'
+                phase_timed_out = True
+                phase_message = (
+                    f'degraded: no strict convergence after {elapsed:.1f}s; '
+                    f'cart_err={cart_err:.3f}m'
                 )
-                self._end_phase(True, cart_err, joint_err, True,
-                                f'degraded: timeout at {cart_err:.3f}m')
+                self.get_logger().warn(
+                    f'MOVING_TO_START degraded ({elapsed:.1f}s at '
+                    f'{cart_err:.3f}m, within grace '
+                    f'{self.CARTESIAN_TIMEOUT_GRACE:.2f}m). Proceeding.'
+                )
             else:
                 self._abort_reason = (
-                    f'MOVING_TO_START timeout ({self.TRAJECTORY_TIMEOUT_S:.0f}s). '
+                    f'MOVING_TO_START timeout/degraded failure ({elapsed:.1f}s). '
                     f'cart_err={cart_err:.3f}m, joint_err={joint_err:.3f}rad, '
                     f'tolerance={self.CARTESIAN_TOLERANCE:.3f}m'
                 )
@@ -506,7 +524,7 @@ class AdmittanceInsertionNode(Node):
             f'Fz={self._get_fz():.1f}N  '
             f'baseline={self._baseline_fz:.1f}N'
         )
-        self._end_phase(True, cart_err, joint_err, False)
+        self._end_phase(True, cart_err, joint_err, phase_timed_out, phase_message)
         self._begin_phase(self.APPROACH)
         self._set_state(self.APPROACH)
 
@@ -531,10 +549,14 @@ class AdmittanceInsertionNode(Node):
                 f'predicted_pose=({q_predicted_pose[0]:.4f}, '
                 f'{q_predicted_pose[1]:.4f}, {q_predicted_pose[2]:.4f})'
             )
-            self._send_trajectory_to_target(q, 'APPROACH')
+            self._approach_duration_s = self._send_trajectory_to_target(q, 'APPROACH')
 
         elapsed = self._state_entry_ticks / self._control_rate
         timed_out = elapsed >= self.TRAJECTORY_TIMEOUT_S
+        degraded_ready = (
+            elapsed >= self._approach_duration_s + 15.0
+            and elapsed >= 20.0
+        )
         peg, _ = self._kinematics.pose(self.current_joints)
         cart_err = np.linalg.norm(peg - self.TOUCH_POSE)
         z_err = abs(peg[2] - self.TOUCH_POSE[2])
@@ -556,23 +578,32 @@ class AdmittanceInsertionNode(Node):
                 f'stable={self._stable_counter}/{self.STABILIZE_TICKS}'
             )
 
-        if not stabilized and not timed_out:
+        if (
+            not stabilized
+            and not timed_out
+            and not (degraded_ready and cart_err < self.CARTESIAN_TIMEOUT_GRACE)
+        ):
             self._state_entry_ticks += 1
             return
 
         joint_err = np.max(np.abs(self.current_joints - self._touch_joints))
 
-        if timed_out and not stabilized:
+        phase_timed_out = False
+        phase_message = ''
+        if not stabilized:
             if cart_err < self.CARTESIAN_TIMEOUT_GRACE:
+                phase_timed_out = True
+                phase_message = (
+                    f'degraded: no strict convergence after {elapsed:.1f}s; '
+                    f'cart_err={cart_err:.3f}m'
+                )
                 self.get_logger().warn(
-                    f'APPROACH degraded (timeout at {cart_err:.3f}m, '
+                    f'APPROACH degraded ({elapsed:.1f}s at {cart_err:.3f}m, '
                     f'within grace {self.CARTESIAN_TIMEOUT_GRACE:.2f}m). Proceeding.'
                 )
-                self._end_phase(True, cart_err, joint_err, True,
-                                f'degraded: timeout at {cart_err:.3f}m')
             else:
                 self._abort_reason = (
-                    f'APPROACH timeout ({self.TRAJECTORY_TIMEOUT_S:.0f}s). '
+                    f'APPROACH timeout/degraded failure ({elapsed:.1f}s). '
                     f'cart_err={cart_err:.3f}m, joint_err={joint_err:.3f}rad, '
                     f'tolerance={self.CARTESIAN_TOLERANCE:.3f}m'
                 )
@@ -592,7 +623,7 @@ class AdmittanceInsertionNode(Node):
             f'cart_err={cart_err:.3f}m  joint_err={joint_err:.3f}rad  '
             f'Fz={self._get_fz():.1f}N  baseline={self._baseline_fz:.1f}N'
         )
-        self._end_phase(True, cart_err, joint_err, False)
+        self._end_phase(True, cart_err, joint_err, phase_timed_out, phase_message)
         self._touch_joints = None
 
         # Check XY alignment before insertion
@@ -948,7 +979,8 @@ def main(args=None) -> None:
         node.get_logger().info('Keyboard interrupt - shutting down.')
     finally:
         node.destroy_node()
-        rclpy.shutdown()
+        if rclpy.ok():
+            rclpy.shutdown()
 
 
 if __name__ == '__main__':

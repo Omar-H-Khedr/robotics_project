@@ -111,7 +111,7 @@ Expected behavior:
 
 ## Phase 2B: Admittance Insertion Controller (v2)
 
-`admittance_insertion_node` is the v2 task-level controller that autonomously performs peg-in-hole insertion using position-only control with force monitoring. It replaces the old action-client approach with topic-based trajectory publishing to avoid deadlocks.
+`admittance_insertion_node` is the v2 task-level controller for simulated peg-in-hole insertion using position-only control with force monitoring. It replaces the old action-client approach with topic-based trajectory publishing to avoid deadlocks. Current evidence supports one simulated insertion-depth event, not a final robustness claim.
 
 ### State Machine
 
@@ -131,7 +131,7 @@ Expected behavior:
 - **Honest tracking**: Uses `joints_ok AND cart_ok` for phase completion (not `or`).
 - **IK**: Damped least-squares solver (λ=0.01) seeded from current joints; retries from SAFE_HOME if needed.
 
-### Test Results
+### Current Runtime Evidence
 
 ```text
 Phase MOVING_TO_START: OK cart_err=0.0466m
@@ -141,12 +141,16 @@ Phase INSERT:        OK depth=0.011m, contact=142.9N
 Phase RETREAT:       OK cart_err=0.0000m
 ```
 
+This should be described as a first simulated insertion event with measured insertion depth. It is not yet robust autonomous peg-in-hole success because repeated validation is still pending and prior runs show non-determinism.
+
 ### Known Limitations
 
 - **Tracking accuracy**: Cartesian XY error after APPROACH is typically 0.02–0.05m (limited by PD gain=1000). CARTESIAN_TIMEOUT_GRACE (0.12m) allows degraded convergence.
 - **SEARCH contact forces**: The spiral search moves the peg at the workpiece surface, generating intermittent contact forces up to 400N. The 350N safety threshold handles this.
 - **INSERT insertion**: The 20s single-point trajectory does not account for contact during descent. The peg typically descends 10-11mm and stays at that depth. Insertion depth depends on the hole geometry and compliance.
 - **Non-deterministic physics**: Gazebo physics variation causes 1-in-3 runs to fail MOVING_TO_START (timeout at 90s). Re-running usually succeeds.
+- **High force spikes**: At least one run has shown a peak raw Fz spike around 1049N. Sustained contact during the insertion-depth event was much lower, but the spike is not acceptable for a final safety claim.
+- **Repeat validation required**: Use `ros2 run experiment_manager research_baseline_repeat_validator --trials 3 --timeout-s 150` after rebuilding to collect per-trial outcome, force, timeout, and Cartesian-error evidence.
 
 ### Running
 

@@ -1,0 +1,4 @@
+trial,final_state,trial_outcome,success,failed_phase,insertion_depth_m,peak_raw_fz_N,sustained_contact_force_N,max_cartesian_error_m,timeout,safety_abort,return_code,elapsed_s,reason,log_path
+1,DONE,DEGRADED,False,INSERT,0.0037,1237.45,1142.44,0.111812,True,False,-15,215.05,Phase(s) failed: INSERT,diagnostics/research_baseline_repeat_validation_v2/trial_01.log
+2,DONE,ABORTED,False,INSERT,0.0367,3716.2,3682.56,0.117422,True,True,0,165.77,"Fz (449.5 N, contact 417.7 N) exceeded safety threshold (350.0 N) during INSERT at depth 0.0034m",diagnostics/research_baseline_repeat_validation_v2/trial_02.log
+3,NO_OUTCOME,NO_OUTCOME,False,launch_or_logging,0.0,0.0,0.0,0.0,True,False,-15,230.05,No fresh /tmp/insertion_trial_outcome.json was written.,diagnostics/research_baseline_repeat_validation_v2/trial_03.log

@@ -1,0 +1,54 @@
+{
+  "trial_outcome": "ABORTED",
+  "reason": "Fz (449.5 N, contact 417.7 N) exceeded safety threshold (350.0 N) during INSERT at depth 0.0034m",
+  "phases": [
+    {
+      "phase": "MOVING_TO_START",
+      "success": true,
+      "cart_error_m": 0.117422,
+      "joint_error_rad": 0.181772,
+      "timed_out": true,
+      "duration_s": 42.4,
+      "message": "degraded: no strict convergence after 42.4s; cart_err=0.117m"
+    },
+    {
+      "phase": "APPROACH",
+      "success": true,
+      "cart_error_m": 0.056991,
+      "joint_error_rad": 0.099196,
+      "timed_out": true,
+      "duration_s": 30.0,
+      "message": "degraded: no strict convergence after 30.0s; cart_err=0.057m"
+    },
+    {
+      "phase": "SEARCH",
+      "success": true,
+      "cart_error_m": 0.001589,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 1.7,
+      "message": "SEARCH converged"
+    },
+    {
+      "phase": "INSERT",
+      "success": false,
+      "cart_error_m": 0.0,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 11.5,
+      "message": "Fz (449.5 N, contact 417.7 N) exceeded safety threshold (350.0 N) during INSERT at depth 0.0034m"
+    }
+  ],
+  "metrics": {
+    "initial_xy_error_m": 0.1174,
+    "pre_insertion_xy_error_m": 0.0016,
+    "insertion_depth_m": 0.0367,
+    "max_fz_N": 3716.2,
+    "baseline_fz_N": 15.27,
+    "max_contact_force_N": 3682.56,
+    "contact_threshold_N": 5.0,
+    "gravity_baseline_valid": true,
+    "baseline_window_samples": 50
+  },
+  "status": "DONE"
+}

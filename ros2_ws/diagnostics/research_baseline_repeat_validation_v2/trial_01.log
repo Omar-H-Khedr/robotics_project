@@ -1,0 +1,374 @@
+[INFO] [launch]: All log files can be found below diagnostics/research_baseline_repeat_validation_v2/ros_logs/2026-06-01-21-00-53-675407-DESKTOP-GVPFGND-8241
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [launch.user]: Phase 2B unified research baseline: launching Gazebo world peg_in_hole_description/worlds/peg_in_hole_world.sdf (/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds/peg_in_hole_world.sdf)
+[INFO] [launch.user]: Phase 2B unified research baseline: spawning robot kuka_lbr_iisy using project robot description peg_in_hole_description/urdf/lbr_iisy6_r1300_research_gripper.urdf.xacro for KUKA model lbr_iisy6_r1300 (family: lbr_iisy) at xyz/rpy [0.80, -0.75, 0.735, 0, 0, 1.5708]
+[INFO] [launch.user]: Phase 2B unified research baseline: task peg_in_hole uses table frame work_table, target frame hole_center, insertion axis z
+[INFO] [launch.user]: Phase 2B unified research baseline: expected controller stack is joint_state_broadcaster + joint_trajectory_controller
+[INFO] [launch.user]: Phase 2B unified research baseline: Gazebo initial arm safe_home joint pose is [0.0, -0.8, 1.2, 0.0, 0.8, 0.0]
+[INFO] [robot_state_publisher-1]: process started with pid [8246]
+[INFO] [gzserver-2]: process started with pid [8247]
+[INFO] [spawn_robot_sdf-3]: process started with pid [8248]
+[INFO] [bridge_node-4]: process started with pid [8249]
+[INFO] [bridge_node-5]: process started with pid [8250]
+[INFO] [bridge_node-6]: process started with pid [8251]
+[INFO] [data_logger_node-7]: process started with pid [8252]
+[robot_state_publisher-1] [INFO] [1780336854.254066960] [robot_state_publisher]: Robot initialized
+[gzserver-2] [1;32m[Msg] [0m[1;32mLoading SDF world file[[0m[1;32m/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds/peg_in_hole_world.sdf[0m[1;32m].[0m
+[gzserver-2] [1;33mWarning [Utils.cc:132][0m [/sdf/world[@name="peg_in_hole_world"]/model[@name="d405_rgbd_camera"]/link[@name="camera_link"]/visual[@name="camera_visual"]/geometry/box[@size="0.03 0.025 0.02"]:/home/omar/code/robotics_project/ros2_ws/install/peg_in_hole_description/share/peg_in_hole_description/worlds/peg_in_hole_world.sdf:L117]: XML Attribute[size] in element[box] not defined in SDF.
+[gzserver-2] [1;33m[Wrn] [SystemLoader.cc:75] [0m[1;33mTrying to load deprecated plugin [[0m[1;33mignition-gazebo-physics-system[0m[1;33m]. Using [[0m[1;33mgz-sim-physics-system[0m[1;33m] instead.[0m[1;33m[0m
+[gzserver-2] [1;33m[Wrn] [SystemLoader.cc:75] [0m[1;33mTrying to load deprecated plugin [[0m[1;33mignition-gazebo-user-commands-system[0m[1;33m]. Using [[0m[1;33mgz-sim-user-commands-system[0m[1;33m] instead.[0m[1;33m[0m
+[gzserver-2] [1;33m[Wrn] [SystemLoader.cc:75] [0m[1;33mTrying to load deprecated plugin [[0m[1;33mignition-gazebo-scene-broadcaster-system[0m[1;33m]. Using [[0m[1;33mgz-sim-scene-broadcaster-system[0m[1;33m] instead.[0m[1;33m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mServing entity system service on [[0m[1;32m/[0m[1;32mentity/system/add[0m[1;32m][0m[1;32m[0m
+[gzserver-2] [1;36m[Dbg] [Physics.cc:906] [0m[1;36mLoaded [[0m[1;36mgz::physics::dartsim::Plugin[0m[1;36m] from library [[0m[1;36m/opt/ros/jazzy/opt/gz_physics_vendor/lib/gz-physics-7/engine-plugins/libgz-physics-dartsim-plugin.so[0m[1;36m][0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [SystemManager.cc:80] [0m[1;36mLoaded system [[0m[1;36mgz::sim::systems::Physics[0m[1;36m] for entity [[0m[1;36m1[0m[1;36m][0m[1;36m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mCreate[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/create_multiple[0m[1;32m] (async)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mCreate[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/create_multiple/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mRemove[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/remove[0m[1;32m] (async)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mRemove[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/remove/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mPose[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/set_pose[0m[1;32m] (async)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mPose[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/set_pose/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mPose[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/set_pose_vector[0m[1;32m] (async)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mPose[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/set_pose_vector/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mLight configuration[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/light_config[0m[1;32m] (async)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mLight configuration[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/light_config/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mPhysics[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/set_physics[0m[1;32m] (async)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mPhysics[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/set_physics/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mSphericalCoordinates[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/set_spherical_coordinates[0m[1;32m] (async)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mSphericalCoordinates[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/set_spherical_coordinates/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mEnable collision[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/enable_collision[0m[1;32m] (async)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mEnable collision[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/enable_collision/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mDisable collision[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/disable_collision[0m[1;32m] (async)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mDisable collision[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/disable_collision/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mMaterial[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/visual_config[0m[1;32m] (async)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mMaterial[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/visual_config/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mMaterial[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/wheel_slip[0m[1;32m] (async)[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mMaterial[0m[1;32m service on [[0m[1;32m/world/peg_in_hole_world/wheel_slip/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gzserver-2] [1;36m[Dbg] [SystemManager.cc:80] [0m[1;36mLoaded system [[0m[1;36mgz::sim::systems::UserCommands[0m[1;36m] for entity [[0m[1;36m1[0m[1;36m][0m[1;36m[0m
+[gzserver-2] [1;33m[Wrn] [SystemLoader.cc:75] [0m[1;33mTrying to load deprecated plugin [[0m[1;33mignition-gazebo-contact-system[0m[1;33m]. Using [[0m[1;33mgz-sim-contact-system[0m[1;33m] instead.[0m[1;33m[0m
+[gzserver-2] [1;33m[Wrn] [SystemLoader.cc:75] [0m[1;33mTrying to load deprecated plugin [[0m[1;33mignition-gazebo-sensors-system[0m[1;33m]. Using [[0m[1;33mgz-sim-sensors-system[0m[1;33m] instead.[0m[1;33m[0m
+[data_logger_node-7] [INFO] [1780336854.683183248] [data_logger_node]: DataLoggerNode started.  Writing to /tmp/thesis_logs/insertion_log_20260601_210054.csv  (rate=50.0 Hz)
+[spawn_robot_sdf-3] [INFO] [1780336854.850297492] [ros_gz_sim]: Requesting list of world names.
+[spawn_robot_sdf-3] [INFO] [1780336855.053127561] [ros_gz_sim]: Entity creation successful.
+[spawn_robot_sdf-3] 
+[INFO] [spawn_robot_sdf-3]: process has finished cleanly [pid 8248]
+[INFO] [spawner-8]: process started with pid [8390]
+[bridge_node-5] [INFO] [1780336855.291043255] [contact_ros_gz_bridge]: Creating GZ->ROS Bridge: [/gazebo/contacts/peg (gz.msgs.Contacts) -> /gazebo/contacts/peg (ros_gz_interfaces/msg/Contacts)] (Lazy 0)
+[bridge_node-4] [INFO] [1780336855.291072055] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/clock (gz.msgs.Clock) -> /clock (rosgraph_msgs/msg/Clock)] (Lazy 0)
+[bridge_node-4] [INFO] [1780336855.293040350] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/joint_states (gz.msgs.Model) -> /joint_states (sensor_msgs/msg/JointState)] (Lazy 0)
+[bridge_node-4] [INFO] [1780336855.295372845] [ros_gz_bridge]: Creating ROS->GZ Bridge: [/cmd_vel (geometry_msgs/msg/Twist) -> /cmd_vel (gz.msgs.Twist)] (Lazy 0)
+[bridge_node-5] [INFO] [1780336855.295869744] [contact_ros_gz_bridge]: Creating GZ->ROS Bridge: [/gazebo/contacts/hole (gz.msgs.Contacts) -> /gazebo/contacts/hole (ros_gz_interfaces/msg/Contacts)] (Lazy 0)
+[bridge_node-4] [INFO] [1780336855.297207942] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/d405/color/image_raw (gz.msgs.Image) -> /d405/color/image_raw (sensor_msgs/msg/Image)] (Lazy 0)
+[bridge_node-5] [INFO] [1780336855.297335641] [contact_ros_gz_bridge]: Creating GZ->ROS Bridge: [/gazebo/contacts/target (gz.msgs.Contacts) -> /gazebo/contacts/target (ros_gz_interfaces/msg/Contacts)] (Lazy 0)
+[bridge_node-4] [INFO] [1780336855.299154337] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/d405/depth/image_rect_raw (gz.msgs.Image) -> /d405/depth/image_rect_raw (sensor_msgs/msg/Image)] (Lazy 0)
+[bridge_node-4] [INFO] [1780336855.300101235] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/d405/depth/camera_info (gz.msgs.CameraInfo) -> /d405/depth/camera_info (sensor_msgs/msg/CameraInfo)] (Lazy 0)
+[bridge_node-4] [INFO] [1780336855.301629532] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/d405/color/camera_info (gz.msgs.CameraInfo) -> /d405/color/camera_info (sensor_msgs/msg/CameraInfo)] (Lazy 0)
+[bridge_node-6] [INFO] [1780336855.302844930] [ft_sensor_bridge]: Creating GZ->ROS Bridge: [/world/peg_in_hole_world/model/lbr_iisy6_r1300/joint/ft_sensor_joint/sensor/ft_sensor/forcetorque (gz.msgs.Wrench) -> /world/peg_in_hole_world/model/lbr_iisy6_r1300/joint/ft_sensor_joint/sensor/ft_sensor/forcetorque (geometry_msgs/msg/Wrench)] (Lazy 0)
+[spawner-8] [INFO] [1780336855.643462405] [joint_state_broadcaster_spawner]: waiting for service /controller_manager/list_controllers to become available...
+[gzserver-2] [1;36m[Dbg] [SystemManager.cc:80] [0m[1;36mLoaded system [[0m[1;36mgz::sim::systems::SceneBroadcaster[0m[1;36m] for entity [[0m[1;36m1[0m[1;36m][0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [SystemManager.cc:80] [0m[1;36mLoaded system [[0m[1;36mgz::sim::systems::Contact[0m[1;36m] for entity [[0m[1;36m1[0m[1;36m][0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [Sensors.cc:697] [0m[1;36mConfiguring Sensors system[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [Sensors.cc:557] [0m[1;36mSensorsPrivate::Run[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [SystemManager.cc:80] [0m[1;36mLoaded system [[0m[1;36mgz::sim::systems::Sensors[0m[1;36m] for entity [[0m[1;36m1[0m[1;36m][0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [Sensors.cc:532] [0m[1;36mSensorsPrivate::RenderThread started[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [Sensors.cc:337] [0m[1;36mWaiting for init[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [SystemManager.cc:80] [0m[1;36mLoaded system [[0m[1;36mgz::sim::systems::ForceTorque[0m[1;36m] for entity [[0m[1;36m1[0m[1;36m][0m[1;36m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mLoaded level [[0m[1;32mdefault[0m[1;32m][0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mServing world controls on [[0m[1;32m/world/peg_in_hole_world[0m[1;32m/control], [[0m[1;32m/world/peg_in_hole_world[0m[1;32m/control/state] and [[0m[1;32m/world/peg_in_hole_world[0m[1;32m/playback/control][0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mServing GUI information on [[0m[1;32m/world/peg_in_hole_world[0m[1;32m/[0m[1;32mgui/info[0m[1;32m][0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mWorld [[0m[1;32mpeg_in_hole_world[0m[1;32m] initialized with [[0m[1;32m1ms[0m[1;32m] physics profile.[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mServing world SDF generation service on [[0m[1;32m/world/peg_in_hole_world[0m[1;32m/[0m[1;32mgenerate_world_sdf[0m[1;32m][0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mServing world names on [[0m[1;32m/gazebo/worlds[0m[1;32m][0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mResource path add service on [[0m[1;32m/gazebo/resource_paths/add[0m[1;32m].[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mResource path get service on [[0m[1;32m/gazebo/resource_paths/get[0m[1;32m].[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mResource path resolve service on [[0m[1;32m/gazebo/resource_paths/resolve[0m[1;32m].[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mResource paths published on [[0m[1;32m/gazebo/resource_paths[0m[1;32m].[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mServer control service on [[0m[1;32m/server_control[0m[1;32m].[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mFound no publishers on /stats, adding root stats topic[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mFound no publishers on /clock, adding root clock topic[0m[1;32m[0m
+[gzserver-2] [1;36m[Dbg] [SimulationRunner.cc:551] [0m[1;36mCreating PostUpdate worker threads: [0m[1;36m5[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m0[0m[1;36m)[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m1[0m[1;36m)[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m2[0m[1;36m)[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m3[0m[1;36m)[0m[1;36m[0m
+[gzserver-2] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="lbr_iisy6_r1300_research_gripper"]/joint[@name="joint_1"]/axis/initial_position:<data-string>:L64]: XML Element[initial_position], child of element[axis], not defined in SDF. Copying[initial_position] as children of [axis].
+[gzserver-2] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="lbr_iisy6_r1300_research_gripper"]/joint[@name="joint_2"]/axis/initial_position:<data-string>:L121]: XML Element[initial_position], child of element[axis], not defined in SDF. Copying[initial_position] as children of [axis].
+[gzserver-2] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="lbr_iisy6_r1300_research_gripper"]/joint[@name="joint_3"]/axis/initial_position:<data-string>:L178]: XML Element[initial_position], child of element[axis], not defined in SDF. Copying[initial_position] as children of [axis].
+[gzserver-2] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="lbr_iisy6_r1300_research_gripper"]/joint[@name="joint_4"]/axis/initial_position:<data-string>:L235]: XML Element[initial_position], child of element[axis], not defined in SDF. Copying[initial_position] as children of [axis].
+[gzserver-2] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="lbr_iisy6_r1300_research_gripper"]/joint[@name="joint_5"]/axis/initial_position:<data-string>:L292]: XML Element[initial_position], child of element[axis], not defined in SDF. Copying[initial_position] as children of [axis].
+[gzserver-2] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="lbr_iisy6_r1300_research_gripper"]/joint[@name="joint_6"]/axis/initial_position:<data-string>:L349]: XML Element[initial_position], child of element[axis], not defined in SDF. Copying[initial_position] as children of [axis].
+[gzserver-2] [INFO] [1780336856.420107253] [gz_ros_control]: [gz_ros2_control] Fixed joint [world-base_link] (Entity=86)] is skipped
+[gzserver-2] [INFO] [1780336856.422692448] [gz_ros_control]: Loading controller_manager
+[gzserver-2] [INFO] [1780336856.444145402] [controller_manager]: Using ROS clock for triggering controller manager cycles.
+[gzserver-2] [INFO] [1780336856.447541795] [controller_manager]: Subscribing to '/robot_description' topic for robot description.
+[gzserver-2] [WARN] [1780336856.453739382] [gz_ros_control]: Waiting RM to load and initialize hardware...
+[gzserver-2] [INFO] [1780336856.458106472] [controller_manager]: Received robot description from topic.
+[gzserver-2] [INFO] [1780336856.458199972] [controller_manager]: Enforcing command limits is disabled. Command limits from URDF will be ignored.
+[gzserver-2] [INFO] [1780336856.461695565] [gz_ros_control]: The position_proportional_gain has been set to: 1000
+[gzserver-2] [INFO] [1780336856.461779665] [gz_ros_control]: Loading joint: joint_1
+[gzserver-2] [INFO] [1780336856.461792465] [gz_ros_control]: 	State:
+[gzserver-2] [INFO] [1780336856.461797565] [gz_ros_control]: 		 position
+[gzserver-2] [INFO] [1780336856.461808665] [gz_ros_control]: 			 found initial value: 0.000000
+[gzserver-2] [INFO] [1780336856.461813865] [gz_ros_control]: 	Command:
+[gzserver-2] [INFO] [1780336856.461817265] [gz_ros_control]: 		 position
+[gzserver-2] [INFO] [1780336856.461828765] [gz_ros_control]: Loading joint: joint_2
+[gzserver-2] [INFO] [1780336856.461832465] [gz_ros_control]: 	State:
+[gzserver-2] [INFO] [1780336856.461835565] [gz_ros_control]: 		 position
+[gzserver-2] [INFO] [1780336856.461843165] [gz_ros_control]: 			 found initial value: -0.800000
+[gzserver-2] [INFO] [1780336856.461847765] [gz_ros_control]: 	Command:
+[gzserver-2] [INFO] [1780336856.461850764] [gz_ros_control]: 		 position
+[gzserver-2] [INFO] [1780336856.461860664] [gz_ros_control]: Loading joint: joint_3
+[gzserver-2] [INFO] [1780336856.461864364] [gz_ros_control]: 	State:
+[gzserver-2] [INFO] [1780336856.461867764] [gz_ros_control]: 		 position
+[gzserver-2] [INFO] [1780336856.461871964] [gz_ros_control]: 			 found initial value: 1.200000
+[gzserver-2] [INFO] [1780336856.461875964] [gz_ros_control]: 	Command:
+[gzserver-2] [INFO] [1780336856.461878864] [gz_ros_control]: 		 position
+[gzserver-2] [INFO] [1780336856.461887964] [gz_ros_control]: Loading joint: joint_4
+[gzserver-2] [INFO] [1780336856.461891464] [gz_ros_control]: 	State:
+[gzserver-2] [INFO] [1780336856.461894464] [gz_ros_control]: 		 position
+[gzserver-2] [INFO] [1780336856.461897964] [gz_ros_control]: 			 found initial value: 0.000000
+[gzserver-2] [INFO] [1780336856.461901564] [gz_ros_control]: 	Command:
+[gzserver-2] [INFO] [1780336856.461904364] [gz_ros_control]: 		 position
+[gzserver-2] [INFO] [1780336856.461912764] [gz_ros_control]: Loading joint: joint_5
+[gzserver-2] [INFO] [1780336856.461916164] [gz_ros_control]: 	State:
+[gzserver-2] [INFO] [1780336856.461919064] [gz_ros_control]: 		 position
+[gzserver-2] [INFO] [1780336856.461928964] [gz_ros_control]: 			 found initial value: 0.800000
+[gzserver-2] [INFO] [1780336856.461933464] [gz_ros_control]: 	Command:
+[gzserver-2] [INFO] [1780336856.461936464] [gz_ros_control]: 		 position
+[gzserver-2] [INFO] [1780336856.461945464] [gz_ros_control]: Loading joint: joint_6
+[gzserver-2] [INFO] [1780336856.461948964] [gz_ros_control]: 	State:
+[gzserver-2] [INFO] [1780336856.461951964] [gz_ros_control]: 		 position
+[gzserver-2] [INFO] [1780336856.461955464] [gz_ros_control]: 			 found initial value: 0.000000
+[gzserver-2] [INFO] [1780336856.461959164] [gz_ros_control]: 	Command:
+[gzserver-2] [INFO] [1780336856.461962064] [gz_ros_control]: 		 position
+[gzserver-2] [INFO] [1780336856.462022764] [gz_ros_control]: Loading sensor: ft_sensor
+[gzserver-2] [INFO] [1780336856.462030364] [gz_ros_control]: 	State:
+[gzserver-2] [INFO] [1780336856.462081864] [controller_manager]: Initialize hardware 'lbr_iisy6_r1300' 
+[gzserver-2] [WARN] [1780336856.462092964] [controller_manager.hardware_component.system.lbr_iisy6_r1300]: Executor is not available during hardware component initialization for 'lbr_iisy6_r1300'. Skipping node creation!
+[gzserver-2] [INFO] [1780336856.462134364] [controller_manager]: Successful initialization of hardware 'lbr_iisy6_r1300'
+[gzserver-2] [INFO] [1780336856.462222564] [controller_manager]: Activating component 'lbr_iisy6_r1300'.
+[gzserver-2] [INFO] [1780336856.462232664] [resource_manager]: 'configure' hardware 'lbr_iisy6_r1300' 
+[gzserver-2] [INFO] [1780336856.462235464] [gz_ros_control]: System Successfully configured!
+[gzserver-2] [INFO] [1780336856.462239564] [resource_manager]: Successful 'configure' of hardware 'lbr_iisy6_r1300'
+[gzserver-2] [INFO] [1780336856.462244364] [resource_manager]: 'activate' hardware 'lbr_iisy6_r1300' 
+[gzserver-2] [INFO] [1780336856.462266964] [resource_manager]: Successful 'activate' of hardware 'lbr_iisy6_r1300'
+[gzserver-2] [WARN] [1780336856.462311064] [controller_manager]: Component 'lbr_iisy6_r1300' does not have read or write statistics initialized, skipping registration.
+[gzserver-2] [INFO] [1780336856.462318264] [controller_manager]: Resource Manager has been successfully initialized. Starting Controller Manager services...
+[gzserver-2] [INFO] [1780336858.149163176] [controller_manager]: Loading controller : 'joint_state_broadcaster' of type 'joint_state_broadcaster/JointStateBroadcaster'
+[gzserver-2] [INFO] [1780336858.149224976] [controller_manager]: Loading controller 'joint_state_broadcaster'
+[gzserver-2] [INFO] [1780336858.152685868] [controller_manager]: Controller 'joint_state_broadcaster' node arguments: --ros-args --params-file /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/config/fake_hardware_config_6_axis.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[spawner-8] [INFO] [1780336858.169724932] [joint_state_broadcaster_spawner]: Loaded joint_state_broadcaster
+[gzserver-2] [INFO] [1780336858.171321629] [controller_manager]: Configuring controller: 'joint_state_broadcaster'
+[gzserver-2] [INFO] [1780336858.171488128] [joint_state_broadcaster]: 'joints' or 'interfaces' parameter is empty. All available state interfaces will be published
+[gzserver-2] [INFO] [1780336858.180897908] [controller_manager]: Activating controllers: [ joint_state_broadcaster ]
+[gzserver-2] [1;36m[Dbg] [SystemManager.cc:80] [0m[1;36mLoaded system [[0m[1;36mgz_ros2_control::GazeboSimROS2ControlPlugin[0m[1;36m] for entity [[0m[1;36m53[0m[1;36m][0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [UserCommands.cc:1094] [0m[1;36mCreated entity [[0m[1;36m53[0m[1;36m] named [[0m[1;36mlbr_iisy6_r1300[0m[1;36m][0m[1;36m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mContact system publishing on [0m[1;32mworld/peg_in_hole_world/model/hole_fixture/link/fixture_link/sensor/hole_contact_sensor/contact[0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mContact system publishing on [0m[1;32mworld/peg_in_hole_world/model/target_plate/link/plate_link/sensor/target_contact_sensor/contact[0m[1;32m[0m
+[gzserver-2] [1;36m[Dbg] [SDFFeatures.cc:332] [0m[1;36mMesh construction from an SDF has not been implemented yet for [0m[1;36mdartsim. Use AttachMeshShapeFeature to use mesh shapes.[0m
+[gzserver-2] [1;36m[Dbg] [SDFFeatures.cc:864] [0m[1;36mThe geometry element of collision [[0m[1;36mbase_link_collision[0m[1;36m] [0m[1;36mcouldn't be created[0m
+[gzserver-2] [1;36m[Dbg] [SDFFeatures.cc:332] [0m[1;36mMesh construction from an SDF has not been implemented yet for [0m[1;36mdartsim. Use AttachMeshShapeFeature to use mesh shapes.[0m
+[gzserver-2] [1;36m[Dbg] [SDFFeatures.cc:864] [0m[1;36mThe geometry element of collision [[0m[1;36mlink_1_collision[0m[1;36m] [0m[1;36mcouldn't be created[0m
+[gzserver-2] [1;36m[Dbg] [SDFFeatures.cc:332] [0m[1;36mMesh construction from an SDF has not been implemented yet for [0m[1;36mdartsim. Use AttachMeshShapeFeature to use mesh shapes.[0m
+[gzserver-2] [1;36m[Dbg] [SDFFeatures.cc:864] [0m[1;36mThe geometry element of collision [[0m[1;36mlink_2_collision[0m[1;36m] [0m[1;36mcouldn't be created[0m
+[gzserver-2] [1;36m[Dbg] [SDFFeatures.cc:332] [0m[1;36mMesh construction from an SDF has not been implemented yet for [0m[1;36mdartsim. Use AttachMeshShapeFeature to use mesh shapes.[0m
+[gzserver-2] [1;36m[Dbg] [SDFFeatures.cc:864] [0m[1;36mThe geometry element of collision [[0m[1;36mlink_3_collision[0m[1;36m] [0m[1;36mcouldn't be created[0m
+[gzserver-2] [1;36m[Dbg] [SDFFeatures.cc:332] [0m[1;36mMesh construction from an SDF has not been implemented yet for [0m[1;36mdartsim. Use AttachMeshShapeFeature to use mesh shapes.[0m
+[gzserver-2] [1;36m[Dbg] [SDFFeatures.cc:864] [0m[1;36mThe geometry element of collision [[0m[1;36mlink_4_collision[0m[1;36m] [0m[1;36mcouldn't be created[0m
+[gzserver-2] [1;36m[Dbg] [SDFFeatures.cc:332] [0m[1;36mMesh construction from an SDF has not been implemented yet for [0m[1;36mdartsim. Use AttachMeshShapeFeature to use mesh shapes.[0m
+[gzserver-2] [1;36m[Dbg] [SDFFeatures.cc:864] [0m[1;36mThe geometry element of collision [[0m[1;36mlink_5_collision[0m[1;36m] [0m[1;36mcouldn't be created[0m
+[gzserver-2] [1;36m[Dbg] [SDFFeatures.cc:332] [0m[1;36mMesh construction from an SDF has not been implemented yet for [0m[1;36mdartsim. Use AttachMeshShapeFeature to use mesh shapes.[0m
+[gzserver-2] [1;36m[Dbg] [SDFFeatures.cc:864] [0m[1;36mThe geometry element of collision [[0m[1;36mlink_6_collision[0m[1;36m] [0m[1;36mcouldn't be created[0m
+[gzserver-2] [1;36m[Dbg] [Sensors.cc:953] [0m[1;36mInitialization needed[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [Sensors.cc:349] [0m[1;36mInitializing render context[0m[1;36m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mLoading plugin [[0m[1;32mgz-rendering-ogre[0m[1;32m][0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mServing scene information on [[0m[1;32m/world/peg_in_hole_world[0m[1;32m/[0m[1;32mscene/info[0m[1;32m][0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mServing graph information on [[0m[1;32m/world/peg_in_hole_world[0m[1;32m/[0m[1;32mscene/graph[0m[1;32m][0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mServing full state on [[0m[1;32m/world/peg_in_hole_world[0m[1;32m/[0m[1;32mstate[0m[1;32m][0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mServing full state (async) on [[0m[1;32m/world/peg_in_hole_world[0m[1;32m/[0m[1;32mstate_async[0m[1;32m][0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mPublishing scene information on [[0m[1;32m/world/peg_in_hole_world/scene/info[0m[1;32m][0m[1;32m[0m
+[gzserver-2] [WARN] [1780336858.507371814] [gz_ros_control]:  Desired controller update period (0.02 s) is slower than the gazebo simulation period (0.001 s).
+[gzserver-2] [1;33m[Wrn] [Component.hh:127] [0m[1;33mTrying to serialize component with data type [[0m[1;33mSt10shared_ptrIN3sdf3v147ElementEE[0m[1;33m], which doesn't have [0m[1;33m`operator<<`. Component will not be serialized.[0m[1;33m[0m
+[gzserver-2] [1;33m[Wrn] [Component.hh:172] [0m[1;33mTrying to deserialize component with data type [[0m[1;33mSt10shared_ptrIN3sdf3v147ElementEE[0m[1;33m], which doesn't have [0m[1;33m`operator>>`. Component will not be deserialized.[0m[1;33m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mPublishing entity deletions on [[0m[1;32m/world/peg_in_hole_world/scene/deletion[0m[1;32m][0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mPublishing state changes on [[0m[1;32m/world/peg_in_hole_world/state[0m[1;32m][0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mPublishing pose messages on [[0m[1;32m/world/peg_in_hole_world[0m[1;32m/[0m[1;32mpose/info[0m[1;32m][0m[1;32m[0m
+[gzserver-2] [1;32m[Msg] [0m[1;32mPublishing dynamic pose messages on [[0m[1;32m/world/peg_in_hole_world[0m[1;32m/[0m[1;32mdynamic_pose/info[0m[1;32m][0m[1;32m[0m
+[gzserver-2] [1;36m[Dbg] [SimulationRunner.cc:578] [0m[1;36mExiting postupdate worker thread ([0m[1;36m2[0m[1;36m)[0m[1;36m
+[gzserver-2] [Dbg] [SimulationRunner.cc:578] [Dbg] [SimulationRunner.cc:578] [Dbg] [SimulationRunner.cc:578] [0m[1;36mExiting postupdate worker thread ([0m[1;36m
+[gzserver-2] [Dbg] [SimulationRunner.cc:578] [Dbg] [SimulationRunner.cc:578] [0m[1;36m
+[gzserver-2] [Dbg] [SimulationRunner.cc:578] [0m[1;36mExiting postupdate worker thread ([0m[1;36m1[0m[1;36m3[0m[1;36m)Exiting postupdate worker thread ([0m[1;36m0[0m[1;36m)[0m[1;36m[0m
+[gzserver-2] [1;36m)[0m[1;36m)[0m[1;36m[0m
+[gzserver-2] [1;36m)[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [SimulationRunner.cc:551] [0m[1;36mCreating PostUpdate worker threads: [0m[1;36m6[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m0[0m[1;36m)[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m1[0m[1;36m)[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m2[0m[1;36m)[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m3[0m[1;36m)[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m4[0m[1;36m)[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [ForceTorque.cc:154] [0m[1;36mAdding JointTransmittedWrench to: [0m[1;36m93[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [EntityComponentManager.cc:1656] [0m[1;36mUpdated state thread iterators: [0m[1;36m8[0m[1;36m threads processing around [0m[1;36m12[0m[1;36m entities each.[0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [RenderUtil.cc:2646] [0m[1;36mCreate scene [[0m[1;36mscene[0m[1;36m][0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [Sensors.cc:953] [0m[1;36mInitialization needed[0m[1;36m
+[gzserver-2] [Dbg] [Sensors.cc:391] [0m[1;36mRendering Thread initialized[0m[1;36m[0m
+[gzserver-2] [1;36m[0m
+[gzserver-2] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="lbr_iisy6_r1300_research_gripper"]/joint[@name="joint_1"]/axis/initial_position:<data-string>:L62]: XML Element[initial_position], child of element[axis], not defined in SDF. Copying[initial_position] as children of [axis].
+[gzserver-2] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="lbr_iisy6_r1300_research_gripper"]/joint[@name="joint_2"]/axis/initial_position:<data-string>:L120]: XML Element[initial_position], child of element[axis], not defined in SDF. Copying[initial_position] as children of [axis].
+[gzserver-2] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="lbr_iisy6_r1300_research_gripper"]/joint[@name="joint_3"]/axis/initial_position:<data-string>:L178]: XML Element[initial_position], child of element[axis], not defined in SDF. Copying[initial_position] as children of [axis].
+[gzserver-2] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="lbr_iisy6_r1300_research_gripper"]/joint[@name="joint_4"]/axis/initial_position:<data-string>:L236]: XML Element[initial_position], child of element[axis], not defined in SDF. Copying[initial_position] as children of [axis].
+[gzserver-2] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="lbr_iisy6_r1300_research_gripper"]/joint[@name="joint_5"]/axis/initial_position:<data-string>:L294]: XML Element[initial_position], child of element[axis], not defined in SDF. Copying[initial_position] as children of [axis].
+[gzserver-2] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="lbr_iisy6_r1300_research_gripper"]/joint[@name="joint_6"]/axis/initial_position:<data-string>:L352]: XML Element[initial_position], child of element[axis], not defined in SDF. Copying[initial_position] as children of [axis].
+[gzserver-2] [INFO] [1780336858.799959292] [gzserver]: InitializeCanonicalLinks
+[gzserver-2] [INFO] [1780336858.800205391] [gzserver]: Creating services on gzserver
+[gzserver-2] [INFO] [1780336858.803840583] [gzserver]: Created service /gzserver/delete_entity
+[gzserver-2] [INFO] [1780336858.805375080] [gzserver]: Created service /gzserver/get_entities
+[gzserver-2] [INFO] [1780336858.806920077] [gzserver]: Created service /gzserver/get_entity_info
+[gzserver-2] [INFO] [1780336858.808445374] [gzserver]: Created service /gzserver/get_entity_state
+[gzserver-2] [INFO] [1780336858.809738671] [gzserver]: Created service /gzserver/get_entities_states
+[gzserver-2] [INFO] [1780336858.810798869] [gzserver]: Created service /gzserver/get_simulation_state
+[gzserver-2] [INFO] [1780336858.811791066] [gzserver]: Created service /gzserver/get_simulator_features
+[gzserver-2] [INFO] [1780336858.812767064] [gzserver]: Created service /gzserver/reset_simulation
+[gzserver-2] [INFO] [1780336858.813832762] [gzserver]: Created service /gzserver/set_entity_state
+[gzserver-2] [INFO] [1780336858.814808260] [gzserver]: Created service /gzserver/set_simulation_state
+[gzserver-2] [INFO] [1780336858.815902358] [gzserver]: Created service /gzserver/spawn_entity
+[gzserver-2] [INFO] [1780336858.816914856] [gzserver]: Created service /gzserver/step_simulation
+[gzserver-2] [INFO] [1780336858.824807639] [gzserver]: Created action /gzserver/simulate_steps
+[gzserver-2] [1;36m[Dbg] [CameraSensor.cc:405] [0m[1;36mCamera images for [[0m[1;36md405_rgbd_camera::camera_link::d405_color[0m[1;36m] advertised on [[0m[1;36m/d405/color/image_raw[0m[1;36m][0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [CameraSensor.cc:695] [0m[1;36mCamera info for [[0m[1;36md405_rgbd_camera::camera_link::d405_color[0m[1;36m] advertised on [[0m[1;36m/d405/color/camera_info[0m[1;36m][0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [DepthCameraSensor.cc:283] [0m[1;36mDepth images for [[0m[1;36md405_rgbd_camera::camera_link::d405_depth[0m[1;36m] advertised on [[0m[1;36m/d405/depth/image_rect_raw[0m[1;36m][0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [CameraSensor.cc:695] [0m[1;36mCamera info for [[0m[1;36md405_rgbd_camera::camera_link::d405_depth[0m[1;36m] advertised on [[0m[1;36m/d405/depth/camera_info[0m[1;36m][0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [DepthCameraSensor.cc:311] [0m[1;36mPoints for [[0m[1;36md405_rgbd_camera::camera_link::d405_depth[0m[1;36m] advertised on [[0m[1;36m/d405/depth/image_rect_raw[0m[1;36m/points][0m[1;36m[0m
+[gzserver-2] [1;36m[Dbg] [CameraSensor.cc:504] [0m[1;36mEnabling camera sensor: '[0m[1;36md405_rgbd_camera::camera_link::d405_color[0m[1;36m' data [0m[1;36mgeneration.[0m[1;36m[0m
+[gzserver-2] [INFO] [1780336859.296760935] [gz_ros_control]: ForceTorque ft_sensor has a topic name: world/peg_in_hole_world/model/lbr_iisy6_r1300/joint/ft_sensor_joint/sensor/ft_sensor/forcetorque
+[gzserver-2] [INFO] [1780336859.297103034] [controller_manager]: Successfully switched controllers!
+[spawner-8] [INFO] [1780336859.360374000] [joint_state_broadcaster_spawner]: Configured and activated joint_state_broadcaster
+[INFO] [spawner-8]: process has finished cleanly [pid 8390]
+[INFO] [spawner-9]: process started with pid [8462]
+[spawner-9] [INFO] [1780336859.939633868] [joint_trajectory_controller_spawner]: waiting for service /controller_manager/list_controllers to become available...
+[gzserver-2] [INFO] [1780336861.192755620] [controller_manager]: Loading controller : 'joint_trajectory_controller' of type 'joint_trajectory_controller/JointTrajectoryController'
+[gzserver-2] [INFO] [1780336861.192796320] [controller_manager]: Loading controller 'joint_trajectory_controller'
+[gzserver-2] [INFO] [1780336861.195226422] [controller_manager]: Controller 'joint_trajectory_controller' node arguments: --ros-args --params-file /home/omar/code/robotics_project/ros2_ws/install/kuka_resources/share/kuka_resources/config/fake_hardware_config_6_axis.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[spawner-9] [INFO] [1780336861.217461139] [joint_trajectory_controller_spawner]: Loaded joint_trajectory_controller
+[gzserver-2] [INFO] [1780336861.218487540] [controller_manager]: Configuring controller: 'joint_trajectory_controller'
+[gzserver-2] [INFO] [1780336861.218756940] [joint_trajectory_controller]: No specific joint names are used for command interfaces. Using 'joints' parameter.
+[gzserver-2] [INFO] [1780336861.218787940] [joint_trajectory_controller]: Command interfaces are [position] and state interfaces are [position].
+[gzserver-2] [INFO] [1780336861.218814140] [joint_trajectory_controller]: Using 'splines' interpolation method.
+[gzserver-2] [INFO] [1780336861.222133343] [joint_trajectory_controller]: Action status changes will be monitored at 20.00 Hz.
+[gzserver-2] [INFO] [1780336861.228964348] [joint_trajectory_controller]: Setting initial scaling factor to 1.000000
+[gzserver-2] [INFO] [1780336861.229021748] [joint_trajectory_controller]: No scaling interface set. This controller will not read speed scaling from the hardware.
+[gzserver-2] [INFO] [1780336861.295589199] [controller_manager]: Activating controllers: [ joint_trajectory_controller ]
+[gzserver-2] [INFO] [1780336861.355496544] [controller_manager]: Successfully switched controllers!
+[spawner-9] [INFO] [1780336861.425392598] [joint_trajectory_controller_spawner]: Configured and activated joint_trajectory_controller
+[INFO] [spawner-9]: process has finished cleanly [pid 8462]
+[INFO] [admittance_insertion_node-10]: process started with pid [8479]
+[admittance_insertion_node-10] [INFO] [1780336862.062279284] [admittance_insertion_node]: AdmittanceInsertionNode v2 (honest tracking).  contact_threshold=5.0 N, safety_threshold=350.0 N, control_rate=10.0 Hz, approach_speed=0.010
+[admittance_insertion_node-10] [INFO] [1780336864.050541802] [admittance_insertion_node]: State transition: IDLE -> MOVING_TO_START
+[admittance_insertion_node-10] [INFO] [1780336864.156880183] [admittance_insertion_node]: MOVING_TO_START: trajectory published. duration=21.1s, waypoints=9, dist=0.7025
+[admittance_insertion_node-10] [INFO] [1780336864.157523184] [admittance_insertion_node]: MOVING_TO_START t=0.0s  peg=(0.753, 0.253, 1.126)  cart_err=0.564  stable=0/5
+[admittance_insertion_node-10] [INFO] [1780336869.151024483] [admittance_insertion_node]: MOVING_TO_START t=5.0s  peg=(0.840, 0.218, 1.048)  cart_err=0.551  stable=0/5
+[admittance_insertion_node-10] [INFO] [1780336874.150958420] [admittance_insertion_node]: MOVING_TO_START t=10.0s  peg=(0.819, 0.255, 1.037)  cart_err=0.565  stable=0/5
+[admittance_insertion_node-10] [INFO] [1780336879.151213821] [admittance_insertion_node]: MOVING_TO_START t=15.0s  peg=(0.792, 0.199, 0.992)  cart_err=0.494  stable=0/5
+[admittance_insertion_node-10] [INFO] [1780336884.151198251] [admittance_insertion_node]: MOVING_TO_START t=20.0s  peg=(0.814, 0.212, 1.025)  cart_err=0.525  stable=0/5
+[admittance_insertion_node-10] [INFO] [1780336889.151301849] [admittance_insertion_node]: MOVING_TO_START t=25.0s  peg=(0.754, 0.148, 0.945)  cart_err=0.423  stable=0/5
+[admittance_insertion_node-10] [INFO] [1780336894.151147189] [admittance_insertion_node]: MOVING_TO_START t=30.0s  peg=(0.669, 0.127, 1.013)  cart_err=0.381  stable=0/5
+[admittance_insertion_node-10] [INFO] [1780336899.151114280] [admittance_insertion_node]: MOVING_TO_START t=35.0s  peg=(0.549, 0.090, 0.976)  cart_err=0.305  stable=0/5
+[admittance_insertion_node-10] [INFO] [1780336904.150941499] [admittance_insertion_node]: MOVING_TO_START t=40.0s  peg=(0.669, 0.060, 0.916)  cart_err=0.301  stable=0/5
+[admittance_insertion_node-10] [INFO] [1780336909.151001937] [admittance_insertion_node]: MOVING_TO_START t=45.0s  peg=(0.643, -0.038, 0.902)  cart_err=0.204  stable=0/5
+[admittance_insertion_node-10] [INFO] [1780336914.150870607] [admittance_insertion_node]: MOVING_TO_START t=50.0s  peg=(0.558, -0.044, 0.922)  cart_err=0.165  stable=0/5
+[admittance_insertion_node-10] [WARN] [1780336914.551175132] [admittance_insertion_node]: MOVING_TO_START degraded (50.4s at 0.105m, within grace 0.12m). Proceeding.
+[admittance_insertion_node-10] [INFO] [1780336914.551784131] [admittance_insertion_node]: MOVING_TO_START complete. peg=(0.5193, -0.1011, 0.9206)  xy_error=0.0989m  cart_err=0.105m  joint_err=0.150rad  Fz=11.6N  baseline=21.0N
+[admittance_insertion_node-10] [INFO] [1780336914.552079230] [admittance_insertion_node]: State transition: MOVING_TO_START -> APPROACH
+[admittance_insertion_node-10] [INFO] [1780336914.655656404] [admittance_insertion_node]: APPROACH IK: current_pose=(-0.3733, ...) dist=0.1050  target_pose=[ 0.52 -0.2   0.83]  predicted_pose=(0.5200, -0.2000, 0.8300)
+[admittance_insertion_node-10] [INFO] [1780336914.656276502] [admittance_insertion_node]: APPROACH: trajectory published. duration=15.0s, waypoints=5, dist=0.1050
+[admittance_insertion_node-10] [INFO] [1780336914.656911401] [admittance_insertion_node]: APPROACH t=0.0s  peg=(0.5425, -0.1009, 0.9169)  cart_err=0.134  stable=0/5
+[admittance_insertion_node-10] [INFO] [1780336919.651000072] [admittance_insertion_node]: APPROACH t=5.0s  peg=(0.5365, -0.1389, 0.9040)  cart_err=0.097  stable=0/5
+[admittance_insertion_node-10] [INFO] [1780336924.651094938] [admittance_insertion_node]: APPROACH t=10.0s  peg=(0.5243, -0.1352, 0.8847)  cart_err=0.085  stable=0/5
+[admittance_insertion_node-10] [INFO] [1780336929.651074148] [admittance_insertion_node]: APPROACH t=15.0s  peg=(0.5927, -0.1132, 0.8548)  cart_err=0.116  stable=0/5
+[admittance_insertion_node-10] [INFO] [1780336934.651152153] [admittance_insertion_node]: APPROACH t=20.0s  peg=(0.5095, -0.1569, 0.8580)  cart_err=0.052  stable=0/5
+[admittance_insertion_node-10] [INFO] [1780336939.650987625] [admittance_insertion_node]: APPROACH t=25.0s  peg=(0.5651, -0.1252, 0.8794)  cart_err=0.100  stable=0/5
+[admittance_insertion_node-10] [INFO] [1780336944.651079281] [admittance_insertion_node]: APPROACH t=30.0s  peg=(0.5784, -0.0926, 0.8506)  cart_err=0.124  stable=0/5
+[admittance_insertion_node-10] [WARN] [1780336944.851098105] [admittance_insertion_node]: APPROACH degraded (30.2s at 0.112m, within grace 0.12m). Proceeding.
+[admittance_insertion_node-10] [INFO] [1780336944.851864103] [admittance_insertion_node]: APPROACH complete. peg=(0.5718, -0.1047, 0.8570)  xy_error=0.1085m  cart_err=0.112m  joint_err=0.180rad  Fz=35.5N  baseline=27.1N
+[admittance_insertion_node-10] [WARN] [1780336944.852461702] [admittance_insertion_node]: Pre-insertion XY error 0.1085m exceeds tolerance 0.0020m. Attempting search phase.
+[admittance_insertion_node-10] [INFO] [1780336944.852756801] [admittance_insertion_node]: State transition: APPROACH -> SEARCH
+[admittance_insertion_node-10] [INFO] [1780336950.955205776] [admittance_insertion_node]: SEARCH step 1/8 radius=0.003m offset=(0.0030, 0.0000)m  q_dist=0.06414
+[admittance_insertion_node-10] [INFO] [1780336957.053834148] [admittance_insertion_node]: SEARCH step 2/8 radius=0.003m offset=(0.0021, 0.0021)m  q_dist=0.05346
+[admittance_insertion_node-10] [INFO] [1780336963.154936071] [admittance_insertion_node]: SEARCH step 3/8 radius=0.003m offset=(0.0000, 0.0030)m  q_dist=0.13152
+[admittance_insertion_node-10] [INFO] [1780336969.255148148] [admittance_insertion_node]: SEARCH step 4/8 radius=0.003m offset=(-0.0021, 0.0021)m  q_dist=0.07508
+[admittance_insertion_node-10] [INFO] [1780336975.355187592] [admittance_insertion_node]: SEARCH step 5/8 radius=0.003m offset=(-0.0030, 0.0000)m  q_dist=0.09305
+[admittance_insertion_node-10] [INFO] [1780336981.454832372] [admittance_insertion_node]: SEARCH step 6/8 radius=0.003m offset=(-0.0021, -0.0021)m  q_dist=0.06415
+[admittance_insertion_node-10] [INFO] [1780336987.555755389] [admittance_insertion_node]: SEARCH step 7/8 radius=0.003m offset=(-0.0000, -0.0030)m  q_dist=0.14309
+[admittance_insertion_node-10] [INFO] [1780336993.654505180] [admittance_insertion_node]: SEARCH step 8/8 radius=0.003m offset=(0.0021, -0.0021)m  q_dist=0.04709
+[admittance_insertion_node-10] [INFO] [1780336993.754933759] [admittance_insertion_node]: SEARCH step 1/8 radius=0.005m offset=(0.0045, 0.0000)m  q_dist=0.09686
+[admittance_insertion_node-10] [INFO] [1780336999.855015039] [admittance_insertion_node]: SEARCH step 2/8 radius=0.005m offset=(0.0032, 0.0032)m  q_dist=0.08855
+[admittance_insertion_node-10] [INFO] [1780337005.953701822] [admittance_insertion_node]: SEARCH step 3/8 radius=0.005m offset=(0.0000, 0.0045)m  q_dist=0.03591
+[admittance_insertion_node-10] [INFO] [1780337008.550905582] [admittance_insertion_node]: SEARCH converged. XY error 0.0011m within tolerance.
+[admittance_insertion_node-10] [INFO] [1780337008.551218382] [admittance_insertion_node]: State transition: SEARCH -> INSERT
+[admittance_insertion_node-10] [INFO] [1780337008.654915452] [admittance_insertion_node]: INSERT started: 20s trajectory, 0.071m descent, q_dist=0.1076
+[admittance_insertion_node-10] [INFO] [1780337009.551024572] [admittance_insertion_node]: INSERT t=1.0s  peg_z=0.8609  depth=0.0000m  Fz=344.3N  baseline=46.6N  contact=295.7N  xy_error=0.0109m
+[admittance_insertion_node-10] [INFO] [1780337010.551101762] [admittance_insertion_node]: INSERT t=2.0s  peg_z=0.8615  depth=0.0000m  Fz=110.7N  baseline=46.6N  contact=62.1N  xy_error=0.0325m
+[admittance_insertion_node-10] [INFO] [1780337011.551025852] [admittance_insertion_node]: INSERT t=3.0s  peg_z=0.8611  depth=0.0000m  Fz=60.5N  baseline=82.3N  contact=0.0N  xy_error=0.0149m
+[admittance_insertion_node-10] [INFO] [1780337012.550971642] [admittance_insertion_node]: INSERT t=4.0s  peg_z=0.8608  depth=0.0000m  Fz=1237.4N  baseline=93.0N  contact=1142.4N  xy_error=0.0092m
+[admittance_insertion_node-10] [INFO] [1780337013.550933025] [admittance_insertion_node]: INSERT t=5.0s  peg_z=0.8579  depth=0.0026m  Fz=17.8N  baseline=92.8N  contact=0.0N  xy_error=0.0131m
+[admittance_insertion_node-10] [INFO] [1780337014.551032886] [admittance_insertion_node]: INSERT t=6.0s  peg_z=0.8554  depth=0.0051m  Fz=25.6N  baseline=86.2N  contact=0.0N  xy_error=0.0112m
+[admittance_insertion_node-10] [INFO] [1780337015.551137547] [admittance_insertion_node]: INSERT t=7.0s  peg_z=0.8589  depth=0.0017m  Fz=2.1N  baseline=93.0N  contact=0.0N  xy_error=0.0137m
+[admittance_insertion_node-10] [INFO] [1780337016.551039908] [admittance_insertion_node]: INSERT t=8.0s  peg_z=0.8619  depth=0.0000m  Fz=83.1N  baseline=125.9N  contact=0.0N  xy_error=0.0215m
+[admittance_insertion_node-10] [INFO] [1780337017.551212769] [admittance_insertion_node]: INSERT t=9.0s  peg_z=0.8571  depth=0.0034m  Fz=9.7N  baseline=83.1N  contact=0.0N  xy_error=0.0124m
+[admittance_insertion_node-10] [INFO] [1780337018.551141731] [admittance_insertion_node]: INSERT t=10.0s  peg_z=0.8611  depth=0.0000m  Fz=246.8N  baseline=86.2N  contact=158.5N  xy_error=0.0219m
+[admittance_insertion_node-10] [INFO] [1780337019.551008792] [admittance_insertion_node]: INSERT t=11.0s  peg_z=0.8610  depth=0.0000m  Fz=74.8N  baseline=110.3N  contact=0.0N  xy_error=0.0151m
+[admittance_insertion_node-10] [INFO] [1780337020.551110253] [admittance_insertion_node]: INSERT t=12.0s  peg_z=0.8609  depth=0.0000m  Fz=219.8N  baseline=113.1N  contact=104.8N  xy_error=0.0197m
+[admittance_insertion_node-10] [INFO] [1780337021.551115419] [admittance_insertion_node]: INSERT t=13.0s  peg_z=0.8598  depth=0.0007m  Fz=167.9N  baseline=101.4N  contact=64.5N  xy_error=0.0205m
+[admittance_insertion_node-10] [INFO] [1780337022.551092003] [admittance_insertion_node]: INSERT t=14.0s  peg_z=0.8551  depth=0.0054m  Fz=356.9N  baseline=113.1N  contact=241.8N  xy_error=0.0114m
+[admittance_insertion_node-10] [INFO] [1780337023.551147186] [admittance_insertion_node]: INSERT t=15.0s  peg_z=0.8613  depth=0.0000m  Fz=70.5N  baseline=94.4N  contact=0.0N  xy_error=0.0248m
+[admittance_insertion_node-10] [INFO] [1780337024.550959170] [admittance_insertion_node]: INSERT t=16.0s  peg_z=0.8553  depth=0.0052m  Fz=140.9N  baseline=78.9N  contact=60.1N  xy_error=0.0077m
+[admittance_insertion_node-10] [INFO] [1780337025.551025654] [admittance_insertion_node]: INSERT t=17.0s  peg_z=0.8582  depth=0.0023m  Fz=343.4N  baseline=100.4N  contact=241.0N  xy_error=0.0147m
+[admittance_insertion_node-10] [INFO] [1780337026.551034837] [admittance_insertion_node]: INSERT t=18.0s  peg_z=0.8609  depth=0.0000m  Fz=104.8N  baseline=100.4N  contact=2.5N  xy_error=0.0259m
+[admittance_insertion_node-10] [INFO] [1780337027.551239320] [admittance_insertion_node]: INSERT t=19.0s  peg_z=0.8589  depth=0.0016m  Fz=212.3N  baseline=100.4N  contact=109.9N  xy_error=0.0176m
+[admittance_insertion_node-10] [INFO] [1780337028.551035704] [admittance_insertion_node]: INSERT t=20.0s  peg_z=0.8571  depth=0.0034m  Fz=146.5N  baseline=127.8N  contact=16.8N  xy_error=0.0127m
+[admittance_insertion_node-10] [INFO] [1780337029.551081790] [admittance_insertion_node]: INSERT t=21.0s  peg_z=0.8568  depth=0.0037m  Fz=56.1N  baseline=146.5N  contact=0.0N  xy_error=0.0191m
+[admittance_insertion_node-10] [INFO] [1780337030.551143587] [admittance_insertion_node]: INSERT t=22.0s  peg_z=0.8548  depth=0.0058m  Fz=365.1N  baseline=125.1N  contact=238.0N  xy_error=0.0094m
+[admittance_insertion_node-10] [INFO] [1780337031.550948383] [admittance_insertion_node]: INSERT t=23.0s  peg_z=0.8568  depth=0.0037m  Fz=140.9N  baseline=158.0N  contact=0.0N  xy_error=0.0125m
+[admittance_insertion_node-10] [INFO] [1780337031.551478082] [admittance_insertion_node]: INSERT done (trajectory elapsed).  peg=(0.5247, -0.1885, 0.8568)  depth=0.0037m  Fz=140.9N  contact=0.0N  max_Fz=1237.4N  max_contact=1142.4N
+[admittance_insertion_node-10] [INFO] [1780337031.551797482] [admittance_insertion_node]: State transition: INSERT -> RETREAT
+[admittance_insertion_node-10] [INFO] [1780337031.650844563] [admittance_insertion_node]: Retreating to SAFE_HOME. duration=8.7s
+[admittance_insertion_node-10] [INFO] [1780337057.650750298] [admittance_insertion_node]: State transition: RETREAT -> DONE
+[admittance_insertion_node-10] [INFO] [1780337057.651403796] [admittance_insertion_node]: 
+[admittance_insertion_node-10] ========== TRIAL OUTCOME ==========
+[admittance_insertion_node-10]   Outcome: DEGRADED
+[admittance_insertion_node-10]   Reason:  Phase(s) failed: INSERT
+[admittance_insertion_node-10]   Depth:   0.0037m
+[admittance_insertion_node-10]   Max Fz:  1237.4N
+[admittance_insertion_node-10]   Baseline:23.8N
+[admittance_insertion_node-10]   Contact: 1142.4N
+[admittance_insertion_node-10]   XY err:  0.0011m
+[admittance_insertion_node-10] ====================================
+[admittance_insertion_node-10] [INFO] [1780337057.651912195] [admittance_insertion_node]:   Phase MOVING_TO_START: OK cart_err=0.1051m TIMEOUT degraded: no strict convergence after 50.4s; cart_err=0.105m
+[admittance_insertion_node-10] [INFO] [1780337057.652362294] [admittance_insertion_node]:   Phase APPROACH: OK cart_err=0.1118m TIMEOUT degraded: no strict convergence after 30.2s; cart_err=0.112m
+[admittance_insertion_node-10] [INFO] [1780337057.652810693] [admittance_insertion_node]:   Phase SEARCH: OK cart_err=0.0011m  SEARCH converged
+[admittance_insertion_node-10] [INFO] [1780337057.653266192] [admittance_insertion_node]:   Phase INSERT: FAIL cart_err=0.0000m  Depth 0.004m below threshold. Contact 0.0N.
+[admittance_insertion_node-10] [INFO] [1780337057.653742891] [admittance_insertion_node]:   Phase RETREAT: OK cart_err=0.0000m  
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[INFO] [admittance_insertion_node-10]: sending signal 'SIGINT' to process[admittance_insertion_node-10]
+[INFO] [data_logger_node-7]: sending signal 'SIGINT' to process[data_logger_node-7]
+[INFO] [bridge_node-6]: sending signal 'SIGINT' to process[bridge_node-6]
+[INFO] [bridge_node-5]: sending signal 'SIGINT' to process[bridge_node-5]
+[INFO] [bridge_node-4]: sending signal 'SIGINT' to process[bridge_node-4]
+[INFO] [gzserver-2]: sending signal 'SIGINT' to process[gzserver-2]
+[INFO] [robot_state_publisher-1]: sending signal 'SIGINT' to process[robot_state_publisher-1]
+[admittance_insertion_node-10] [INFO] [1780337058.427837924] [admittance_insertion_node]: Keyboard interrupt - shutting down.
+[admittance_insertion_node-10] Failed to publish log message to rosout: publisher's context is invalid, at ./src/rcl/publisher.c:423
+[bridge_node-6] [INFO] [1780337058.429046522] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[data_logger_node-7] [INFO] [1780337058.429186621] [data_logger_node]: Keyboard interrupt – shutting down.
+[data_logger_node-7] Failed to publish log message to rosout: publisher's context is invalid, at ./src/rcl/publisher.c:423
+[data_logger_node-7] [INFO] [1780337058.429564920] [data_logger_node]: CSV closed: /tmp/thesis_logs/insertion_log_20260601_210054.csv  (10187 rows written)
+[data_logger_node-7] Failed to publish log message to rosout: publisher's context is invalid, at ./src/rcl/publisher.c:423
+[bridge_node-5] [INFO] [1780337058.429888420] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[bridge_node-4] [INFO] [1780337058.435022709] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[robot_state_publisher-1] [INFO] [1780337058.437567803] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [robot_state_publisher-1]: process has finished cleanly [pid 8246]
+[INFO] [admittance_insertion_node-10]: process has finished cleanly [pid 8479]
+[INFO] [data_logger_node-7]: process has finished cleanly [pid 8252]
+[ERROR] [bridge_node-4]: process has died [pid 8249, exit code -11, cmd '/opt/ros/jazzy/lib/ros_gz_bridge/bridge_node --ros-args --log-level info --ros-args -r __node:=ros_gz_bridge -r __ns:=/ --params-file /tmp/launch_params_k4bo3ziu'].
+[ERROR] [bridge_node-6]: process has died [pid 8251, exit code -11, cmd '/opt/ros/jazzy/lib/ros_gz_bridge/bridge_node --ros-args -r __node:=ft_sensor_bridge --params-file /tmp/launch_params_vqo89zp8 -r /world/peg_in_hole_world/model/lbr_iisy6_r1300/joint/ft_sensor_joint/sensor/ft_sensor/forcetorque:=/ft_sensor_wrench'].
+[ERROR] [bridge_node-5]: process has died [pid 8250, exit code -11, cmd '/opt/ros/jazzy/lib/ros_gz_bridge/bridge_node --ros-args --log-level info --ros-args -r __node:=contact_ros_gz_bridge -r __ns:=/ --params-file /tmp/launch_params_iajykfgp'].
+[ERROR] [gzserver-2]: process[gzserver-2] failed to terminate '5' seconds after receiving 'SIGINT', escalating to 'SIGTERM'
+[INFO] [gzserver-2]: sending signal 'SIGTERM' to process[gzserver-2]

@@ -1,8 +1,8 @@
-# ros2_ws
+# ROS 2 Jazzy / Gazebo Peg-in-Hole Research Workspace
 
-This folder is reserved for the future ROS 2 workspace.
+Current status as of 2026-06-01: this is an active ROS 2 Jazzy workspace for a Gazebo-based KUKA LBR iisy 6 R1300 peg-in-hole research baseline. The project has a working robot spawn path, active ros2_control controllers, a fixed grasped peg model, a fixed hole fixture, force/torque bridge plumbing, and an admittance-style insertion controller.
 
-When ROS 2 is installed later, this workspace can contain build, install, log, and source folders used by ROS 2 development tools.
+The strongest current evidence is a **single simulated insertion-depth event**: measured insertion depth about 0.011 m with sustained contact around 142.9 N. This is not yet robust autonomous peg-in-hole success. Known unresolved concerns include a peak raw Fz spike around 1049 N, non-deterministic MOVING_TO_START failures, large Cartesian tracking errors during MOVING_TO_START/APPROACH, broken multi-point INSERT behavior, and incomplete repeated validation.
 
 ## Milestones
 
@@ -39,9 +39,11 @@ When ROS 2 is installed later, this workspace can contain build, install, log, a
 | proposal_simulation_cell_v2_13_context_encoder_prototype | Completed |
 | proposal_simulation_cell_v2_14_context_conditioned_guarded_action_validation | Completed |
 | proposal_simulation_cell_v2_15_context_action_ablation_validation | Completed |
-| proposal_simulation_cell_v2_16_guarded_peg_in_hole_objective_validation | Completed |
+| proposal_simulation_cell_v2_16_guarded_peg_in_hole_objective_validation | Completed (no peg insertion) |
 | research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes | Completed |
 | research_baseline_v0_2_camera_visual_size_fix | Completed |
+| admittance_controller_v2_honest_tracking_and_contact_estimation | Implemented; first insertion-depth event observed; repeat validation pending |
+| research_baseline_repeat_validation | Failed: 0/3 physical successes in 2026-06-01 v2 repeat run |
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 
@@ -144,6 +146,127 @@ The robot moved from the SAFE_HOME posture towards the task start pose.
 - Debug the contact detection threshold (5.0 N) vs. observed contact wrench (~2.7 N, below threshold)
 - Verify the FT sensor bridge remapping from `/world/peg_in_hole_world/model/lbr_iisy6_r1300/joint/ft_sensor_joint/sensor/ft_sensor/forcetorque` → `/ft_sensor_wrench`
 - Confirm the automaton state machine logic checks for contact after trajectory complete
+
+## admittance_controller_v2_honest_tracking_and_contact_estimation
+
+Status: `first_simulated_insertion_event_observed_repeat_validation_pending`
+
+The v2 controller has produced one simulated insertion-depth event with measured insertion depth, but that single run is not enough to claim robust autonomous peg-in-hole success. Until repeated validation shows stable behavior, the correct wording is: **first simulated insertion event with measured insertion depth**.
+
+### Fix 1 — State machine honesty
+
+The original state machine (IDLE → MOVING_TO_START → APPROACH → INSERT → RETREAT → DONE) had no mechanism to detect or report failure:
+- If MOVING_TO_START or APPROACH timed out without reaching Cartesian tolerance (0.025 m), the controller proceeded blindly to the next phase.
+- The DONE state reported "Full cycle completed successfully" even when tracking never converged and the peg never entered the hole.
+- XY error at the hole surface (0.04 m) was 40× the required clearance (~0.001 m), but the controller proceeded to INSERT anyway.
+
+**Fix applied:**
+- MOVING_TO_START and APPROACH now ABORT with a logged reason if the trajectory does not converge within the configured tolerance and timeout. No silent proceed.
+- A CHECK_ALIGNMENT sub-phase was considered but replaced with direct XY-error gating: APPROACH checks `pre_insertion_xy_error ≤ INSERTION_XY_TOLERANCE (0.002 m)` before allowing INSERT. If the error is too large, a SEARCH phase is attempted before aborting.
+- DONE is never reached without a correct trial outcome (SUCCESS, DEGRADED, ABORTED) and a human-readable reason string. The outcome distinguishes "tracking timeout" from "alignment error" from "insertion succeeded" from "insertion incomplete".
+- Each phase records `{success, cart_error, joint_error, timeout, message}` for the final diagnostic log.
+
+### Fix 2 — Motion and tracking accuracy
+
+The original controller sent a single JointTrajectory point on the topic interface with a fixed 5 s duration. There was no feedback from the controller, no multi-point interpolation, and no adaptation to the distance-to-target.
+
+**Fix applied:**
+- Long moves are broken into intermediate waypoints (linear interpolation in joint space) with durations scaled by the max joint-space distance.
+- The FollowJointTrajectory action client is used when available, with fallback to the topic interface.
+- Trajectory durations are computed as `max(5, min(15, distance × 15))` seconds, giving the controller more time for large motions.
+- Multiple waypoints (2–10 depending on distance) give the controller smoother targets.
+
+**Known limitation:** The `gz_ros2_control/GazeboSimSystem` hardware interface uses position command interfaces only (no velocity/effort). Tracking accuracy is fundamentally limited by the PD gains in the simulation plugin, which are not user-configurable from the ROS side. The 0.025 m Cartesian tolerance and 0.002 m XY alignment tolerance are engineering targets; actual performance depends on Gazebo physics settings and controller tuning.
+
+### Fix 3 — Gravity and contact estimation
+
+The original controller captured a single `_baseline_fz` at state transition. During INSERT, the robot configuration changes significantly, causing the gravity component at the FT sensor to drift by 30 N or more. Contact was computed as `Fz − baseline`, so contact remained 0.00 N even when Fz reached 82.87 N.
+
+**Fix applied:**
+- A running median filter over a sliding window of 50 Fz samples is continuously updated while the controller is active.
+- The baseline is computed as the median of recent samples (robust to outliers).
+- A 2.0 N deadband prevents noise from being reported as contact.
+- Contact force = `max(0, Fz − baseline − deadband)`.
+- The baseline is valid after 10 samples have been collected.
+
+**Limitation:** The running median assumes the robot is in free space (no contact) during baseline collection. If the peg contacts the hole surface while the baseline window includes contact forces, the baseline will drift upward and mask real contact. Future work: gate the baseline update on Z-height (only collect when peg Z > touch_Z + margin).
+
+### Fix 4 — Search/homing phase
+
+When the pre-insertion XY error exceeds `INSERTION_XY_TOLERANCE (0.002 m)`, a simple spiral search is executed at the touch Z height (0.830 m). The search:
+- Starts at radius 0.003 m and expands to max 0.015 m.
+- Visits 8 angular positions per radius.
+- Uses IK + trajectory publication (controller-driven, not fake).
+- After each step, rechecks the XY error. If within tolerance, proceeds to INSERT.
+- Exhaustion without convergence → ABORT with reason.
+
+### Fix 5 — Comprehensive logging
+
+All phases and metrics are logged:
+- State transitions with timestamps
+- Per-phase tracking errors (Cartesian and joint)
+- Peg-tip XY error at pre-insertion
+- Insertion depth (from Cartesian Z tracking)
+- Raw Fz (max observed)
+- Gravity baseline estimate (median of running window)
+- Contact force estimate (Fz − baseline − deadband)
+- Trial outcome: SUCCESS / DEGRADED / ABORTED with reason
+- A JSON file is written to `/tmp/insertion_trial_outcome.json` for post-mortem analysis
+- A JSON message is published on `/insertion_log` for real-time monitoring
+
+### Repeat Validation Harness
+
+`experiment_manager` now includes a process-level repeat-run harness:
+
+```bash
+cd /home/omar/code/robotics_project/ros2_ws
+source /opt/ros/jazzy/setup.bash
+source install/setup.bash
+ros2 run experiment_manager research_baseline_repeat_validator --trials 3 --timeout-s 150
+```
+
+The harness starts a fresh `research_baseline.launch.py use_gui:=false` process for each trial, waits for `/tmp/insertion_trial_outcome.json`, and writes:
+
+- `diagnostics/research_baseline_repeat_validation/repeat_trials.csv`
+- `diagnostics/research_baseline_repeat_validation/summary.json`
+- `diagnostics/research_baseline_repeat_validation/summary.md`
+- per-trial launch logs and outcome JSON files
+
+Physical success is counted only when `trial_outcome == SUCCESS`, insertion depth is at least 0.010 m, contact force exceeds the configured threshold, and no safety abort occurs.
+
+### 2026-06-01 Repeat Validation Result
+
+Command:
+
+```bash
+ros2 run experiment_manager research_baseline_repeat_validator --trials 3 --timeout-s 220 --output-dir diagnostics/research_baseline_repeat_validation_v2
+```
+
+Result: `0/3` physical successes.
+
+- Trial 1: `DEGRADED`, failed INSERT, depth `0.0037 m`, peak raw Fz `1237.45 N`, max contact `1142.44 N`.
+- Trial 2: `ABORTED`, failed INSERT by safety threshold, depth `0.0367 m`, peak raw Fz `3716.2 N`, max contact `3682.56 N`.
+- Trial 3: `NO_OUTCOME`, harness timeout during extended SEARCH before insertion outcome.
+
+Current conclusion: the baseline is not robust. The next technical milestone is force-safe insertion stabilization: reduce search/insert contact spikes, prevent unsafe descents when XY tracking is poor, and make SEARCH bounded by explicit timeout/outcome criteria.
+
+### Files changed
+
+- `kuka_task_control/kuka_task_control/admittance_insertion_node.py` — Complete rewrite of the state machine with honest tracking, running gravity baseline, multi-point trajectories, SEARCH phase, and comprehensive outcome logging.
+- `README.md` — Added this section.
+
+### Exact Test Commands
+
+Same as research baseline:
+```
+cd /home/omar/code/robotics_project/ros2_ws
+source /opt/ros/jazzy/setup.bash
+source install/setup.bash
+ros2 launch thesis_bringup research_baseline.launch.py headless:=true timeout_seconds:=120 2>&1 | tee /tmp/launch_run.log
+```
+
+Note: the current launch file exposes `use_gui:=false` for headless server operation. External timeout should be applied with shell `timeout` or the repeat validator.
+
 
 ## research_baseline_v0_2_camera_visual_size_fix
 
