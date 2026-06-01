@@ -78,3 +78,5 @@ Robust success requires repeated validation with a documented success rate and f
 `research_baseline_above_hole_tracking_stabilization`
 
 Reason: force-safe insert stabilization prevented some unsafe INSERT attempts, corrected the insertion-depth metric, and added a hard force abort. A no-contact alignment gate now blocks APPROACH when above-hole XY error exceeds 0.030 m. Validation still failed because MOVING_TO_START leaves the peg 0.087-0.103 m laterally away from the hole. The next milestone must improve above-hole target execution before any descent or contact search can be credible.
+
+A same-target refresh experiment was tested and rejected: repeated MOVING_TO_START target publication produced hard-force aborts and did not improve XY gate convergence.

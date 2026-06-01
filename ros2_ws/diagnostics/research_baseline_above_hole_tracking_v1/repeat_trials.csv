@@ -1,0 +1,4 @@
+trial,final_state,trial_outcome,success,failed_phase,insertion_depth_m,peak_raw_fz_N,sustained_contact_force_N,max_cartesian_error_m,timeout,safety_abort,return_code,elapsed_s,reason,log_path
+1,DONE,ABORTED,False,MOVING_TO_START,0.0,4086.95,4060.38,0.122345,False,True,0,75.61,Hard force abort: raw Fz 4086.9N exceeded 1000.0N in state MOVING_TO_START.,diagnostics/research_baseline_above_hole_tracking_v1/trial_01.log
+2,DONE,ABORTED,False,MOVING_TO_START,0.0,1766.64,1746.76,0.174572,False,True,0,65.35,Hard force abort: raw Fz 1766.6N exceeded 1000.0N in state MOVING_TO_START.,diagnostics/research_baseline_above_hole_tracking_v1/trial_02.log
+3,DONE,ABORTED,False,MOVING_TO_START,0.0,467.8,430.85,0.114463,True,False,-15,77.02,APPROACH blocked: above-hole XY error 0.1116m exceeds no-contact descent precondition 0.0300m.,diagnostics/research_baseline_above_hole_tracking_v1/trial_03.log

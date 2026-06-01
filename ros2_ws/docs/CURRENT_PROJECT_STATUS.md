@@ -106,3 +106,5 @@ The no-contact alignment gate was then implemented and validated in `diagnostics
 | 3 | ABORTED | APPROACH blocked at above-hole XY error 0.0872 m |
 
 This removed descent/SEARCH from these bad initial alignments and produced complete outcome JSON for all three trials. It did not solve task execution. The next milestone is above-hole tracking stabilization: improve the `MOVING_TO_START` target execution so the peg reaches the no-contact XY gate (`<=0.030 m`) before any descent is attempted.
+
+An above-hole target-refresh experiment was run in `diagnostics/research_baseline_above_hole_tracking_v1`. It was not retained because it worsened safety: two of three trials hard-aborted in `MOVING_TO_START` with raw Fz spikes of 4086.95 N and 1766.64 N, and the remaining trial still failed the no-contact gate at 0.1116 m XY error.

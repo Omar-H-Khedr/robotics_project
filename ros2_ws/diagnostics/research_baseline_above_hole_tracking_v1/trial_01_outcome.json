@@ -1,0 +1,27 @@
+{
+  "trial_outcome": "ABORTED",
+  "reason": "Hard force abort: raw Fz 4086.9N exceeded 1000.0N in state MOVING_TO_START.",
+  "phases": [
+    {
+      "phase": "MOVING_TO_START",
+      "success": false,
+      "cart_error_m": 0.122345,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 35.3,
+      "message": "Hard force abort: raw Fz 4086.9N exceeded 1000.0N in state MOVING_TO_START."
+    }
+  ],
+  "metrics": {
+    "initial_xy_error_m": 0.0,
+    "pre_insertion_xy_error_m": 0.0,
+    "insertion_depth_m": 0.0,
+    "max_fz_N": 4086.95,
+    "baseline_fz_N": 16.66,
+    "max_contact_force_N": 4060.38,
+    "contact_threshold_N": 5.0,
+    "gravity_baseline_valid": true,
+    "baseline_window_samples": 50
+  },
+  "status": "DONE"
+}

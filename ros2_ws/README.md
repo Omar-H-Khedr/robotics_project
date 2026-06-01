@@ -295,6 +295,18 @@ Result: `0/3` physical successes, but all three trials produced bounded final ou
 
 Current conclusion: the controller now fails earlier and more honestly before descending, but MOVING_TO_START tracking is too poor for the task. The next technical milestone is to improve above-hole joint target generation/tracking so the peg reaches the no-contact XY gate reliably.
 
+### 2026-06-01 Above-Hole Target Refresh Experiment
+
+An experiment re-published the final `MOVING_TO_START` target to improve hold tracking. Validation command:
+
+```bash
+ros2 run experiment_manager research_baseline_repeat_validator --trials 3 --timeout-s 130 --output-dir diagnostics/research_baseline_above_hole_tracking_v1
+```
+
+Result: `0/3` physical successes and worse safety behavior. Two trials hard-aborted in `MOVING_TO_START` with raw Fz spikes of `4086.95 N` and `1766.64 N`; the third still failed the no-contact XY gate at `0.1116 m`.
+
+The target-refresh strategy was not retained. Current conclusion: above-hole tracking cannot be fixed by repeatedly re-publishing the same joint target; the next attempt should revisit the joint target itself, controller gains/physics, or a safer multi-stage free-space path.
+
 ### Files changed
 
 - `kuka_task_control/kuka_task_control/admittance_insertion_node.py` — Complete rewrite of the state machine with honest tracking, running gravity baseline, multi-point trajectories, SEARCH phase, and comprehensive outcome logging.

@@ -1,0 +1,15 @@
+{
+  "created_at_utc": "2026-06-01T19:20:13.168587+00:00",
+  "command": "ros2 launch thesis_bringup research_baseline.launch.py use_gui:=false",
+  "trials_requested": 3,
+  "timeout_s": 130.0,
+  "trials_completed": 3,
+  "success_count": 0,
+  "success_rate": 0.0,
+  "timeout_count": 1,
+  "safety_abort_count": 2,
+  "criteria": {
+    "physical_success": "trial_outcome == SUCCESS, insertion_depth_m >= 0.010, max_contact_force_N >= contact_threshold_N, and no safety abort",
+    "robust_success_claim": "requires repeated evidence; one successful insertion-depth event is not treated as final autonomous peg-in-hole success"
+  }
+}
