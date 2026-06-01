@@ -136,6 +136,7 @@ class AdmittanceInsertionNode(Node):
     SEARCH_TIMEOUT_S = 45.0
     INSERT_PRECONDITION_XY_TOLERANCE = 0.015
     INSERT_PRECONDITION_MAX_Z = 0.845
+    APPROACH_START_XY_TOLERANCE = 0.030
 
     def __init__(self) -> None:
         super().__init__('admittance_insertion_node')
@@ -563,6 +564,17 @@ class AdmittanceInsertionNode(Node):
             f'Fz={self._get_fz():.1f}N  '
             f'baseline={self._baseline_fz:.1f}N'
         )
+        if self._initial_xy_error > self.APPROACH_START_XY_TOLERANCE:
+            self._abort_reason = (
+                f'APPROACH blocked: above-hole XY error '
+                f'{self._initial_xy_error:.4f}m exceeds no-contact descent '
+                f'precondition {self.APPROACH_START_XY_TOLERANCE:.4f}m.'
+            )
+            self.get_logger().error(self._abort_reason)
+            self._end_phase(False, cart_err, joint_err, phase_timed_out,
+                            self._abort_reason)
+            self._set_state(self.ABORT)
+            return
         self._end_phase(True, cart_err, joint_err, phase_timed_out, phase_message)
         self._begin_phase(self.APPROACH)
         self._set_state(self.APPROACH)

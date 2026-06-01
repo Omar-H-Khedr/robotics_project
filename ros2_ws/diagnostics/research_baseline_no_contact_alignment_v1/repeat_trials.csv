@@ -1,0 +1,4 @@
+trial,final_state,trial_outcome,success,failed_phase,insertion_depth_m,peak_raw_fz_N,sustained_contact_force_N,max_cartesian_error_m,timeout,safety_abort,return_code,elapsed_s,reason,log_path
+1,DONE,ABORTED,False,MOVING_TO_START,0.0,481.15,457.89,0.104071,True,False,0,85.05,APPROACH blocked: above-hole XY error 0.1034m exceeds no-contact descent precondition 0.0300m.,diagnostics/research_baseline_no_contact_alignment_v1/trial_01.log
+2,DONE,ABORTED,False,MOVING_TO_START,0.0,360.4,323.11,0.095332,True,False,0,84.91,APPROACH blocked: above-hole XY error 0.0911m exceeds no-contact descent precondition 0.0300m.,diagnostics/research_baseline_no_contact_alignment_v1/trial_02.log
+3,DONE,ABORTED,False,MOVING_TO_START,0.0,193.17,168.43,0.087531,True,False,-15,83.02,APPROACH blocked: above-hole XY error 0.0872m exceeds no-contact descent precondition 0.0300m.,diagnostics/research_baseline_no_contact_alignment_v1/trial_03.log

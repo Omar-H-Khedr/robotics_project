@@ -85,9 +85,9 @@ This confirms the baseline is not robust. It also confirms that the high-force c
 
 ## Next Milestone
 
-`research_baseline_no_contact_alignment_before_descent`
+`research_baseline_above_hole_tracking_stabilization`
 
-Reason: force-safe insert stabilization blocked unsafe INSERT when peg Z was too high, but validation still failed. The latest 2026-06-01 force-safe validation (`diagnostics/research_baseline_force_safe_insert_v3`) showed:
+Reason: force-safe insert stabilization blocked unsafe INSERT when peg Z was too high, but validation still failed. The 2026-06-01 force-safe validation (`diagnostics/research_baseline_force_safe_insert_v3`) showed:
 
 | Trial | Outcome | Reason |
 |---|---|---|
@@ -96,3 +96,13 @@ Reason: force-safe insert stabilization blocked unsafe INSERT when peg Z was too
 | 3 | ABORTED | Hard-force abort in SEARCH at raw Fz 2990.77 N |
 
 This means the next technical problem is not just INSERT. SEARCH/approach correction can generate unsafe force before insertion. The next milestone should move lateral alignment above the workpiece, verify no-contact XY convergence, then descend vertically only after XY is stable and peg Z reaches the force-safe precondition.
+
+The no-contact alignment gate was then implemented and validated in `diagnostics/research_baseline_no_contact_alignment_v1`:
+
+| Trial | Outcome | Reason |
+|---|---|---|
+| 1 | ABORTED | APPROACH blocked at above-hole XY error 0.1034 m |
+| 2 | ABORTED | APPROACH blocked at above-hole XY error 0.0911 m |
+| 3 | ABORTED | APPROACH blocked at above-hole XY error 0.0872 m |
+
+This removed descent/SEARCH from these bad initial alignments and produced complete outcome JSON for all three trials. It did not solve task execution. The next milestone is above-hole tracking stabilization: improve the `MOVING_TO_START` target execution so the peg reaches the no-contact XY gate (`<=0.030 m`) before any descent is attempted.

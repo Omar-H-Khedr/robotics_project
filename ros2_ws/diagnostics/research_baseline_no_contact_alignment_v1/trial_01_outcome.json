@@ -1,0 +1,27 @@
+{
+  "trial_outcome": "ABORTED",
+  "reason": "APPROACH blocked: above-hole XY error 0.1034m exceeds no-contact descent precondition 0.0300m.",
+  "phases": [
+    {
+      "phase": "MOVING_TO_START",
+      "success": false,
+      "cart_error_m": 0.104071,
+      "joint_error_rad": 0.140072,
+      "timed_out": true,
+      "duration_s": 48.4,
+      "message": "APPROACH blocked: above-hole XY error 0.1034m exceeds no-contact descent precondition 0.0300m."
+    }
+  ],
+  "metrics": {
+    "initial_xy_error_m": 0.1034,
+    "pre_insertion_xy_error_m": 0.0,
+    "insertion_depth_m": 0.0,
+    "max_fz_N": 481.15,
+    "baseline_fz_N": 22.91,
+    "max_contact_force_N": 457.89,
+    "contact_threshold_N": 5.0,
+    "gravity_baseline_valid": true,
+    "baseline_window_samples": 50
+  },
+  "status": "DONE"
+}

@@ -274,6 +274,27 @@ Result: `0/3` physical successes. The controller is safer about not entering INS
 
 Current conclusion: high force is not only an INSERT problem; SEARCH/approach correction can generate unsafe contact before insertion. The next milestone is to replace surface-level SEARCH with a no-contact XY alignment strategy above the workpiece, then descend only after XY alignment is stable.
 
+### 2026-06-01 No-Contact Alignment Gate Result
+
+Implemented after SEARCH was shown to be unsafe:
+
+- APPROACH is now blocked unless above-hole XY error after `MOVING_TO_START` is at or below `0.030 m`.
+- This prevents descent and contact-seeking SEARCH when the robot is still laterally far from the hole.
+
+Validation command:
+
+```bash
+ros2 run experiment_manager research_baseline_repeat_validator --trials 3 --timeout-s 120 --output-dir diagnostics/research_baseline_no_contact_alignment_v1
+```
+
+Result: `0/3` physical successes, but all three trials produced bounded final outcomes before descent:
+
+- Trial 1: `ABORTED`, APPROACH blocked at XY error `0.1034 m`, peak raw Fz `481.15 N`.
+- Trial 2: `ABORTED`, APPROACH blocked at XY error `0.0911 m`, peak raw Fz `360.40 N`.
+- Trial 3: `ABORTED`, APPROACH blocked at XY error `0.0872 m`, peak raw Fz `193.17 N`.
+
+Current conclusion: the controller now fails earlier and more honestly before descending, but MOVING_TO_START tracking is too poor for the task. The next technical milestone is to improve above-hole joint target generation/tracking so the peg reaches the no-contact XY gate reliably.
+
 ### Files changed
 
 - `kuka_task_control/kuka_task_control/admittance_insertion_node.py` — Complete rewrite of the state machine with honest tracking, running gravity baseline, multi-point trajectories, SEARCH phase, and comprehensive outcome logging.

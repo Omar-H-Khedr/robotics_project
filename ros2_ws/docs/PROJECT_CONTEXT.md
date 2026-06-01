@@ -75,6 +75,6 @@ Robust success requires repeated validation with a documented success rate and f
 
 ## Next Technical Milestone
 
-`research_baseline_no_contact_alignment_before_descent`
+`research_baseline_above_hole_tracking_stabilization`
 
-Reason: force-safe insert stabilization prevented some unsafe INSERT attempts, corrected the insertion-depth metric, and added a hard force abort. Validation still failed because unsafe raw force spikes now appear during SEARCH/approach correction before INSERT. The next milestone must perform lateral alignment above the workpiece, prove no-contact XY convergence, and only then descend toward the hole.
+Reason: force-safe insert stabilization prevented some unsafe INSERT attempts, corrected the insertion-depth metric, and added a hard force abort. A no-contact alignment gate now blocks APPROACH when above-hole XY error exceeds 0.030 m. Validation still failed because MOVING_TO_START leaves the peg 0.087-0.103 m laterally away from the hole. The next milestone must improve above-hole target execution before any descent or contact search can be credible.
