@@ -229,3 +229,36 @@ The task outcome remained a bounded safety failure:
 - `Max Fz: 171.1 N`.
 
 This is not insertion success. The next blocker remains stable above-hole convergence/holding under the preserved strict no-contact gate. The next milestone should add commanded-versus-actual trajectory tracking evidence and then tune trajectory timing, hold behavior, or controller/physics parameters from measured tracking data.
+
+## 2026-06-02 Trajectory Tracking Observer
+
+Milestone: `research_baseline_trajectory_tracking_observer`
+
+Evidence: `diagnostics/research_baseline_trajectory_tracking/summary.md`
+
+The canonical launch now starts a passive `trajectory_tracking_observer` by default. It compares task-published `/joint_trajectory_controller/joint_trajectory` commands against named `/joint_states`, writes compact summaries, and does not publish commands. The direct `/joint_trajectory_controller/state` topic was discoverable in topic lists but did not deliver samples during validation, so the observer records that count separately and relies on command-vs-feedback tracking for evidence.
+
+Validation passed for Python syntax, targeted `thesis_bringup` build, and a 150 s headless launch with `tracking_log_dir:=diagnostics/research_baseline_trajectory_tracking`.
+
+The task outcome remained a bounded safety failure:
+
+- `Outcome: ABORTED`;
+- `Reason: MOVING_TO_START timeout/failure (90.0s)`;
+- `cart_err=0.014 m`;
+- `xy_err=0.010 m`;
+- `joint_err=0.014 rad`;
+- `stable=0/5`;
+- `Depth: 0.0000 m`;
+- `Max Fz: 168.6 N`.
+
+Tracking summary:
+
+- observed trajectory commands: 2;
+- direct JTC state samples: 0;
+- command-vs-joint-state samples: 15,893;
+- max absolute position error: 0.045250 rad;
+- mean max absolute position error: 0.015565 rad;
+- p95 max absolute position error: 0.024368 rad;
+- final max absolute position error: 0.014106 rad.
+
+This evidence confirms the next blocker is stable final tracking/hold at the above-hole pose, not launch wiring. The next milestone should tune trajectory timing, final hold/stabilization behavior, and controller/physics parameters from measured tracking data without relaxing the 2 mm no-contact descent gate.

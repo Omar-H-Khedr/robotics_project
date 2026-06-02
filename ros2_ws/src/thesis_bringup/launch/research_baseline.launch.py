@@ -317,6 +317,22 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
     )
 
+    trajectory_tracking_observer = Node(
+        package="thesis_bringup",
+        executable="trajectory_tracking_observer",
+        parameters=[
+            {
+                "use_sim_time": simulation["use_sim_time"],
+                "state_topic": "/joint_trajectory_controller/state",
+                "command_topic": "/joint_trajectory_controller/joint_trajectory",
+                "joint_state_topic": "/joint_states",
+                "output_dir": LaunchConfiguration("tracking_log_dir"),
+            }
+        ],
+        output="screen",
+        condition=IfCondition(LaunchConfiguration("enable_tracking_observer")),
+    )
+
     admittance_insertion = Node(
         package="kuka_task_control",
         executable="admittance_insertion_node",
@@ -400,6 +416,7 @@ def launch_setup(context, *args, **kwargs):
             )
         ),
         data_logger,
+        trajectory_tracking_observer,
     ]
 
 
@@ -468,6 +485,16 @@ def generate_launch_description():
                 "controller_config_path",
                 default_value="config/research_baseline_ros2_control.yaml",
                 description="Path inside controller_config_package for gz_ros2_control parameters.",
+            ),
+            DeclareLaunchArgument(
+                "enable_tracking_observer",
+                default_value="true",
+                description="If true, passively log joint trajectory controller tracking error.",
+            ),
+            DeclareLaunchArgument(
+                "tracking_log_dir",
+                default_value="/tmp/thesis_tracking_logs",
+                description="Directory for passive trajectory tracking observer CSV and summary.",
             ),
             OpaqueFunction(function=launch_setup),
         ]
