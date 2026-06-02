@@ -57,6 +57,7 @@ Latest tracking evidence localizes the approach/descent blocker to `joint_2`: no
 | research_baseline_approach_gain_3000_v1 | Rejected: gain 3000 worsens APPROACH to about 0.073 m Cartesian error and higher raw wrench |
 | research_baseline_joint2_approach_tracking_diagnostic | Completed: reusable analyzer confirms joint_2 dominates missing descent across recent approach runs |
 | research_baseline_joint_damping_scale_0p2_v1 | Rejected: broad damping reduction triggers hard-force abort in MOVING_TO_START |
+| research_baseline_joint_effort_scale_2p0_v1 | Rejected: doubled effort reaches APPROACH but immediately hard-aborts on unsafe wrench/contact |
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
@@ -124,6 +125,31 @@ Result: rejected. The run aborted in `MOVING_TO_START` before descent with
 `|Fz|=1181.04 N`, force norm `1272.74 N`, Cartesian error `0.272028 m`, and
 zero insertion depth. Broad damping reduction did not solve the approach
 blocker and is not a credible canonical change.
+
+## 2026-06-02 Joint Effort Scale 2.0 Diagnostic
+
+Milestone: `research_baseline_joint_effort_scale_2p0_v1`
+
+The second dynamics diagnostic used `joint_effort_scale:=2.0` with canonical
+damping, default position gain, and unchanged task safety gates.
+
+Validation command:
+
+```bash
+timeout 260s ros2 launch thesis_bringup research_baseline.launch.py \
+  use_gui:=false \
+  joint_effort_scale:=2.0 \
+  tracking_log_dir:=diagnostics/research_baseline_joint_effort_scale_2p0_v1
+```
+
+Evidence: `diagnostics/research_baseline_joint_effort_scale_2p0_v1/summary.md`
+
+Result: rejected. The run reached `MOVING_TO_START` in `81.4 s` with
+`initial_xy_error=0.0007 m`, then hard-aborted in `APPROACH` after `0.5 s` with
+`|Fz|=968.4 N`, force norm `1009.7 N`, total max force norm `1043.0 N`, and
+zero insertion depth. Doubling effort improves authority enough to begin
+descent, but it immediately creates unsafe force/contact evidence and is not a
+credible canonical setting.
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 

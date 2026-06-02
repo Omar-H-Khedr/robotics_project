@@ -27,6 +27,7 @@ The project must not claim final autonomous peg-in-hole success yet. The defensi
 - `diagnostics/research_baseline_slow_approach_descent_v1/approach_tracking_analysis.md`
 - `diagnostics/research_baseline_approach_gain_3000_v1/approach_tracking_analysis.md`
 - `diagnostics/research_baseline_joint_damping_scale_0p2_v1/summary.md`
+- `diagnostics/research_baseline_joint_effort_scale_2p0_v1/summary.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -349,6 +350,27 @@ Result: rejected.
 - contact observer recorded no bridged contact samples.
 
 Broad damping reduction did not reach the no-contact gate or approach phase. It is useful diagnostic evidence, but not a canonical fix. The next controller/physics investigation should be more targeted than global damping reduction.
+
+## 2026-06-02 Joint Effort Scale 2.0 Diagnostic
+
+Milestone: `research_baseline_joint_effort_scale_2p0_v1`
+
+Evidence: `diagnostics/research_baseline_joint_effort_scale_2p0_v1/summary.md`
+
+The second dynamics diagnostic used `joint_effort_scale:=2.0`, leaving damping, position gain, and all task safety gates unchanged. The converted SDF doubled all arm-joint effort limits; `joint_2` changed from about `199.605 Nm` to `399.21 Nm`.
+
+Result: rejected.
+
+- outcome: `ABORTED`;
+- `MOVING_TO_START`: success after `81.4 s`, initial XY error `0.0007 m`, Cartesian error `0.006955 m`;
+- `APPROACH`: hard-force abort after `0.5 s`, `|Fz|=968.4 N`, force norm `1009.7 N`;
+- total max raw `|Fz|`: `1020.10 N`;
+- total max raw force norm: `1043.00 N`;
+- insertion depth: `0.0000 m`;
+- trajectory tracking p95 max joint error: `0.048923 rad`;
+- contact observer recorded target-source contact rows in `MOVING_TO_START`, `APPROACH`, and `ABORT`, with max target contact force `9925.518339 N`.
+
+This diagnostic shows effort authority is involved, but doubled effort is unsafe and not a fix. The next investigation should localize why force/contact evidence appears immediately at approach start when XY is valid and the command target is a short vertical descent.
 
 ## 2026-06-02 Trajectory Tracking Observer
 
