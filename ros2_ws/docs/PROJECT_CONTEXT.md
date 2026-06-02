@@ -88,6 +88,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - A 2026-06-02 above-hole hold analyzer milestone added a reusable offline diagnostic for `wrench_state_samples.csv`. Re-analysis of five post-tool runs showed none satisfied the estimated five 10 Hz stable ticks required by the preserved 2 mm no-contact gate. Several runs reached sub-millimetre XY error transiently, but the best estimated state-loop hold was only one tick.
 - A 2026-06-02 MOVING_TO_START tracking analyzer milestone added selector-based command attribution for the axis-align command. It prevents retreat-only command logs from being misread as start tracking and showed the usable post-tool start runs have distributed joint error with persistent Cartesian XY drift, not one dominant joint comparable to the approach `joint_2` failure.
 - A 2026-06-02 bounded endpoint-correction experiment was rejected and removed. It accepted three small no-contact corrections and improved final timeout XY to about `0.004 m`, but still failed the five-tick strict hold gate and aborted in `MOVING_TO_START` with zero contact-topic samples.
+- A 2026-06-03 2x joint-damping diagnostic was rejected as a canonical change. It reduced p95 max joint tracking error to about `0.0158 rad` and improved the estimated strict hold to two ticks, but still failed `MOVING_TO_START` with final XY about `0.007 m` and `stable=0/5`.
 
 ## Current Success Criteria
 
@@ -142,6 +143,12 @@ was safe, but it did not hold the strict gate, so the source was removed. The
 next implementation should not merely republish small IK corrections; it should
 address why the endpoint continues to oscillate or drift across the strict
 2 mm window.
+
+The 2x damping diagnostic suggests damping is relevant but insufficient alone.
+It improved joint tracking and the strict-gate hold window without contact
+regression, but it still failed before descent. Treat it as evidence for a
+targeted controller/physics stabilization path, not as a canonical robot model
+change.
 
 A same-target refresh experiment was tested and rejected: repeated MOVING_TO_START target publication produced hard-force aborts and did not improve XY gate convergence.
 

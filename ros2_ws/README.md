@@ -67,6 +67,7 @@ Latest hold evidence shows the corrected post-tool runs do not satisfy the requi
 | research_baseline_above_hole_hold_analyzer | Completed: reusable offline analyzer confirms recent post-tool runs only cross the strict gate transiently |
 | research_baseline_moving_to_start_tracking_analyzer | Completed: reusable selector-based analyzer localizes post-tool start hold drift without false retreat-command attribution |
 | research_baseline_start_endpoint_correction_v1 | Rejected: bounded endpoint corrections improved final XY but still failed the five-tick strict hold gate |
+| research_baseline_joint_damping_scale_2p0_v1 | Rejected: 2x damping improved tracking and best hold to two ticks, but still failed the strict gate |
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
@@ -411,6 +412,30 @@ small corrections, but still aborted in `MOVING_TO_START` with final
 `cart_err=0.010 m`, `xy_err=0.004 m`, `joint_err=0.018 rad`, and `stable=0/5`.
 Offline hold analysis still found only one estimated 10 Hz stable tick. This is
 not a credible canonical fix.
+
+## 2026-06-03 Joint Damping Scale 2.0 Diagnostic
+
+Milestone: `research_baseline_joint_damping_scale_2p0_v1`
+
+A diagnostic run doubled converted SDF joint damping while preserving the
+canonical position gain and all task safety gates.
+
+Validation command:
+
+```bash
+timeout 200s ros2 launch thesis_bringup research_baseline.launch.py \
+  use_gui:=false \
+  joint_damping_scale:=2.0 \
+  tracking_log_dir:=diagnostics/research_baseline_joint_damping_scale_2p0_v1
+```
+
+Evidence: `diagnostics/research_baseline_joint_damping_scale_2p0_v1/summary.md`
+
+Result: rejected as a canonical change. The run stayed safe, recorded zero
+contact-topic samples, and reduced p95 max joint error to about `0.0158 rad`.
+It also improved the estimated strict-gate hold to `2/5` ticks, but still
+aborted in `MOVING_TO_START` with final `xy_err=0.007 m`, `joint_err=0.013
+rad`, and `stable=0/5`. Canonical damping remains unchanged.
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 

@@ -47,6 +47,9 @@ The project must not claim final autonomous peg-in-hole success yet. The defensi
 - `diagnostics/research_baseline_start_endpoint_correction_v1/summary.md`
 - `diagnostics/research_baseline_start_endpoint_correction_v1/above_hole_hold_analysis.md`
 - `diagnostics/research_baseline_start_endpoint_correction_v1/moving_to_start_tracking_analysis.md`
+- `diagnostics/research_baseline_joint_damping_scale_2p0_v1/summary.md`
+- `diagnostics/research_baseline_joint_damping_scale_2p0_v1/above_hole_hold_analysis.md`
+- `diagnostics/research_baseline_joint_damping_scale_2p0_v1/moving_to_start_tracking_analysis.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -110,6 +113,7 @@ This confirms the baseline is not robust. It also confirms that the high-force c
 - Offline above-hole hold analysis of five post-tool runs confirmed that transient strict-gate crossings are not enough. None reached the required estimated five 10 Hz stable ticks; the best estimated state-loop hold was one tick.
 - Selector-based MOVING_TO_START command tracking showed the usable post-tool runs have distributed joint error with persistent final XY drift, not a single dominant joint. Some diagnostics only captured abort-retreat and should not be used for start-command attribution.
 - A bounded endpoint-correction experiment was safe but rejected. It accepted three small corrections, reached final timeout XY about 4 mm, and still failed the strict five-tick hold gate.
+- A 2x joint-damping diagnostic was safe and improved tracking/hold evidence, but was rejected because the strict gate still failed at `2/5` estimated stable ticks and final XY about 7 mm.
 - `APPROACH` currently commands a 67 mm Cartesian descent but measured peg Z remains near 0.90 m instead of reaching the 0.83 m touch target.
 - Peak raw Fz spikes are confirmed: 1237.45 N and 3716.2 N were recorded in the 2026-06-01 repeat run.
 - Large Cartesian errors during APPROACH remain unresolved.
@@ -181,6 +185,14 @@ did not descend, recorded zero contact-topic samples, and kept peak raw force
 norm at `270.2 N`, but still aborted in `MOVING_TO_START` with final
 `xy_err=0.004 m` and `stable=0/5`. Offline hold analysis still found only one
 estimated stable tick. The source change was removed.
+
+A 2x damping diagnostic was then tested in
+`diagnostics/research_baseline_joint_damping_scale_2p0_v1` and rejected as a
+canonical change. It preserved zero contact-topic samples and reduced peak raw
+force norm to `255.5 N`; trajectory tracking improved to p95 max joint error
+about `0.0158 rad`, and above-hole hold analysis improved to two estimated
+stable ticks. It still aborted in `MOVING_TO_START` with final `xy_err=0.007 m`
+and `stable=0/5`, so it does not justify changing canonical damping.
 
 ## 2026-06-02 Joint-State Source Integrity
 
