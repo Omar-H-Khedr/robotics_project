@@ -248,6 +248,8 @@ def launch_setup(context, *args, **kwargs):
         f"initial_joint_5:={safe_home_pose[4]}",
         f"initial_joint_6:={safe_home_pose[5]}",
         "include_camera:=false",
+        "--position-gain",
+        LaunchConfiguration("position_gain"),
         "--x",
         "0.0",
         "--y",
@@ -442,6 +444,15 @@ def generate_launch_description():
                     "If true, allow ros_gz_sim create to rename duplicate robot "
                     "entities instead of failing. Keep false for canonical runs "
                     "because F/T sensor bridge paths include the robot model name."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "position_gain",
+                default_value="1000.0",
+                description=(
+                    "Gazebo position_proportional_gain for gz_ros2_control. "
+                    "The canonical default keeps the upstream-style value; "
+                    "override only for documented tracking experiments."
                 ),
             ),
             OpaqueFunction(function=launch_setup),

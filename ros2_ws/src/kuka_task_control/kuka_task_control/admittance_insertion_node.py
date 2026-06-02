@@ -136,7 +136,7 @@ class AdmittanceInsertionNode(Node):
     SEARCH_TIMEOUT_S = 45.0
     INSERT_PRECONDITION_XY_TOLERANCE = 0.015
     INSERT_PRECONDITION_MAX_Z = 0.845
-    APPROACH_START_XY_TOLERANCE = 0.030
+    APPROACH_START_XY_TOLERANCE = INSERTION_XY_TOLERANCE
 
     def __init__(self) -> None:
         super().__init__('admittance_insertion_node')
@@ -181,6 +181,7 @@ class AdmittanceInsertionNode(Node):
         self._state_entry_ticks: int = 0
         self._abort_ticks: int = 0
         self._correction_ticks: int = 0
+        self._insert_traj_dur: float = 20.0
 
         self.current_joints: np.ndarray = np.zeros(6)
         self.current_wrench: Wrench = Wrench()
@@ -240,8 +241,14 @@ class AdmittanceInsertionNode(Node):
         )
 
     def _joint_states_cb(self, msg: JointState) -> None:
-        if len(msg.position) >= 6:
-            self.current_joints = np.array(msg.position[:6])
+        positions_by_name = {
+            name: position
+            for name, position in zip(msg.name, msg.position)
+        }
+        if all(name in positions_by_name for name in self.JOINT_NAMES):
+            self.current_joints = np.array([
+                positions_by_name[name] for name in self.JOINT_NAMES
+            ])
             self._joints_received = True
 
     def _wrench_cb(self, msg: Wrench) -> None:
@@ -251,7 +258,14 @@ class AdmittanceInsertionNode(Node):
     # --- Gravity baseline ---------------------------------------------------
 
     def _update_baseline(self) -> None:
+        """Update gravity baseline only during free-space states.
+
+        During INSERT, SEARCH, or RETREAT the Fz readings contain contact
+        forces which would corrupt the median-based baseline.
+        """
         if not self._wrench_received:
+            return
+        if self._state not in (self.IDLE, self.MOVING_TO_START, self.APPROACH):
             return
         fz = abs(self.current_wrench.force.z)
         self._fz_buffer.append(fz)
@@ -396,6 +410,8 @@ class AdmittanceInsertionNode(Node):
                 fz > self.HARD_FORCE_ABORT_N
                 and self._state not in (
                     self.IDLE,
+                    self.MOVING_TO_START,
+                    self.APPROACH,
                     self.RETREAT,
                     self.ABORT,
                     self.DONE,
@@ -420,7 +436,11 @@ class AdmittanceInsertionNode(Node):
         elif self._state == self.APPROACH:
             self._handle_approach()
         elif self._state == self.CHECK_ALIGNMENT:
-            self._handle_check_alignment()
+            # CHECK_ALIGNMENT is not currently reachable (no transition targets
+            # it), but the handler exists defensively.  If entered, abort.
+            self._abort_reason = 'CHECK_ALIGNMENT state is not implemented'
+            self.get_logger().error(self._abort_reason)
+            self._set_state(self.ABORT)
         elif self._state == self.SEARCH:
             self._handle_search()
         elif self._state == self.INSERT:
@@ -503,12 +523,14 @@ class AdmittanceInsertionNode(Node):
         )
         peg, _ = self._kinematics.pose(self.current_joints)
         cart_err = np.linalg.norm(peg - self.AXIS_ALIGN_POSE)
+        xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
         joints_ok = bool(
             np.all(np.abs(self.current_joints - self._insert_joints)
                    < self.JOINT_TOLERANCE)
         )
         cart_ok = cart_err < self.CARTESIAN_TOLERANCE
-        settled = joints_ok and cart_ok
+        xy_ok = xy_err <= self.APPROACH_START_XY_TOLERANCE
+        settled = joints_ok and cart_ok and xy_ok
         self._stable_counter = (self._stable_counter + 1) if settled else 0
         stabilized = self._stable_counter >= self.STABILIZE_TICKS
 
@@ -517,13 +539,19 @@ class AdmittanceInsertionNode(Node):
                 f'MOVING_TO_START t={elapsed:.1f}s  '
                 f'peg=({peg[0]:.3f}, {peg[1]:.3f}, {peg[2]:.3f})  '
                 f'cart_err={cart_err:.3f}  '
+                f'xy_err={xy_err:.3f}  '
+                f'joint_err={np.max(np.abs(self.current_joints - self._insert_joints)):.3f}  '
                 f'stable={self._stable_counter}/{self.STABILIZE_TICKS}'
             )
 
         if (
             not stabilized
             and not timed_out
-            and not (degraded_ready and cart_err < self.CARTESIAN_TIMEOUT_GRACE)
+            and not (
+                degraded_ready
+                and cart_err < self.CARTESIAN_TIMEOUT_GRACE
+                and xy_err <= self.APPROACH_START_XY_TOLERANCE
+            )
         ):
             self._state_entry_ticks += 1
             return
@@ -533,16 +561,20 @@ class AdmittanceInsertionNode(Node):
         phase_timed_out = False
         phase_message = ''
         if not stabilized:
-            if cart_err < self.CARTESIAN_TIMEOUT_GRACE:
+            if (
+                cart_err < self.CARTESIAN_TIMEOUT_GRACE
+                and xy_err <= self.APPROACH_START_XY_TOLERANCE
+            ):
                 phase_timed_out = True
                 phase_message = (
                     f'degraded: no strict convergence after {elapsed:.1f}s; '
-                    f'cart_err={cart_err:.3f}m'
+                    f'cart_err={cart_err:.3f}m, xy_err={xy_err:.3f}m'
                 )
                 self.get_logger().warn(
                     f'MOVING_TO_START degraded ({elapsed:.1f}s at '
                     f'{cart_err:.3f}m, within grace '
-                    f'{self.CARTESIAN_TIMEOUT_GRACE:.2f}m). Proceeding.'
+                    f'{self.CARTESIAN_TIMEOUT_GRACE:.2f}m and '
+                    f'xy_err={xy_err:.3f}m). Proceeding.'
                 )
             else:
                 self._abort_reason = (
@@ -611,6 +643,18 @@ class AdmittanceInsertionNode(Node):
         peg, _ = self._kinematics.pose(self.current_joints)
         cart_err = np.linalg.norm(peg - self.TOUCH_POSE)
         z_err = abs(peg[2] - self.TOUCH_POSE[2])
+        contact_force = self._get_contact_force()
+        if peg[2] <= self.TOUCH_POSE[2] + 0.005 and self._check_abort(contact_force):
+            self._abort_reason = (
+                f'APPROACH aborted because contact force '
+                f'({contact_force:.1f} N) exceeded safety threshold '
+                f'({self._safety_threshold:.1f} N) near touch height.'
+            )
+            self.get_logger().warn(self._abort_reason)
+            self._end_phase(False, cart_err, 0.0, False, self._abort_reason)
+            self._touch_joints = None
+            self._set_state(self.ABORT)
+            return
         joints_ok = bool(
             np.all(np.abs(self.current_joints - self._touch_joints)
                    < self.JOINT_TOLERANCE)
@@ -995,7 +1039,8 @@ class AdmittanceInsertionNode(Node):
         retreat_ok = joints_ok or not timed_out
         if not retreat_ok:
             self.get_logger().warn(
-                f'RETREAT timeout after {timeout_s:.0f}s. joints not at SAFE_HOME.'
+                f'RETREAT timeout after {self.TRAJECTORY_TIMEOUT_S:.0f}s. '
+                f'joints not at SAFE_HOME.'
             )
 
         self._end_phase(retreat_ok, 0.0, 0.0, timed_out)

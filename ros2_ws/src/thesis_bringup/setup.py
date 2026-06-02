@@ -22,6 +22,7 @@ setup(
     extras_require={"test": ["pytest"]},
     entry_points={
         "console_scripts": [
+            "spawn_robot_sdf = thesis_bringup.spawn_robot_sdf:main",
             "controller_readiness_gate = thesis_bringup.controller_readiness_gate:main",
             "proposal_simulation_cell_monitor = thesis_bringup.proposal_simulation_cell_monitor:main",
             "proposal_simulation_cell_v1_1_validator = thesis_bringup.proposal_simulation_cell_v1_1_validator:main",

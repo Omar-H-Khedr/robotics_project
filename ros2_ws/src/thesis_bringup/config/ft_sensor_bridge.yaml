@@ -1,0 +1,4 @@
+- topic_name: /world/peg_in_hole_world/model/lbr_iisy6_r1300/joint/ft_sensor_joint/sensor/ft_sensor/forcetorque
+  ros_type_name: geometry_msgs/msg/Wrench
+  gz_type_name: gz.msgs.Wrench
+  direction: GZ_TO_ROS

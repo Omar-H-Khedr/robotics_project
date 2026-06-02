@@ -61,6 +61,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - Gazebo contact physics are adequate for early simulation evidence but not final safety fidelity.
 - Some older docs still describe stale iisy3 state and must not be used as current truth.
 - A 2026-06-02 source-integrity run confirmed `joint_state_broadcaster` as the intended `/joint_states` publisher, but the same run still timed out in `MOVING_TO_START` with large XY error.
+- A 2026-06-02 tracking audit confirmed the above-hole target is reachable in offline IK, but runtime Gazebo/controller tracking remains underdamped or unstable. Gain 250 and repeated bounded refinements were rejected.
 
 ## Current Success Criteria
 
@@ -84,3 +85,5 @@ Reason: force-safe insert stabilization prevented some unsafe INSERT attempts, c
 A same-target refresh experiment was tested and rejected: repeated MOVING_TO_START target publication produced hard-force aborts and did not improve XY gate convergence.
 
 The next step remains tracking stabilization. The joint-state source integrity milestone removed one measurement ambiguity; it did not solve the large no-contact XY error.
+
+Tracking stabilization should focus on controller/physics configuration and measured joint tracking. Do not loosen the no-contact XY gate to hide the error.

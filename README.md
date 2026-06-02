@@ -13,6 +13,8 @@ The active baseline targets the KUKA LBR iisy 6 R1300 and is controller-driven i
 
 The canonical `research_baseline.launch.py` now uses a project-local bridge config that omits Gazebo `/joint_states`; `joint_state_broadcaster` is the intended single ROS 2 joint-state source. Evidence is in `ros2_ws/diagnostics/research_baseline_joint_state_source_integrity/`.
 
+The latest tracking audit confirms the above-hole IK target is reachable offline, but Gazebo/controller tracking remains unstable. Gain 250 and repeated bounded refinement were rejected; the retained baseline keeps the 2 mm no-contact gate and exposes `position_gain` only for documented experiments.
+
 ## 1. Project Overview
 
 This repository contains a ROS 2 / Gazebo-based research framework for robotic peg-in-hole assembly in smart manufacturing cells. The project investigates how a robot can adapt to product variation, tolerance uncertainty, and contact-state changes using:

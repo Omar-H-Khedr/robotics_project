@@ -125,3 +125,19 @@ The canonical baseline now avoids the shared KUKA Gazebo `/joint_states` bridge 
 - `ros2 node info /joint_state_broadcaster` listed `/joint_states` as a publisher.
 
 The trial remained a bounded failure, not a success: it timed out in `MOVING_TO_START` with late observed XY error 0.066 m, so descent remained blocked by the 0.002 m no-contact gate.
+
+## 2026-06-02 Tracking Gain Audit
+
+Milestone: `research_baseline_tracking_gain_audit`
+
+Evidence: `diagnostics/research_baseline_tracking_gain_audit/summary.md`
+
+Offline IK confirmed that `AXIS_ALIGN_POSE` is reachable from `SAFE_HOME` with near-zero FK residual, so the current failure is runtime tracking/physics/controller behavior rather than an unreachable Cartesian target.
+
+Runtime tests showed:
+
+- canonical gain 1000 can get near the target but oscillates/drifts, with best observed XY around 0.011 m before drifting back outside the gate;
+- gain 250 was accepted by `gz_ros2_control` but was worse, reaching only about 0.023 m XY at 60 s and drifting to about 0.072 m;
+- a bounded repeated joint-refinement experiment was rejected and removed because it increased joint error up to about 1.15 rad and left XY error around 0.14-0.23 m.
+
+Retained implementation changes are diagnostic/configuration only: launch-time `position_gain` override and `MOVING_TO_START` joint-error logging. The no-contact descent gate remains 0.002 m.

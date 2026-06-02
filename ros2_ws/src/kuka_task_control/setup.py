@@ -52,6 +52,8 @@ setup(
             "semantic_model_validator = kuka_task_control.semantic_model_validator:main",
             "robot_description_semantic_diagnostics = kuka_task_control.robot_description_semantic_diagnostics:main",
             "tool_link_validator = kuka_task_control.tool_link_validator:main",
+            "admittance_insertion_node = kuka_task_control.admittance_insertion_node:main",
+            "data_logger_node = kuka_task_control.data_logger_node:main",
         ]
     },
 )
