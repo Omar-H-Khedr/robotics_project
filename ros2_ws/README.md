@@ -4,6 +4,8 @@ Current status as of 2026-06-02: this is an active ROS 2 Jazzy workspace for a G
 
 The strongest historical insertion evidence remains a **single simulated insertion-depth event**: measured insertion depth about 0.011 m with sustained contact around 142.9 N. This is not robust autonomous peg-in-hole success. The current safer iisy6 baseline reaches the strict above-hole XY gate with an axis-aligned vertical peg, then aborts honestly in `APPROACH` because the 67 mm descent is not tracked. Known unresolved concerns include high raw F/T spikes, large approach tracking errors, broken multi-point INSERT behavior, and failed repeated validation.
 
+Latest tracking evidence localizes the approach/descent blocker to `joint_2`: normal, slow-descent, and high-gain diagnostics all leave `joint_2` about 0.107-0.111 rad from target, keeping the peg tip about 67-70 mm above the commanded touch pose. This supports a controller/physics/joint-authority investigation before any learning or insertion-claim work.
+
 ## Milestones
 
 | Milestone | Status |
@@ -53,6 +55,44 @@ The strongest historical insertion evidence remains a **single simulated inserti
 | research_baseline_search_fail_closed_v2 | Completed: 120 s axis-aligned start reaches strict 2 mm XY gate; failed APPROACH now aborts before SEARCH |
 | research_baseline_slow_approach_descent_v1 | Rejected: 41.7 s descent still stalls near joint_2 with about 0.070 m Cartesian error |
 | research_baseline_approach_gain_3000_v1 | Rejected: gain 3000 worsens APPROACH to about 0.073 m Cartesian error and higher raw wrench |
+| research_baseline_joint2_approach_tracking_diagnostic | Completed: reusable analyzer confirms joint_2 dominates missing descent across recent approach runs |
+
+## 2026-06-02 Joint 2 Approach Tracking Diagnostic
+
+Milestone: `research_baseline_joint2_approach_tracking_diagnostic`
+
+The workspace now includes `approach_tracking_analyzer`, an offline diagnostic
+tool for the passive trajectory observer CSVs. It reads named-joint command and
+feedback data, computes per-joint error statistics for the approach command,
+and maps final feedback through the local iisy6 peg-tip kinematics.
+
+Validation commands:
+
+```bash
+python3 -m py_compile src/thesis_bringup/thesis_bringup/approach_tracking_analyzer.py
+colcon build --symlink-install --packages-select thesis_bringup
+ros2 run thesis_bringup approach_tracking_analyzer diagnostics/research_baseline_search_fail_closed_v2
+ros2 run thesis_bringup approach_tracking_analyzer diagnostics/research_baseline_slow_approach_descent_v1
+ros2 run thesis_bringup approach_tracking_analyzer diagnostics/research_baseline_approach_gain_3000_v1
+```
+
+Evidence:
+
+- `diagnostics/research_baseline_search_fail_closed_v2/approach_tracking_analysis.md`
+- `diagnostics/research_baseline_slow_approach_descent_v1/approach_tracking_analysis.md`
+- `diagnostics/research_baseline_approach_gain_3000_v1/approach_tracking_analysis.md`
+
+Result: all three recent approach variants fail through the same dominant
+tracking signature, not through a bad Cartesian command. `joint_2` has p95
+absolute approach error `0.108733 rad` in the fail-closed run, `0.106741 rad`
+in the slow-descent run, and `0.110990 rad` in the high-gain run. Final peg-tip
+feedback remains near `z=0.897-0.900 m` while the command target is
+`z=0.830 m`.
+
+Current conclusion: the next milestone should investigate iisy6 joint dynamics,
+effort/damping assumptions, and Gazebo position-control authority around
+`joint_2`. Safety gates remain correct; do not loosen the 2 mm no-contact gate,
+approach Z preconditions, or hard-force abort to mask this failure.
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 

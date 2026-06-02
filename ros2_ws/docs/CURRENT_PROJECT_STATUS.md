@@ -23,6 +23,9 @@ The project must not claim final autonomous peg-in-hole success yet. The defensi
 - `spawn_robot_sdf.py`
 - `diagnostics/research_baseline_cell_model_consistency/summary.md`
 - `diagnostics/research_baseline_search_fail_closed_v2/summary.md`
+- `diagnostics/research_baseline_search_fail_closed_v2/approach_tracking_analysis.md`
+- `diagnostics/research_baseline_slow_approach_descent_v1/approach_tracking_analysis.md`
+- `diagnostics/research_baseline_approach_gain_3000_v1/approach_tracking_analysis.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -293,6 +296,34 @@ Result:
 - no `SEARCH` phase was entered.
 
 The higher gain slightly reduced time to the above-hole gate, but it worsened approach tracking and increased peak wrench. The next milestone remains a dynamics/controller investigation around `joint_2`, not simple gain increase.
+
+## 2026-06-02 Joint 2 Approach Tracking Diagnostic
+
+Milestone: `research_baseline_joint2_approach_tracking_diagnostic`
+
+Evidence:
+
+- `diagnostics/research_baseline_search_fail_closed_v2/approach_tracking_analysis.md`
+- `diagnostics/research_baseline_slow_approach_descent_v1/approach_tracking_analysis.md`
+- `diagnostics/research_baseline_approach_gain_3000_v1/approach_tracking_analysis.md`
+
+Added `thesis_bringup.approach_tracking_analyzer`, an offline analyzer for the passive trajectory observer CSVs. It uses named joints from `trajectory_commands.csv` and `trajectory_tracking_samples.csv`, computes per-joint approach error statistics, and maps final feedback through the local KUKA LBR iisy6 R1300 peg-tip kinematics.
+
+Validation passed:
+
+- `python3 -m py_compile src/thesis_bringup/thesis_bringup/approach_tracking_analyzer.py`;
+- targeted `colcon build --symlink-install --packages-select thesis_bringup`;
+- analyzer runs over the three recent approach-failure diagnostic directories.
+
+Cross-run result:
+
+| Run | p95 joint_2 abs error | final joint_2 error | final Cartesian error | missing descent |
+|---|---:|---:|---:|---:|
+| `research_baseline_search_fail_closed_v2` | `0.108733 rad` | `0.107360 rad` | `0.072220 m` | `-0.069840 m` |
+| `research_baseline_slow_approach_descent_v1` | `0.106741 rad` | `0.108545 rad` | `0.070156 m` | `-0.067465 m` |
+| `research_baseline_approach_gain_3000_v1` | `0.110990 rad` | `0.110880 rad` | `0.072500 m` | `-0.069807 m` |
+
+The approach command target is consistently the correct peg-tip touch pose near `0.520, -0.200, 0.830 m`. Runtime feedback remains near `z=0.897-0.900 m`, so the blocked descent is a controller/physics/joint-authority issue dominated by `joint_2`, not an unreachable or wrongly computed Cartesian target.
 
 ## 2026-06-02 Trajectory Tracking Observer
 
