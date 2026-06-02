@@ -262,3 +262,24 @@ Tracking summary:
 - final max absolute position error: 0.014106 rad.
 
 This evidence confirms the next blocker is stable final tracking/hold at the above-hole pose, not launch wiring. The next milestone should tune trajectory timing, final hold/stabilization behavior, and controller/physics parameters from measured tracking data without relaxing the 2 mm no-contact descent gate.
+
+## 2026-06-02 Slow Move-To-Start Timing Rejected
+
+Milestone: `research_baseline_slow_move_to_start_rejected`
+
+Evidence: `diagnostics/research_baseline_slow_move_to_start_tracking/summary.md`
+
+A temporary slower and denser no-contact `MOVING_TO_START` trajectory was tested and then reverted. The tested command used `duration=45.6s`, `waypoints=17`, and `dist=0.6517`; it delayed arrival near the above-hole target and still failed the strict stability gate.
+
+Runtime result:
+
+- `Outcome: ABORTED`;
+- `Reason: MOVING_TO_START timeout/failure (90.0s)`;
+- `cart_err=0.012 m`;
+- `xy_err=0.011 m`;
+- `joint_err=0.015 rad`;
+- `stable=0/5`;
+- `Depth: 0.0000 m`;
+- `Max Fz: 169.4 N`.
+
+Decision: rejected and reverted. The retained code keeps the prior move-to-start timing. The next milestone should target final hold/stabilization near the above-hole pose or controller/physics parameters, not a globally slower no-contact approach.

@@ -67,6 +67,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - A 2026-06-02 strict-stability audit removed descent from transient above-hole crossings. The latest validation aborted safely in `MOVING_TO_START` with `xy_err=0.018 m`, `stable=0/5`, zero insertion depth, and a high no-contact F/T spike.
 - A 2026-06-02 controller-config audit made the canonical baseline use a project-local 250 Hz `research_baseline_ros2_control.yaml`. The config loaded correctly and reduced controller-configuration ambiguity, but the task still aborted safely in `MOVING_TO_START` with `xy_err=0.011 m`, `stable=0/5`, and zero insertion depth.
 - A 2026-06-02 trajectory-tracking audit added a passive observer for task-command-versus-`/joint_states` tracking. The latest validation still aborted safely in `MOVING_TO_START` with `xy_err=0.010 m`, while the observer recorded p95 max joint error `0.024368 rad` and final max joint error `0.014106 rad`.
+- A 2026-06-02 slower move-to-start timing experiment was rejected and reverted. It delayed arrival near the above-hole pose and still aborted safely with `xy_err=0.011 m`, `stable=0/5`, and zero insertion depth.
 
 ## Current Success Criteria
 
@@ -91,4 +92,4 @@ A same-target refresh experiment was tested and rejected: repeated MOVING_TO_STA
 
 The next step remains tracking stabilization. The joint-state source integrity milestone removed one measurement ambiguity; it did not solve the large no-contact XY error.
 
-Tracking stabilization should now focus on trajectory timing, final hold behavior, controller/physics configuration, and high free-space F/T behavior using the new command-vs-feedback evidence. Do not loosen the no-contact XY gate to hide the error.
+Tracking stabilization should now focus on final hold behavior, controller/physics configuration, and high free-space F/T behavior using the new command-vs-feedback evidence. A globally slower move-to-start trajectory was tested and rejected. Do not loosen the no-contact XY gate to hide the error.

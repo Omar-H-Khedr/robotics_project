@@ -1,7 +1,7 @@
 # Visuomotor Context-Based Meta-Reinforcement Learning for Safe Peg-in-Hole Assembly
 
 **Repository status:** active doctoral research prototype
-**Latest documented:** `research_baseline_trajectory_tracking_observer`
+**Latest documented:** `research_baseline_slow_move_to_start_rejected`
 **README last updated:** 2026-06-02
 **Execution scope:** simulation-first validation only; no real-robot claim is made in this repository state.
 
@@ -24,6 +24,8 @@ The latest strict-stability audit removes the degraded `MOVING_TO_START` transit
 The latest controller-config audit makes the canonical baseline use a project-local `thesis_bringup/config/research_baseline_ros2_control.yaml` instead of the upstream 50 Hz fake-hardware YAML. The 250 Hz controller config was loaded by both controller spawners and the headless launch remained safe, but the trial still aborted in `MOVING_TO_START` with `xy_err=0.011 m`, `stable=0/5`, and zero insertion depth. Evidence is in `ros2_ws/diagnostics/research_baseline_ros2_control_config/`.
 
 The latest trajectory-tracking audit adds a passive observer that compares commanded `JointTrajectory` points against named `/joint_states`. A 150 s validation still aborted safely in `MOVING_TO_START` with `xy_err=0.010 m`, `stable=0/5`, and zero insertion depth. The observer recorded 15,893 command-vs-feedback samples, with p95 max joint error `0.024368 rad` and final max joint error `0.014106 rad`; direct JTC state samples were unavailable. Evidence is in `ros2_ws/diagnostics/research_baseline_trajectory_tracking/`.
+
+The latest timing experiment tested a slower, denser no-contact `MOVING_TO_START` trajectory and rejected it. The temporary run used `duration=45.6s` and `waypoints=17`, but still aborted safely with `xy_err=0.011 m`, `stable=0/5`, zero insertion depth, and no descent. The code change was reverted; evidence is in `ros2_ws/diagnostics/research_baseline_slow_move_to_start_tracking/`.
 
 ## 1. Project Overview
 
