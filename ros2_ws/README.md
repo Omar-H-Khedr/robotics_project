@@ -66,6 +66,7 @@ Latest hold evidence shows the corrected post-tool runs do not satisfy the requi
 | research_baseline_zero_derivative_trajectory_hold_v1 | Rejected: explicit zero velocity/acceleration trajectory points still failed above-hole hold |
 | research_baseline_above_hole_hold_analyzer | Completed: reusable offline analyzer confirms recent post-tool runs only cross the strict gate transiently |
 | research_baseline_moving_to_start_tracking_analyzer | Completed: reusable selector-based analyzer localizes post-tool start hold drift without false retreat-command attribution |
+| research_baseline_start_endpoint_correction_v1 | Rejected: bounded endpoint corrections improved final XY but still failed the five-tick strict hold gate |
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
@@ -390,6 +391,26 @@ for slow settle, `joint_3` at `0.022163 rad` for gain 2000, and `joint_5` at
 `0.003992 m`, and `0.011025 m` respectively, so the next implementation should
 target closed endpoint hold/correction rather than another broad gain or
 single-joint dynamics change.
+
+## 2026-06-02 Start Endpoint Correction Diagnostic
+
+Milestone: `research_baseline_start_endpoint_correction_v1`
+
+A bounded endpoint-correction experiment was tested in `MOVING_TO_START`.
+Corrections were allowed only after the original 40 s start trajectory had
+finished, only above the workpiece, only at low force, only when XY error was
+within 20 mm, and only if the IK correction required at most 0.05 rad of joint
+motion. The experiment did not relax the 2 mm no-contact gate and did not allow
+descent without five strict stable ticks.
+
+Evidence: `diagnostics/research_baseline_start_endpoint_correction_v1/summary.md`
+
+Result: rejected and source change removed. The run remained safe and recorded
+zero contact-topic samples. It rejected one large correction and accepted three
+small corrections, but still aborted in `MOVING_TO_START` with final
+`cart_err=0.010 m`, `xy_err=0.004 m`, `joint_err=0.018 rad`, and `stable=0/5`.
+Offline hold analysis still found only one estimated 10 Hz stable tick. This is
+not a credible canonical fix.
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 
