@@ -49,6 +49,7 @@ The strongest current evidence is a **single simulated insertion-depth event**: 
 | research_baseline_contact_wrench_correlation | Completed: no canonical contact-topic messages during raw wrench abort |
 | research_baseline_ft_mount_effort_limit | Completed: F/T mount limit corrected; raw spike reduced but still aborts safely |
 | research_baseline_contact_bridge_full_paths | Completed: full-path contact bridge shows peg-target contact during MOVING_TO_START |
+| research_baseline_axis_aligned_start_pose | Completed: vertical peg start pose removes raw-force abort; still times out at strict stability gate |
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 
@@ -447,6 +448,38 @@ Current conclusion: the previous zero-contact result was an observability gap.
 The raw wrench abort is now correlated with peg-target contact before descent.
 The next change should keep the no-contact start pose physically clear of the
 target plate; the hard-force abort and strict stability gate remain unchanged.
+
+### 2026-06-02 Axis-Aligned Start Pose Validation
+
+The previous `MOVING_TO_START` target used position-only IK. Offline FK showed
+that the peg tip reached `[0.520, -0.200, 0.885]` while the peg body was tilted
+about 116 deg from world +Z, allowing the peg body to sweep into the target
+plate before descent. `RobotKinematics.inverse_position_axis(...)` now solves
+peg-tip position while constraining peg local +Z to world +Z, with iisy6 joint
+limits enforced.
+
+Validation command:
+
+```bash
+timeout 150s ros2 launch thesis_bringup research_baseline.launch.py use_gui:=false tracking_log_dir:=diagnostics/research_baseline_axis_aligned_start_pose
+```
+
+Result: no raw hard-force abort occurred, and no peg-source contact rows were
+recorded. The run still failed honestly at `MOVING_TO_START`:
+
+- `Outcome: ABORTED`
+- `Reason: MOVING_TO_START timeout/failure (90.0s)`
+- final `cart_err`: `0.011498 m`
+- final logged `xy_err`: `0.006 m`
+- `Max |Fz|: 554.24 N`
+- `Max |F|: 628.61 N`
+- `Depth: 0.0000 m`
+
+Current conclusion: axis-aligned IK fixes the tilted-peg safety issue but
+creates a larger 2.4145 rad no-contact move that does not settle within the
+existing 90 s timeout and 2 mm XY stability gate. The next milestone should
+improve trajectory timing or split the start move through a clear staging pose;
+do not loosen the safety gate.
 
 ### Files changed
 

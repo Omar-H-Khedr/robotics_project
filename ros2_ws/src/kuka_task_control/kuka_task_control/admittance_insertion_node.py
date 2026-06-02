@@ -101,6 +101,7 @@ class AdmittanceInsertionNode(Node):
 
     # Hole centre XY (used for alignment checks)
     HOLE_CENTRE_XY = np.array([0.520, -0.200])
+    PEG_AXIS_WORLD = np.array([0.0, 0.0, 1.0])
 
     # State labels
     IDLE = 'IDLE'
@@ -346,19 +347,22 @@ class AdmittanceInsertionNode(Node):
                   max_iter: int = 50) -> np.ndarray | None:
         if seed is None:
             seed = self.current_joints
-        q, converged, _ = self._kinematics.inverse_position(
-            target_pos, seed, max_iter=max_iter,
+        q, converged, err = self._kinematics.inverse_position_axis(
+            target_pos, self.PEG_AXIS_WORLD, seed, max_iter=max_iter,
         )
         if not converged:
-            q, converged, _ = self._kinematics.inverse_position(
-                target_pos, self.SAFE_HOME, max_iter=100,
+            q, converged, err = self._kinematics.inverse_position_axis(
+                target_pos, self.PEG_AXIS_WORLD, self.SAFE_HOME, max_iter=100,
             )
-        actual_pos, _ = self._kinematics.pose(q)
-        err = np.linalg.norm(actual_pos - target_pos)
-        if err > 0.01:
+        actual_pos, actual_rot = self._kinematics.pose(q)
+        pos_err = np.linalg.norm(actual_pos - target_pos)
+        axis_err = np.linalg.norm(actual_rot[:, 2] - self.PEG_AXIS_WORLD)
+        if pos_err > 0.01 or axis_err > 0.02:
             self.get_logger().warn(
-                f'IK error {err:.4f}m for target {target_pos}. '
-                f'Actual: {actual_pos}'
+                f'Axis-aligned IK error pos={pos_err:.4f}m, '
+                f'axis={axis_err:.4f} for target {target_pos}. '
+                f'Actual: {actual_pos}, peg_axis={actual_rot[:, 2]}, '
+                f'solver_err={err:.4f}'
             )
             return None
         return q
@@ -549,17 +553,17 @@ class AdmittanceInsertionNode(Node):
             return
 
         if self._insert_joints is None:
-            q = self._kinematics.inverse_position(
-                self.AXIS_ALIGN_POSE, self.SAFE_HOME, max_iter=100,
-            )[0]
-            actual_pos, _ = self._kinematics.pose(q)
-            err = np.linalg.norm(actual_pos - self.AXIS_ALIGN_POSE)
-            if err > 0.01:
+            q = self._solve_ik(self.AXIS_ALIGN_POSE, self.SAFE_HOME, max_iter=100)
+            if q is None:
+                actual_pos, actual_rot = self._kinematics.pose(self.current_joints)
+                pos_err = np.linalg.norm(actual_pos - self.AXIS_ALIGN_POSE)
+                axis_err = np.linalg.norm(actual_rot[:, 2] - self.PEG_AXIS_WORLD)
                 self._abort_reason = (
-                    f'IK error {err:.4f}m for axis_align_pose is too large'
+                    f'Axis-aligned IK failed for axis_align_pose '
+                    f'(pos_err={pos_err:.4f}m, axis_err={axis_err:.4f})'
                 )
                 self.get_logger().error(self._abort_reason)
-                self._end_phase(False, err, 0.0, False, self._abort_reason)
+                self._end_phase(False, pos_err, 0.0, False, self._abort_reason)
                 self._set_state(self.ABORT)
                 return
             self._insert_joints = q

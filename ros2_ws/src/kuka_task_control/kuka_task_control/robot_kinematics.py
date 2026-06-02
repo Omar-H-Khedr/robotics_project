@@ -97,6 +97,25 @@ class RobotKinematics:
         JointTransform(xyz=(0.0837, 0.0, -0.0507), rpy=(np.pi / 2, 0.0, -np.pi / 2)),
     ]
 
+    _JOINT_LIMITS = (
+        np.array([
+            -3.2288591125,
+            -4.014257279586958,
+            -2.617993875,
+            -3.14159265,
+            -1.919862175,
+            -3.83972435,
+        ]),
+        np.array([
+            3.2288591125,
+            0.8726646259971648,
+            2.617993875,
+            3.14159265,
+            1.919862175,
+            3.83972435,
+        ]),
+    )
+
     # Fixed transform link_6 → peg_tip:
     #   link6-flange:      xyz=(0,0,-0.0943),  rpy=(0, pi/2, 0)
     #   flange-ft_sensor:  xyz=(0,0, 0.005),   rpy=(0,0,0)
@@ -193,6 +212,63 @@ class RobotKinematics:
             q = q + dq
         pos, _ = self.pose(q)
         return q, False, np.linalg.norm(target_pos - pos)
+
+    def inverse_position_axis(
+        self,
+        target_pos: np.ndarray,
+        target_axis_world: np.ndarray,
+        initial_joints: np.ndarray,
+        max_iter: int = 80,
+        pos_tol: float = 1e-5,
+        axis_tol: float = 1e-3,
+        pos_weight: float = 10.0,
+        axis_weight: float = 1.0,
+    ) -> Tuple[np.ndarray, bool, float]:
+        """Position IK with peg local +Z constrained to a world axis.
+
+        This keeps the grasped peg vertical during approach. Position-only IK
+        can place the peg tip correctly while tilting the peg body into the
+        fixture, which is unsafe for a no-contact alignment phase.
+        """
+        target_axis = np.array(target_axis_world, dtype=float)
+        target_axis = target_axis / np.linalg.norm(target_axis)
+        lower, upper = self._JOINT_LIMITS
+        q = np.clip(initial_joints.copy(), lower, upper)
+
+        def residual(joints: np.ndarray) -> np.ndarray:
+            pos, rot = self.pose(joints)
+            axis = rot[:, 2]
+            return np.concatenate((
+                pos_weight * (target_pos - pos),
+                axis_weight * (target_axis - axis),
+            ))
+
+        for _ in range(max_iter):
+            pos, rot = self.pose(q)
+            axis = rot[:, 2]
+            err_pos = target_pos - pos
+            err_axis = target_axis - axis
+            pos_norm = np.linalg.norm(err_pos)
+            axis_norm = np.linalg.norm(err_axis)
+            if pos_norm < pos_tol and axis_norm < axis_tol:
+                return q, True, pos_norm + axis_norm
+
+            err = residual(q)
+            J_res = np.zeros((6, len(q)))
+            for i in range(len(q)):
+                q_pert = q.copy()
+                q_pert[i] += self._eps
+                J_res[:, i] = (residual(q_pert) - err) / self._eps
+            dq = -self._pinv(J_res, self._dls_lambda) @ err
+            q = np.clip(q + dq, lower, upper)
+
+        pos, rot = self.pose(q)
+        axis = rot[:, 2]
+        return (
+            q,
+            False,
+            np.linalg.norm(target_pos - pos) + np.linalg.norm(target_axis - axis),
+        )
 
     def inverse(self,
                 target_pos: np.ndarray,

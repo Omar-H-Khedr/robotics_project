@@ -449,3 +449,37 @@ current blocker is no-contact start-pose geometry: before descent, the peg can
 contact the target plate while hovering near the above-hole target. The next
 milestone should correct the free-space start pose or clearance geometry without
 loosening the hard-force abort or strict no-contact stability gate.
+
+## 2026-06-02 Axis-Aligned Start Pose
+
+Milestone: `research_baseline_axis_aligned_start_pose`
+
+Evidence: `diagnostics/research_baseline_axis_aligned_start_pose/summary.md`
+
+The previous above-hole target used position-only IK. Offline FK showed the peg
+tip at the target but the peg body tilted strongly into the target area. The
+task controller now uses joint-limit-aware axis-aligned IK for Cartesian task
+targets, constraining peg local +Z to world +Z.
+
+Validation passed for Python syntax, offline IK checks, targeted `colcon build`,
+and a 150 s headless launch. Runtime result:
+
+- `Outcome: ABORTED`;
+- `Reason: MOVING_TO_START timeout/failure (90.0s)`;
+- final phase `cart_err=0.011498 m`;
+- final logged `xy_err=0.006 m`;
+- final `joint_err=0.026354 rad`;
+- `Max |Fz|=554.24 N`;
+- `Max |F|=628.61 N`;
+- `Depth: 0.0000 m`.
+
+This is a safety improvement, not task success. The previous raw hard-force
+abort did not occur, and the contact observer recorded no peg-source contact
+rows. The target-source contact rows are not sufficient evidence of peg contact
+because the target plate also has support/fixture contacts.
+
+The new blocker is convergence of the larger axis-aligned no-contact move. It
+requires a `2.4145 rad` joint-space move and did not satisfy the strict 2 mm XY
+stability gate before timeout. The next milestone should improve start-pose
+trajectory timing/settling or split the move through a clear staging posture,
+while preserving the hard-force abort and no-contact gate.
