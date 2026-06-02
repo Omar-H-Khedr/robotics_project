@@ -31,6 +31,8 @@ The project must not claim final autonomous peg-in-hole success yet. The defensi
 - `diagnostics/research_baseline_contact_pair_attribution_v1/summary.md`
 - `diagnostics/research_baseline_tool_tip_frame_correction_v1/summary.md`
 - `diagnostics/research_baseline_start_slow_settle_after_tool_fix_v1/summary.md`
+- `diagnostics/research_baseline_start_gain_2000_after_tool_fix_v1/summary.md`
+- `diagnostics/research_baseline_start_gain_3000_after_tool_fix_v1/summary.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -89,6 +91,7 @@ This confirms the baseline is not robust. It also confirms that the high-force c
 ## Open Risks
 
 - The corrected tool-tip frame removes the reproduced `link_5` target-plate collision, but `MOVING_TO_START` still failed the strict 2 mm no-contact gate. The latest slow-settle diagnostic crossed the gate only transiently and timed out with final XY about 0.011 m.
+- Post-tool global gain diagnostics at `position_gain:=2000` and `position_gain:=3000` were safe but rejected. Gain 2000 improved the final timeout to about 2 mm XY but reached only three consecutive strict observer samples; gain 3000 was worse, with final XY about 7 mm and only two consecutive strict observer samples.
 - `APPROACH` currently commands a 67 mm Cartesian descent but measured peg Z remains near 0.90 m instead of reaching the 0.83 m touch target.
 - Peak raw Fz spikes are confirmed: 1237.45 N and 3716.2 N were recorded in the 2026-06-01 repeat run.
 - Large Cartesian errors during APPROACH remain unresolved.
@@ -124,6 +127,13 @@ This removed descent/SEARCH from these bad initial alignments and produced compl
 An above-hole target-refresh experiment was run in `diagnostics/research_baseline_above_hole_tracking_v1`. It was not retained because it worsened safety: two of three trials hard-aborted in `MOVING_TO_START` with raw Fz spikes of 4086.95 N and 1766.64 N, and the remaining trial still failed the no-contact gate at 0.1116 m XY error.
 
 After the tool-tip frame correction removed the reproduced `link_5` target-plate collision, a one-shot 20 s same-target settle was also rejected in `diagnostics/research_baseline_start_slow_settle_after_tool_fix_v1`. It crossed the strict 2 mm gate only transiently, timed out safely in `MOVING_TO_START` with final `xy_err=0.011 m`, recorded zero contact-topic samples, and left the controller source unchanged.
+
+Post-correction global gain diagnostics were then run at `position_gain:=2000`
+and `position_gain:=3000`. Both preserved clearance and contact safety, but
+both failed the strict above-hole stability gate. Gain 2000 was closest
+(`xy_err=0.002 m`, `stable=0/5`, best strict replay streak three samples);
+gain 3000 was worse (`xy_err=0.007 m`, best streak two samples). The canonical
+gain remains unchanged.
 
 ## 2026-06-02 Joint-State Source Integrity
 

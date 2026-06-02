@@ -61,6 +61,8 @@ Latest tracking evidence localizes the approach/descent blocker to `joint_2`: no
 | research_baseline_contact_pair_attribution_v1 | Completed: unsafe doubled-effort reproduction attributed MOVING_TO_START contact to link_5 versus target plate |
 | research_baseline_tool_tip_frame_correction_v1 | Completed: corrected peg-tip frame removes reproduced link_5 target-plate clearance collision; still no insertion |
 | research_baseline_start_slow_settle_after_tool_fix_v1 | Rejected: one 20 s same-target settle did not satisfy the strict above-hole stability gate |
+| research_baseline_start_gain_2000_after_tool_fix_v1 | Rejected: gain 2000 improved final error but did not hold the 2 mm gate |
+| research_baseline_start_gain_3000_after_tool_fix_v1 | Rejected: gain 3000 was worse than gain 2000 for strict-gate stability |
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
@@ -252,6 +254,35 @@ Current conclusion: same-target settle publication is not a credible fix. The
 next milestone remains above-hole pose hold/tracking stabilization from
 measured controller and physics behavior, with the strict no-contact gate and
 hard-force abort preserved.
+
+## 2026-06-02 Post-Tool Start Gain Diagnostics
+
+Milestones:
+
+- `research_baseline_start_gain_2000_after_tool_fix_v1`
+- `research_baseline_start_gain_3000_after_tool_fix_v1`
+
+After the tool-tip frame correction, global `position_gain` values 2000 and
+3000 were retested with unchanged task gates and full observers. Both runs were
+safe bounded failures: no descent, zero insertion depth, zero contact-topic
+samples, and no `link_5` target-plate clearance intersections.
+
+Evidence:
+
+- `diagnostics/research_baseline_start_gain_2000_after_tool_fix_v1/summary.md`
+- `diagnostics/research_baseline_start_gain_3000_after_tool_fix_v1/summary.md`
+
+Result: gain 2000 was the better of the two but still failed. It timed out in
+`MOVING_TO_START` with final `cart_err=0.006 m`, `xy_err=0.002 m`,
+`joint_err=0.009 rad`, and `stable=0/5`; replay showed a best strict-gate
+streak of only three observer samples. Gain 3000 timed out with final
+`xy_err=0.007 m` and only two consecutive strict observer samples. The
+canonical gain therefore remains unchanged.
+
+Current conclusion: global gain increase alone is not a credible fix. The next
+milestone should implement and validate explicit endpoint hold/tracking
+behavior or trajectory timing changes, still preserving the strict 2 mm
+no-contact gate.
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 

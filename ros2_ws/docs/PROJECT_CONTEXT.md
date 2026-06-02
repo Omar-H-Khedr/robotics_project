@@ -83,6 +83,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - A 2026-06-02 contact-pair attribution diagnostic added exact collision-pair logging to the passive contact observer. A reproduced doubled-effort run aborted in `MOVING_TO_START` with raw `|Fz|=1018.9 N` and showed target-source contact from `lbr_iisy6_r1300::link_5::link_5_collision <-> target_plate::plate_link::target_plate_collision`. This is invalid robot-link clearance contact, not peg insertion contact.
 - A 2026-06-02 tool-tip frame correction moved the modeled `peg_tip` from the near-palm end of the 110 mm peg to the protruding negative local tool-Z end and updated `RobotKinematics` to match. Offline clearance analysis and runtime feedback then showed zero `link_5` target-plate intersections, zero contact-topic samples, and max raw force norm `270.82 N`. The validation still failed honestly in `MOVING_TO_START` with final XY about `0.014 m`.
 - A 2026-06-02 slow same-target settle after the tool-tip correction was rejected and removed. It aborted safely in `MOVING_TO_START` with final `xy_err=0.011 m`, `stable=0/5`, zero contact-topic samples, zero insertion depth, and no planned or runtime-feedback `link_5` target-plate intersections. Offline replay showed the corrected peg tip crossed the strict 2 mm XY gate only transiently, with minimum replayed XY `0.000072 m` but only two consecutive strict observer samples.
+- 2026-06-02 post-tool global gain diagnostics at `position_gain:=2000` and `position_gain:=3000` were rejected. Both preserved zero contact-topic samples and zero `link_5` target-plate intersections, but neither held the strict gate. Gain 2000 was closest with final `xy_err=0.002 m` and a best strict replay streak of three observer samples; gain 3000 ended at `xy_err=0.007 m` with a best streak of two samples.
 
 ## Current Success Criteria
 
@@ -108,6 +109,12 @@ the peg inside the strict 2 mm no-contact XY gate for the required consecutive
 state-machine ticks. A post-correction slow settle crossed the gate only
 transiently and was rejected.
 
+Post-correction global gain increases were also rejected. Gain 2000 improved
+the final error but still did not meet the consecutive strict-gate requirement;
+gain 3000 was worse. The next implementation should focus on explicit
+endpoint hold/tracking behavior or trajectory timing rather than another
+global gain increase.
+
 A same-target refresh experiment was tested and rejected: repeated MOVING_TO_START target publication produced hard-force aborts and did not improve XY gate convergence.
 
 The next step remains tracking stabilization. The joint-state source integrity milestone removed one measurement ambiguity; it did not solve the large no-contact XY error.
@@ -118,8 +125,9 @@ tracking authority, final-pose damping, and high free-space F/T behavior using
 the command-vs-feedback, wrench-by-state, and contact-by-pair evidence. A
 globally slower move-to-start trajectory, repeated same-target hold
 corrections, slower approach timing, higher plugin position gain, broad damping
-reduction, doubled effort limits, and one slow post-tool-fix same-target settle
-were tested and rejected. The weak F/T measurement-joint limit has been
+reduction, doubled effort limits, one slow post-tool-fix same-target settle,
+and post-tool global gains 2000/3000 were tested and rejected. The weak F/T
+measurement-joint limit has been
 corrected but did not eliminate all force spikes. Full-path contact evidence
 showed that the earlier abort could coincide with peg-target contact before
 descent, axis-aligned IK removed that tilted-peg failure mode,
