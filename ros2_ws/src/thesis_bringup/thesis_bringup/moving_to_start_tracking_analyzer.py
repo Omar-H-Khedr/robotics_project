@@ -18,6 +18,8 @@ from kuka_task_control.robot_kinematics import RobotKinematics
 
 AXIS_ALIGN_POSE = np.array([0.520, -0.200, 0.885])
 COMMAND_TARGET_TOLERANCE_M = 0.02
+STRICT_XY_M = 0.002
+FINAL_XY_WINDOW_S = 1.0
 
 
 @dataclass(frozen=True)
@@ -156,6 +158,16 @@ def analyze(input_dir: Path) -> dict[str, object]:
     feedback_q = np.array(final.feedback, dtype=float)
     feedback_pos, _ = kin.pose(feedback_q)
     cart_error = target_pos - feedback_pos
+    xy_errors: list[float] = []
+    for sample in window:
+        sample_pos, _ = kin.pose(np.array(sample.feedback, dtype=float))
+        xy_errors.append(float(np.linalg.norm(sample_pos[:2] - AXIS_ALIGN_POSE[:2])))
+    final_window_start_s = max(command.receipt_stamp_s, final.stamp_s - FINAL_XY_WINDOW_S)
+    final_xy_errors = [
+        xy_error
+        for sample, xy_error in zip(window, xy_errors)
+        if sample.stamp_s >= final_window_start_s
+    ]
     joint_rows: list[dict[str, object]] = []
     worst_p95 = ("", 0.0)
     worst_final = ("", 0.0)
@@ -208,6 +220,21 @@ def analyze(input_dir: Path) -> dict[str, object]:
         "final_cartesian_error_xyz_m": [float(value) for value in cart_error],
         "final_cartesian_error_norm_m": float(np.linalg.norm(cart_error)),
         "final_xy_error_m": float(np.linalg.norm(feedback_pos[:2] - AXIS_ALIGN_POSE[:2])),
+        "xy_error_min_m": min(xy_errors, default=0.0),
+        "xy_error_mean_m": mean(xy_errors) if xy_errors else 0.0,
+        "xy_error_p95_m": _percentile(xy_errors, 95.0),
+        "xy_error_max_m": max(xy_errors, default=0.0),
+        "strict_xy_m": STRICT_XY_M,
+        "strict_xy_sample_count": sum(1 for value in xy_errors if value <= STRICT_XY_M),
+        "strict_xy_sample_fraction": (
+            sum(1 for value in xy_errors if value <= STRICT_XY_M) / len(xy_errors)
+            if xy_errors
+            else 0.0
+        ),
+        "final_xy_window_s": FINAL_XY_WINDOW_S,
+        "final_xy_window_min_m": min(final_xy_errors, default=0.0),
+        "final_xy_window_mean_m": mean(final_xy_errors) if final_xy_errors else 0.0,
+        "final_xy_window_max_m": max(final_xy_errors, default=0.0),
         "joint_errors": joint_rows,
     }
 
@@ -265,6 +292,16 @@ def write_outputs(input_dir: Path, result: dict[str, object]) -> None:
             f"- final_cartesian_error_xyz_m: `{_fmt(result.get('final_cartesian_error_xyz_m'))}`",
             f"- final_cartesian_error_norm_m: `{_fmt(result.get('final_cartesian_error_norm_m'))}`",
             f"- final_xy_error_m: `{_fmt(result.get('final_xy_error_m'))}`",
+            f"- xy_error_min_m: `{_fmt(result.get('xy_error_min_m'))}`",
+            f"- xy_error_mean_m: `{_fmt(result.get('xy_error_mean_m'))}`",
+            f"- xy_error_p95_m: `{_fmt(result.get('xy_error_p95_m'))}`",
+            f"- xy_error_max_m: `{_fmt(result.get('xy_error_max_m'))}`",
+            f"- strict_xy_sample_count: `{result.get('strict_xy_sample_count')}`",
+            f"- strict_xy_sample_fraction: `{_fmt(result.get('strict_xy_sample_fraction'))}`",
+            f"- final_xy_window_s: `{_fmt(result.get('final_xy_window_s'), 3)}`",
+            f"- final_xy_window_min_m: `{_fmt(result.get('final_xy_window_min_m'))}`",
+            f"- final_xy_window_mean_m: `{_fmt(result.get('final_xy_window_mean_m'))}`",
+            f"- final_xy_window_max_m: `{_fmt(result.get('final_xy_window_max_m'))}`",
             "",
             "## Per Joint Error",
             "",

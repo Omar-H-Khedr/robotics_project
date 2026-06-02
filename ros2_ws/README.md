@@ -71,6 +71,7 @@ Latest hold evidence shows the corrected post-tool runs do not satisfy the requi
 | research_baseline_damping_2p0_gain_1500_v1 | Rejected: 2x damping plus gain 1500 still failed the strict hold gate and only captured retreat-command tracking |
 | research_baseline_trajectory_command_capture_v1 | Completed: bounded first-command discovery wait restores command-attributed MOVING_TO_START tracking logs |
 | research_baseline_canonical_after_command_capture_v1 | Failed safely: canonical run captures MOVING_TO_START command but still fails the strict above-hole hold gate |
+| research_baseline_moving_to_start_xy_distribution_analyzer_v1 | Completed: command-attributed analyzer now reports XY distribution and final-window oscillation |
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 

@@ -35,6 +35,17 @@
   ],
   "final_cartesian_error_norm_m": 0.0036357391879330374,
   "final_xy_error_m": 0.003577743427146297,
+  "xy_error_min_m": 0.00011541192781869978,
+  "xy_error_mean_m": 0.14494457027828378,
+  "xy_error_p95_m": 0.3839192968480274,
+  "xy_error_max_m": 0.415978932539699,
+  "strict_xy_m": 0.002,
+  "strict_xy_sample_count": 138,
+  "strict_xy_sample_fraction": 0.008889461479000257,
+  "final_xy_window_s": 1.0,
+  "final_xy_window_min_m": 0.0005752666898159348,
+  "final_xy_window_mean_m": 0.007943787601825859,
+  "final_xy_window_max_m": 0.01834470254914592,
   "joint_errors": [
     {
       "joint": "joint_1",

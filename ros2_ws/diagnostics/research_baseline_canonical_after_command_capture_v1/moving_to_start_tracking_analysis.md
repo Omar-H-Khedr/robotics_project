@@ -14,6 +14,16 @@
 - final_cartesian_error_xyz_m: `0.002997, -0.001955, 0.000644`
 - final_cartesian_error_norm_m: `0.003636`
 - final_xy_error_m: `0.003578`
+- xy_error_min_m: `0.000115`
+- xy_error_mean_m: `0.144945`
+- xy_error_p95_m: `0.383919`
+- xy_error_max_m: `0.415979`
+- strict_xy_sample_count: `138`
+- strict_xy_sample_fraction: `0.008889`
+- final_xy_window_s: `1.000`
+- final_xy_window_min_m: `0.000575`
+- final_xy_window_mean_m: `0.007944`
+- final_xy_window_max_m: `0.018345`
 
 ## Per Joint Error
 

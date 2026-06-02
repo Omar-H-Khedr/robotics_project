@@ -92,6 +92,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - A 2026-06-03 2x damping plus `position_gain:=1500` diagnostic was rejected as a canonical change. It reached instantaneous XY error as low as `0.000052 m`, but the estimated strict hold was still only two 10 Hz ticks, final `MOVING_TO_START` XY was about `0.004 m`, contact-topic samples were zero, and the run aborted safely before descent.
 - A 2026-06-03 trajectory command-capture fix added a bounded first-command discovery wait before the task publishes its first joint trajectory. A short validation run captured the 20-point `MOVING_TO_START` command and the selector-based tracking analyzer attributed it to the canonical axis-align target. This is an instrumentation/reproducibility fix, not insertion evidence.
 - A 2026-06-03 canonical post-command-capture validation failed safely in `MOVING_TO_START`. It captured both the start and abort-retreat commands, attributed command index 0 to the canonical axis-align target, and showed final command-attributed XY error about `0.0036 m`. The strict 2 mm hold gate still failed with only one estimated stable tick, zero contact-topic samples, and zero insertion depth.
+- A 2026-06-03 MOVING_TO_START XY-distribution analyzer enhancement showed why final/minimum samples are insufficient: in the canonical post-command-capture run, command-window minimum XY was `0.000115 m`, but only `138/15524` samples were inside the strict 2 mm band and the final one-second XY range was `0.000575-0.018345 m`.
 
 ## Current Success Criteria
 
@@ -152,6 +153,10 @@ but the endpoint is not held inside the strict 2 mm XY gate for the required
 five consecutive 10 Hz ticks. Continue focusing on sustained endpoint hold,
 controller/physics dynamics, or target-frame feedback consistency before
 approach or learning work.
+
+Use the enhanced MOVING_TO_START tracking analyzer to judge command-attributed
+XY stability by distribution and final-window range. A single minimum or final
+sample is not sufficient evidence for safe no-contact alignment.
 
 A first bounded endpoint-correction implementation was tested and rejected. It
 was safe, but it did not hold the strict gate, so the source was removed. The

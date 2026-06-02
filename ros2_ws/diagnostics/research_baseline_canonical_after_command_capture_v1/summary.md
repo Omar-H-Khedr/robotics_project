@@ -38,6 +38,10 @@ Command-attributed tracking:
 - worst joint by p95 error: `joint_3` at `0.021407 rad`
 - final command-attributed Cartesian norm error: `0.003636 m`
 - final command-attributed XY error: `0.003578 m`
+- command-window minimum XY error: `0.000115 m`
+- strict 2 mm samples: `138 / 15524`
+- strict 2 mm sample fraction: `0.008889`
+- final one-second XY range: `0.000575 m` to `0.018345 m`
 
 Above-hole hold analyzer:
 
@@ -60,6 +64,7 @@ Wrench/contact observers:
 The first-command capture fix worked, and the canonical run now has usable
 command-attributed `MOVING_TO_START` tracking evidence. The task still fails
 honestly before descent because the peg tip only crosses the strict 2 mm
-above-hole XY gate transiently. The current blocker remains sustained no-contact
-above-hole hold stability, not missing command capture and not target
-reachability.
+above-hole XY gate transiently. The command-window XY distribution confirms
+oscillation through the gate rather than a sustained hold. The current blocker
+remains sustained no-contact above-hole hold stability, not missing command
+capture and not target reachability.
