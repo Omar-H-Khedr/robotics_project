@@ -1,6 +1,6 @@
 # Current Project Status
 
-Date: 2026-06-01
+Date: 2026-06-02
 
 ## Review Summary
 
@@ -37,6 +37,7 @@ until repeated validation demonstrates robust success.
 - SAFE_HOME: `[0.0, -0.8, 1.2, 0.0, 0.8, 0.0]`.
 - Spawn: x=0.80, y=-0.75, z=0.735, yaw=1.5708.
 - Controller stack: `joint_state_broadcaster` and `joint_trajectory_controller`.
+- Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
 - Insertion controller: topic-based trajectory publishing with median Fz baseline, SEARCH phase, single-point INSERT, final JSON outcome logging.
 
@@ -108,3 +109,19 @@ The no-contact alignment gate was then implemented and validated in `diagnostics
 This removed descent/SEARCH from these bad initial alignments and produced complete outcome JSON for all three trials. It did not solve task execution. The next milestone is above-hole tracking stabilization: improve the `MOVING_TO_START` target execution so the peg reaches the no-contact XY gate (`<=0.030 m`) before any descent is attempted.
 
 An above-hole target-refresh experiment was run in `diagnostics/research_baseline_above_hole_tracking_v1`. It was not retained because it worsened safety: two of three trials hard-aborted in `MOVING_TO_START` with raw Fz spikes of 4086.95 N and 1766.64 N, and the remaining trial still failed the no-contact gate at 0.1116 m XY error.
+
+## 2026-06-02 Joint-State Source Integrity
+
+Milestone: `research_baseline_joint_state_source_integrity`
+
+Evidence: `diagnostics/research_baseline_joint_state_source_integrity/summary.md`
+
+The canonical baseline now avoids the shared KUKA Gazebo `/joint_states` bridge and uses a project-local bridge config for `/clock`, `/cmd_vel`, D405 topics, contact, and F/T only. Runtime evidence showed:
+
+- headless Gazebo launched and spawned `lbr_iisy6_r1300`;
+- `research_baseline_ros_gz_bridge` did not create a `/joint_states` bridge;
+- `joint_state_broadcaster` and `joint_trajectory_controller` activated;
+- `/joint_states` samples contained named joints `joint_1` through `joint_6`;
+- `ros2 node info /joint_state_broadcaster` listed `/joint_states` as a publisher.
+
+The trial remained a bounded failure, not a success: it timed out in `MOVING_TO_START` with late observed XY error 0.066 m, so descent remained blocked by the 0.002 m no-contact gate.

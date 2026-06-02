@@ -1,11 +1,17 @@
 # Visuomotor Context-Based Meta-Reinforcement Learning for Safe Peg-in-Hole Assembly
 
 **Repository status:** active doctoral research prototype
-**Latest documented:** `proposal_simulation_cell_v2_16_guarded_peg_in_hole_objective_validation`
-**README last updated:** 2026-05-31
+**Latest documented:** `research_baseline_joint_state_source_integrity`
+**README last updated:** 2026-06-02
 **Execution scope:** simulation-first validation only; no real-robot claim is made in this repository state.
 
 ---
+
+## Current Status Note
+
+The active baseline targets the KUKA LBR iisy 6 R1300 and is controller-driven in Gazebo. It must not be described as robust autonomous peg-in-hole success: repeated validation has produced 0/3 physical successes, and the latest 2026-06-02 run timed out safely in `MOVING_TO_START` with XY error still outside the no-contact descent gate.
+
+The canonical `research_baseline.launch.py` now uses a project-local bridge config that omits Gazebo `/joint_states`; `joint_state_broadcaster` is the intended single ROS 2 joint-state source. Evidence is in `ros2_ws/diagnostics/research_baseline_joint_state_source_integrity/`.
 
 ## 1. Project Overview
 

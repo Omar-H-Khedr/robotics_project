@@ -178,9 +178,9 @@ def launch_setup(context, *args, **kwargs):
         ),
         launch_arguments={
             "config_file": PathJoinSubstitution(
-                [FindPackageShare("kuka_gazebo"), "config", "bridge_config.yaml"]
+                [FindPackageShare("thesis_bringup"), "config", "research_baseline_bridge.yaml"]
             ),
-            "bridge_name": "ros_gz_bridge",
+            "bridge_name": "research_baseline_ros_gz_bridge",
         }.items(),
     )
 
@@ -437,10 +437,11 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 "allow_robot_renaming",
-                default_value="true",
+                default_value="false",
                 description=(
                     "If true, allow ros_gz_sim create to rename duplicate robot "
-                    "entities instead of failing."
+                    "entities instead of failing. Keep false for canonical runs "
+                    "because F/T sensor bridge paths include the robot model name."
                 ),
             ),
             OpaqueFunction(function=launch_setup),

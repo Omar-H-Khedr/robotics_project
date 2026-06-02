@@ -1,0 +1,35 @@
+# Canonical research baseline Gazebo bridge.
+#
+# /joint_states is intentionally omitted here. The research baseline starts
+# joint_state_broadcaster, which is the single ROS 2 source of joint feedback
+# used by task logic, diagnostics, and validation metrics.
+- topic_name: /clock
+  ros_type_name: rosgraph_msgs/msg/Clock
+  gz_type_name: gz.msgs.Clock
+  direction: GZ_TO_ROS
+
+- topic_name: /cmd_vel
+  ros_type_name: geometry_msgs/msg/Twist
+  gz_type_name: gz.msgs.Twist
+  direction: ROS_TO_GZ
+
+# D405 RGB-D camera defined as a static model in peg_in_hole_world.sdf.
+- topic_name: /d405/color/image_raw
+  ros_type_name: sensor_msgs/msg/Image
+  gz_type_name: gz.msgs.Image
+  direction: GZ_TO_ROS
+
+- topic_name: /d405/depth/image_rect_raw
+  ros_type_name: sensor_msgs/msg/Image
+  gz_type_name: gz.msgs.Image
+  direction: GZ_TO_ROS
+
+- topic_name: /d405/depth/camera_info
+  ros_type_name: sensor_msgs/msg/CameraInfo
+  gz_type_name: gz.msgs.CameraInfo
+  direction: GZ_TO_ROS
+
+- topic_name: /d405/color/camera_info
+  ros_type_name: sensor_msgs/msg/CameraInfo
+  gz_type_name: gz.msgs.CameraInfo
+  direction: GZ_TO_ROS

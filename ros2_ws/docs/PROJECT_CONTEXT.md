@@ -1,6 +1,6 @@
 # Project Context
 
-Last reviewed: 2026-06-01
+Last reviewed: 2026-06-02
 
 This workspace is the active ROS 2 Jazzy / Gazebo implementation for the PhD topic:
 
@@ -28,6 +28,7 @@ The current workspace contains a Gazebo workcell with:
 - fixed gripper and fixed grasped cylindrical peg;
 - fixed work table, target plate, and hole fixture;
 - `joint_state_broadcaster` and `joint_trajectory_controller`;
+- a canonical research baseline bridge that intentionally does not bridge Gazebo `/joint_states`;
 - FT sensor injection and ROS bridge to `/ft_sensor_wrench`;
 - RGB-D camera model in the world;
 - task-level admittance insertion node with phase logging;
@@ -59,6 +60,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - Contact/gravity estimation depends on median Fz baseline validity and needs more validation.
 - Gazebo contact physics are adequate for early simulation evidence but not final safety fidelity.
 - Some older docs still describe stale iisy3 state and must not be used as current truth.
+- A 2026-06-02 source-integrity run confirmed `joint_state_broadcaster` as the intended `/joint_states` publisher, but the same run still timed out in `MOVING_TO_START` with large XY error.
 
 ## Current Success Criteria
 
@@ -80,3 +82,5 @@ Robust success requires repeated validation with a documented success rate and f
 Reason: force-safe insert stabilization prevented some unsafe INSERT attempts, corrected the insertion-depth metric, and added a hard force abort. A no-contact alignment gate now blocks APPROACH when above-hole XY error exceeds 0.030 m. Validation still failed because MOVING_TO_START leaves the peg 0.087-0.103 m laterally away from the hole. The next milestone must improve above-hole target execution before any descent or contact search can be credible.
 
 A same-target refresh experiment was tested and rejected: repeated MOVING_TO_START target publication produced hard-force aborts and did not improve XY gate convergence.
+
+The next step remains tracking stabilization. The joint-state source integrity milestone removed one measurement ambiguity; it did not solve the large no-contact XY error.
