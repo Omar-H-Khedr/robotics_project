@@ -1,0 +1,3 @@
+receipt_stamp_s,joint_names,point_count,final_time_from_start_s,final_positions_rad
+2.443000000,joint_1 joint_2 joint_3 joint_4 joint_5 joint_6,9,19.297751371,-0.446293942 -0.884287613 1.851243145 -0.102913473 1.055584623 0.014103786
+22.837000000,joint_1 joint_2 joint_3 joint_4 joint_5 joint_6,4,6.391853698,0.000000000 -0.800000000 1.200000000 0.000000000 0.800000000 0.000000000

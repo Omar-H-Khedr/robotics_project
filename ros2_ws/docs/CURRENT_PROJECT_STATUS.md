@@ -345,3 +345,35 @@ spikes are hidden contact, force-torque sensor semantics, inertial dynamics from
 the free-space trajectory, or Gazebo/controller physics. Descent, search,
 insertion, and learning should remain blocked until this is understood or
 bounded by evidence.
+
+## 2026-06-02 Contact-Wrench Correlation
+
+Milestone: `research_baseline_contact_wrench_correlation`
+
+Evidence: `diagnostics/research_baseline_contact_wrench_correlation/summary.md`
+
+The canonical launch now also starts a passive `contact_state_observer` by
+default. It subscribes to `/gazebo/contacts/peg`, `/gazebo/contacts/hole`, and
+`/gazebo/contacts/target`, groups messages by `/insertion_state`, and writes
+compact contact summaries.
+
+Validation passed for Python syntax, targeted `colcon build`, and a 150 s
+headless launch. Runtime result:
+
+- `Outcome: ABORTED`;
+- `Reason: Hard force abort: raw wrench exceeded 1000.0N in state MOVING_TO_START`;
+- `Max |Fz|=1396.8 N`;
+- `Max |F|=2624.1 N`;
+- `Depth: 0.0000 m`.
+
+Contact observer result:
+
+- samples: `0`;
+- positive contact samples: `0`;
+- max contact force from contact topics: `0.000000 N`.
+
+This does not prove every possible collision pair was contact-free, but it does
+show that the canonical peg/hole/target contact topics did not provide positive
+contact evidence for the raw wrench spike. The next investigation should focus
+on FT sensor semantics, inertial/dynamic loads from the free-space trajectory,
+uninstrumented collision pairs, or Gazebo/controller physics.

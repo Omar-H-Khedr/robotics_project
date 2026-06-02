@@ -70,6 +70,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - A 2026-06-02 slower move-to-start timing experiment was rejected and reverted. It delayed arrival near the above-hole pose and still aborted safely with `xy_err=0.011 m`, `stable=0/5`, and zero insertion depth.
 - A 2026-06-02 bounded same-target hold-correction experiment was rejected and reverted. It produced transient XY errors as low as `0.0008 m`, but did not satisfy the consecutive strict stability gate and timed out safely with final logged `xy_err=0.011 m`, `stable=0/5`, and zero insertion depth.
 - A 2026-06-02 raw-wrench instrumentation milestone added passive wrench-by-state logging and callback-level hard-force latching. The latest validation aborted in `MOVING_TO_START` with `max_abs_fz_N=1943.29`, `max_force_norm_N=2936.48`, and zero insertion depth.
+- A 2026-06-02 contact-wrench correlation milestone added passive contact-topic logging. The latest validation aborted in `MOVING_TO_START` with `max_abs_fz_N=1396.75` and `max_force_norm_N=2624.11`; the canonical peg/hole/target contact topics produced zero messages in that run.
 
 ## Current Success Criteria
 
@@ -94,4 +95,4 @@ A same-target refresh experiment was tested and rejected: repeated MOVING_TO_STA
 
 The next step remains tracking stabilization. The joint-state source integrity milestone removed one measurement ambiguity; it did not solve the large no-contact XY error.
 
-Tracking stabilization should now focus on controller/physics configuration, final-pose damping, and high free-space F/T behavior using the command-vs-feedback and wrench-by-state evidence. A globally slower move-to-start trajectory and repeated same-target hold corrections were both tested and rejected. Do not loosen the no-contact XY gate or hard-force abort to hide the error.
+Tracking stabilization should now focus on controller/physics configuration, final-pose damping, and high free-space F/T behavior using the command-vs-feedback, wrench-by-state, and contact-by-state evidence. A globally slower move-to-start trajectory and repeated same-target hold corrections were both tested and rejected. Do not loosen the no-contact XY gate or hard-force abort to hide the error.

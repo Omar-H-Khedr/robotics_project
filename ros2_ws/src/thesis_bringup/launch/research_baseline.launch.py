@@ -349,6 +349,25 @@ def launch_setup(context, *args, **kwargs):
         condition=IfCondition(LaunchConfiguration("enable_wrench_observer")),
     )
 
+    contact_state_observer = Node(
+        package="thesis_bringup",
+        executable="contact_state_observer",
+        parameters=[
+            {
+                "use_sim_time": simulation["use_sim_time"],
+                "state_topic": "/insertion_state",
+                "contact_topics": [
+                    "peg:/gazebo/contacts/peg",
+                    "hole:/gazebo/contacts/hole",
+                    "target:/gazebo/contacts/target",
+                ],
+                "output_dir": LaunchConfiguration("tracking_log_dir"),
+            }
+        ],
+        output="screen",
+        condition=IfCondition(LaunchConfiguration("enable_contact_observer")),
+    )
+
     admittance_insertion = Node(
         package="kuka_task_control",
         executable="admittance_insertion_node",
@@ -434,6 +453,7 @@ def launch_setup(context, *args, **kwargs):
         data_logger,
         trajectory_tracking_observer,
         wrench_state_observer,
+        contact_state_observer,
     ]
 
 
@@ -512,6 +532,11 @@ def generate_launch_description():
                 "enable_wrench_observer",
                 default_value="true",
                 description="If true, passively log F/T wrench by insertion state and peg pose.",
+            ),
+            DeclareLaunchArgument(
+                "enable_contact_observer",
+                default_value="true",
+                description="If true, passively log contact sensor events by insertion state.",
             ),
             DeclareLaunchArgument(
                 "tracking_log_dir",

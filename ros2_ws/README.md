@@ -46,6 +46,7 @@ The strongest current evidence is a **single simulated insertion-depth event**: 
 | research_baseline_repeat_validation | Failed: 0/3 physical successes in 2026-06-01 v2 repeat run |
 | research_baseline_move_to_start_hold_correction | Rejected: transient good XY samples but no stable gate |
 | research_baseline_raw_wrench_abort | Completed: raw wrench spikes now latched and abort active motion |
+| research_baseline_contact_wrench_correlation | Completed: no canonical contact-topic messages during raw wrench abort |
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 
@@ -357,6 +358,31 @@ Result: safety abort in `MOVING_TO_START`, not insertion success:
 - `Depth: 0.0000 m`
 
 Current conclusion: high free-space raw wrench spikes are now measured and safety-latched. The next blocker is determining whether they come from hidden contact, FT sensor semantics, inertial dynamics, or Gazebo/controller physics.
+
+### 2026-06-02 Contact-Wrench Correlation
+
+Added passive `contact_state_observer` for the canonical bridged contact topics: `/gazebo/contacts/peg`, `/gazebo/contacts/hole`, and `/gazebo/contacts/target`.
+
+Validation command:
+
+```bash
+timeout 150s ros2 launch thesis_bringup research_baseline.launch.py use_gui:=false tracking_log_dir:=diagnostics/research_baseline_contact_wrench_correlation
+```
+
+Result: another safe raw-wrench abort in `MOVING_TO_START`, with no insertion:
+
+- `Outcome: ABORTED`
+- `Max |Fz|: 1396.8 N`
+- `Max |F|: 2624.1 N`
+- `Depth: 0.0000 m`
+
+Contact observer result:
+
+- contact samples: `0`
+- positive contact samples: `0`
+- max contact force from contact topics: `0.000000 N`
+
+Current conclusion: the canonical contact topics did not provide positive contact evidence for the raw wrench spike. This narrows the next investigation to FT sensor semantics, inertial/dynamic loads, uninstrumented collision pairs, or Gazebo/controller physics.
 
 ### Files changed
 

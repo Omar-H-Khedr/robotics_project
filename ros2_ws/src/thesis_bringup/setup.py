@@ -25,6 +25,7 @@ setup(
             "spawn_robot_sdf = thesis_bringup.spawn_robot_sdf:main",
             "trajectory_tracking_observer = thesis_bringup.trajectory_tracking_observer:main",
             "wrench_state_observer = thesis_bringup.wrench_state_observer:main",
+            "contact_state_observer = thesis_bringup.contact_state_observer:main",
             "controller_readiness_gate = thesis_bringup.controller_readiness_gate:main",
             "proposal_simulation_cell_monitor = thesis_bringup.proposal_simulation_cell_monitor:main",
             "proposal_simulation_cell_v1_1_validator = thesis_bringup.proposal_simulation_cell_v1_1_validator:main",
