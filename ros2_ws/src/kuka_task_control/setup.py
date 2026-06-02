@@ -54,6 +54,7 @@ setup(
             "tool_link_validator = kuka_task_control.tool_link_validator:main",
             "admittance_insertion_node = kuka_task_control.admittance_insertion_node:main",
             "data_logger_node = kuka_task_control.data_logger_node:main",
+            "clearance_path_analyzer = kuka_task_control.clearance_path_analyzer:main",
         ]
     },
 )

@@ -29,6 +29,7 @@ The project must not claim final autonomous peg-in-hole success yet. The defensi
 - `diagnostics/research_baseline_joint_damping_scale_0p2_v1/summary.md`
 - `diagnostics/research_baseline_joint_effort_scale_2p0_v1/summary.md`
 - `diagnostics/research_baseline_contact_pair_attribution_v1/summary.md`
+- `diagnostics/research_baseline_tool_tip_frame_correction_v1/summary.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -86,7 +87,7 @@ This confirms the baseline is not robust. It also confirms that the high-force c
 
 ## Open Risks
 
-- The safer axis-aligned `MOVING_TO_START` can reach the strict 2 mm no-contact gate, but it needs about 96-100 s in current Gazebo/controller conditions.
+- The corrected tool-tip frame removes the reproduced `link_5` target-plate collision, but `MOVING_TO_START` still failed the strict 2 mm no-contact gate in the latest validation with final XY about 0.014 m.
 - `APPROACH` currently commands a 67 mm Cartesian descent but measured peg Z remains near 0.90 m instead of reaching the 0.83 m touch target.
 - Peak raw Fz spikes are confirmed: 1237.45 N and 3716.2 N were recorded in the 2026-06-01 repeat run.
 - Large Cartesian errors during APPROACH remain unresolved.
@@ -393,6 +394,29 @@ Runtime result with `joint_effort_scale:=2.0`:
 - no peg-source or hole-source contact rows were recorded.
 
 This shows at least one unsafe high-force path is caused by robot-link clearance contact with the target plate before descent. It is not valid insertion contact and must not be counted as progress. The next safety-critical milestone is clearance-aware `MOVING_TO_START` geometry/path validation before further approach or insertion tuning.
+
+## 2026-06-02 Tool Tip Frame Correction
+
+Milestone: `research_baseline_tool_tip_frame_correction_v1`
+
+Evidence: `diagnostics/research_baseline_tool_tip_frame_correction_v1/summary.md`
+
+The research gripper `peg_tip` frame was corrected from the near-palm end of the 110 mm peg to the protruding negative local tool-Z end. The URDF now places the fingers at `z=-0.055 m`, the peg center at `z=-0.075 m`, and both `gripper_tcp` and `peg_tip` at `z=-0.130 m`. `RobotKinematics` now uses the matching `link_6 -> peg_tip` offset.
+
+Validation passed for Python syntax, xacro expansion, targeted package build, offline clearance analysis, and a canonical 240 s headless launch.
+
+Runtime result:
+
+- outcome: `ABORTED`;
+- reason: `MOVING_TO_START timeout/failure (120.0s)`;
+- final phase Cartesian error: `0.015238 m`;
+- final phase joint error: `0.022126 rad`;
+- final logged XY error: about `0.014 m`;
+- insertion depth: `0.0000 m`;
+- max raw force norm: `270.82 N`;
+- contact observer samples: `0`.
+
+The clearance analyzer reported `0/201` planned and `0/1338` runtime-feedback `link_5` target-plate intersections, with closest sampled runtime-feedback clearance `0.117041 m`. The previous clearance collision is therefore resolved for this run. The next blocker is final above-hole XY stabilization/settling, not contact search or insertion.
 
 ## 2026-06-02 Trajectory Tracking Observer
 

@@ -8,8 +8,8 @@
     <xacro:property name="gripper_finger_y" value="0.012"/>
     <xacro:property name="gripper_finger_z" value="0.090"/>
     <xacro:property name="gripper_finger_y_offset" value="0.031"/>
-    <xacro:property name="gripper_finger_z_offset" value="0.075"/>
-    <xacro:property name="gripper_tcp_z_offset" value="0.125"/>
+    <xacro:property name="gripper_finger_z_offset" value="-0.055"/>
+    <xacro:property name="gripper_tcp_z_offset" value="-0.130"/>
 
     <material name="${prefix}research_gripper_dark">
       <color rgba="0.08 0.09 0.10 1.0"/>
@@ -109,8 +109,8 @@
     <xacro:if value="${has_peg}">
       <xacro:property name="peg_radius" value="0.0125"/>
       <xacro:property name="peg_length" value="0.11"/>
-      <xacro:property name="peg_center_z" value="${gripper_tcp_z_offset - peg_length / 2.0}"/>
-      <xacro:property name="peg_tip_z" value="${gripper_tcp_z_offset - peg_length}"/>
+      <xacro:property name="peg_center_z" value="${gripper_tcp_z_offset + peg_length / 2.0}"/>
+      <xacro:property name="peg_tip_z" value="${gripper_tcp_z_offset}"/>
       <material name="${prefix}peg_material">
         <color rgba="0.70 0.72 0.74 1.0"/>
       </material>

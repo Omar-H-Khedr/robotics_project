@@ -120,11 +120,11 @@ class RobotKinematics:
     #   link6-flange:      xyz=(0,0,-0.0943),  rpy=(0, pi/2, 0)
     #   flange-ft_sensor:  xyz=(0,0, 0.005),   rpy=(0,0,0)
     #   ft_sensor-palm:    xyz=(0,0, 0),       rpy=(0,0,0)
-    #   palm-peg_tip:      xyz=(0,0, 0.015),   rpy=(0,0,0)
+    #   palm-peg_tip:      xyz=(0,0,-0.130),   rpy=(0,0,0)
     # Combined:
     _LINK6_TO_PEGTIP = (
         _make_transform((0.0, 0.0, -0.0943), (0.0, np.pi / 2, 0.0))
-        @ _make_transform((0.0, 0.0, 0.02), (0.0, 0.0, 0.0))
+        @ _make_transform((0.0, 0.0, -0.125), (0.0, 0.0, 0.0))
     )
 
     def __init__(self, base_xyz=(0.80, -0.75, 0.735), base_rpy=(0, 0, np.pi / 2)):
@@ -148,6 +148,28 @@ class RobotKinematics:
         T = T @ self._LINK6_TO_PEGTIP
         T = self._T_world_base @ T
         return T
+
+    def link_transform(self, joints: np.ndarray, link_name: str) -> Transform4:
+        """Compute world→link transform for a serial-chain link frame.
+
+        Supported names are ``base_link``, ``link_1`` through ``link_6``, and
+        ``peg_tip``. Collision diagnostics use this to place primitive link
+        collision boxes in the world frame without duplicating kinematics.
+        """
+        if link_name == "base_link":
+            return self._T_world_base.copy()
+        if link_name == "peg_tip":
+            return self.forward(joints)
+
+        T = np.eye(4)
+        for index, jt in enumerate(self._JOINT_TRANSFORMS, start=1):
+            T_origin = _make_transform(jt.xyz, jt.rpy)
+            R_joint = np.eye(4)
+            R_joint[:3, :3] = _rot_z(joints[index - 1])
+            T = T @ T_origin @ R_joint
+            if link_name == f"link_{index}":
+                return self._T_world_base @ T
+        raise ValueError(f"Unsupported link name: {link_name}")
 
     def _pose_from_transform(self, T: Transform4
                              ) -> Tuple[np.ndarray, np.ndarray]:

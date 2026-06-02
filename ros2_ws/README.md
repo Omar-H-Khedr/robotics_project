@@ -59,6 +59,7 @@ Latest tracking evidence localizes the approach/descent blocker to `joint_2`: no
 | research_baseline_joint_damping_scale_0p2_v1 | Rejected: broad damping reduction triggers hard-force abort in MOVING_TO_START |
 | research_baseline_joint_effort_scale_2p0_v1 | Rejected: doubled effort reaches APPROACH but immediately hard-aborts on unsafe wrench/contact |
 | research_baseline_contact_pair_attribution_v1 | Completed: unsafe doubled-effort reproduction attributed MOVING_TO_START contact to link_5 versus target plate |
+| research_baseline_tool_tip_frame_correction_v1 | Completed: corrected peg-tip frame removes reproduced link_5 target-plate clearance collision; still no insertion |
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
@@ -184,6 +185,34 @@ Current conclusion: the next milestone is clearance-aware motion/geometry
 validation for `MOVING_TO_START` and the target fixture. The no-contact descent
 gate and global hard-force abort remain correct and must not be loosened to hide
 this failure.
+
+## 2026-06-02 Tool Tip Frame Correction
+
+Milestone: `research_baseline_tool_tip_frame_correction_v1`
+
+Contact-pair attribution showed the modeled wrist was colliding with the target
+plate before descent. The root cause was the research gripper peg-tip frame:
+`peg_tip` was at the near-palm end of the 110 mm peg, so the controller drove
+the wrist down to put that near-palm point over the hole. The gripper model now
+places the peg and fingers on the negative local tool-Z side, with `peg_tip` and
+`gripper_tcp` at `z=-0.130 m`; `RobotKinematics` now uses the matching
+`link_6 -> peg_tip` offset.
+
+Validation passed for Python syntax, xacro expansion, targeted `colcon build`,
+offline clearance analysis, and a canonical 240 s headless launch.
+
+Evidence: `diagnostics/research_baseline_tool_tip_frame_correction_v1/summary.md`
+
+Runtime result: `ABORTED` in `MOVING_TO_START`, not insertion success. The run
+timed out at 120 s with final phase Cartesian error `0.015238 m`, joint error
+`0.022126 rad`, and XY error about `0.014 m`. It recorded zero contact-topic
+samples, max raw `|Fz|=172.83 N`, and max raw force norm `270.82 N`. Offline
+clearance analysis found `0/201` planned and `0/1338` runtime-feedback
+`link_5` target-plate intersections.
+
+Current conclusion: the clearance collision has been removed. The immediate
+blocker is now final above-hole XY stabilization under the preserved 2 mm
+no-contact gate.
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 
