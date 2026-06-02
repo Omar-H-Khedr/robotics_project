@@ -274,6 +274,26 @@ Result:
 
 The slower trajectory reduced neither the blocking joint error nor the missing Z descent enough to matter. The next investigation should focus on why the approach target command leaves `joint_2` roughly `0.108 rad` away from target under Gazebo/`gz_ros2_control`, not on further timing-only changes.
 
+## 2026-06-02 Approach Gain 3000 Diagnostic
+
+Milestone: `research_baseline_approach_gain_3000_v1`
+
+Evidence: `diagnostics/research_baseline_approach_gain_3000_v1/summary.md`
+
+A high-gain Gazebo position-controller diagnostic ran with `position_gain:=3000`. It was rejected and not retained as the canonical launch setting.
+
+Result:
+
+- Gazebo confirmed `position_proportional_gain=3000`;
+- `MOVING_TO_START`: success after `92.6 s`, initial XY error `0.0014 m`;
+- `APPROACH`: failed at 90 s with `cart_err=0.073 m`, `joint_err=0.110 rad`;
+- insertion depth: `0.0000 m`;
+- peak raw `|Fz|`: `842.85 N`;
+- peak force norm: `890.27 N`;
+- no `SEARCH` phase was entered.
+
+The higher gain slightly reduced time to the above-hole gate, but it worsened approach tracking and increased peak wrench. The next milestone remains a dynamics/controller investigation around `joint_2`, not simple gain increase.
+
 ## 2026-06-02 Trajectory Tracking Observer
 
 Milestone: `research_baseline_trajectory_tracking_observer`
