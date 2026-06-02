@@ -283,3 +283,34 @@ Runtime result:
 - `Max Fz: 169.4 N`.
 
 Decision: rejected and reverted. The retained code keeps the prior move-to-start timing. The next milestone should target final hold/stabilization near the above-hole pose or controller/physics parameters, not a globally slower no-contact approach.
+
+## 2026-06-02 Move-To-Start Hold Correction Rejected
+
+Milestone: `research_baseline_move_to_start_hold_correction`
+
+Evidence: `diagnostics/research_baseline_move_to_start_hold_correction/summary.md`
+
+A temporary bounded final hold correction was tested and then removed. The
+experiment allowed up to three same-target hold commands after the original
+`MOVING_TO_START` trajectory if the peg was already within a 30 mm XY window.
+
+Runtime result:
+
+- `Outcome: ABORTED`;
+- `Reason: MOVING_TO_START timeout/failure (90.0s)`;
+- `cart_err=0.016 m`;
+- `xy_err=0.011 m`;
+- `joint_err=0.014 rad`;
+- `stable=0/5`;
+- `Depth: 0.0000 m`;
+- `Max Fz: 170.8 N`.
+
+The hold commands briefly reduced XY error to `0.0028 m` and `0.0008 m`, but
+the pose did not remain stable for the required consecutive samples and drifted
+back outside the strict 2 mm no-contact gate. Passive tracking evidence showed
+p95 max joint error `0.026865 rad` and final max joint error `0.030123 rad`.
+
+Decision: rejected and reverted. The strict above-hole stability gate remains
+unchanged. The next blocker is runtime tracking/physics and high free-space
+F/T behavior near the above-hole target, not repeated same-target commands or
+weaker descent criteria.

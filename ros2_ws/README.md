@@ -44,6 +44,7 @@ The strongest current evidence is a **single simulated insertion-depth event**: 
 | research_baseline_v0_2_camera_visual_size_fix | Completed |
 | admittance_controller_v2_honest_tracking_and_contact_estimation | Implemented; first insertion-depth event observed; repeat validation pending |
 | research_baseline_repeat_validation | Failed: 0/3 physical successes in 2026-06-01 v2 repeat run |
+| research_baseline_move_to_start_hold_correction | Rejected: transient good XY samples but no stable gate |
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 
@@ -306,6 +307,28 @@ ros2 run experiment_manager research_baseline_repeat_validator --trials 3 --time
 Result: `0/3` physical successes and worse safety behavior. Two trials hard-aborted in `MOVING_TO_START` with raw Fz spikes of `4086.95 N` and `1766.64 N`; the third still failed the no-contact XY gate at `0.1116 m`.
 
 The target-refresh strategy was not retained. Current conclusion: above-hole tracking cannot be fixed by repeatedly re-publishing the same joint target; the next attempt should revisit the joint target itself, controller gains/physics, or a safer multi-stage free-space path.
+
+### 2026-06-02 Move-To-Start Hold Correction Experiment
+
+A bounded final hold experiment tested whether up to three same-target hold commands could settle the already-computed `MOVING_TO_START` joint target without weakening the strict 2 mm no-contact descent gate.
+
+Validation command:
+
+```bash
+timeout 150s ros2 launch thesis_bringup research_baseline.launch.py use_gui:=false tracking_log_dir:=diagnostics/research_baseline_move_to_start_hold_correction
+```
+
+Result: the strategy was rejected and the code was not retained. The trial produced transient good XY samples (`0.0028 m` and `0.0008 m`) but never satisfied the consecutive stability gate. It timed out safely in `MOVING_TO_START`:
+
+- `Outcome: ABORTED`
+- `cart_err=0.016 m`
+- `xy_err=0.011 m`
+- `joint_err=0.014 rad`
+- `stable=0/5`
+- `Depth: 0.0000 m`
+- `Max Fz: 170.8 N`
+
+Tracking evidence in `diagnostics/research_baseline_move_to_start_hold_correction/trajectory_tracking_summary.md` showed p95 max joint error `0.026865 rad` and final max joint error `0.030123 rad`. Current conclusion: repeated final hold commands can momentarily cross the XY threshold, but do not create a stable safe descent condition. The next work should diagnose runtime tracking/physics and free-space F/T behavior near the above-hole target.
 
 ### Files changed
 
