@@ -58,6 +58,7 @@ Latest tracking evidence localizes the approach/descent blocker to `joint_2`: no
 | research_baseline_joint2_approach_tracking_diagnostic | Completed: reusable analyzer confirms joint_2 dominates missing descent across recent approach runs |
 | research_baseline_joint_damping_scale_0p2_v1 | Rejected: broad damping reduction triggers hard-force abort in MOVING_TO_START |
 | research_baseline_joint_effort_scale_2p0_v1 | Rejected: doubled effort reaches APPROACH but immediately hard-aborts on unsafe wrench/contact |
+| research_baseline_contact_pair_attribution_v1 | Completed: unsafe doubled-effort reproduction attributed MOVING_TO_START contact to link_5 versus target plate |
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
@@ -152,6 +153,37 @@ descent, but it immediately creates unsafe force/contact evidence and is not a
 credible canonical setting. Command-index approach analysis showed the peg was
 still at `z=0.890982 m` against the `z=0.830000 m` target when the abort was
 triggered, with `joint_2` still `0.099473 rad` from the final target.
+
+## 2026-06-02 Contact Pair Attribution Diagnostic
+
+Milestone: `research_baseline_contact_pair_attribution_v1`
+
+`contact_state_observer` now records exact Gazebo collision pairs in the contact
+CSV and summary. This is passive instrumentation only; it does not change
+motion, contact handling, or safety gates.
+
+Validation command:
+
+```bash
+timeout 260s ros2 launch thesis_bringup research_baseline.launch.py \
+  use_gui:=false \
+  joint_effort_scale:=2.0 \
+  tracking_log_dir:=diagnostics/research_baseline_contact_pair_attribution_v1
+```
+
+Evidence: `diagnostics/research_baseline_contact_pair_attribution_v1/summary.md`
+
+Result: the reproduced doubled-effort run aborted safely in
+`MOVING_TO_START`, before approach, at raw `|Fz|=1018.9 N` and force norm
+`1195.8 N`. Contact attribution showed the target-source contact was
+`lbr_iisy6_r1300::link_5::link_5_collision <-> target_plate::plate_link::target_plate_collision`,
+with no peg-source or hole-source rows. This is robot-link clearance contact
+with the target plate, not valid peg insertion contact.
+
+Current conclusion: the next milestone is clearance-aware motion/geometry
+validation for `MOVING_TO_START` and the target fixture. The no-contact descent
+gate and global hard-force abort remain correct and must not be loosened to hide
+this failure.
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 

@@ -94,6 +94,24 @@ def _max_contact_force(message: Any) -> float:
     return max_force
 
 
+def _entity_name(entity: Any) -> str:
+    name = getattr(entity, "name", "")
+    return str(name) if name else "unknown"
+
+
+def _collision_pairs(message: Any, limit: int = 8) -> list[str]:
+    pairs: list[str] = []
+    for contact in _extract_contacts(message):
+        name_1 = _entity_name(getattr(contact, "collision1", None))
+        name_2 = _entity_name(getattr(contact, "collision2", None))
+        pair = " <-> ".join(sorted((name_1, name_2)))
+        if pair not in pairs:
+            pairs.append(pair)
+        if len(pairs) >= limit:
+            break
+    return pairs
+
+
 class ContactStateObserver(Node):
     """Write contact counts and force estimates grouped by insertion state."""
 
@@ -128,6 +146,7 @@ class ContactStateObserver(Node):
                 "source",
                 "contact_count",
                 "max_contact_force_n",
+                "collision_pairs",
             ]
         )
 
@@ -136,6 +155,9 @@ class ContactStateObserver(Node):
         self._positive_count = 0
         self._max_force = 0.0
         self._by_state_source: dict[tuple[str, str], list[tuple[int, float]]] = defaultdict(list)
+        self._by_state_source_pair: dict[tuple[str, str, str], list[tuple[int, float]]] = (
+            defaultdict(list)
+        )
         self._first_stamp: float | None = None
         self._last_stamp: float | None = None
 
@@ -184,6 +206,8 @@ class ContactStateObserver(Node):
         stamp_s = self.get_clock().now().nanoseconds * 1.0e-9
         contact_count = len(_extract_contacts(msg))
         max_force = _max_contact_force(msg)
+        pairs = _collision_pairs(msg)
+        pair_text = "; ".join(pairs)
         state = self._state
         self._writer.writerow(
             [
@@ -192,6 +216,7 @@ class ContactStateObserver(Node):
                 source,
                 contact_count,
                 f"{max_force:.9f}",
+                pair_text,
             ]
         )
         self._sample_count += 1
@@ -199,6 +224,15 @@ class ContactStateObserver(Node):
             self._positive_count += 1
         self._max_force = max(self._max_force, max_force)
         self._by_state_source[(state, source)].append((contact_count, max_force))
+        if pairs:
+            for pair in pairs:
+                self._by_state_source_pair[(state, source, pair)].append(
+                    (contact_count, max_force)
+                )
+        else:
+            self._by_state_source_pair[(state, source, "none")].append(
+                (contact_count, max_force)
+            )
         if self._first_stamp is None:
             self._first_stamp = stamp_s
         self._last_stamp = stamp_s
@@ -234,6 +268,22 @@ class ContactStateObserver(Node):
                 f"{sum(1 for count in counts if count > 0)} | "
                 f"{max(counts, default=0)} | "
                 f"{(mean(counts) if counts else 0.0):.6f} | "
+                f"{max(forces, default=0.0):.6f} |"
+            )
+        lines.extend(
+            [
+                "",
+                "## Collision Pairs",
+                "",
+                "| State | Source | Collision Pair | Samples | Max Force N |",
+                "|---|---|---|---:|---:|",
+            ]
+        )
+        for (state, source, pair), rows in sorted(self._by_state_source_pair.items()):
+            forces = [force for _count, force in rows]
+            lines.append(
+                "| "
+                f"{state} | {source} | `{pair}` | {len(rows)} | "
                 f"{max(forces, default=0.0):.6f} |"
             )
         lines.extend(

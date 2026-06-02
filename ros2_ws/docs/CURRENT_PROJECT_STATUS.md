@@ -28,6 +28,7 @@ The project must not claim final autonomous peg-in-hole success yet. The defensi
 - `diagnostics/research_baseline_approach_gain_3000_v1/approach_tracking_analysis.md`
 - `diagnostics/research_baseline_joint_damping_scale_0p2_v1/summary.md`
 - `diagnostics/research_baseline_joint_effort_scale_2p0_v1/summary.md`
+- `diagnostics/research_baseline_contact_pair_attribution_v1/summary.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -91,6 +92,7 @@ This confirms the baseline is not robust. It also confirms that the high-force c
 - Large Cartesian errors during APPROACH remain unresolved.
 - Multi-point INSERT is still not reliable.
 - Contact/gravity baseline validity needs scenario-specific validation.
+- Contact events must be interpreted by collision pair. The latest attributed contact run showed `link_5_collision` hitting the target plate during `MOVING_TO_START`, which is invalid robot-link clearance contact rather than peg insertion contact.
 - Older `docs/context/robot_cell_audit.md` contains stale iisy3 statements and should be superseded by `docs/PROJECT_CONTEXT.md` plus `docs/ROBOT_DATASHEET_CHECK.md`.
 
 ## Next Milestone
@@ -372,6 +374,25 @@ Result: rejected.
 - contact observer recorded target-source contact rows in `MOVING_TO_START`, `APPROACH`, and `ABORT`, with max target contact force `9925.518339 N`.
 
 This diagnostic shows effort authority is involved, but doubled effort is unsafe and not a fix. The next investigation should localize why force/contact evidence appears immediately at approach start when XY is valid and the command target is a short vertical descent.
+
+## 2026-06-02 Contact Pair Attribution
+
+Milestone: `research_baseline_contact_pair_attribution_v1`
+
+Evidence: `diagnostics/research_baseline_contact_pair_attribution_v1/summary.md`
+
+`contact_state_observer` now records exact Gazebo collision pairs in its CSV and compact summary. The observer remains passive and does not alter controller behavior.
+
+Runtime result with `joint_effort_scale:=2.0`:
+
+- outcome: `ABORTED`;
+- state at abort: `MOVING_TO_START`;
+- reason: hard-force abort at `|Fz|=1018.9 N`, force norm `1195.8 N`;
+- insertion depth: `0.0000 m`;
+- attributed collision pair: `lbr_iisy6_r1300::link_5::link_5_collision <-> target_plate::plate_link::target_plate_collision`;
+- no peg-source or hole-source contact rows were recorded.
+
+This shows at least one unsafe high-force path is caused by robot-link clearance contact with the target plate before descent. It is not valid insertion contact and must not be counted as progress. The next safety-critical milestone is clearance-aware `MOVING_TO_START` geometry/path validation before further approach or insertion tuning.
 
 ## 2026-06-02 Trajectory Tracking Observer
 
