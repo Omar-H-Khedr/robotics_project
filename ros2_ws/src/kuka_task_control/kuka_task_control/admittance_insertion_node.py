@@ -487,6 +487,50 @@ class AdmittanceInsertionNode(Node):
         )
         return duration
 
+    def _send_cartesian_descent_trajectory(self, start_pos: np.ndarray,
+                                           target_pos: np.ndarray,
+                                           label: str) -> tuple[np.ndarray, float] | None:
+        q_seed = self.current_joints.copy()
+        z_dist = abs(float(start_pos[2] - target_pos[2]))
+        n_cart_waypoints = max(4, min(10, int(z_dist / 0.01) + 2))
+
+        joint_waypoints = [q_seed.copy()]
+        q_prev = q_seed
+        max_joint_step = 0.0
+        for i in range(1, n_cart_waypoints + 1):
+            alpha = i / n_cart_waypoints
+            cart_target = np.array([
+                target_pos[0],
+                target_pos[1],
+                start_pos[2] + alpha * (target_pos[2] - start_pos[2]),
+            ])
+            q, converged, _ = self._kinematics.inverse_position(
+                cart_target, q_prev, max_iter=100,
+            )
+            actual_pos, _ = self._kinematics.pose(q)
+            err = np.linalg.norm(actual_pos - cart_target)
+            if not converged or err > 0.01:
+                self.get_logger().error(
+                    f'{label} Cartesian waypoint IK failed: '
+                    f'target=({cart_target[0]:.4f}, {cart_target[1]:.4f}, '
+                    f'{cart_target[2]:.4f}), err={err:.4f}m'
+                )
+                return None
+            max_joint_step = max(max_joint_step, float(np.max(np.abs(q - q_prev))))
+            joint_waypoints.append(q.copy())
+            q_prev = q
+
+        total_joint_dist = float(np.max(np.abs(q_seed - joint_waypoints[-1])))
+        duration = max(15.0, min(40.0, max(total_joint_dist, max_joint_step) * 30.0))
+        self._publish_multi_point_trajectory(joint_waypoints, duration)
+        self.get_logger().info(
+            f'{label}: Cartesian descent trajectory published. '
+            f'duration={duration:.1f}s, cart_waypoints={n_cart_waypoints}, '
+            f'z_dist={z_dist:.4f}, joint_dist={total_joint_dist:.4f}, '
+            f'max_joint_step={max_joint_step:.4f}'
+        )
+        return joint_waypoints[-1], duration
+
     def _handle_moving_to_start(self) -> None:
         if not self._joints_received:
             return
@@ -517,10 +561,6 @@ class AdmittanceInsertionNode(Node):
             else self.TRAJECTORY_TIMEOUT_S
         )
         timed_out = elapsed >= timeout_s
-        degraded_ready = (
-            elapsed >= self._move_to_start_duration_s + 15.0
-            and elapsed >= 20.0
-        )
         peg, _ = self._kinematics.pose(self.current_joints)
         cart_err = np.linalg.norm(peg - self.AXIS_ALIGN_POSE)
         xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
@@ -547,11 +587,6 @@ class AdmittanceInsertionNode(Node):
         if (
             not stabilized
             and not timed_out
-            and not (
-                degraded_ready
-                and cart_err < self.CARTESIAN_TIMEOUT_GRACE
-                and xy_err <= self.APPROACH_START_XY_TOLERANCE
-            )
         ):
             self._state_entry_ticks += 1
             return
@@ -561,31 +596,17 @@ class AdmittanceInsertionNode(Node):
         phase_timed_out = False
         phase_message = ''
         if not stabilized:
-            if (
-                cart_err < self.CARTESIAN_TIMEOUT_GRACE
-                and xy_err <= self.APPROACH_START_XY_TOLERANCE
-            ):
-                phase_timed_out = True
-                phase_message = (
-                    f'degraded: no strict convergence after {elapsed:.1f}s; '
-                    f'cart_err={cart_err:.3f}m, xy_err={xy_err:.3f}m'
-                )
-                self.get_logger().warn(
-                    f'MOVING_TO_START degraded ({elapsed:.1f}s at '
-                    f'{cart_err:.3f}m, within grace '
-                    f'{self.CARTESIAN_TIMEOUT_GRACE:.2f}m and '
-                    f'xy_err={xy_err:.3f}m). Proceeding.'
-                )
-            else:
-                self._abort_reason = (
-                    f'MOVING_TO_START timeout/degraded failure ({elapsed:.1f}s). '
-                    f'cart_err={cart_err:.3f}m, joint_err={joint_err:.3f}rad, '
-                    f'tolerance={self.CARTESIAN_TOLERANCE:.3f}m'
-                )
-                self.get_logger().error(self._abort_reason)
-                self._end_phase(False, cart_err, joint_err, True, self._abort_reason)
-                self._set_state(self.ABORT)
-                return
+            self._abort_reason = (
+                f'MOVING_TO_START timeout/failure ({elapsed:.1f}s). '
+                f'cart_err={cart_err:.3f}m, xy_err={xy_err:.3f}m, '
+                f'joint_err={joint_err:.3f}rad, stable='
+                f'{self._stable_counter}/{self.STABILIZE_TICKS}, '
+                f'tolerance={self.CARTESIAN_TOLERANCE:.3f}m'
+            )
+            self.get_logger().error(self._abort_reason)
+            self._end_phase(False, cart_err, joint_err, True, self._abort_reason)
+            self._set_state(self.ABORT)
+            return
 
         self._initial_xy_error = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
         self.get_logger().info(
@@ -618,9 +639,18 @@ class AdmittanceInsertionNode(Node):
             return
 
         if self._touch_joints is None:
-            q = self._solve_ik(self.TOUCH_POSE)
-            if q is None:
+            current_peg, _ = self._kinematics.pose(self.current_joints)
+            descent_start = np.array([
+                self.HOLE_CENTRE_XY[0],
+                self.HOLE_CENTRE_XY[1],
+                current_peg[2],
+            ])
+            descent = self._send_cartesian_descent_trajectory(
+                descent_start, self.TOUCH_POSE, 'APPROACH'
+            )
+            if descent is None:
                 return
+            q, duration = descent
             self._touch_joints = q
 
             q_current = self.current_joints.copy()
@@ -632,7 +662,7 @@ class AdmittanceInsertionNode(Node):
                 f'predicted_pose=({q_predicted_pose[0]:.4f}, '
                 f'{q_predicted_pose[1]:.4f}, {q_predicted_pose[2]:.4f})'
             )
-            self._approach_duration_s = self._send_trajectory_to_target(q, 'APPROACH')
+            self._approach_duration_s = duration
 
         elapsed = self._state_entry_ticks / self._control_rate
         timed_out = elapsed >= self.TRAJECTORY_TIMEOUT_S
@@ -642,6 +672,7 @@ class AdmittanceInsertionNode(Node):
         )
         peg, _ = self._kinematics.pose(self.current_joints)
         cart_err = np.linalg.norm(peg - self.TOUCH_POSE)
+        xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
         z_err = abs(peg[2] - self.TOUCH_POSE[2])
         contact_force = self._get_contact_force()
         if peg[2] <= self.TOUCH_POSE[2] + 0.005 and self._check_abort(contact_force):
@@ -670,6 +701,7 @@ class AdmittanceInsertionNode(Node):
                 f'APPROACH t={elapsed:.1f}s  '
                 f'peg=({peg[0]:.4f}, {peg[1]:.4f}, {peg[2]:.4f})  '
                 f'cart_err={cart_err:.3f}  '
+                f'xy_err={xy_err:.3f}  '
                 f'stable={self._stable_counter}/{self.STABILIZE_TICKS}'
             )
 

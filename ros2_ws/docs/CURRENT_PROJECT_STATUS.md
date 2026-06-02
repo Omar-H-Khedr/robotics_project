@@ -178,3 +178,23 @@ The iisy6 macro explicitly uses the existing iisy11 R1300 mesh assets for visual
 Validation passed for Xacro expansion, URDF-to-SDF conversion, generated-URDF inspection, targeted `colcon build`, and a 90 s headless launch. The launch reached `MOVING_TO_START` completion once with `xy_error=0.0006 m`, then transitioned into `APPROACH`.
 
 This is still not insertion success. `APPROACH` did not stabilize before timeout, with late approach Cartesian error around 0.039 m. The next blocker is approach/descent tracking stability after valid above-hole alignment.
+
+## 2026-06-02 Strict Above-Hole Stability Gate
+
+Milestone: `research_baseline_strict_above_hole_stability_gate`
+
+Evidence: `diagnostics/research_baseline_strict_above_hole_stability_gate/summary.md`
+
+The degraded `MOVING_TO_START` proceed path has been removed. The controller no longer descends from a single transient XY-good sample; it must satisfy the existing strict joint, Cartesian, and 2 mm XY gates for `STABILIZE_TICKS` before entering `APPROACH`.
+
+Validation passed for Python syntax, targeted `colcon build`, and a 120 s headless launch. The launch aborted safely in `MOVING_TO_START` at 90 s:
+
+- `cart_err=0.022 m`;
+- `xy_err=0.018 m`;
+- `joint_err=0.034 rad`;
+- `stable=0/5`;
+- `Outcome: ABORTED`;
+- `Depth: 0.0000 m`;
+- `Max Fz: 707.9 N`.
+
+This is a safety improvement, not task success. The next blocker is stable above-hole tracking and high free-space F/T behavior before any descent, contact search, insertion, or learning milestone can be credible.

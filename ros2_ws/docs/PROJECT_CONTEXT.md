@@ -64,6 +64,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - A 2026-06-02 tracking audit confirmed the above-hole target is reachable in offline IK, but runtime Gazebo/controller tracking remains underdamped or unstable. Gain 250 and repeated bounded refinements were rejected.
 - A 2026-06-02 cell-model consistency audit validated iisy6 naming, target Z convention, D405 topics, fixed peg geometry, deprecated cylinder marking, and standalone world/robot SDF checks. The same headless launch still failed to satisfy the preserved 0.002 m no-contact gate, with best observed XY error about 0.027 m.
 - A 2026-06-02 primitive-collision audit replaced canonical Gazebo KUKA arm mesh collisions with simple DART-loadable primitive collisions while keeping mesh visuals. The prior KUKA arm mesh-collision rejection messages were not observed, and one run reached the strict above-hole XY gate before timing out in `APPROACH`.
+- A 2026-06-02 strict-stability audit removed descent from transient above-hole crossings. The latest validation aborted safely in `MOVING_TO_START` with `xy_err=0.018 m`, `stable=0/5`, zero insertion depth, and a high no-contact F/T spike.
 
 ## Current Success Criteria
 
@@ -88,4 +89,4 @@ A same-target refresh experiment was tested and rejected: repeated MOVING_TO_STA
 
 The next step remains tracking stabilization. The joint-state source integrity milestone removed one measurement ambiguity; it did not solve the large no-contact XY error.
 
-Tracking stabilization should now focus on approach/descent tracking after valid above-hole alignment, controller/physics configuration, and measured joint tracking. Do not loosen the no-contact XY gate to hide the error.
+Tracking stabilization should now focus on stable above-hole convergence, controller/physics configuration, measured joint tracking, and high free-space F/T behavior. Do not loosen the no-contact XY gate to hide the error.

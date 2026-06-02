@@ -1,7 +1,7 @@
 # Visuomotor Context-Based Meta-Reinforcement Learning for Safe Peg-in-Hole Assembly
 
 **Repository status:** active doctoral research prototype
-**Latest documented:** `research_baseline_primitive_collision_geometry`
+**Latest documented:** `research_baseline_strict_above_hole_stability_gate`
 **README last updated:** 2026-06-02
 **Execution scope:** simulation-first validation only; no real-robot claim is made in this repository state.
 
@@ -18,6 +18,8 @@ The latest tracking audit confirms the above-hole IK target is reachable offline
 The latest cell-model consistency audit validated the iisy6 workcell naming, D405 bridge topics, target Z convention, fixed grasped peg model, deprecated cylinder placeholder warning, and standalone robot/world SDF checks. A 90 s headless launch still timed out in `MOVING_TO_START`; best observed XY error was about 0.027 m, which remains outside the preserved 0.002 m descent gate. Evidence is in `ros2_ws/diagnostics/research_baseline_cell_model_consistency/`.
 
 The latest primitive-collision audit switches the canonical research wrapper to simple DART-loadable collision geometry for KUKA arm links while keeping mesh visuals. The prior KUKA arm mesh-collision rejection messages were not observed; `MOVING_TO_START` reached the strict XY gate once, then the trial timed out in `APPROACH`. Evidence is in `ros2_ws/diagnostics/research_baseline_primitive_collision_geometry/`.
+
+The latest strict-stability audit removes the degraded `MOVING_TO_START` transition that allowed descent from a transient XY-good sample. A 120 s validation run aborted safely in `MOVING_TO_START` at 90 s with `xy_err=0.018 m`, `stable=0/5`, zero insertion depth, and a high no-contact F/T spike. Evidence is in `ros2_ws/diagnostics/research_baseline_strict_above_hole_stability_gate/`.
 
 ## 1. Project Overview
 
