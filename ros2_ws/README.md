@@ -47,6 +47,7 @@ The strongest current evidence is a **single simulated insertion-depth event**: 
 | research_baseline_move_to_start_hold_correction | Rejected: transient good XY samples but no stable gate |
 | research_baseline_raw_wrench_abort | Completed: raw wrench spikes now latched and abort active motion |
 | research_baseline_contact_wrench_correlation | Completed: no canonical contact-topic messages during raw wrench abort |
+| research_baseline_ft_mount_effort_limit | Completed: F/T mount limit corrected; raw spike reduced but still aborts safely |
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 
@@ -383,6 +384,36 @@ Contact observer result:
 - max contact force from contact topics: `0.000000 N`
 
 Current conclusion: the canonical contact topics did not provide positive contact evidence for the raw wrench spike. This narrows the next investigation to FT sensor semantics, inertial/dynamic loads, uninstrumented collision pairs, or Gazebo/controller physics.
+
+### 2026-06-02 F/T Mount Effort-Limit Validation
+
+The F/T measurement joint in `lbr_iisy6_r1300_research_gripper.urdf.xacro` is a
+zero-range revolute joint because Gazebo's URDF-to-SDF conversion collapses
+fixed joints and would remove the named joint needed for the joint-level
+force-torque sensor. The previous `effort=1`, `velocity=0` limit was physically
+too weak for a rigid sensor mount, so it was changed to `effort=10000`,
+`velocity=100` while preserving lower/upper limits at `0`.
+
+Validation command:
+
+```bash
+timeout 150s ros2 launch thesis_bringup research_baseline.launch.py use_gui:=false tracking_log_dir:=diagnostics/research_baseline_ft_mount_effort_limit
+```
+
+Result: the F/T bridge and controllers still loaded, and the spike was reduced
+but not eliminated:
+
+- `Outcome: ABORTED`
+- `Reason: Hard force abort: raw wrench exceeded 1000.0N in state MOVING_TO_START`
+- `Max |Fz|: 612.25 N`
+- `Max |F|: 1765.41 N`
+- `Depth: 0.0000 m`
+- contact-topic samples: `0`
+
+Current conclusion: the weak measurement-joint limit was a credibility issue and
+has been corrected, but it was not the full root cause. The next investigation
+should localize uninstrumented collisions or late free-space dynamics near the
+above-hole target; the hard-force abort remains unchanged.
 
 ### Files changed
 

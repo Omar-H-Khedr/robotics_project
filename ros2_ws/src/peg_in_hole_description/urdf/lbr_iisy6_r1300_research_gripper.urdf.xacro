@@ -54,7 +54,11 @@
 
   <xacro:kuka_lbr_iisy6_r1300_robot prefix="$(arg prefix)" package_name="kuka_lbr_iisy_support" collision_geometry="primitive"/>
 
-  <!-- FT sensor between flange and gripper -->
+  <!-- FT sensor between flange and gripper.
+       Gazebo's URDF->SDF conversion collapses fixed joints, so this zero-range
+       revolute joint is used only to preserve a named joint for the joint-level
+       force_torque sensor injected by spawn_robot_sdf.py. The high effort and
+       velocity limits avoid modeling the rigid sensor mount as a weak actuator. -->
   <link name="$(arg prefix)ft_sensor_link">
     <visual>
       <geometry><cylinder radius="0.025" length="0.01"/></geometry>
@@ -73,7 +77,7 @@
     <parent link="$(arg prefix)flange"/>
     <child link="$(arg prefix)ft_sensor_link"/>
     <origin xyz="0 0 0.005" rpy="0 0 0"/>
-    <limit effort="1" lower="0" upper="0" velocity="0"/>
+    <limit effort="10000" lower="0" upper="0" velocity="100"/>
     <axis xyz="1 0 0"/>
     <dynamics damping="1" friction="0"/>
   </joint>

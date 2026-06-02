@@ -44,7 +44,7 @@
     </model>
 
     <!--
-      Real-scale KUKA LBR iisy 3 R760 workcell.
+      Real-scale KUKA LBR iisy 6 R1300 workcell.
       The robot is spawned by thesis_bringup without scaling. The table work
       surface is at z=0.75 m. A floor-mounted robot spawn at z=0.0 made the
       arm appear under the table even when x/y alignment was correct, so the

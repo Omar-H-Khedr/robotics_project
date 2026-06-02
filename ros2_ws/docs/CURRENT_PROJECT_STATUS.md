@@ -377,3 +377,38 @@ show that the canonical peg/hole/target contact topics did not provide positive
 contact evidence for the raw wrench spike. The next investigation should focus
 on FT sensor semantics, inertial/dynamic loads from the free-space trajectory,
 uninstrumented collision pairs, or Gazebo/controller physics.
+
+## 2026-06-02 F/T Mount Effort-Limit Validation
+
+Milestone: `research_baseline_ft_mount_effort_limit`
+
+Evidence: `diagnostics/research_baseline_ft_mount_effort_limit/summary.md`
+
+The F/T mount remains a zero-range revolute joint because URDF fixed joints are
+collapsed by `gz sdf -p`, which removes the named joint needed by the
+joint-level Gazebo force-torque sensor. The previous measurement-joint limit of
+`effort=1`, `velocity=0` was corrected to `effort=10000`, `velocity=100` while
+preserving lower/upper limits at `0`.
+
+Validation passed for Python syntax, xacro expansion, URDF-to-SDF conversion,
+targeted `colcon build`, and a 150 s headless launch. Runtime result:
+
+- `Outcome: ABORTED`;
+- `Reason: Hard force abort: raw wrench exceeded 1000.0N in state MOVING_TO_START`;
+- `Max |Fz|=612.25 N`;
+- `Max |F|=1765.41 N`;
+- `Depth: 0.0000 m`.
+
+Observer result:
+
+- wrench samples: `7310`;
+- contact-topic samples: `0`;
+- trajectory max absolute joint-position error: `0.048581 rad`;
+- trajectory p95 max absolute joint-position error: `0.028216 rad`.
+
+This reduced the raw wrench spike compared with the preceding
+contact-correlation run (`Max |Fz|=1396.8 N`, `Max |F|=2624.1 N`), but did not
+produce insertion or clear the hard-force safety gate. The next blocker is to
+localize late `MOVING_TO_START` force norm spikes from uninstrumented collision
+pairs, tool/peg/table geometry proximity, F/T joint semantics, or
+controller/physics dynamics near the above-hole target.

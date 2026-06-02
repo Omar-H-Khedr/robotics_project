@@ -36,10 +36,11 @@ def _resolve_path(spec: str) -> str:
 def _inject_ft_sensor(root: ET.Element) -> None:
     """Add force_torque <sensor> inside joint ft_sensor_joint.
 
-    With a revolute joint (limits [0,0]), gz sdf -p keeps ft_sensor_joint
-    as a proper <joint>, so the sensor can be attached at joint level.
-    The joint-level FT sensor gives the net wrench across the flange-gripper
-    interface (gripper + peg + contact forces).
+    With a zero-range revolute joint, gz sdf -p keeps ft_sensor_joint as a
+    proper <joint>, so the sensor can be attached at joint level. A URDF fixed
+    joint is collapsed into the upstream link by conversion. The joint-level FT
+    sensor gives the net wrench across the flange-gripper interface (gripper +
+    peg + contact forces).
     """
     model = root.find("model")
     if model is None:
