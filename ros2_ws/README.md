@@ -60,6 +60,7 @@ Latest tracking evidence localizes the approach/descent blocker to `joint_2`: no
 | research_baseline_joint_effort_scale_2p0_v1 | Rejected: doubled effort reaches APPROACH but immediately hard-aborts on unsafe wrench/contact |
 | research_baseline_contact_pair_attribution_v1 | Completed: unsafe doubled-effort reproduction attributed MOVING_TO_START contact to link_5 versus target plate |
 | research_baseline_tool_tip_frame_correction_v1 | Completed: corrected peg-tip frame removes reproduced link_5 target-plate clearance collision; still no insertion |
+| research_baseline_start_slow_settle_after_tool_fix_v1 | Rejected: one 20 s same-target settle did not satisfy the strict above-hole stability gate |
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
@@ -213,6 +214,44 @@ clearance analysis found `0/201` planned and `0/1338` runtime-feedback
 Current conclusion: the clearance collision has been removed. The immediate
 blocker is now final above-hole XY stabilization under the preserved 2 mm
 no-contact gate.
+
+## 2026-06-02 Slow Start Settle After Tool-Tip Fix
+
+Milestone: `research_baseline_start_slow_settle_after_tool_fix_v1`
+
+After correcting the gripper peg-tip frame, a bounded one-shot settle
+experiment tested whether another 20 s same-target `MOVING_TO_START` trajectory
+from current feedback to the same axis-aligned start joint target would hold
+the peg inside the strict 2 mm no-contact gate. The experiment was rejected and
+the source change was removed.
+
+Validation command:
+
+```bash
+timeout 240s ros2 launch thesis_bringup research_baseline.launch.py \
+  use_gui:=false \
+  tracking_log_dir:=diagnostics/research_baseline_start_slow_settle_after_tool_fix_v1
+```
+
+Evidence:
+
+- `diagnostics/research_baseline_start_slow_settle_after_tool_fix_v1/summary.md`
+- `diagnostics/research_baseline_start_slow_settle_after_tool_fix_v1/trial_outcome.json`
+- `diagnostics/research_baseline_start_slow_settle_after_tool_fix_v1/clearance_path_analysis.md`
+
+Result: `ABORTED` in `MOVING_TO_START`, zero insertion depth, zero contact-topic
+samples, max raw `|Fz|=171.25 N`, and max raw force norm `271.34 N`. The final
+phase timeout reported `cart_err=0.012 m`, `xy_err=0.011 m`, `joint_err=0.025
+rad`, and `stable=0/5`. Offline replay showed the corrected peg tip crossed
+the 2 mm XY gate only transiently, with a minimum replayed XY error
+`0.000072 m` but only two consecutive strict observer samples. Clearance
+analysis still found `0/201` planned and `0/1884` runtime-feedback `link_5`
+target-plate intersections.
+
+Current conclusion: same-target settle publication is not a credible fix. The
+next milestone remains above-hole pose hold/tracking stabilization from
+measured controller and physics behavior, with the strict no-contact gate and
+hard-force abort preserved.
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 

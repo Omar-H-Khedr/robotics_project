@@ -1,0 +1,43 @@
+# Clearance Path Analysis
+
+- title: `planned_SAFE_HOME_to_AXIS_ALIGN`
+- samples: `201`
+- intersection_samples: `0`
+
+## First Intersection
+
+None.
+
+## Closest Sample
+
+- label: `planned_162`
+- stamp_s: `None`
+- min_aabb_distance_m: `0.129226`
+- peg_xyz: `[0.533527, -0.109448, 0.865301]`
+- link5_center_xyz: `[0.550396, -0.215708, 1.019008]`
+- intersections: `[]`
+- joints_rad: `[-0.407081, -0.955575, 2.123952, -0.091352, -0.941484, 0.02009]`
+
+This analyzer is offline only and does not publish robot commands.
+
+# Clearance Path Analysis
+
+- title: `tracking_feedback_samples`
+- samples: `1884`
+- intersection_samples: `0`
+
+## First Intersection
+
+None.
+
+## Closest Sample
+
+- label: `tracking_6620`
+- stamp_s: `67.436`
+- min_aabb_distance_m: `0.111635`
+- peg_xyz: `[0.538612, -0.116363, 0.845847]`
+- link5_center_xyz: `[0.550963, -0.215076, 1.005105]`
+- intersections: `[]`
+- joints_rad: `[-0.406065, -0.933248, 2.121823, -0.098714, -0.907708, 0.031408]`
+
+This analyzer is offline only and does not publish robot commands.

@@ -30,6 +30,7 @@ The project must not claim final autonomous peg-in-hole success yet. The defensi
 - `diagnostics/research_baseline_joint_effort_scale_2p0_v1/summary.md`
 - `diagnostics/research_baseline_contact_pair_attribution_v1/summary.md`
 - `diagnostics/research_baseline_tool_tip_frame_correction_v1/summary.md`
+- `diagnostics/research_baseline_start_slow_settle_after_tool_fix_v1/summary.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -87,7 +88,7 @@ This confirms the baseline is not robust. It also confirms that the high-force c
 
 ## Open Risks
 
-- The corrected tool-tip frame removes the reproduced `link_5` target-plate collision, but `MOVING_TO_START` still failed the strict 2 mm no-contact gate in the latest validation with final XY about 0.014 m.
+- The corrected tool-tip frame removes the reproduced `link_5` target-plate collision, but `MOVING_TO_START` still failed the strict 2 mm no-contact gate. The latest slow-settle diagnostic crossed the gate only transiently and timed out with final XY about 0.011 m.
 - `APPROACH` currently commands a 67 mm Cartesian descent but measured peg Z remains near 0.90 m instead of reaching the 0.83 m touch target.
 - Peak raw Fz spikes are confirmed: 1237.45 N and 3716.2 N were recorded in the 2026-06-01 repeat run.
 - Large Cartesian errors during APPROACH remain unresolved.
@@ -98,7 +99,7 @@ This confirms the baseline is not robust. It also confirms that the high-force c
 
 ## Next Milestone
 
-`research_baseline_above_hole_tracking_stabilization`
+`research_baseline_above_hole_hold_tracking_stabilization`
 
 Reason: force-safe insert stabilization blocked unsafe INSERT when peg Z was too high, but validation still failed. The 2026-06-01 force-safe validation (`diagnostics/research_baseline_force_safe_insert_v3`) showed:
 
@@ -118,9 +119,11 @@ The no-contact alignment gate was then implemented and validated in `diagnostics
 | 2 | ABORTED | APPROACH blocked at above-hole XY error 0.0911 m |
 | 3 | ABORTED | APPROACH blocked at above-hole XY error 0.0872 m |
 
-This removed descent/SEARCH from these bad initial alignments and produced complete outcome JSON for all three trials. It did not solve task execution. The next milestone is above-hole tracking stabilization: improve the `MOVING_TO_START` target execution so the peg reaches the no-contact XY gate (`<=0.030 m`) before any descent is attempted.
+This removed descent/SEARCH from these bad initial alignments and produced complete outcome JSON for all three trials. It did not solve task execution. The next milestone remains above-hole hold/tracking stabilization: improve `MOVING_TO_START` target execution so the corrected peg tip reaches and holds the strict no-contact XY gate (`<=0.002 m`) for the required consecutive state-machine ticks before any descent is attempted.
 
 An above-hole target-refresh experiment was run in `diagnostics/research_baseline_above_hole_tracking_v1`. It was not retained because it worsened safety: two of three trials hard-aborted in `MOVING_TO_START` with raw Fz spikes of 4086.95 N and 1766.64 N, and the remaining trial still failed the no-contact gate at 0.1116 m XY error.
+
+After the tool-tip frame correction removed the reproduced `link_5` target-plate collision, a one-shot 20 s same-target settle was also rejected in `diagnostics/research_baseline_start_slow_settle_after_tool_fix_v1`. It crossed the strict 2 mm gate only transiently, timed out safely in `MOVING_TO_START` with final `xy_err=0.011 m`, recorded zero contact-topic samples, and left the controller source unchanged.
 
 ## 2026-06-02 Joint-State Source Integrity
 

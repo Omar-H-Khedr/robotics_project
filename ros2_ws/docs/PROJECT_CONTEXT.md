@@ -82,6 +82,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - A 2026-06-02 effort-authority diagnostic was rejected. `joint_effort_scale:=2.0` reached the no-contact gate faster and entered `APPROACH`, but hard-aborted after 0.5 s with force norm `1009.7 N` and target-source contact rows while the peg was still at `z=0.890982 m` against the `z=0.830000 m` target.
 - A 2026-06-02 contact-pair attribution diagnostic added exact collision-pair logging to the passive contact observer. A reproduced doubled-effort run aborted in `MOVING_TO_START` with raw `|Fz|=1018.9 N` and showed target-source contact from `lbr_iisy6_r1300::link_5::link_5_collision <-> target_plate::plate_link::target_plate_collision`. This is invalid robot-link clearance contact, not peg insertion contact.
 - A 2026-06-02 tool-tip frame correction moved the modeled `peg_tip` from the near-palm end of the 110 mm peg to the protruding negative local tool-Z end and updated `RobotKinematics` to match. Offline clearance analysis and runtime feedback then showed zero `link_5` target-plate intersections, zero contact-topic samples, and max raw force norm `270.82 N`. The validation still failed honestly in `MOVING_TO_START` with final XY about `0.014 m`.
+- A 2026-06-02 slow same-target settle after the tool-tip correction was rejected and removed. It aborted safely in `MOVING_TO_START` with final `xy_err=0.011 m`, `stable=0/5`, zero contact-topic samples, zero insertion depth, and no planned or runtime-feedback `link_5` target-plate intersections. Offline replay showed the corrected peg tip crossed the strict 2 mm XY gate only transiently, with minimum replayed XY `0.000072 m` but only two consecutive strict observer samples.
 
 ## Current Success Criteria
 
@@ -98,12 +99,31 @@ Robust success requires repeated validation with a documented success rate and f
 
 ## Next Technical Milestone
 
-`research_baseline_approach_descent_tracking_stabilization`
+`research_baseline_above_hole_hold_tracking_stabilization`
 
-Reason: the safer axis-aligned `MOVING_TO_START` now reaches the strict 0.002 m no-contact XY gate when allowed 120 s, so the immediate blocker has moved from above-hole alignment to approach/descent tracking. Current validation commands a descent from about `z=0.897 m` to `z=0.830 m`, but measured peg Z stays near `0.90 m` and `APPROACH` aborts with `cart_err=0.072 m`.
+Reason: after the peg-tip frame correction, the current canonical blocker is
+again stable above-hole holding. The corrected tool frame removed the
+reproduced `link_5` target-plate collision, but the controller does not hold
+the peg inside the strict 2 mm no-contact XY gate for the required consecutive
+state-machine ticks. A post-correction slow settle crossed the gate only
+transiently and was rejected.
 
 A same-target refresh experiment was tested and rejected: repeated MOVING_TO_START target publication produced hard-force aborts and did not improve XY gate convergence.
 
 The next step remains tracking stabilization. The joint-state source integrity milestone removed one measurement ambiguity; it did not solve the large no-contact XY error.
 
-Tracking stabilization should now focus on final above-hole XY settling with the corrected tool frame, then approach IK trajectory realization, `joint_2` tracking authority, final-pose damping, and high free-space F/T behavior using the command-vs-feedback, wrench-by-state, and contact-by-pair evidence. A globally slower move-to-start trajectory, repeated same-target hold corrections, slower approach timing, higher plugin position gain, broad damping reduction, and doubled effort limits were tested and rejected before the tool-tip correction. The weak F/T measurement-joint limit has been corrected but did not eliminate all force spikes. Full-path contact evidence showed that the earlier abort could coincide with peg-target contact before descent, axis-aligned IK removed that tilted-peg failure mode, collision-pair attribution showed `link_5` could hit the target plate, and the tool-tip correction removed that reproduced clearance collision. Do not loosen the no-contact XY gate, approach Z preconditions, or hard-force abort to hide the remaining tracking failure.
+Tracking stabilization should now focus on final above-hole XY settling with
+the corrected tool frame, then approach IK trajectory realization, `joint_2`
+tracking authority, final-pose damping, and high free-space F/T behavior using
+the command-vs-feedback, wrench-by-state, and contact-by-pair evidence. A
+globally slower move-to-start trajectory, repeated same-target hold
+corrections, slower approach timing, higher plugin position gain, broad damping
+reduction, doubled effort limits, and one slow post-tool-fix same-target settle
+were tested and rejected. The weak F/T measurement-joint limit has been
+corrected but did not eliminate all force spikes. Full-path contact evidence
+showed that the earlier abort could coincide with peg-target contact before
+descent, axis-aligned IK removed that tilted-peg failure mode,
+collision-pair attribution showed `link_5` could hit the target plate, and the
+tool-tip correction removed that reproduced clearance collision. Do not loosen
+the no-contact XY gate, approach Z preconditions, or hard-force abort to hide
+the remaining tracking failure.
