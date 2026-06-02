@@ -91,6 +91,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - A 2026-06-03 2x joint-damping diagnostic was rejected as a canonical change. It reduced p95 max joint tracking error to about `0.0158 rad` and improved the estimated strict hold to two ticks, but still failed `MOVING_TO_START` with final XY about `0.007 m` and `stable=0/5`.
 - A 2026-06-03 2x damping plus `position_gain:=1500` diagnostic was rejected as a canonical change. It reached instantaneous XY error as low as `0.000052 m`, but the estimated strict hold was still only two 10 Hz ticks, final `MOVING_TO_START` XY was about `0.004 m`, contact-topic samples were zero, and the run aborted safely before descent.
 - A 2026-06-03 trajectory command-capture fix added a bounded first-command discovery wait before the task publishes its first joint trajectory. A short validation run captured the 20-point `MOVING_TO_START` command and the selector-based tracking analyzer attributed it to the canonical axis-align target. This is an instrumentation/reproducibility fix, not insertion evidence.
+- A 2026-06-03 canonical post-command-capture validation failed safely in `MOVING_TO_START`. It captured both the start and abort-retreat commands, attributed command index 0 to the canonical axis-align target, and showed final command-attributed XY error about `0.0036 m`. The strict 2 mm hold gate still failed with only one estimated stable tick, zero contact-topic samples, and zero insertion depth.
 
 ## Current Success Criteria
 
@@ -144,6 +145,13 @@ The first-command capture race has been reduced by a bounded discovery wait in
 the task node. Future canonical runs should normally capture the initial
 axis-align trajectory; if they do not, treat that as an instrumentation failure
 before drawing controller-tracking conclusions.
+
+The first full canonical run after that fix confirms the same physical blocker
+with better evidence: the axis-align command is captured and nearly reached,
+but the endpoint is not held inside the strict 2 mm XY gate for the required
+five consecutive 10 Hz ticks. Continue focusing on sustained endpoint hold,
+controller/physics dynamics, or target-frame feedback consistency before
+approach or learning work.
 
 A first bounded endpoint-correction implementation was tested and rejected. It
 was safe, but it did not hold the strict gate, so the source was removed. The
