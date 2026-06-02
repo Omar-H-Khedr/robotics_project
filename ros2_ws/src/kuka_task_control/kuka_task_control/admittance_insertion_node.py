@@ -220,8 +220,10 @@ class AdmittanceInsertionNode(Node):
         self._initial_xy_error: float = 0.0
         self._pre_insertion_xy_error: float = 0.0
         self._max_fz: float = 0.0
+        self._max_force_norm: float = 0.0
         self._max_contact_force: float = 0.0
         self._insertion_depth_m: float = 0.0
+        self._raw_force_abort_reason: str = ''
 
         # Search state
         self._search_angle: float = 0.0
@@ -254,6 +256,24 @@ class AdmittanceInsertionNode(Node):
     def _wrench_cb(self, msg: Wrench) -> None:
         self.current_wrench = msg
         self._wrench_received = True
+        abs_fz = abs(float(msg.force.z))
+        force_norm = math.sqrt(
+            float(msg.force.x) * float(msg.force.x)
+            + float(msg.force.y) * float(msg.force.y)
+            + float(msg.force.z) * float(msg.force.z)
+        )
+        self._max_fz = max(self._max_fz, abs_fz)
+        self._max_force_norm = max(self._max_force_norm, force_norm)
+        if (
+            not self._raw_force_abort_reason
+            and self._state not in (self.IDLE, self.RETREAT, self.ABORT, self.DONE)
+            and max(abs_fz, force_norm) > self.HARD_FORCE_ABORT_N
+        ):
+            self._raw_force_abort_reason = (
+                f'Hard force abort: raw wrench exceeded '
+                f'{self.HARD_FORCE_ABORT_N:.1f}N in state {self._state}; '
+                f'|Fz|={abs_fz:.1f}N, |F|={force_norm:.1f}N.'
+            )
 
     # --- Gravity baseline ---------------------------------------------------
 
@@ -401,26 +421,17 @@ class AdmittanceInsertionNode(Node):
         self._update_baseline()
         if self._wrench_received:
             fz = self._get_fz()
-            self._max_fz = max(self._max_fz, fz)
             self._max_contact_force = max(
                 self._max_contact_force,
                 self._get_contact_force(),
             )
-            if (
-                fz > self.HARD_FORCE_ABORT_N
-                and self._state not in (
-                    self.IDLE,
-                    self.MOVING_TO_START,
-                    self.APPROACH,
-                    self.RETREAT,
-                    self.ABORT,
-                    self.DONE,
-                )
+            if self._raw_force_abort_reason and self._state not in (
+                self.IDLE,
+                self.RETREAT,
+                self.ABORT,
+                self.DONE,
             ):
-                self._abort_reason = (
-                    f'Hard force abort: raw Fz {fz:.1f}N exceeded '
-                    f'{self.HARD_FORCE_ABORT_N:.1f}N in state {self._state}.'
-                )
+                self._abort_reason = self._raw_force_abort_reason
                 self.get_logger().error(self._abort_reason)
                 if self._current_phase_result is not None:
                     peg, _ = self._kinematics.pose(self.current_joints)
@@ -458,7 +469,9 @@ class AdmittanceInsertionNode(Node):
             self._phase_results = []
             self._trial_outcome = ''
             self._abort_reason = ''
+            self._raw_force_abort_reason = ''
             self._max_fz = 0.0
+            self._max_force_norm = 0.0
             self._max_contact_force = 0.0
             self._insertion_depth_m = 0.0
             self._begin_phase(self.MOVING_TO_START)
@@ -1004,7 +1017,8 @@ class AdmittanceInsertionNode(Node):
                 f'peg=({peg[0]:.4f}, {peg[1]:.4f}, {peg[2]:.4f})  '
                 f'depth={final_depth:.4f}m  '
                 f'Fz={fz:.1f}N  contact={contact_force:.1f}N  '
-                f'max_Fz={self._max_fz:.1f}N  '
+                f'max_abs_Fz={self._max_fz:.1f}N  '
+                f'max_force_norm={self._max_force_norm:.1f}N  '
                 f'max_contact={self._max_contact_force:.1f}N'
             )
 
@@ -1138,6 +1152,8 @@ class AdmittanceInsertionNode(Node):
                 'pre_insertion_xy_error_m': round(self._pre_insertion_xy_error, 4),
                 'insertion_depth_m': round(self._insertion_depth_m, 4),
                 'max_fz_N': round(self._max_fz, 2),
+                'max_abs_fz_N': round(self._max_fz, 2),
+                'max_force_norm_N': round(self._max_force_norm, 2),
                 'baseline_fz_N': round(self._baseline_fz, 2),
                 'max_contact_force_N': round(self._max_contact_force, 2),
                 'contact_threshold_N': self._contact_threshold,
@@ -1153,7 +1169,8 @@ class AdmittanceInsertionNode(Node):
             f'  Outcome: {self._trial_outcome}\n'
             f'  Reason:  {reason}\n'
             f'  Depth:   {self._insertion_depth_m:.4f}m\n'
-            f'  Max Fz:  {self._max_fz:.1f}N\n'
+            f'  Max |Fz|:{self._max_fz:.1f}N\n'
+            f'  Max |F|: {self._max_force_norm:.1f}N\n'
             f'  Baseline:{self._baseline_fz:.1f}N\n'
             f'  Contact: {self._max_contact_force:.1f}N\n'
             f'  XY err:  {self._pre_insertion_xy_error:.4f}m\n'

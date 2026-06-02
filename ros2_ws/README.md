@@ -45,6 +45,7 @@ The strongest current evidence is a **single simulated insertion-depth event**: 
 | admittance_controller_v2_honest_tracking_and_contact_estimation | Implemented; first insertion-depth event observed; repeat validation pending |
 | research_baseline_repeat_validation | Failed: 0/3 physical successes in 2026-06-01 v2 repeat run |
 | research_baseline_move_to_start_hold_correction | Rejected: transient good XY samples but no stable gate |
+| research_baseline_raw_wrench_abort | Completed: raw wrench spikes now latched and abort active motion |
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 
@@ -329,6 +330,33 @@ Result: the strategy was rejected and the code was not retained. The trial produ
 - `Max Fz: 170.8 N`
 
 Tracking evidence in `diagnostics/research_baseline_move_to_start_hold_correction/trajectory_tracking_summary.md` showed p95 max joint error `0.026865 rad` and final max joint error `0.030123 rad`. Current conclusion: repeated final hold commands can momentarily cross the XY threshold, but do not create a stable safe descent condition. The next work should diagnose runtime tracking/physics and free-space F/T behavior near the above-hole target.
+
+### 2026-06-02 Raw Wrench Abort Instrumentation
+
+Implemented after passive wrench evidence showed that the controller could miss sub-control-period raw wrench spikes during `MOVING_TO_START`.
+
+Changes:
+
+- Added passive `wrench_state_observer` to log `/ft_sensor_wrench` by insertion state and peg pose.
+- Added callback-level raw wrench peak tracking in `admittance_insertion_node`.
+- Hard-force abort now latches on raw `|Fz|` or force norm above `1000 N` in active task states, including `MOVING_TO_START`.
+- Outcome JSON now records `max_abs_fz_N` and `max_force_norm_N`; legacy `max_fz_N` is preserved for the repeat validator.
+
+Validation command:
+
+```bash
+timeout 150s ros2 launch thesis_bringup research_baseline.launch.py use_gui:=false tracking_log_dir:=diagnostics/research_baseline_raw_wrench_abort
+```
+
+Result: safety abort in `MOVING_TO_START`, not insertion success:
+
+- `Outcome: ABORTED`
+- `Reason: Hard force abort: raw wrench exceeded 1000.0N in state MOVING_TO_START`
+- `Max |Fz|: 1943.3 N`
+- `Max |F|: 2936.5 N`
+- `Depth: 0.0000 m`
+
+Current conclusion: high free-space raw wrench spikes are now measured and safety-latched. The next blocker is determining whether they come from hidden contact, FT sensor semantics, inertial dynamics, or Gazebo/controller physics.
 
 ### Files changed
 

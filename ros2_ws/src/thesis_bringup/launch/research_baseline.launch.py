@@ -333,6 +333,22 @@ def launch_setup(context, *args, **kwargs):
         condition=IfCondition(LaunchConfiguration("enable_tracking_observer")),
     )
 
+    wrench_state_observer = Node(
+        package="thesis_bringup",
+        executable="wrench_state_observer",
+        parameters=[
+            {
+                "use_sim_time": simulation["use_sim_time"],
+                "wrench_topic": "/ft_sensor_wrench",
+                "state_topic": "/insertion_state",
+                "joint_state_topic": "/joint_states",
+                "output_dir": LaunchConfiguration("tracking_log_dir"),
+            }
+        ],
+        output="screen",
+        condition=IfCondition(LaunchConfiguration("enable_wrench_observer")),
+    )
+
     admittance_insertion = Node(
         package="kuka_task_control",
         executable="admittance_insertion_node",
@@ -417,6 +433,7 @@ def launch_setup(context, *args, **kwargs):
         ),
         data_logger,
         trajectory_tracking_observer,
+        wrench_state_observer,
     ]
 
 
@@ -490,6 +507,11 @@ def generate_launch_description():
                 "enable_tracking_observer",
                 default_value="true",
                 description="If true, passively log joint trajectory controller tracking error.",
+            ),
+            DeclareLaunchArgument(
+                "enable_wrench_observer",
+                default_value="true",
+                description="If true, passively log F/T wrench by insertion state and peg pose.",
             ),
             DeclareLaunchArgument(
                 "tracking_log_dir",

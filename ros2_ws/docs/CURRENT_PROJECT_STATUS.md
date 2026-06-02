@@ -314,3 +314,34 @@ Decision: rejected and reverted. The strict above-hole stability gate remains
 unchanged. The next blocker is runtime tracking/physics and high free-space
 F/T behavior near the above-hole target, not repeated same-target commands or
 weaker descent criteria.
+
+## 2026-06-02 Raw Wrench Abort Instrumentation
+
+Milestone: `research_baseline_raw_wrench_abort`
+
+Evidence: `diagnostics/research_baseline_raw_wrench_abort/summary.md`
+
+The canonical launch now starts a passive `wrench_state_observer` by default.
+It records `/ft_sensor_wrench` grouped by `/insertion_state` and peg pose. The
+task controller also now tracks raw wrench peaks in the wrench callback and
+latches hard-force aborts on raw `|Fz|` or force norm above `1000 N` in active
+task states, including `MOVING_TO_START`.
+
+Validation passed for Python syntax, targeted `colcon build`, and a 150 s
+headless launch. Runtime result:
+
+- `Outcome: ABORTED`;
+- `Reason: Hard force abort: raw wrench exceeded 1000.0N in state MOVING_TO_START`;
+- `Max |Fz|=1943.3 N`;
+- `Max |F|=2936.5 N`;
+- `Depth: 0.0000 m`.
+
+The passive observer independently recorded `MOVING_TO_START` max abs Fz
+`1943.293077 N` and max force norm `2936.479541 N`. This is a safety improvement
+and a clearer failure mode, not task success.
+
+The next blocker is to determine whether these high free-space raw wrench
+spikes are hidden contact, force-torque sensor semantics, inertial dynamics from
+the free-space trajectory, or Gazebo/controller physics. Descent, search,
+insertion, and learning should remain blocked until this is understood or
+bounded by evidence.
