@@ -39,6 +39,11 @@ The project must not claim final autonomous peg-in-hole success yet. The defensi
 - `diagnostics/research_baseline_start_gain_2000_after_tool_fix_v1/above_hole_hold_analysis.md`
 - `diagnostics/research_baseline_start_gain_3000_after_tool_fix_v1/above_hole_hold_analysis.md`
 - `diagnostics/research_baseline_zero_derivative_trajectory_hold_v1/above_hole_hold_analysis.md`
+- `diagnostics/research_baseline_tool_tip_frame_correction_v1/moving_to_start_tracking_analysis.md`
+- `diagnostics/research_baseline_start_slow_settle_after_tool_fix_v1/moving_to_start_tracking_analysis.md`
+- `diagnostics/research_baseline_start_gain_2000_after_tool_fix_v1/moving_to_start_tracking_analysis.md`
+- `diagnostics/research_baseline_start_gain_3000_after_tool_fix_v1/moving_to_start_tracking_analysis.md`
+- `diagnostics/research_baseline_zero_derivative_trajectory_hold_v1/moving_to_start_tracking_analysis.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -100,6 +105,7 @@ This confirms the baseline is not robust. It also confirms that the high-force c
 - Post-tool global gain diagnostics at `position_gain:=2000` and `position_gain:=3000` were safe but rejected. Gain 2000 improved the final timeout to about 2 mm XY but reached only three consecutive strict observer samples; gain 3000 was worse, with final XY about 7 mm and only two consecutive strict observer samples.
 - Explicit zero velocity/acceleration trajectory points were safe but rejected. The run reached minimum replayed XY `0.000014 m`, but held only four strict observer samples and timed out at final XY about 14 mm.
 - Offline above-hole hold analysis of five post-tool runs confirmed that transient strict-gate crossings are not enough. None reached the required estimated five 10 Hz stable ticks; the best estimated state-loop hold was one tick.
+- Selector-based MOVING_TO_START command tracking showed the usable post-tool runs have distributed joint error with persistent final XY drift, not a single dominant joint. Some diagnostics only captured abort-retreat and should not be used for start-command attribution.
 - `APPROACH` currently commands a 67 mm Cartesian descent but measured peg Z remains near 0.90 m instead of reaching the 0.83 m touch target.
 - Peak raw Fz spikes are confirmed: 1237.45 N and 3716.2 N were recorded in the 2026-06-01 repeat run.
 - Large Cartesian errors during APPROACH remain unresolved.
@@ -155,6 +161,15 @@ files and estimates the task controller's five-tick 10 Hz stable-gate
 requirement from passive `wrench_state_samples.csv`. All analyzed runs failed
 the estimated gate despite transient sub-millimetre XY crossings; the best
 estimated state-loop hold was one tick.
+
+A selector-based MOVING_TO_START tracking analyzer was then added and run over
+the same diagnostics. It selects the axis-align command by FK target pose and
+marks retreat-only command logs as missing start-command evidence. The usable
+post-tool runs showed final XY drift of `0.012767 m` for slow settle,
+`0.003992 m` for gain 2000, and `0.011025 m` for zero-derivative hold, with
+worst p95 joint errors spread across `joint_4`, `joint_3`, and `joint_5`
+respectively. This does not support another single-joint or broad-gain
+diagnostic as the immediate next fix.
 
 ## 2026-06-02 Joint-State Source Integrity
 

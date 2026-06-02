@@ -86,6 +86,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - 2026-06-02 post-tool global gain diagnostics at `position_gain:=2000` and `position_gain:=3000` were rejected. Both preserved zero contact-topic samples and zero `link_5` target-plate intersections, but neither held the strict gate. Gain 2000 was closest with final `xy_err=0.002 m` and a best strict replay streak of three observer samples; gain 3000 ended at `xy_err=0.007 m` with a best streak of two samples.
 - A 2026-06-02 zero-derivative trajectory-point experiment was rejected and removed. It explicitly filled trajectory velocities and accelerations with zeros, remained safe and clearance-clean, but timed out at final `xy_err=0.014 m` after reaching only four consecutive strict observer samples.
 - A 2026-06-02 above-hole hold analyzer milestone added a reusable offline diagnostic for `wrench_state_samples.csv`. Re-analysis of five post-tool runs showed none satisfied the estimated five 10 Hz stable ticks required by the preserved 2 mm no-contact gate. Several runs reached sub-millimetre XY error transiently, but the best estimated state-loop hold was only one tick.
+- A 2026-06-02 MOVING_TO_START tracking analyzer milestone added selector-based command attribution for the axis-align command. It prevents retreat-only command logs from being misread as start tracking and showed the usable post-tool start runs have distributed joint error with persistent Cartesian XY drift, not one dominant joint comparable to the approach `joint_2` failure.
 
 ## Current Success Criteria
 
@@ -127,6 +128,13 @@ converts passive `MOVING_TO_START` observer rows into estimated 10 Hz
 state-loop hold windows and confirmed that recent post-tool diagnostics cross
 the strict 2 mm gate only briefly. The next implementation should therefore
 target sustained endpoint hold/control, not gate relaxation.
+
+Use `moving_to_start_tracking_analyzer` alongside it when checking trajectory
+logs. It selects the axis-align command by FK target pose, so diagnostics that
+only captured abort-retreat are not falsely treated as MOVING_TO_START
+evidence. Current usable post-tool runs show final XY drift despite small,
+distributed joint errors, which makes endpoint correction/hold behavior the
+next target.
 
 A same-target refresh experiment was tested and rejected: repeated MOVING_TO_START target publication produced hard-force aborts and did not improve XY gate convergence.
 

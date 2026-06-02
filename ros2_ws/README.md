@@ -65,6 +65,7 @@ Latest hold evidence shows the corrected post-tool runs do not satisfy the requi
 | research_baseline_start_gain_3000_after_tool_fix_v1 | Rejected: gain 3000 was worse than gain 2000 for strict-gate stability |
 | research_baseline_zero_derivative_trajectory_hold_v1 | Rejected: explicit zero velocity/acceleration trajectory points still failed above-hole hold |
 | research_baseline_above_hole_hold_analyzer | Completed: reusable offline analyzer confirms recent post-tool runs only cross the strict gate transiently |
+| research_baseline_moving_to_start_tracking_analyzer | Completed: reusable selector-based analyzer localizes post-tool start hold drift without false retreat-command attribution |
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
@@ -352,6 +353,43 @@ corrected tool-tip run reached minimum XY `0.000037 m`, gain 2000 reached
 reached `0.000257 m`, but none held the strict gate for more than one
 estimated 10 Hz state-loop tick. This confirms the blocker is controlled
 endpoint hold, not merely reaching the target once.
+
+## 2026-06-02 MOVING_TO_START Tracking Analyzer
+
+Milestone: `research_baseline_moving_to_start_tracking_analyzer`
+
+The workspace now includes `moving_to_start_tracking_analyzer`, an offline
+diagnostic that selects the MOVING_TO_START command by FK target near the
+canonical axis-align peg-tip pose instead of assuming command index 0. This is
+needed because some diagnostics only captured the abort-retreat command in
+`trajectory_commands.csv`; those runs are now reported as missing axis-align
+command evidence instead of being misattributed.
+
+Validation commands:
+
+```bash
+python3 -m py_compile src/thesis_bringup/thesis_bringup/moving_to_start_tracking_analyzer.py
+colcon build --symlink-install --packages-select thesis_bringup
+ros2 run thesis_bringup moving_to_start_tracking_analyzer diagnostics/research_baseline_tool_tip_frame_correction_v1
+ros2 run thesis_bringup moving_to_start_tracking_analyzer diagnostics/research_baseline_start_slow_settle_after_tool_fix_v1
+ros2 run thesis_bringup moving_to_start_tracking_analyzer diagnostics/research_baseline_start_gain_2000_after_tool_fix_v1
+ros2 run thesis_bringup moving_to_start_tracking_analyzer diagnostics/research_baseline_start_gain_3000_after_tool_fix_v1
+ros2 run thesis_bringup moving_to_start_tracking_analyzer diagnostics/research_baseline_zero_derivative_trajectory_hold_v1
+```
+
+Evidence: `moving_to_start_tracking_analysis.md/json` in the same five
+diagnostic directories.
+
+Result: the tool-tip and gain-3000 diagnostics did not capture the axis-align
+command, only retreat, so they cannot be used for MOVING_TO_START joint
+attribution. The slow-settle, gain-2000, and zero-derivative runs did capture a
+valid axis-align command. They show distributed joint tracking error rather
+than a single dominant joint: worst p95 joints were `joint_4` at `0.020421 rad`
+for slow settle, `joint_3` at `0.022163 rad` for gain 2000, and `joint_5` at
+`0.024759 rad` for zero-derivative hold. Final XY drift remained `0.012767 m`,
+`0.003992 m`, and `0.011025 m` respectively, so the next implementation should
+target closed endpoint hold/correction rather than another broad gain or
+single-joint dynamics change.
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 
