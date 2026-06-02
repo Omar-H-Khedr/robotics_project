@@ -250,6 +250,10 @@ def launch_setup(context, *args, **kwargs):
         "include_camera:=false",
         "--position-gain",
         LaunchConfiguration("position_gain"),
+        "--controller-config-package",
+        LaunchConfiguration("controller_config_package"),
+        "--controller-config-path",
+        LaunchConfiguration("controller_config_path"),
         "--x",
         "0.0",
         "--y",
@@ -454,6 +458,16 @@ def generate_launch_description():
                     "The canonical default keeps the upstream-style value; "
                     "override only for documented tracking experiments."
                 ),
+            ),
+            DeclareLaunchArgument(
+                "controller_config_package",
+                default_value="thesis_bringup",
+                description="Package containing the canonical research ros2_control YAML.",
+            ),
+            DeclareLaunchArgument(
+                "controller_config_path",
+                default_value="config/research_baseline_ros2_control.yaml",
+                description="Path inside controller_config_package for gz_ros2_control parameters.",
             ),
             OpaqueFunction(function=launch_setup),
         ]

@@ -178,6 +178,16 @@ def main() -> None:
         default=1000.0,
         help="gz_ros2_control position_proportional_gain",
     )
+    parser.add_argument(
+        "--controller-config-package",
+        default=_RESOURCE_PACKAGE,
+        help="Package containing the gz_ros2_control controller YAML.",
+    )
+    parser.add_argument(
+        "--controller-config-path",
+        default=_CONTROLLER_CONFIG,
+        help="Path to the gz_ros2_control controller YAML inside the package share.",
+    )
     args, _ = parser.parse_known_args()
 
     # 1. Expand xacro → URDF
@@ -209,7 +219,8 @@ def main() -> None:
 
     # 4. Inject plugin & initial positions into SDF
     controller_config_path = os.path.join(
-        get_package_share_directory(_RESOURCE_PACKAGE), _CONTROLLER_CONFIG
+        get_package_share_directory(args.controller_config_package),
+        args.controller_config_path,
     )
     sdf_with_plugin = _inject_plugin(
         sdf_raw.stdout,

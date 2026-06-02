@@ -1,7 +1,7 @@
 # Visuomotor Context-Based Meta-Reinforcement Learning for Safe Peg-in-Hole Assembly
 
 **Repository status:** active doctoral research prototype
-**Latest documented:** `research_baseline_strict_above_hole_stability_gate`
+**Latest documented:** `research_baseline_ros2_control_config`
 **README last updated:** 2026-06-02
 **Execution scope:** simulation-first validation only; no real-robot claim is made in this repository state.
 
@@ -9,7 +9,7 @@
 
 ## Current Status Note
 
-The active baseline targets the KUKA LBR iisy 6 R1300 and is controller-driven in Gazebo. It must not be described as robust autonomous peg-in-hole success: repeated validation has produced 0/3 physical successes, and the latest 2026-06-02 run timed out safely in `MOVING_TO_START` with XY error still outside the no-contact descent gate.
+The active baseline targets the KUKA LBR iisy 6 R1300 and is controller-driven in Gazebo. It must not be described as robust autonomous peg-in-hole success: repeated validation has produced 0/3 physical successes, and the latest 2026-06-02 run timed out safely in `MOVING_TO_START` with XY error still outside the strict no-contact descent gate.
 
 The canonical `research_baseline.launch.py` now uses a project-local bridge config that omits Gazebo `/joint_states`; `joint_state_broadcaster` is the intended single ROS 2 joint-state source. Evidence is in `ros2_ws/diagnostics/research_baseline_joint_state_source_integrity/`.
 
@@ -20,6 +20,8 @@ The latest cell-model consistency audit validated the iisy6 workcell naming, D40
 The latest primitive-collision audit switches the canonical research wrapper to simple DART-loadable collision geometry for KUKA arm links while keeping mesh visuals. The prior KUKA arm mesh-collision rejection messages were not observed; `MOVING_TO_START` reached the strict XY gate once, then the trial timed out in `APPROACH`. Evidence is in `ros2_ws/diagnostics/research_baseline_primitive_collision_geometry/`.
 
 The latest strict-stability audit removes the degraded `MOVING_TO_START` transition that allowed descent from a transient XY-good sample. A 120 s validation run aborted safely in `MOVING_TO_START` at 90 s with `xy_err=0.018 m`, `stable=0/5`, zero insertion depth, and a high no-contact F/T spike. Evidence is in `ros2_ws/diagnostics/research_baseline_strict_above_hole_stability_gate/`.
+
+The latest controller-config audit makes the canonical baseline use a project-local `thesis_bringup/config/research_baseline_ros2_control.yaml` instead of the upstream 50 Hz fake-hardware YAML. The 250 Hz controller config was loaded by both controller spawners and the headless launch remained safe, but the trial still aborted in `MOVING_TO_START` with `xy_err=0.011 m`, `stable=0/5`, and zero insertion depth. Evidence is in `ros2_ws/diagnostics/research_baseline_ros2_control_config/`.
 
 ## 1. Project Overview
 

@@ -38,6 +38,7 @@ until repeated validation demonstrates robust success.
 - SAFE_HOME: `[0.0, -0.8, 1.2, 0.0, 0.8, 0.0]`.
 - Spawn: x=0.80, y=-0.75, z=0.735, yaw=1.5708.
 - Controller stack: `joint_state_broadcaster` and `joint_trajectory_controller`.
+- Canonical controller parameters: `thesis_bringup/config/research_baseline_ros2_control.yaml` loaded by `spawn_robot_sdf.py`.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
 - Insertion controller: topic-based trajectory publishing with median Fz baseline, SEARCH phase, single-point INSERT, final JSON outcome logging.
@@ -198,3 +199,33 @@ Validation passed for Python syntax, targeted `colcon build`, and a 120 s headle
 - `Max Fz: 707.9 N`.
 
 This is a safety improvement, not task success. The next blocker is stable above-hole tracking and high free-space F/T behavior before any descent, contact search, insertion, or learning milestone can be credible.
+
+## 2026-06-02 Research Baseline ROS 2 Control Config
+
+Milestone: `research_baseline_ros2_control_config`
+
+Evidence: `diagnostics/research_baseline_ros2_control_config/summary.md`
+
+The canonical `research_baseline.launch.py` now passes a project-local controller YAML into `spawn_robot_sdf.py` instead of relying on the upstream `kuka_resources/config/fake_hardware_config_6_axis.yaml` path. The upstream config remains the fallback for comparison, but the research launch owns its controller assumptions.
+
+The research config uses:
+
+- `controller_manager.update_rate: 250 Hz`;
+- `joint_trajectory_controller.state_publish_rate: 100 Hz`;
+- `joint_trajectory_controller.action_monitor_rate: 50 Hz`;
+- `allow_nonzero_velocity_at_trajectory_end: false`.
+
+Validation passed for Python syntax, targeted `thesis_bringup` build, and a 120 s headless launch. Runtime logs showed both `joint_state_broadcaster` and `joint_trajectory_controller` loaded `/home/omar/code/robotics_project/ros2_ws/install/thesis_bringup/share/thesis_bringup/config/research_baseline_ros2_control.yaml`. The controller update warning changed to a 0.004 s desired period, confirming the 250 Hz config was active.
+
+The task outcome remained a bounded safety failure:
+
+- `Outcome: ABORTED`;
+- `Reason: MOVING_TO_START timeout/failure (90.0s)`;
+- `cart_err=0.015 m`;
+- `xy_err=0.011 m`;
+- `joint_err=0.018 rad`;
+- `stable=0/5`;
+- `Depth: 0.0000 m`;
+- `Max Fz: 171.1 N`.
+
+This is not insertion success. The next blocker remains stable above-hole convergence/holding under the preserved strict no-contact gate. The next milestone should add commanded-versus-actual trajectory tracking evidence and then tune trajectory timing, hold behavior, or controller/physics parameters from measured tracking data.
