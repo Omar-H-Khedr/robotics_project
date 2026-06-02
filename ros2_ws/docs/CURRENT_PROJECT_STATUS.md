@@ -164,3 +164,17 @@ Validation passed for Xacro expansion, world SDF validation with local model pat
 A 90 s headless launch spawned `lbr_iisy6_r1300`, started D405 and F/T bridges, loaded `gz_ros2_control`, and activated `joint_state_broadcaster` plus `joint_trajectory_controller`. The run still timed out in `MOVING_TO_START`; best observed XY error was about 0.027 m at 60 s, then drifted to about 0.070 m by 75 s. This is not insertion success and it keeps tracking/physics as the next blocker.
 
 Remaining risk: Gazebo/DART still reports that KUKA mesh collision geometry could not be created. This is now a high-priority physics-credibility risk for the next milestone.
+
+## 2026-06-02 Primitive Collision Geometry
+
+Milestone: `research_baseline_primitive_collision_geometry`
+
+Evidence: `diagnostics/research_baseline_primitive_collision_geometry/summary.md`
+
+The canonical `lbr_iisy6_r1300_research_gripper.urdf.xacro` wrapper now requests primitive collision geometry from the project-local iisy6 macro. This keeps mesh visuals but gives Gazebo/DART cylinders/boxes for `base_link` through `link_6`, avoiding the previously observed KUKA arm mesh-collision rejection messages.
+
+The iisy6 macro explicitly uses the existing iisy11 R1300 mesh assets for visual/default mesh compatibility because both are 1300 mm reach variants and the iisy6-specific mesh assets are not available in the local submodule state. Primitive collisions are used for the active Gazebo baseline.
+
+Validation passed for Xacro expansion, URDF-to-SDF conversion, generated-URDF inspection, targeted `colcon build`, and a 90 s headless launch. The launch reached `MOVING_TO_START` completion once with `xy_error=0.0006 m`, then transitioned into `APPROACH`.
+
+This is still not insertion success. `APPROACH` did not stabilize before timeout, with late approach Cartesian error around 0.039 m. The next blocker is approach/descent tracking stability after valid above-hole alignment.

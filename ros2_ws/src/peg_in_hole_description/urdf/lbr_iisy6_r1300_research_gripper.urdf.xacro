@@ -52,7 +52,7 @@
 
   <link name="world"/>
 
-  <xacro:kuka_lbr_iisy6_r1300_robot prefix="$(arg prefix)" package_name="kuka_lbr_iisy_support"/>
+  <xacro:kuka_lbr_iisy6_r1300_robot prefix="$(arg prefix)" package_name="kuka_lbr_iisy_support" collision_geometry="primitive"/>
 
   <!-- FT sensor between flange and gripper -->
   <link name="$(arg prefix)ft_sensor_link">
