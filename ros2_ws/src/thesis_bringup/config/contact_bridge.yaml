@@ -1,14 +1,17 @@
-- topic_name: /gazebo/contacts/peg
+- ros_topic_name: /gazebo/contacts/peg
+  gz_topic_name: /world/peg_in_hole_world/model/lbr_iisy6_r1300/link/ft_sensor_link/sensor/peg_contact_sensor/contact
   ros_type_name: ros_gz_interfaces/msg/Contacts
   gz_type_name: gz.msgs.Contacts
   direction: GZ_TO_ROS
 
-- topic_name: /gazebo/contacts/hole
+- ros_topic_name: /gazebo/contacts/hole
+  gz_topic_name: /world/peg_in_hole_world/model/hole_fixture/link/fixture_link/sensor/hole_contact_sensor/contact
   ros_type_name: ros_gz_interfaces/msg/Contacts
   gz_type_name: gz.msgs.Contacts
   direction: GZ_TO_ROS
 
-- topic_name: /gazebo/contacts/target
+- ros_topic_name: /gazebo/contacts/target
+  gz_topic_name: /world/peg_in_hole_world/model/target_plate/link/plate_link/sensor/target_contact_sensor/contact
   ros_type_name: ros_gz_interfaces/msg/Contacts
   gz_type_name: gz.msgs.Contacts
   direction: GZ_TO_ROS

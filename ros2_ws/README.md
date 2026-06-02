@@ -48,6 +48,7 @@ The strongest current evidence is a **single simulated insertion-depth event**: 
 | research_baseline_raw_wrench_abort | Completed: raw wrench spikes now latched and abort active motion |
 | research_baseline_contact_wrench_correlation | Completed: no canonical contact-topic messages during raw wrench abort |
 | research_baseline_ft_mount_effort_limit | Completed: F/T mount limit corrected; raw spike reduced but still aborts safely |
+| research_baseline_contact_bridge_full_paths | Completed: full-path contact bridge shows peg-target contact during MOVING_TO_START |
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 
@@ -414,6 +415,38 @@ Current conclusion: the weak measurement-joint limit was a credibility issue and
 has been corrected, but it was not the full root cause. The next investigation
 should localize uninstrumented collisions or late free-space dynamics near the
 above-hole target; the hard-force abort remains unchanged.
+
+### 2026-06-02 Full-Path Contact Bridge Validation
+
+The research baseline contact bridge now maps full Gazebo contact sensor paths
+back to stable ROS topics. `spawn_robot_sdf.py` also injects a robot-mounted
+`peg_contact_sensor` on the converted `ft_sensor_link`, because the active peg
+is fixed into the robot model rather than spawned as the standalone
+`cylindrical_peg`.
+
+Validation command:
+
+```bash
+timeout 150s ros2 launch thesis_bringup research_baseline.launch.py use_gui:=false tracking_log_dir:=diagnostics/research_baseline_contact_bridge_full_paths
+```
+
+Result: the three contact bridges were created and Gazebo reported peg, target,
+and fixture contact sensors publishing. The task still aborted safely in
+`MOVING_TO_START`, but the contact observer now recorded positive peg-target
+contact:
+
+- `Outcome: ABORTED`
+- `Max |Fz|: 939.36 N`
+- `Max |F|: 1748.50 N`
+- `Depth: 0.0000 m`
+- contact samples: `50`
+- positive contact samples: `50`
+- `MOVING_TO_START` peg/target max contact force: `2427.31 N`
+
+Current conclusion: the previous zero-contact result was an observability gap.
+The raw wrench abort is now correlated with peg-target contact before descent.
+The next change should keep the no-contact start pose physically clear of the
+target plate; the hard-force abort and strict stability gate remain unchanged.
 
 ### Files changed
 

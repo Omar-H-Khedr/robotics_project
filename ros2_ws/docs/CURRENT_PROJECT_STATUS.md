@@ -412,3 +412,40 @@ produce insertion or clear the hard-force safety gate. The next blocker is to
 localize late `MOVING_TO_START` force norm spikes from uninstrumented collision
 pairs, tool/peg/table geometry proximity, F/T joint semantics, or
 controller/physics dynamics near the above-hole target.
+
+## 2026-06-02 Full-Path Contact Bridge Validation
+
+Milestone: `research_baseline_contact_bridge_full_paths`
+
+Evidence: `diagnostics/research_baseline_contact_bridge_full_paths/summary.md`
+
+The canonical contact bridge now maps fully scoped Gazebo sensor topics to the
+stable ROS topics consumed by `contact_state_observer`. The active robot-mounted
+peg is also instrumented by injecting `peg_contact_sensor` onto the converted
+`ft_sensor_link`, referencing the lumped grasped-peg collision.
+
+Validation passed for Python syntax, generated-SDF inspection, targeted
+`colcon build`, and a 150 s headless launch. Runtime logs showed all three
+contact bridges created and Gazebo publishing all three contact sensors.
+
+The task outcome remained a bounded safety failure:
+
+- `Outcome: ABORTED`;
+- `Reason: Hard force abort: raw wrench exceeded 1000.0N in state MOVING_TO_START`;
+- `Max |Fz|=939.36 N`;
+- `Max |F|=1748.50 N`;
+- `Depth: 0.0000 m`.
+
+Contact observer result:
+
+- contact samples: `50`;
+- positive contact samples: `50`;
+- `MOVING_TO_START` peg max contact force: `2427.307742 N`;
+- `MOVING_TO_START` target max contact force: `2427.307742 N`;
+- no hole contact samples were recorded.
+
+The previous zero-contact conclusion was therefore an observability gap. The
+current blocker is no-contact start-pose geometry: before descent, the peg can
+contact the target plate while hovering near the above-hole target. The next
+milestone should correct the free-space start pose or clearance geometry without
+loosening the hard-force abort or strict no-contact stability gate.

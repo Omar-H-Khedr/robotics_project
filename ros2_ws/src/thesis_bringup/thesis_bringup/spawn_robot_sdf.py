@@ -64,6 +64,42 @@ def _inject_ft_sensor(root: ET.Element) -> None:
             break
 
 
+def _inject_peg_contact_sensor(root: ET.Element) -> None:
+    """Attach a contact sensor to the robot-mounted grasped peg collision.
+
+    The active research peg is fixed into the robot description, not spawned as
+    the standalone ``cylindrical_peg`` model. During URDF->SDF conversion the
+    fixed gripper and peg links are lumped into ``ft_sensor_link``. This helper
+    finds the lumped peg collision and adds a link-level contact sensor so the
+    research baseline can bridge peg contacts under a stable ROS topic.
+    """
+    model = root.find("model")
+    if model is None:
+        return
+    for link in model.findall("link"):
+        peg_collision = None
+        for collision in link.findall("collision"):
+            name = collision.get("name", "")
+            if "grasped_peg_collision" in name:
+                peg_collision = name
+                break
+        if peg_collision is None:
+            continue
+        if any(sensor.get("name") == "peg_contact_sensor" for sensor in link.findall("sensor")):
+            return
+        sensor = ET.SubElement(link, "sensor")
+        sensor.set("name", "peg_contact_sensor")
+        sensor.set("type", "contact")
+        e = ET.SubElement(sensor, "always_on")
+        e.text = "true"
+        e = ET.SubElement(sensor, "update_rate")
+        e.text = "100"
+        contact = ET.SubElement(sensor, "contact")
+        e = ET.SubElement(contact, "collision")
+        e.text = peg_collision
+        return
+
+
 def _inject_ros2_control_plugin(
     root: ET.Element,
     controller_config: str,
@@ -151,6 +187,7 @@ def _inject_plugin(
         _inject_initial_positions(model, initial_positions)
     _inject_ros2_control_plugin(root, controller_config, position_proportional_gain)
     _inject_ft_sensor(root)
+    _inject_peg_contact_sensor(root)
     return '<?xml version="1.0"?>\n' + ET.tostring(root, encoding="unicode")
 
 
