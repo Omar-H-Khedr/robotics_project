@@ -173,11 +173,48 @@ def _inject_initial_positions(
             e.text = str(initial_positions[name])
 
 
+def _scale_joint_dynamics(
+    model: ET.Element,
+    joint_damping_scale: float,
+    joint_effort_scale: float,
+) -> list[str]:
+    """Scale converted SDF joint damping and effort limits for diagnostics."""
+    changes: list[str] = []
+    for joint in model.findall("joint"):
+        name = joint.get("name", "")
+        if not name:
+            continue
+        axis = joint.find("axis")
+        if axis is None:
+            continue
+        dynamics = axis.find("dynamics")
+        damping = dynamics.find("damping") if dynamics is not None else None
+        if damping is not None and damping.text and joint_damping_scale != 1.0:
+            original = float(damping.text.strip())
+            updated = original * joint_damping_scale
+            damping.text = f"{updated:.12g}"
+            changes.append(
+                f"{name}: damping {original:.6g} -> {updated:.6g}"
+            )
+        limit = axis.find("limit")
+        effort = limit.find("effort") if limit is not None else None
+        if effort is not None and effort.text and joint_effort_scale != 1.0:
+            original = float(effort.text.strip())
+            updated = original * joint_effort_scale
+            effort.text = f"{updated:.12g}"
+            changes.append(
+                f"{name}: effort {original:.6g} -> {updated:.6g}"
+            )
+    return changes
+
+
 def _inject_plugin(
     sdf_xml: str,
     urdf_xml: str,
     controller_config: str,
     position_proportional_gain: float,
+    joint_damping_scale: float,
+    joint_effort_scale: float,
 ) -> str:
     """Add ros2_control plugin, FT sensor, and initial positions to the SDF."""
     root = ET.fromstring(sdf_xml)
@@ -185,6 +222,13 @@ def _inject_plugin(
     model = root.find("model")
     if model is not None:
         _inject_initial_positions(model, initial_positions)
+        changes = _scale_joint_dynamics(
+            model,
+            joint_damping_scale,
+            joint_effort_scale,
+        )
+        for change in changes:
+            print(f"SDF joint dynamics override: {change}")
     _inject_ros2_control_plugin(root, controller_config, position_proportional_gain)
     _inject_ft_sensor(root)
     _inject_peg_contact_sensor(root)
@@ -215,6 +259,24 @@ def main() -> None:
         type=float,
         default=1000.0,
         help="gz_ros2_control position_proportional_gain",
+    )
+    parser.add_argument(
+        "--joint-damping-scale",
+        type=float,
+        default=1.0,
+        help=(
+            "Diagnostic multiplier for SDF joint damping. "
+            "Default 1.0 preserves the converted robot model."
+        ),
+    )
+    parser.add_argument(
+        "--joint-effort-scale",
+        type=float,
+        default=1.0,
+        help=(
+            "Diagnostic multiplier for SDF joint effort limits. "
+            "Default 1.0 preserves the converted robot model."
+        ),
     )
     parser.add_argument(
         "--controller-config-package",
@@ -265,6 +327,8 @@ def main() -> None:
         urdf.stdout,
         controller_config_path,
         args.position_gain,
+        args.joint_damping_scale,
+        args.joint_effort_scale,
     )
 
     # 5. Spawn via ros_gz_sim create (use -string to avoid temp-file races)

@@ -250,6 +250,10 @@ def launch_setup(context, *args, **kwargs):
         "include_camera:=false",
         "--position-gain",
         LaunchConfiguration("position_gain"),
+        "--joint-damping-scale",
+        LaunchConfiguration("joint_damping_scale"),
+        "--joint-effort-scale",
+        LaunchConfiguration("joint_effort_scale"),
         "--controller-config-package",
         LaunchConfiguration("controller_config_package"),
         "--controller-config-path",
@@ -511,6 +515,22 @@ def generate_launch_description():
                     "Gazebo position_proportional_gain for gz_ros2_control. "
                     "The canonical default keeps the upstream-style value; "
                     "override only for documented tracking experiments."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "joint_damping_scale",
+                default_value="1.0",
+                description=(
+                    "Diagnostic multiplier for converted SDF joint damping. "
+                    "Default 1.0 preserves canonical robot dynamics."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "joint_effort_scale",
+                default_value="1.0",
+                description=(
+                    "Diagnostic multiplier for converted SDF joint effort limits. "
+                    "Default 1.0 preserves canonical robot dynamics."
                 ),
             ),
             DeclareLaunchArgument(

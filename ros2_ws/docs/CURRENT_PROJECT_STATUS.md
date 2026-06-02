@@ -26,6 +26,7 @@ The project must not claim final autonomous peg-in-hole success yet. The defensi
 - `diagnostics/research_baseline_search_fail_closed_v2/approach_tracking_analysis.md`
 - `diagnostics/research_baseline_slow_approach_descent_v1/approach_tracking_analysis.md`
 - `diagnostics/research_baseline_approach_gain_3000_v1/approach_tracking_analysis.md`
+- `diagnostics/research_baseline_joint_damping_scale_0p2_v1/summary.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -324,6 +325,30 @@ Cross-run result:
 | `research_baseline_approach_gain_3000_v1` | `0.110990 rad` | `0.110880 rad` | `0.072500 m` | `-0.069807 m` |
 
 The approach command target is consistently the correct peg-tip touch pose near `0.520, -0.200, 0.830 m`. Runtime feedback remains near `z=0.897-0.900 m`, so the blocked descent is a controller/physics/joint-authority issue dominated by `joint_2`, not an unreachable or wrongly computed Cartesian target.
+
+## 2026-06-02 Joint Damping Scale 0.2 Diagnostic
+
+Milestone: `research_baseline_joint_damping_scale_0p2_v1`
+
+Evidence: `diagnostics/research_baseline_joint_damping_scale_0p2_v1/summary.md`
+
+`spawn_robot_sdf` now supports diagnostic-only launch-time scaling of converted SDF joint damping and effort limits. Defaults remain `joint_damping_scale:=1.0` and `joint_effort_scale:=1.0`, preserving canonical robot dynamics unless a run explicitly overrides them.
+
+The first dynamics diagnostic used `joint_damping_scale:=0.2`, leaving position gain, effort limits, and all task safety gates unchanged. The converted SDF damping overrides were:
+
+- arm joints: `30/30/20/10/10/5 -> 6/6/4/2/2/1`;
+- `ft_sensor_joint`: `1 -> 0.2`.
+
+Result: rejected.
+
+- outcome: `ABORTED`;
+- reason: hard-force abort in `MOVING_TO_START`, `|Fz|=1181.0 N`, `|F|=1272.7 N`;
+- insertion depth: `0.0000 m`;
+- phase Cartesian error at abort: `0.272028 m`;
+- trajectory tracking p95 max joint error: `0.113972 rad`;
+- contact observer recorded no bridged contact samples.
+
+Broad damping reduction did not reach the no-contact gate or approach phase. It is useful diagnostic evidence, but not a canonical fix. The next controller/physics investigation should be more targeted than global damping reduction.
 
 ## 2026-06-02 Trajectory Tracking Observer
 

@@ -56,6 +56,7 @@ Latest tracking evidence localizes the approach/descent blocker to `joint_2`: no
 | research_baseline_slow_approach_descent_v1 | Rejected: 41.7 s descent still stalls near joint_2 with about 0.070 m Cartesian error |
 | research_baseline_approach_gain_3000_v1 | Rejected: gain 3000 worsens APPROACH to about 0.073 m Cartesian error and higher raw wrench |
 | research_baseline_joint2_approach_tracking_diagnostic | Completed: reusable analyzer confirms joint_2 dominates missing descent across recent approach runs |
+| research_baseline_joint_damping_scale_0p2_v1 | Rejected: broad damping reduction triggers hard-force abort in MOVING_TO_START |
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
@@ -93,6 +94,36 @@ Current conclusion: the next milestone should investigate iisy6 joint dynamics,
 effort/damping assumptions, and Gazebo position-control authority around
 `joint_2`. Safety gates remain correct; do not loosen the 2 mm no-contact gate,
 approach Z preconditions, or hard-force abort to mask this failure.
+
+## 2026-06-02 Joint Damping Scale 0.2 Diagnostic
+
+Milestone: `research_baseline_joint_damping_scale_0p2_v1`
+
+`spawn_robot_sdf` now exposes diagnostic-only launch arguments for converted
+SDF joint dynamics:
+
+- `joint_damping_scale`, default `1.0`
+- `joint_effort_scale`, default `1.0`
+
+The canonical default preserves the converted robot model. The first diagnostic
+run used `joint_damping_scale:=0.2` with default effort limits, default position
+gain, and unchanged safety gates.
+
+Validation command:
+
+```bash
+timeout 240s ros2 launch thesis_bringup research_baseline.launch.py \
+  use_gui:=false \
+  joint_damping_scale:=0.2 \
+  tracking_log_dir:=diagnostics/research_baseline_joint_damping_scale_0p2_v1
+```
+
+Evidence: `diagnostics/research_baseline_joint_damping_scale_0p2_v1/summary.md`
+
+Result: rejected. The run aborted in `MOVING_TO_START` before descent with
+`|Fz|=1181.04 N`, force norm `1272.74 N`, Cartesian error `0.272028 m`, and
+zero insertion depth. Broad damping reduction did not solve the approach
+blocker and is not a credible canonical change.
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 
