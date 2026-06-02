@@ -114,7 +114,11 @@
       <pose>0.42 -0.55 1.18 0.95 0 0.35</pose>
       <link name="camera_link">
         <visual name="camera_visual">
-          <geometry><box size="0.03 0.025 0.02"/></geometry>
+          <geometry>
+            <box>
+              <size>0.03 0.025 0.02</size>
+            </box>
+          </geometry>
           <material>
             <ambient>0.03 0.03 0.03 1</ambient>
             <diffuse>0.05 0.05 0.05 1</diffuse>

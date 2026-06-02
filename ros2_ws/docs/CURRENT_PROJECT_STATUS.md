@@ -21,6 +21,7 @@ The project must not claim final autonomous peg-in-hole success yet. The defensi
 - `admittance_insertion_node.py`
 - `baseline_joint_sequence_executor.py`
 - `spawn_robot_sdf.py`
+- `diagnostics/research_baseline_cell_model_consistency/summary.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -141,3 +142,25 @@ Runtime tests showed:
 - a bounded repeated joint-refinement experiment was rejected and removed because it increased joint error up to about 1.15 rad and left XY error around 0.14-0.23 m.
 
 Retained implementation changes are diagnostic/configuration only: launch-time `position_gain` override and `MOVING_TO_START` joint-error logging. The no-contact descent gate remains 0.002 m.
+
+## 2026-06-02 Cell Model Consistency
+
+Milestone: `research_baseline_cell_model_consistency`
+
+Evidence: `diagnostics/research_baseline_cell_model_consistency/summary.md`
+
+The current model/configuration layer now consistently targets the KUKA LBR iisy 6 R1300 workcell:
+
+- canonical robot metadata names `KUKA LBR iisy 6 R1300`;
+- the deprecated cylinder robot is marked as a placeholder and must not be used for new baseline work;
+- D405 perception topics match the canonical bridge topics;
+- D405 world visual SDF syntax validates;
+- task target Z values match the controller's `HOLE_TOP_Z=0.810` convention;
+- the research gripper includes a fixed 25 mm peg and `peg_tip` frame;
+- the optional robot-wrapper camera TF is disabled by default, because the Gazebo world owns the D405 sensor.
+
+Validation passed for Xacro expansion, world SDF validation with local model path, robot URDF-to-SDF conversion, Python syntax checks, and targeted `colcon build`.
+
+A 90 s headless launch spawned `lbr_iisy6_r1300`, started D405 and F/T bridges, loaded `gz_ros2_control`, and activated `joint_state_broadcaster` plus `joint_trajectory_controller`. The run still timed out in `MOVING_TO_START`; best observed XY error was about 0.027 m at 60 s, then drifted to about 0.070 m by 75 s. This is not insertion success and it keeps tracking/physics as the next blocker.
+
+Remaining risk: Gazebo/DART still reports that KUKA mesh collision geometry could not be created. This is now a high-priority physics-credibility risk for the next milestone.

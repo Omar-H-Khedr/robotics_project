@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-  <xacro:macro name="research_parallel_gripper" params="prefix parent_link tcp_frame:=gripper_tcp">
+  <xacro:macro name="research_parallel_gripper" params="prefix parent_link tcp_frame:=gripper_tcp has_peg:=false">
     <xacro:property name="gripper_palm_x" value="0.080"/>
     <xacro:property name="gripper_palm_y" value="0.060"/>
     <xacro:property name="gripper_palm_z" value="0.030"/>
@@ -105,5 +105,42 @@
       <child link="${prefix}${tcp_frame}"/>
       <origin xyz="0 0 ${gripper_tcp_z_offset}" rpy="0 0 0"/>
     </joint>
+
+    <xacro:if value="${has_peg}">
+      <xacro:property name="peg_radius" value="0.0125"/>
+      <xacro:property name="peg_length" value="0.11"/>
+      <xacro:property name="peg_center_z" value="${gripper_tcp_z_offset - peg_length / 2.0}"/>
+      <xacro:property name="peg_tip_z" value="${gripper_tcp_z_offset - peg_length}"/>
+      <material name="${prefix}peg_material">
+        <color rgba="0.70 0.72 0.74 1.0"/>
+      </material>
+      <link name="${prefix}grasped_peg">
+        <inertial>
+          <origin xyz="0 0 ${peg_center_z}" rpy="0 0 0"/>
+          <mass value="0.15"/>
+          <inertia ixx="0.000157" ixy="0.0" ixz="0.0" iyy="0.000157" iyz="0.0" izz="0.0000117"/>
+        </inertial>
+        <visual>
+          <origin xyz="0 0 ${peg_center_z}" rpy="0 0 0"/>
+          <geometry><cylinder radius="${peg_radius}" length="${peg_length}"/></geometry>
+          <material name="${prefix}peg_material"/>
+        </visual>
+        <collision>
+          <origin xyz="0 0 ${peg_center_z}" rpy="0 0 0"/>
+          <geometry><cylinder radius="${peg_radius}" length="${peg_length}"/></geometry>
+        </collision>
+      </link>
+      <joint name="${prefix}gripper_palm_to_grasped_peg" type="fixed">
+        <parent link="${prefix}gripper_palm"/>
+        <child link="${prefix}grasped_peg"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+      </joint>
+      <link name="${prefix}peg_tip"/>
+      <joint name="${prefix}grasped_peg_to_peg_tip" type="fixed">
+        <parent link="${prefix}grasped_peg"/>
+        <child link="${prefix}peg_tip"/>
+        <origin xyz="0 0 ${peg_tip_z}" rpy="0 0 0"/>
+      </joint>
+    </xacro:if>
   </xacro:macro>
 </robot>

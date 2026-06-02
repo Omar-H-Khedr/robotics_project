@@ -2,7 +2,7 @@ research_baseline:
   ros__parameters:
     experiment_id: research_baseline_v0_1
     simulator: Gazebo
-    robot_name: KUKA LBR iisy 3 R760
+    robot_name: KUKA LBR iisy 6 R1300
     controller_action: /joint_trajectory_controller/follow_joint_trajectory
     task_sequence_config: package://kuka_task_control/config/baseline_task_sequence.yaml
     safety_config: package://safety_layer/config/safety_limits.yaml

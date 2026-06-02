@@ -27,7 +27,7 @@
   <xacro:arg name="initial_joint_4" default="0.0"/>
   <xacro:arg name="initial_joint_5" default="0.8"/>
   <xacro:arg name="initial_joint_6" default="0.0"/>
-  <xacro:arg name="include_camera" default="true"/>
+  <xacro:arg name="include_camera" default="false"/>
 
   <xacro:kuka_lbr_iisy_ros2_control name="$(arg prefix)lbr_iisy6_r1300"
     driver_version="$(arg driver_version)"
@@ -80,6 +80,9 @@
 
   <xacro:research_parallel_gripper prefix="$(arg prefix)" parent_link="$(arg prefix)ft_sensor_link" tcp_frame="gripper_tcp" has_peg="true"/>
 
+  <!-- The canonical Gazebo world owns the D405 sensor model. This optional
+       TF-only camera frame is disabled by default so URDF->SDF conversion of
+       the robot model stays self-contained. -->
   <xacro:if value="$(arg include_camera)">
     <link name="d405_camera_link">
       <visual>

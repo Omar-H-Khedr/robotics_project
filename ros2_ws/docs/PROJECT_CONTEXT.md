@@ -30,7 +30,7 @@ The current workspace contains a Gazebo workcell with:
 - `joint_state_broadcaster` and `joint_trajectory_controller`;
 - a canonical research baseline bridge that intentionally does not bridge Gazebo `/joint_states`;
 - FT sensor injection and ROS bridge to `/ft_sensor_wrench`;
-- RGB-D camera model in the world;
+- RGB-D D405 camera model in the world, with perception config aligned to `/d405/*` topics;
 - task-level admittance insertion node with phase logging;
 - dry-run experiment/context scaffolds from earlier proposal milestones.
 
@@ -62,6 +62,8 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - Some older docs still describe stale iisy3 state and must not be used as current truth.
 - A 2026-06-02 source-integrity run confirmed `joint_state_broadcaster` as the intended `/joint_states` publisher, but the same run still timed out in `MOVING_TO_START` with large XY error.
 - A 2026-06-02 tracking audit confirmed the above-hole target is reachable in offline IK, but runtime Gazebo/controller tracking remains underdamped or unstable. Gain 250 and repeated bounded refinements were rejected.
+- A 2026-06-02 cell-model consistency audit validated iisy6 naming, target Z convention, D405 topics, fixed peg geometry, deprecated cylinder marking, and standalone world/robot SDF checks. The same headless launch still failed to satisfy the preserved 0.002 m no-contact gate, with best observed XY error about 0.027 m.
+- Gazebo/DART currently reports that KUKA mesh collision geometry could not be created. Treat this as a physics-credibility risk before further insertion-performance claims.
 
 ## Current Success Criteria
 
@@ -86,4 +88,4 @@ A same-target refresh experiment was tested and rejected: repeated MOVING_TO_STA
 
 The next step remains tracking stabilization. The joint-state source integrity milestone removed one measurement ambiguity; it did not solve the large no-contact XY error.
 
-Tracking stabilization should focus on controller/physics configuration and measured joint tracking. Do not loosen the no-contact XY gate to hide the error.
+Tracking stabilization should focus on controller/physics configuration, the DART mesh-collision warning, and measured joint tracking. Do not loosen the no-contact XY gate to hide the error.

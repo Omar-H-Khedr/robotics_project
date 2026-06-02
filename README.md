@@ -1,7 +1,7 @@
 # Visuomotor Context-Based Meta-Reinforcement Learning for Safe Peg-in-Hole Assembly
 
 **Repository status:** active doctoral research prototype
-**Latest documented:** `research_baseline_joint_state_source_integrity`
+**Latest documented:** `research_baseline_cell_model_consistency`
 **README last updated:** 2026-06-02
 **Execution scope:** simulation-first validation only; no real-robot claim is made in this repository state.
 
@@ -14,6 +14,8 @@ The active baseline targets the KUKA LBR iisy 6 R1300 and is controller-driven i
 The canonical `research_baseline.launch.py` now uses a project-local bridge config that omits Gazebo `/joint_states`; `joint_state_broadcaster` is the intended single ROS 2 joint-state source. Evidence is in `ros2_ws/diagnostics/research_baseline_joint_state_source_integrity/`.
 
 The latest tracking audit confirms the above-hole IK target is reachable offline, but Gazebo/controller tracking remains unstable. Gain 250 and repeated bounded refinement were rejected; the retained baseline keeps the 2 mm no-contact gate and exposes `position_gain` only for documented experiments.
+
+The latest cell-model consistency audit validated the iisy6 workcell naming, D405 bridge topics, target Z convention, fixed grasped peg model, deprecated cylinder placeholder warning, and standalone robot/world SDF checks. A 90 s headless launch still timed out in `MOVING_TO_START`; best observed XY error was about 0.027 m, which remains outside the preserved 0.002 m descent gate. Evidence is in `ros2_ws/diagnostics/research_baseline_cell_model_consistency/`.
 
 ## 1. Project Overview
 

@@ -1,4 +1,13 @@
 <?xml version="1.0"?>
+<!--
+  !!! DEPRECATED – CYLINDER-BASED PLACEHOLDER !!!
+  This file defines a fake cylinder robot with no kinematic accuracy.
+  It was used during early proposal validation (v1.x / early v2.x).
+  DO NOT use for any new work. Use instead:
+    peg_in_hole_description/urdf/lbr_iisy6_r1300_research_gripper.urdf.xacro
+  which includes the real mesh-based KUKA LBR iisy 6 R1300 description
+  with a research parallel gripper.
+-->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="proposal_lbr_iisy6_r1300_cell">
   <link name="world"/>
 

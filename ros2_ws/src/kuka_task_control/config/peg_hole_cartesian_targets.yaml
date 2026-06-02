@@ -38,30 +38,30 @@ insertion_axis:
 targets:
   hole_center:
     frame: world
-    position_xyz: [0.520, -0.200, 0.845]
+    position_xyz: [0.520, -0.200, 0.810]
 
   staging_pose:
     frame: world
-    position_xyz: [0.640, -0.120, 0.920]
+    position_xyz: [0.640, -0.120, 0.885]
     description: "Safe Cartesian staging waypoint, not insertion-aligned."
 
   axis_align_pose:
     frame: world
-    position_xyz: [0.520, -0.200, 0.920]
+    position_xyz: [0.520, -0.200, 0.885]
     description: "Directly above hole center on insertion axis."
 
   insertion_touch_pose:
     frame: world
-    position_xyz: [0.520, -0.200, 0.865]
+    position_xyz: [0.520, -0.200, 0.830]
 
   insertion_hold_pose:
     frame: world
-    position_xyz: [0.520, -0.200, 0.845]
+    position_xyz: [0.520, -0.200, 0.810]
 
   final_insertion_pose:
     frame: world
-    position_xyz: [0.520, -0.200, 0.825]
+    position_xyz: [0.520, -0.200, 0.790]
 
   retreat_pose:
     frame: world
-    position_xyz: [0.520, -0.200, 0.920]
+    position_xyz: [0.520, -0.200, 0.885]
