@@ -53,6 +53,8 @@ The project must not claim final autonomous peg-in-hole success yet. The defensi
 - `diagnostics/research_baseline_damping_2p0_gain_1500_v1/summary.md`
 - `diagnostics/research_baseline_damping_2p0_gain_1500_v1/above_hole_hold_analysis.md`
 - `diagnostics/research_baseline_damping_2p0_gain_1500_v1/moving_to_start_tracking_analysis.md`
+- `diagnostics/research_baseline_trajectory_command_capture_v1/summary.md`
+- `diagnostics/research_baseline_trajectory_command_capture_v1/moving_to_start_tracking_analysis.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position

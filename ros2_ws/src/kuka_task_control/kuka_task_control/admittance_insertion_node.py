@@ -43,6 +43,7 @@ from __future__ import annotations
 
 import json
 import math
+import time
 from collections import deque
 from typing import Any
 
@@ -149,6 +150,8 @@ class AdmittanceInsertionNode(Node):
         self.declare_parameter('control_rate', 10.0)
         self.declare_parameter('approach_speed', 0.01)
         self.declare_parameter('action_timeout', 15.0)
+        self.declare_parameter('trajectory_discovery_wait_s', 2.0)
+        self.declare_parameter('expected_trajectory_subscribers', 2)
 
         self._contact_threshold: float = (
             self.get_parameter('contact_threshold').value
@@ -165,6 +168,12 @@ class AdmittanceInsertionNode(Node):
         self._action_timeout: float = (
             self.get_parameter('action_timeout').value
         )
+        self._trajectory_discovery_wait_s: float = float(
+            self.get_parameter('trajectory_discovery_wait_s').value
+        )
+        self._expected_trajectory_subscribers: int = int(
+            self.get_parameter('expected_trajectory_subscribers').value
+        )
 
         self._state: str = self.IDLE
         self._progress: float = 0.0
@@ -180,6 +189,7 @@ class AdmittanceInsertionNode(Node):
         self._insert_start_z: float = 0.0
         self._start_ticks: int = -1
         self._retreat_sent: bool = False
+        self._trajectory_discovery_checked: bool = False
         self._stable_counter: int = 0
         self._state_entry_ticks: int = 0
         self._abort_ticks: int = 0
@@ -242,7 +252,9 @@ class AdmittanceInsertionNode(Node):
             f'contact_threshold={self._contact_threshold:.1f} N, '
             f'safety_threshold={self._safety_threshold:.1f} N, '
             f'control_rate={self._control_rate:.1f} Hz, '
-            f'approach_speed={self._approach_speed:.3f}'
+            f'approach_speed={self._approach_speed:.3f}, '
+            f'trajectory_discovery_wait_s={self._trajectory_discovery_wait_s:.1f}, '
+            f'expected_trajectory_subscribers={self._expected_trajectory_subscribers}'
         )
 
     def _joint_states_cb(self, msg: JointState) -> None:
@@ -310,8 +322,38 @@ class AdmittanceInsertionNode(Node):
 
     # --- Trajectory publishing (topic-based, non-blocking) -------------------
 
+    def _wait_for_trajectory_subscribers(self) -> None:
+        if self._trajectory_discovery_checked:
+            return
+        self._trajectory_discovery_checked = True
+
+        expected = max(1, self._expected_trajectory_subscribers)
+        timeout_s = max(0.0, self._trajectory_discovery_wait_s)
+        deadline = time.monotonic() + timeout_s
+        subscribers = self.count_subscribers(
+            '/joint_trajectory_controller/joint_trajectory',
+        )
+        while subscribers < expected and time.monotonic() < deadline:
+            time.sleep(0.05)
+            subscribers = self.count_subscribers(
+                '/joint_trajectory_controller/joint_trajectory',
+            )
+
+        if subscribers < expected:
+            self.get_logger().warn(
+                'Trajectory topic discovery wait ended with '
+                f'{subscribers}/{expected} subscribers. Continuing so the '
+                'controller cannot hang on observer availability.'
+            )
+        else:
+            self.get_logger().info(
+                'Trajectory topic discovery satisfied: '
+                f'{subscribers}/{expected} subscribers matched.'
+            )
+
     def _send_trajectory_goal(self, positions: np.ndarray,
                               duration_s: float = 2.0) -> None:
+        self._wait_for_trajectory_subscribers()
         msg = JointTrajectory()
         msg.joint_names = list(self.JOINT_NAMES)
         point = JointTrajectoryPoint()
@@ -332,6 +374,7 @@ class AdmittanceInsertionNode(Node):
         if n == 1:
             self._send_trajectory_goal(waypoints[0], total_duration_s)
             return
+        self._wait_for_trajectory_subscribers()
         for i, q in enumerate(waypoints):
             t = total_duration_s * (i + 1) / n
             point = JointTrajectoryPoint()

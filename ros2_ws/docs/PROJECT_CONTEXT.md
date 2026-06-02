@@ -90,6 +90,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - A 2026-06-02 bounded endpoint-correction experiment was rejected and removed. It accepted three small no-contact corrections and improved final timeout XY to about `0.004 m`, but still failed the five-tick strict hold gate and aborted in `MOVING_TO_START` with zero contact-topic samples.
 - A 2026-06-03 2x joint-damping diagnostic was rejected as a canonical change. It reduced p95 max joint tracking error to about `0.0158 rad` and improved the estimated strict hold to two ticks, but still failed `MOVING_TO_START` with final XY about `0.007 m` and `stable=0/5`.
 - A 2026-06-03 2x damping plus `position_gain:=1500` diagnostic was rejected as a canonical change. It reached instantaneous XY error as low as `0.000052 m`, but the estimated strict hold was still only two 10 Hz ticks, final `MOVING_TO_START` XY was about `0.004 m`, contact-topic samples were zero, and the run aborted safely before descent.
+- A 2026-06-03 trajectory command-capture fix added a bounded first-command discovery wait before the task publishes its first joint trajectory. A short validation run captured the 20-point `MOVING_TO_START` command and the selector-based tracking analyzer attributed it to the canonical axis-align target. This is an instrumentation/reproducibility fix, not insertion evidence.
 
 ## Current Success Criteria
 
@@ -138,6 +139,11 @@ only captured abort-retreat are not falsely treated as MOVING_TO_START
 evidence. Current usable post-tool runs show final XY drift despite small,
 distributed joint errors, which makes endpoint correction/hold behavior the
 next target.
+
+The first-command capture race has been reduced by a bounded discovery wait in
+the task node. Future canonical runs should normally capture the initial
+axis-align trajectory; if they do not, treat that as an instrumentation failure
+before drawing controller-tracking conclusions.
 
 A first bounded endpoint-correction implementation was tested and rejected. It
 was safe, but it did not hold the strict gate, so the source was removed. The
