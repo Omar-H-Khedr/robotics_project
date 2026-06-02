@@ -63,6 +63,7 @@ Latest tracking evidence localizes the approach/descent blocker to `joint_2`: no
 | research_baseline_start_slow_settle_after_tool_fix_v1 | Rejected: one 20 s same-target settle did not satisfy the strict above-hole stability gate |
 | research_baseline_start_gain_2000_after_tool_fix_v1 | Rejected: gain 2000 improved final error but did not hold the 2 mm gate |
 | research_baseline_start_gain_3000_after_tool_fix_v1 | Rejected: gain 3000 was worse than gain 2000 for strict-gate stability |
+| research_baseline_zero_derivative_trajectory_hold_v1 | Rejected: explicit zero velocity/acceleration trajectory points still failed above-hole hold |
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
@@ -283,6 +284,36 @@ Current conclusion: global gain increase alone is not a credible fix. The next
 milestone should implement and validate explicit endpoint hold/tracking
 behavior or trajectory timing changes, still preserving the strict 2 mm
 no-contact gate.
+
+## 2026-06-02 Zero-Derivative Trajectory Hold Diagnostic
+
+Milestone: `research_baseline_zero_derivative_trajectory_hold_v1`
+
+A small trajectory-publisher experiment populated every
+`JointTrajectoryPoint` with zero velocities and accelerations to test whether
+the spline controller needed explicit stop conditions at the endpoint. The
+change was rejected and removed.
+
+Validation command:
+
+```bash
+timeout 240s ros2 launch thesis_bringup research_baseline.launch.py \
+  use_gui:=false \
+  tracking_log_dir:=diagnostics/research_baseline_zero_derivative_trajectory_hold_v1
+```
+
+Evidence: `diagnostics/research_baseline_zero_derivative_trajectory_hold_v1/summary.md`
+
+Result: `ABORTED` in `MOVING_TO_START`, zero insertion depth, zero contact-topic
+samples, max raw `|Fz|=176.57 N`, and max raw force norm `272.23 N`. Clearance
+analysis found `0/201` planned and `0/2647` runtime-feedback `link_5`
+target-plate intersections. Corrected peg-tip replay showed a very low
+minimum XY error of `0.000014 m`, but the best strict-gate streak was only four
+observer samples and the final timeout regressed to `xy_err=0.014 m`.
+
+Current conclusion: explicit zero derivatives alone are not a credible fix.
+The next milestone should target endpoint hold observability/control more
+directly, not relax the 2 mm gate.
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 

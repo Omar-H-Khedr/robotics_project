@@ -1,0 +1,29 @@
+{
+  "trial_outcome": "ABORTED",
+  "reason": "MOVING_TO_START timeout/failure (120.0s). cart_err=0.014m, xy_err=0.014m, joint_err=0.020rad, stable=0/5, tolerance=0.050m",
+  "phases": [
+    {
+      "phase": "MOVING_TO_START",
+      "success": false,
+      "cart_error_m": 0.014437,
+      "joint_error_rad": 0.020401,
+      "timed_out": true,
+      "duration_s": 120.0,
+      "message": "MOVING_TO_START timeout/failure (120.0s). cart_err=0.014m, xy_err=0.014m, joint_err=0.020rad, stable=0/5, tolerance=0.050m"
+    }
+  ],
+  "metrics": {
+    "initial_xy_error_m": 0.0,
+    "pre_insertion_xy_error_m": 0.0,
+    "insertion_depth_m": 0.0,
+    "max_fz_N": 176.57,
+    "max_abs_fz_N": 176.57,
+    "max_force_norm_N": 272.23,
+    "baseline_fz_N": 61.7,
+    "max_contact_force_N": 107.6,
+    "contact_threshold_N": 5.0,
+    "gravity_baseline_valid": true,
+    "baseline_window_samples": 50
+  },
+  "status": "DONE"
+}

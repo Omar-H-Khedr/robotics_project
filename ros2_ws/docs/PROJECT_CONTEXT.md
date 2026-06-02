@@ -84,6 +84,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - A 2026-06-02 tool-tip frame correction moved the modeled `peg_tip` from the near-palm end of the 110 mm peg to the protruding negative local tool-Z end and updated `RobotKinematics` to match. Offline clearance analysis and runtime feedback then showed zero `link_5` target-plate intersections, zero contact-topic samples, and max raw force norm `270.82 N`. The validation still failed honestly in `MOVING_TO_START` with final XY about `0.014 m`.
 - A 2026-06-02 slow same-target settle after the tool-tip correction was rejected and removed. It aborted safely in `MOVING_TO_START` with final `xy_err=0.011 m`, `stable=0/5`, zero contact-topic samples, zero insertion depth, and no planned or runtime-feedback `link_5` target-plate intersections. Offline replay showed the corrected peg tip crossed the strict 2 mm XY gate only transiently, with minimum replayed XY `0.000072 m` but only two consecutive strict observer samples.
 - 2026-06-02 post-tool global gain diagnostics at `position_gain:=2000` and `position_gain:=3000` were rejected. Both preserved zero contact-topic samples and zero `link_5` target-plate intersections, but neither held the strict gate. Gain 2000 was closest with final `xy_err=0.002 m` and a best strict replay streak of three observer samples; gain 3000 ended at `xy_err=0.007 m` with a best streak of two samples.
+- A 2026-06-02 zero-derivative trajectory-point experiment was rejected and removed. It explicitly filled trajectory velocities and accelerations with zeros, remained safe and clearance-clean, but timed out at final `xy_err=0.014 m` after reaching only four consecutive strict observer samples.
 
 ## Current Success Criteria
 
@@ -115,6 +116,11 @@ gain 3000 was worse. The next implementation should focus on explicit
 endpoint hold/tracking behavior or trajectory timing rather than another
 global gain increase.
 
+Explicit zero velocity/acceleration trajectory points were also rejected. They
+did not create a stable hold and regressed the final timeout error, so the
+remaining work should instrument and control the endpoint hold window more
+directly.
+
 A same-target refresh experiment was tested and rejected: repeated MOVING_TO_START target publication produced hard-force aborts and did not improve XY gate convergence.
 
 The next step remains tracking stabilization. The joint-state source integrity milestone removed one measurement ambiguity; it did not solve the large no-contact XY error.
@@ -126,7 +132,8 @@ the command-vs-feedback, wrench-by-state, and contact-by-pair evidence. A
 globally slower move-to-start trajectory, repeated same-target hold
 corrections, slower approach timing, higher plugin position gain, broad damping
 reduction, doubled effort limits, one slow post-tool-fix same-target settle,
-and post-tool global gains 2000/3000 were tested and rejected. The weak F/T
+post-tool global gains 2000/3000, and zero-derivative trajectory points were
+tested and rejected. The weak F/T
 measurement-joint limit has been
 corrected but did not eliminate all force spikes. Full-path contact evidence
 showed that the earlier abort could coincide with peg-target contact before

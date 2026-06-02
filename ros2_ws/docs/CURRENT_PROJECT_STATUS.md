@@ -33,6 +33,7 @@ The project must not claim final autonomous peg-in-hole success yet. The defensi
 - `diagnostics/research_baseline_start_slow_settle_after_tool_fix_v1/summary.md`
 - `diagnostics/research_baseline_start_gain_2000_after_tool_fix_v1/summary.md`
 - `diagnostics/research_baseline_start_gain_3000_after_tool_fix_v1/summary.md`
+- `diagnostics/research_baseline_zero_derivative_trajectory_hold_v1/summary.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -92,6 +93,7 @@ This confirms the baseline is not robust. It also confirms that the high-force c
 
 - The corrected tool-tip frame removes the reproduced `link_5` target-plate collision, but `MOVING_TO_START` still failed the strict 2 mm no-contact gate. The latest slow-settle diagnostic crossed the gate only transiently and timed out with final XY about 0.011 m.
 - Post-tool global gain diagnostics at `position_gain:=2000` and `position_gain:=3000` were safe but rejected. Gain 2000 improved the final timeout to about 2 mm XY but reached only three consecutive strict observer samples; gain 3000 was worse, with final XY about 7 mm and only two consecutive strict observer samples.
+- Explicit zero velocity/acceleration trajectory points were safe but rejected. The run reached minimum replayed XY `0.000014 m`, but held only four strict observer samples and timed out at final XY about 14 mm.
 - `APPROACH` currently commands a 67 mm Cartesian descent but measured peg Z remains near 0.90 m instead of reaching the 0.83 m touch target.
 - Peak raw Fz spikes are confirmed: 1237.45 N and 3716.2 N were recorded in the 2026-06-01 repeat run.
 - Large Cartesian errors during APPROACH remain unresolved.
@@ -134,6 +136,12 @@ both failed the strict above-hole stability gate. Gain 2000 was closest
 (`xy_err=0.002 m`, `stable=0/5`, best strict replay streak three samples);
 gain 3000 was worse (`xy_err=0.007 m`, best streak two samples). The canonical
 gain remains unchanged.
+
+An explicit zero-velocity/zero-acceleration trajectory-point experiment was
+then rejected in `diagnostics/research_baseline_zero_derivative_trajectory_hold_v1`.
+It remained safe and clearance-clean, but timed out with final `xy_err=0.014 m`
+and only four consecutive strict observer samples. The source change was
+removed.
 
 ## 2026-06-02 Joint-State Source Integrity
 
