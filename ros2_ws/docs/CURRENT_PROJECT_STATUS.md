@@ -255,6 +255,25 @@ The same validation then exposed the current blocker in `APPROACH`: the controll
 
 The previous unsafe behavior where a degraded approach could enter local `SEARCH` has been removed. In the corrected run, observer summaries contain no `SEARCH` rows. `SEARCH` is now limited to a completed approach at force-safe Z with residual XY within the bounded search radius.
 
+## 2026-06-02 Slow Approach Descent Experiment
+
+Milestone: `research_baseline_slow_approach_descent_v1`
+
+Evidence: `diagnostics/research_baseline_slow_approach_descent_v1/summary.md`
+
+A timing-only approach experiment increased the descent command duration from the default 15 s minimum to `41.662 s`. It was rejected and reverted.
+
+Result:
+
+- `MOVING_TO_START`: success after `95.6 s`, initial XY error `0.0015 m`;
+- `APPROACH`: failed at 90 s with `cart_err=0.070 m`, `joint_err=0.108 rad`;
+- insertion depth: `0.0000 m`;
+- peak raw `|Fz|`: `570.07 N`;
+- peak force norm: `627.03 N`;
+- no `SEARCH` phase was entered.
+
+The slower trajectory reduced neither the blocking joint error nor the missing Z descent enough to matter. The next investigation should focus on why the approach target command leaves `joint_2` roughly `0.108 rad` away from target under Gazebo/`gz_ros2_control`, not on further timing-only changes.
+
 ## 2026-06-02 Trajectory Tracking Observer
 
 Milestone: `research_baseline_trajectory_tracking_observer`
