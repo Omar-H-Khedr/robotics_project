@@ -23,6 +23,7 @@ setup(
     entry_points={
         "console_scripts": [
             "spawn_robot_sdf = thesis_bringup.spawn_robot_sdf:main",
+            "above_hole_hold_analyzer = thesis_bringup.above_hole_hold_analyzer:main",
             "approach_tracking_analyzer = thesis_bringup.approach_tracking_analyzer:main",
             "trajectory_tracking_observer = thesis_bringup.trajectory_tracking_observer:main",
             "wrench_state_observer = thesis_bringup.wrench_state_observer:main",

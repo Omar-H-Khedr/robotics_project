@@ -2,9 +2,9 @@
 
 Current status as of 2026-06-02: this is an active ROS 2 Jazzy workspace for a Gazebo-based KUKA LBR iisy 6 R1300 peg-in-hole research baseline. The project has a working robot spawn path, active ros2_control controllers, a fixed grasped peg model, a fixed hole fixture, force/torque bridge plumbing, contact observability, and an admittance-style insertion controller.
 
-The strongest historical insertion evidence remains a **single simulated insertion-depth event**: measured insertion depth about 0.011 m with sustained contact around 142.9 N. This is not robust autonomous peg-in-hole success. The current safer iisy6 baseline reaches the strict above-hole XY gate with an axis-aligned vertical peg, then aborts honestly in `APPROACH` because the 67 mm descent is not tracked. Known unresolved concerns include high raw F/T spikes, large approach tracking errors, broken multi-point INSERT behavior, and failed repeated validation.
+The strongest historical insertion evidence remains a **single simulated insertion-depth event**: measured insertion depth about 0.011 m with sustained contact around 142.9 N. This is not robust autonomous peg-in-hole success. The current safer iisy6 baseline has corrected the peg-tip frame and removed a reproduced robot-link clearance collision, but it still aborts honestly before descent because it only crosses the strict 2 mm above-hole XY gate transiently. Known unresolved concerns include unstable above-hole hold behavior, high raw F/T spikes, large approach tracking errors, broken multi-point INSERT behavior, and failed repeated validation.
 
-Latest tracking evidence localizes the approach/descent blocker to `joint_2`: normal, slow-descent, and high-gain diagnostics all leave `joint_2` about 0.107-0.111 rad from target, keeping the peg tip about 67-70 mm above the commanded touch pose. This supports a controller/physics/joint-authority investigation before any learning or insertion-claim work.
+Latest hold evidence shows the corrected post-tool runs do not satisfy the required five 10 Hz stable ticks inside the 2 mm no-contact gate. The best estimated state-loop hold among the recent post-tool variants was one tick, despite minimum replayed XY errors below 0.5 mm in several runs. Older approach evidence also localizes the descent blocker to `joint_2`: normal, slow-descent, and high-gain approach diagnostics all left `joint_2` about 0.107-0.111 rad from target, keeping the peg tip about 67-70 mm above the commanded touch pose. This supports endpoint hold and controller/physics investigation before any learning or insertion-claim work.
 
 ## Milestones
 
@@ -64,6 +64,7 @@ Latest tracking evidence localizes the approach/descent blocker to `joint_2`: no
 | research_baseline_start_gain_2000_after_tool_fix_v1 | Rejected: gain 2000 improved final error but did not hold the 2 mm gate |
 | research_baseline_start_gain_3000_after_tool_fix_v1 | Rejected: gain 3000 was worse than gain 2000 for strict-gate stability |
 | research_baseline_zero_derivative_trajectory_hold_v1 | Rejected: explicit zero velocity/acceleration trajectory points still failed above-hole hold |
+| research_baseline_above_hole_hold_analyzer | Completed: reusable offline analyzer confirms recent post-tool runs only cross the strict gate transiently |
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
@@ -314,6 +315,43 @@ observer samples and the final timeout regressed to `xy_err=0.014 m`.
 Current conclusion: explicit zero derivatives alone are not a credible fix.
 The next milestone should target endpoint hold observability/control more
 directly, not relax the 2 mm gate.
+
+## 2026-06-02 Above-Hole Hold Analyzer
+
+Milestone: `research_baseline_above_hole_hold_analyzer`
+
+The workspace now includes `above_hole_hold_analyzer`, an offline diagnostic
+tool for `wrench_state_samples.csv`. It estimates whether passive observer
+data would satisfy the task controller's preserved strict 2 mm no-contact XY
+gate for five consecutive 10 Hz state-machine ticks. It does not publish
+commands or alter controller safety behavior.
+
+Validation commands:
+
+```bash
+python3 -m py_compile src/thesis_bringup/thesis_bringup/above_hole_hold_analyzer.py
+colcon build --symlink-install --packages-select thesis_bringup
+ros2 run thesis_bringup above_hole_hold_analyzer diagnostics/research_baseline_tool_tip_frame_correction_v1
+ros2 run thesis_bringup above_hole_hold_analyzer diagnostics/research_baseline_start_slow_settle_after_tool_fix_v1
+ros2 run thesis_bringup above_hole_hold_analyzer diagnostics/research_baseline_start_gain_2000_after_tool_fix_v1
+ros2 run thesis_bringup above_hole_hold_analyzer diagnostics/research_baseline_start_gain_3000_after_tool_fix_v1
+ros2 run thesis_bringup above_hole_hold_analyzer diagnostics/research_baseline_zero_derivative_trajectory_hold_v1
+```
+
+Evidence:
+
+- `diagnostics/research_baseline_tool_tip_frame_correction_v1/above_hole_hold_analysis.md`
+- `diagnostics/research_baseline_start_slow_settle_after_tool_fix_v1/above_hole_hold_analysis.md`
+- `diagnostics/research_baseline_start_gain_2000_after_tool_fix_v1/above_hole_hold_analysis.md`
+- `diagnostics/research_baseline_start_gain_3000_after_tool_fix_v1/above_hole_hold_analysis.md`
+- `diagnostics/research_baseline_zero_derivative_trajectory_hold_v1/above_hole_hold_analysis.md`
+
+Result: all five post-tool runs failed the estimated five-tick gate. The
+corrected tool-tip run reached minimum XY `0.000037 m`, gain 2000 reached
+`0.000455 m`, gain 3000 reached `0.000034 m`, and the zero-derivative run
+reached `0.000257 m`, but none held the strict gate for more than one
+estimated 10 Hz state-loop tick. This confirms the blocker is controlled
+endpoint hold, not merely reaching the target once.
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 

@@ -85,6 +85,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - A 2026-06-02 slow same-target settle after the tool-tip correction was rejected and removed. It aborted safely in `MOVING_TO_START` with final `xy_err=0.011 m`, `stable=0/5`, zero contact-topic samples, zero insertion depth, and no planned or runtime-feedback `link_5` target-plate intersections. Offline replay showed the corrected peg tip crossed the strict 2 mm XY gate only transiently, with minimum replayed XY `0.000072 m` but only two consecutive strict observer samples.
 - 2026-06-02 post-tool global gain diagnostics at `position_gain:=2000` and `position_gain:=3000` were rejected. Both preserved zero contact-topic samples and zero `link_5` target-plate intersections, but neither held the strict gate. Gain 2000 was closest with final `xy_err=0.002 m` and a best strict replay streak of three observer samples; gain 3000 ended at `xy_err=0.007 m` with a best streak of two samples.
 - A 2026-06-02 zero-derivative trajectory-point experiment was rejected and removed. It explicitly filled trajectory velocities and accelerations with zeros, remained safe and clearance-clean, but timed out at final `xy_err=0.014 m` after reaching only four consecutive strict observer samples.
+- A 2026-06-02 above-hole hold analyzer milestone added a reusable offline diagnostic for `wrench_state_samples.csv`. Re-analysis of five post-tool runs showed none satisfied the estimated five 10 Hz stable ticks required by the preserved 2 mm no-contact gate. Several runs reached sub-millimetre XY error transiently, but the best estimated state-loop hold was only one tick.
 
 ## Current Success Criteria
 
@@ -120,6 +121,12 @@ Explicit zero velocity/acceleration trajectory points were also rejected. They
 did not create a stable hold and regressed the final timeout error, so the
 remaining work should instrument and control the endpoint hold window more
 directly.
+
+The new `above_hole_hold_analyzer` should be used for that next work. It
+converts passive `MOVING_TO_START` observer rows into estimated 10 Hz
+state-loop hold windows and confirmed that recent post-tool diagnostics cross
+the strict 2 mm gate only briefly. The next implementation should therefore
+target sustained endpoint hold/control, not gate relaxation.
 
 A same-target refresh experiment was tested and rejected: repeated MOVING_TO_START target publication produced hard-force aborts and did not improve XY gate convergence.
 
