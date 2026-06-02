@@ -125,6 +125,7 @@ def _write_summary(
         p95_abs = _percentile(abs_errors, 95.0)
         mean_abs = mean(abs_errors) if abs_errors else 0.0
         final_abs = abs(final_sample.error[index])
+        target_error = float(target_q[index] - feedback_q[index])
         if p95_abs > worst_joint_by_p95[1]:
             worst_joint_by_p95 = (name, p95_abs)
         if final_abs > worst_joint_by_final[1]:
@@ -138,6 +139,7 @@ def _write_summary(
                     f"{p95_abs:.6f}",
                     f"{mean_abs:.6f}",
                     f"{final_sample.error[index]:.6f}",
+                    f"{target_error:.6f}",
                     f"{target_q[index]:.6f}",
                     f"{feedback_q[index]:.6f}",
                 ]
@@ -179,8 +181,8 @@ def _write_summary(
         "",
         "## Per Joint Error",
         "",
-        "| joint | max_abs_rad | p95_abs_rad | mean_abs_rad | final_error_rad | target_rad | final_feedback_rad |",
-        "| --- | ---: | ---: | ---: | ---: | ---: | ---: |",
+        "| joint | max_abs_rad | p95_abs_rad | mean_abs_rad | final_sample_error_rad | target_minus_feedback_rad | target_rad | final_feedback_rad |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
         *per_joint_lines,
         "",
         "Interpretation: this is an offline diagnostic over the passive tracking observer CSVs. "
@@ -189,7 +191,7 @@ def _write_summary(
     output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def analyze_directory(input_dir: Path, output_name: str) -> Path:
+def analyze_directory(input_dir: Path, output_name: str, command_index: int) -> Path:
     commands_path = input_dir / "trajectory_commands.csv"
     tracking_path = input_dir / "trajectory_tracking_samples.csv"
     if not commands_path.exists():
@@ -200,8 +202,17 @@ def analyze_directory(input_dir: Path, output_name: str) -> Path:
     commands = _read_commands(commands_path)
     if not commands:
         raise RuntimeError(f"no commands in {commands_path}")
-    approach_command = commands[0]
-    next_stamp = commands[1].receipt_stamp_s if len(commands) > 1 else None
+    if command_index < 0 or command_index >= len(commands):
+        raise RuntimeError(
+            f"command_index {command_index} out of range for {len(commands)} commands"
+        )
+    approach_command = commands[command_index]
+    next_command_index = command_index + 1
+    next_stamp = (
+        commands[next_command_index].receipt_stamp_s
+        if next_command_index < len(commands)
+        else None
+    )
     samples = _read_tracking(tracking_path, approach_command.joint_names)
     approach_samples = [
         sample
@@ -222,8 +233,17 @@ def main() -> None:
         default="approach_tracking_analysis.md",
         help="Markdown file to write inside input_dir",
     )
+    parser.add_argument(
+        "--command-index",
+        type=int,
+        default=0,
+        help=(
+            "Zero-based command index to analyze. Use 1 when the observer "
+            "captured MOVING_TO_START before APPROACH."
+        ),
+    )
     args = parser.parse_args()
-    output_path = analyze_directory(args.input_dir, args.output_name)
+    output_path = analyze_directory(args.input_dir, args.output_name, args.command_index)
     print(output_path)
 
 

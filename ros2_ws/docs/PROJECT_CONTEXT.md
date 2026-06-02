@@ -79,7 +79,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - A 2026-06-02 high-gain approach diagnostic was rejected. `position_gain:=3000` slightly reduced time to the above-hole gate but worsened approach failure to `cart_err=0.073 m`, `joint_err=0.110 rad`, with peak raw force norm `890.27 N`.
 - A 2026-06-02 joint-level approach tracking diagnostic added a reusable analyzer and confirmed that `joint_2` dominates the missing descent across normal, slow-descent, and high-gain runs. The command target remains the correct `z=0.830 m` touch pose, while final feedback remains near `z=0.897-0.900 m`.
 - A 2026-06-02 broad damping-reduction diagnostic was rejected. `joint_damping_scale:=0.2` preserved safety gates but hard-aborted in `MOVING_TO_START` at raw `|Fz|=1181.0 N` before reaching the no-contact gate or approach phase.
-- A 2026-06-02 effort-authority diagnostic was rejected. `joint_effort_scale:=2.0` reached the no-contact gate faster and entered `APPROACH`, but hard-aborted after 0.5 s with force norm `1009.7 N` and target-source contact rows.
+- A 2026-06-02 effort-authority diagnostic was rejected. `joint_effort_scale:=2.0` reached the no-contact gate faster and entered `APPROACH`, but hard-aborted after 0.5 s with force norm `1009.7 N` and target-source contact rows while the peg was still at `z=0.890982 m` against the `z=0.830000 m` target.
 
 ## Current Success Criteria
 

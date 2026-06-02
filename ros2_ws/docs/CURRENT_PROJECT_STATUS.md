@@ -368,6 +368,7 @@ Result: rejected.
 - total max raw force norm: `1043.00 N`;
 - insertion depth: `0.0000 m`;
 - trajectory tracking p95 max joint error: `0.048923 rad`;
+- command-index 1 approach analysis: peg still at `z=0.890982 m` against the `z=0.830000 m` target at abort, with final target-minus-feedback `joint_2` error `0.099473 rad`;
 - contact observer recorded target-source contact rows in `MOVING_TO_START`, `APPROACH`, and `ABORT`, with max target contact force `9925.518339 N`.
 
 This diagnostic shows effort authority is involved, but doubled effort is unsafe and not a fix. The next investigation should localize why force/contact evidence appears immediately at approach start when XY is valid and the command target is a short vertical descent.

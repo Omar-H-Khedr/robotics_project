@@ -45,6 +45,7 @@ Runtime result:
 Passive observer evidence:
 
 - `trajectory_tracking_summary.md`: max joint error `0.079934 rad`, p95 max joint error `0.048923 rad`, final max joint error `0.028637 rad`.
+- `approach_tracking_analysis.md`: command-index 1 analysis of the short `APPROACH` command. The abort happened after only `0.283 s` of observed approach samples; the peg was still at `z=0.890982 m` against the `z=0.830000 m` target, with `0.060988 m` Cartesian error and `joint_2` target-minus-feedback error `0.099473 rad`.
 - `wrench_state_summary.md`: `APPROACH` max abs Fz `968.406086 N`, max force norm `1009.722857 N`; total run max abs Fz `1020.099637 N`.
 - `contact_state_summary.md`: target-source contact rows were present in `MOVING_TO_START`, `APPROACH`, and `ABORT`; max target contact force `9925.518339 N`.
 - `trial_outcome.json`: copied from `/tmp/insertion_trial_outcome.json` after the run.

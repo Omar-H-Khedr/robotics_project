@@ -149,7 +149,9 @@ Result: rejected. The run reached `MOVING_TO_START` in `81.4 s` with
 `|Fz|=968.4 N`, force norm `1009.7 N`, total max force norm `1043.0 N`, and
 zero insertion depth. Doubling effort improves authority enough to begin
 descent, but it immediately creates unsafe force/contact evidence and is not a
-credible canonical setting.
+credible canonical setting. Command-index approach analysis showed the peg was
+still at `z=0.890982 m` against the `z=0.830000 m` target when the abort was
+triggered, with `joint_2` still `0.099473 rad` from the final target.
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 

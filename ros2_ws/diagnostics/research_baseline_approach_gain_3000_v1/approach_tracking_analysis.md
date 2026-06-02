@@ -1,6 +1,6 @@
 # Approach Tracking Analysis
 
-- input_dir: `diagnostics/research_baseline_approach_gain_3000_v1`
+- input_dir: `ros2_ws/diagnostics/research_baseline_approach_gain_3000_v1`
 - command_receipt_stamp_s: `48.723`
 - next_command_stamp_s: `92.805`
 - approach_command_duration_s: `15.000`
@@ -23,13 +23,13 @@
 
 ## Per Joint Error
 
-| joint | max_abs_rad | p95_abs_rad | mean_abs_rad | final_error_rad | target_rad | final_feedback_rad |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| joint_1 | 0.006128 | 0.001999 | 0.000872 | -0.000788 | -0.526200 | -0.525412 |
-| joint_2 | 0.111631 | 0.110990 | 0.089108 | 0.110880 | -0.552738 | -0.663619 |
-| joint_3 | 0.007021 | 0.002809 | 0.001107 | 0.001718 | 2.238869 | 2.237151 |
-| joint_4 | 0.039887 | 0.017105 | 0.007662 | 0.004532 | -0.192657 | -0.197189 |
-| joint_5 | 0.034808 | 0.021580 | 0.008806 | 0.000414 | -1.648699 | -1.649113 |
-| joint_6 | 0.041436 | 0.015259 | 0.006575 | 0.010650 | -0.022223 | -0.032873 |
+| joint | max_abs_rad | p95_abs_rad | mean_abs_rad | final_sample_error_rad | target_minus_feedback_rad | target_rad | final_feedback_rad |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| joint_1 | 0.006128 | 0.001999 | 0.000872 | -0.000788 | -0.000788 | -0.526200 | -0.525412 |
+| joint_2 | 0.111631 | 0.110990 | 0.089108 | 0.110880 | 0.110880 | -0.552738 | -0.663619 |
+| joint_3 | 0.007021 | 0.002809 | 0.001107 | 0.001718 | 0.001718 | 2.238869 | 2.237151 |
+| joint_4 | 0.039887 | 0.017105 | 0.007662 | 0.004532 | 0.004532 | -0.192657 | -0.197189 |
+| joint_5 | 0.034808 | 0.021580 | 0.008806 | 0.000414 | 0.000414 | -1.648699 | -1.649113 |
+| joint_6 | 0.041436 | 0.015259 | 0.006575 | 0.010650 | 0.010650 | -0.022223 | -0.032873 |
 
 Interpretation: this is an offline diagnostic over the passive tracking observer CSVs. It does not alter controller behavior or task safety gates.
