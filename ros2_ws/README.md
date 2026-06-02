@@ -1,8 +1,8 @@
 # ROS 2 Jazzy / Gazebo Peg-in-Hole Research Workspace
 
-Current status as of 2026-06-01: this is an active ROS 2 Jazzy workspace for a Gazebo-based KUKA LBR iisy 6 R1300 peg-in-hole research baseline. The project has a working robot spawn path, active ros2_control controllers, a fixed grasped peg model, a fixed hole fixture, force/torque bridge plumbing, and an admittance-style insertion controller.
+Current status as of 2026-06-02: this is an active ROS 2 Jazzy workspace for a Gazebo-based KUKA LBR iisy 6 R1300 peg-in-hole research baseline. The project has a working robot spawn path, active ros2_control controllers, a fixed grasped peg model, a fixed hole fixture, force/torque bridge plumbing, contact observability, and an admittance-style insertion controller.
 
-The strongest current evidence is a **single simulated insertion-depth event**: measured insertion depth about 0.011 m with sustained contact around 142.9 N. This is not yet robust autonomous peg-in-hole success. Known unresolved concerns include a peak raw Fz spike around 1049 N, non-deterministic MOVING_TO_START failures, large Cartesian tracking errors during MOVING_TO_START/APPROACH, broken multi-point INSERT behavior, and incomplete repeated validation.
+The strongest historical insertion evidence remains a **single simulated insertion-depth event**: measured insertion depth about 0.011 m with sustained contact around 142.9 N. This is not robust autonomous peg-in-hole success. The current safer iisy6 baseline reaches the strict above-hole XY gate with an axis-aligned vertical peg, then aborts honestly in `APPROACH` because the 67 mm descent is not tracked. Known unresolved concerns include high raw F/T spikes, large approach tracking errors, broken multi-point INSERT behavior, and failed repeated validation.
 
 ## Milestones
 
@@ -50,6 +50,7 @@ The strongest current evidence is a **single simulated insertion-depth event**: 
 | research_baseline_ft_mount_effort_limit | Completed: F/T mount limit corrected; raw spike reduced but still aborts safely |
 | research_baseline_contact_bridge_full_paths | Completed: full-path contact bridge shows peg-target contact during MOVING_TO_START |
 | research_baseline_axis_aligned_start_pose | Completed: vertical peg start pose removes raw-force abort; still times out at strict stability gate |
+| research_baseline_search_fail_closed_v2 | Completed: 120 s axis-aligned start reaches strict 2 mm XY gate; failed APPROACH now aborts before SEARCH |
 
 ## research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes
 

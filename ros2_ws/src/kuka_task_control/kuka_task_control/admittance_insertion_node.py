@@ -6,7 +6,7 @@ DEPENDENCY-ORDERED FIXES (applied together because they are interdependent):
 1. STATE MACHINE HONESTY (Fix 1):
    - No state transition is treated as "successful" if Cartesian/joint tracking
      did not reach tolerance.
-   - MOVING_TO_START and APPROACH timeouts → ABORT (not silent proceed).
+   - MOVING_TO_START and APPROACH timeouts -> ABORT (not silent proceed).
    - Before INSERT, XY error must be within INSERTION_XY_TOLERANCE.
    - RETREAT→DONE only reports success if all phases completed within tolerance.
    - Each phase records {success, cart_error, timeout} for final outcome.
@@ -28,8 +28,9 @@ DEPENDENCY-ORDERED FIXES (applied together because they are interdependent):
      to raw Fz minus initial capture.
 
 4. SEARCH/HOMING (Fix 4):
-   - A simple spiral search at touch height is triggered if the peg tip
-     reaches touch Z but XY error exceeds INSERTION_XY_TOLERANCE.
+   - A simple spiral search at touch height is triggered only if the peg tip
+     reaches the force-safe pre-insertion Z band and residual XY error is
+     within the bounded search radius.
    - The search is controller-driven (IK + trajectory publication), not fake
      object motion.
 
@@ -120,6 +121,7 @@ class AdmittanceInsertionNode(Node):
     INSERTION_XY_TOLERANCE = 0.002
     CARTESIAN_TIMEOUT_GRACE = 0.12  # proceed if below this on timeout
     STABILIZE_TICKS = 5
+    MOVING_TO_START_TIMEOUT_S = 120.0
     TRAJECTORY_TIMEOUT_S = 90.0
     ABORT_RETREAT_TIMEOUT_S = 20.0
     ABORT_SETTLE_TICKS = 3
@@ -575,7 +577,7 @@ class AdmittanceInsertionNode(Node):
         timeout_s = (
             self.ABORT_RETREAT_TIMEOUT_S
             if self._state == self.ABORT
-            else self.TRAJECTORY_TIMEOUT_S
+            else self.MOVING_TO_START_TIMEOUT_S
         )
         timed_out = elapsed >= timeout_s
         peg, _ = self._kinematics.pose(self.current_joints)
@@ -683,10 +685,6 @@ class AdmittanceInsertionNode(Node):
 
         elapsed = self._state_entry_ticks / self._control_rate
         timed_out = elapsed >= self.TRAJECTORY_TIMEOUT_S
-        degraded_ready = (
-            elapsed >= self._approach_duration_s + 15.0
-            and elapsed >= 20.0
-        )
         peg, _ = self._kinematics.pose(self.current_joints)
         cart_err = np.linalg.norm(peg - self.TOUCH_POSE)
         xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
@@ -725,7 +723,6 @@ class AdmittanceInsertionNode(Node):
         if (
             not stabilized
             and not timed_out
-            and not (degraded_ready and cart_err < self.CARTESIAN_TIMEOUT_GRACE)
         ):
             self._state_entry_ticks += 1
             return
@@ -735,27 +732,16 @@ class AdmittanceInsertionNode(Node):
         phase_timed_out = False
         phase_message = ''
         if not stabilized:
-            if cart_err < self.CARTESIAN_TIMEOUT_GRACE:
-                phase_timed_out = True
-                phase_message = (
-                    f'degraded: no strict convergence after {elapsed:.1f}s; '
-                    f'cart_err={cart_err:.3f}m'
-                )
-                self.get_logger().warn(
-                    f'APPROACH degraded ({elapsed:.1f}s at {cart_err:.3f}m, '
-                    f'within grace {self.CARTESIAN_TIMEOUT_GRACE:.2f}m). Proceeding.'
-                )
-            else:
-                self._abort_reason = (
-                    f'APPROACH timeout/degraded failure ({elapsed:.1f}s). '
-                    f'cart_err={cart_err:.3f}m, joint_err={joint_err:.3f}rad, '
-                    f'tolerance={self.CARTESIAN_TOLERANCE:.3f}m'
-                )
-                self.get_logger().error(self._abort_reason)
-                self._end_phase(False, cart_err, joint_err, True, self._abort_reason)
-                self._touch_joints = None
-                self._set_state(self.ABORT)
-                return
+            self._abort_reason = (
+                f'APPROACH timeout/degraded failure ({elapsed:.1f}s). '
+                f'cart_err={cart_err:.3f}m, joint_err={joint_err:.3f}rad, '
+                f'tolerance={self.CARTESIAN_TOLERANCE:.3f}m'
+            )
+            self.get_logger().error(self._abort_reason)
+            self._end_phase(False, cart_err, joint_err, True, self._abort_reason)
+            self._touch_joints = None
+            self._set_state(self.ABORT)
+            return
 
         current_pos, _ = self._kinematics.pose(self.current_joints)
         self._pre_insertion_xy_error = np.linalg.norm(
@@ -767,22 +753,49 @@ class AdmittanceInsertionNode(Node):
             f'cart_err={cart_err:.3f}m  joint_err={joint_err:.3f}rad  '
             f'Fz={self._get_fz():.1f}N  baseline={self._baseline_fz:.1f}N'
         )
-        self._end_phase(True, cart_err, joint_err, phase_timed_out, phase_message)
-        self._touch_joints = None
-
         # Check XY alignment before insertion
         if self._pre_insertion_xy_error > self.INSERTION_XY_TOLERANCE:
+            if current_pos[2] > self.INSERT_PRECONDITION_MAX_Z:
+                self._abort_reason = (
+                    f'SEARCH blocked: peg_z {current_pos[2]:.4f}m is above '
+                    f'force-safe precondition '
+                    f'{self.INSERT_PRECONDITION_MAX_Z:.4f}m. Approach did '
+                    f'not reach the hole surface reliably.'
+                )
+                self.get_logger().error(self._abort_reason)
+                self._end_phase(False, cart_err, joint_err, phase_timed_out,
+                                self._abort_reason)
+                self._touch_joints = None
+                self._set_state(self.ABORT)
+                return
+            if self._pre_insertion_xy_error > self.SEARCH_RADIUS_MAX:
+                self._abort_reason = (
+                    f'SEARCH blocked: pre-insertion XY error '
+                    f'{self._pre_insertion_xy_error:.4f}m exceeds bounded '
+                    f'search radius {self.SEARCH_RADIUS_MAX:.4f}m.'
+                )
+                self.get_logger().error(self._abort_reason)
+                self._end_phase(False, cart_err, joint_err, phase_timed_out,
+                                self._abort_reason)
+                self._touch_joints = None
+                self._set_state(self.ABORT)
+                return
             self.get_logger().warn(
                 f'Pre-insertion XY error {self._pre_insertion_xy_error:.4f}m exceeds '
                 f'tolerance {self.INSERTION_XY_TOLERANCE:.4f}m. '
                 f'Attempting search phase.'
             )
+            self._end_phase(True, cart_err, joint_err, phase_timed_out,
+                            phase_message)
+            self._touch_joints = None
             self._begin_phase(self.SEARCH)
             self._search_angle = 0.0
             self._search_radius = self.SEARCH_RADIUS_INIT
             self._set_state(self.SEARCH)
             return
 
+        self._end_phase(True, cart_err, joint_err, phase_timed_out, phase_message)
+        self._touch_joints = None
         self._insert_start_z = current_pos[2]
         if not self._insert_preconditions_ok(current_pos):
             self._set_state(self.ABORT)

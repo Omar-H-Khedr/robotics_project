@@ -34,7 +34,7 @@ The current workspace contains a Gazebo workcell with:
 - task-level admittance insertion node with phase logging;
 - dry-run experiment/context scaffolds from earlier proposal milestones.
 
-The strongest single-run insertion evidence so far is one simulated insertion-depth event:
+The strongest historical single-run insertion evidence so far is one simulated insertion-depth event:
 
 - insertion depth: about 0.011 m;
 - sustained contact: about 142.9 N;
@@ -74,6 +74,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - A 2026-06-02 F/T mount effort-limit validation corrected the preserved zero-range measurement joint from `effort=1`, `velocity=0` to `effort=10000`, `velocity=100`. The latest validation still aborted safely in `MOVING_TO_START`, but peak raw wrench dropped to `max_abs_fz_N=612.25` and `max_force_norm_N=1765.41`; canonical contact topics still produced zero messages.
 - A 2026-06-02 full-path contact bridge validation fixed the contact observability gap and added a robot-mounted peg contact sensor. The latest validation still aborted safely in `MOVING_TO_START`, and contact evidence now shows peg-target contact before descent (`MOVING_TO_START` max contact force `2427.31 N`).
 - A 2026-06-02 axis-aligned start-pose validation replaced position-only Cartesian IK with joint-limit-aware peg-axis-constrained IK. The latest validation no longer hard-aborted on raw wrench and recorded no peg-source contact rows, but it still timed out in `MOVING_TO_START` with final `xy_err=0.006 m`, zero insertion depth, and no descent.
+- A 2026-06-02 search fail-closed validation gave the safer axis-aligned start posture a scoped 120 s timeout. The run reached the strict 2 mm no-contact XY gate in `MOVING_TO_START` after 96.3 s, then failed honestly in `APPROACH` after 90 s because the 67 mm descent was not tracked. The state machine transitioned directly to `ABORT`; no `SEARCH` rows were recorded.
 
 ## Current Success Criteria
 
@@ -90,12 +91,12 @@ Robust success requires repeated validation with a documented success rate and f
 
 ## Next Technical Milestone
 
-`research_baseline_above_hole_tracking_stabilization`
+`research_baseline_approach_descent_tracking_stabilization`
 
-Reason: force-safe insert stabilization prevented some unsafe INSERT attempts, corrected the insertion-depth metric, and added a hard force abort. A no-contact alignment gate now blocks APPROACH when above-hole XY error exceeds 0.030 m. Validation still failed because MOVING_TO_START leaves the peg 0.087-0.103 m laterally away from the hole. The next milestone must improve above-hole target execution before any descent or contact search can be credible.
+Reason: the safer axis-aligned `MOVING_TO_START` now reaches the strict 0.002 m no-contact XY gate when allowed 120 s, so the immediate blocker has moved from above-hole alignment to approach/descent tracking. Current validation commands a descent from about `z=0.897 m` to `z=0.830 m`, but measured peg Z stays near `0.90 m` and `APPROACH` aborts with `cart_err=0.072 m`.
 
 A same-target refresh experiment was tested and rejected: repeated MOVING_TO_START target publication produced hard-force aborts and did not improve XY gate convergence.
 
 The next step remains tracking stabilization. The joint-state source integrity milestone removed one measurement ambiguity; it did not solve the large no-contact XY error.
 
-Tracking stabilization should now focus on controller/physics configuration, final-pose damping, and high free-space F/T behavior using the command-vs-feedback, wrench-by-state, and contact-by-state evidence. A globally slower move-to-start trajectory and repeated same-target hold corrections were both tested and rejected. The weak F/T measurement-joint limit has been corrected but did not eliminate the force-norm abort. Full-path contact evidence showed that the abort can coincide with peg-target contact before descent, and axis-aligned IK removed that tilted-peg failure mode in the latest run. The immediate blocker is now convergence/settling of the larger vertical no-contact start move. Do not loosen the no-contact XY gate or hard-force abort to hide the error.
+Tracking stabilization should now focus on controller/physics configuration, approach IK trajectory realization, final-pose damping, and high free-space F/T behavior using the command-vs-feedback, wrench-by-state, and contact-by-state evidence. A globally slower move-to-start trajectory and repeated same-target hold corrections were both tested and rejected. The weak F/T measurement-joint limit has been corrected but did not eliminate force spikes. Full-path contact evidence showed that the earlier abort could coincide with peg-target contact before descent, and axis-aligned IK removed that tilted-peg failure mode. Do not loosen the no-contact XY gate, approach Z preconditions, or hard-force abort to hide the remaining approach tracking error.

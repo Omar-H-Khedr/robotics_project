@@ -6,7 +6,7 @@ Date: 2026-06-02
 
 The repository is an active ROS 2 Jazzy / Gazebo research workspace, not a blank future workspace. The current implementation has moved beyond proposal-only diagnostics into a controller-driven KUKA LBR iisy 6 R1300 Gazebo baseline. Controllers can activate and the task controller can command simulated motion.
 
-The project must not claim final autonomous peg-in-hole success yet. The defensible claim is a first simulated insertion event with measured insertion depth. Repeated runtime validation is still required.
+The project must not claim final autonomous peg-in-hole success yet. The defensible claim is a first historical simulated insertion event with measured insertion depth, followed by current safety-focused regressions that fail honestly before insertion.
 
 ## Evidence Reviewed
 
@@ -22,6 +22,7 @@ The project must not claim final autonomous peg-in-hole success yet. The defensi
 - `baseline_joint_sequence_executor.py`
 - `spawn_robot_sdf.py`
 - `diagnostics/research_baseline_cell_model_consistency/summary.md`
+- `diagnostics/research_baseline_search_fail_closed_v2/summary.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -79,9 +80,10 @@ This confirms the baseline is not robust. It also confirms that the high-force c
 
 ## Open Risks
 
-- Non-deterministic MOVING_TO_START failure rate is not quantified by a fresh repeated run yet.
+- The safer axis-aligned `MOVING_TO_START` can reach the strict 2 mm no-contact gate, but it needs about 96-100 s in current Gazebo/controller conditions.
+- `APPROACH` currently commands a 67 mm Cartesian descent but measured peg Z remains near 0.90 m instead of reaching the 0.83 m touch target.
 - Peak raw Fz spikes are confirmed: 1237.45 N and 3716.2 N were recorded in the 2026-06-01 repeat run.
-- Large Cartesian errors during MOVING_TO_START and APPROACH remain unresolved.
+- Large Cartesian errors during APPROACH remain unresolved.
 - Multi-point INSERT is still not reliable.
 - Contact/gravity baseline validity needs scenario-specific validation.
 - Older `docs/context/robot_cell_audit.md` contains stale iisy3 statements and should be superseded by `docs/PROJECT_CONTEXT.md` plus `docs/ROBOT_DATASHEET_CHECK.md`.
@@ -229,6 +231,29 @@ The task outcome remained a bounded safety failure:
 - `Max Fz: 171.1 N`.
 
 This is not insertion success. The next blocker remains stable above-hole convergence/holding under the preserved strict no-contact gate. The next milestone should add commanded-versus-actual trajectory tracking evidence and then tune trajectory timing, hold behavior, or controller/physics parameters from measured tracking data.
+
+## 2026-06-02 Axis-Aligned Start And Search Fail-Closed
+
+Milestone: `research_baseline_search_fail_closed_v2`
+
+Evidence: `diagnostics/research_baseline_search_fail_closed_v2/summary.md`
+
+The controller now gives the safer axis-aligned vertical-peg `MOVING_TO_START` posture a scoped 120 s timeout. This is not a descent or insertion gate relaxation; the strict above-hole XY requirement remains 0.002 m. Validation reached the strict gate:
+
+- `MOVING_TO_START`: success, duration `96.3 s`;
+- above-hole XY error: `0.0018 m`;
+- Cartesian error: `0.012606 m`;
+- joint error: `0.063314 rad`.
+
+The same validation then exposed the current blocker in `APPROACH`: the controller commanded a 67 mm descent from about `z=0.897 m` to `z=0.830 m`, but the measured peg stayed near `z=0.90 m` and XY drifted to about `0.018 m`. `APPROACH` timed out at 90 s and transitioned directly to `ABORT`:
+
+- outcome: `ABORTED`;
+- reason: `APPROACH timeout/degraded failure (90.0s). cart_err=0.072m, joint_err=0.107rad, tolerance=0.050m`;
+- insertion depth: `0.0000 m`;
+- peak raw `|Fz|`: `691.37 N`;
+- peak raw force norm: `703.09 N`.
+
+The previous unsafe behavior where a degraded approach could enter local `SEARCH` has been removed. In the corrected run, observer summaries contain no `SEARCH` rows. `SEARCH` is now limited to a completed approach at force-safe Z with residual XY within the bounded search radius.
 
 ## 2026-06-02 Trajectory Tracking Observer
 
