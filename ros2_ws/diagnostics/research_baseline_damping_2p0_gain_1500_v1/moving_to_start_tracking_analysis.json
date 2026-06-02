@@ -1,0 +1,18 @@
+{
+  "input_dir": "diagnostics/research_baseline_damping_2p0_gain_1500_v1",
+  "result": "NO_AXIS_ALIGN_COMMAND_CAPTURED",
+  "commands": 1,
+  "axis_align_pose_m": [
+    0.52,
+    -0.2,
+    0.885
+  ],
+  "command_target_tolerance_m": 0.02,
+  "command_targets_m": [
+    [
+      0.8000000000000002,
+      0.09905620187530717,
+      1.0398718589107658
+    ]
+  ]
+}

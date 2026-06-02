@@ -1,6 +1,6 @@
 # Current Project Status
 
-Date: 2026-06-02
+Date: 2026-06-03
 
 ## Review Summary
 
@@ -50,6 +50,9 @@ The project must not claim final autonomous peg-in-hole success yet. The defensi
 - `diagnostics/research_baseline_joint_damping_scale_2p0_v1/summary.md`
 - `diagnostics/research_baseline_joint_damping_scale_2p0_v1/above_hole_hold_analysis.md`
 - `diagnostics/research_baseline_joint_damping_scale_2p0_v1/moving_to_start_tracking_analysis.md`
+- `diagnostics/research_baseline_damping_2p0_gain_1500_v1/summary.md`
+- `diagnostics/research_baseline_damping_2p0_gain_1500_v1/above_hole_hold_analysis.md`
+- `diagnostics/research_baseline_damping_2p0_gain_1500_v1/moving_to_start_tracking_analysis.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position

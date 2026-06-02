@@ -89,6 +89,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - A 2026-06-02 MOVING_TO_START tracking analyzer milestone added selector-based command attribution for the axis-align command. It prevents retreat-only command logs from being misread as start tracking and showed the usable post-tool start runs have distributed joint error with persistent Cartesian XY drift, not one dominant joint comparable to the approach `joint_2` failure.
 - A 2026-06-02 bounded endpoint-correction experiment was rejected and removed. It accepted three small no-contact corrections and improved final timeout XY to about `0.004 m`, but still failed the five-tick strict hold gate and aborted in `MOVING_TO_START` with zero contact-topic samples.
 - A 2026-06-03 2x joint-damping diagnostic was rejected as a canonical change. It reduced p95 max joint tracking error to about `0.0158 rad` and improved the estimated strict hold to two ticks, but still failed `MOVING_TO_START` with final XY about `0.007 m` and `stable=0/5`.
+- A 2026-06-03 2x damping plus `position_gain:=1500` diagnostic was rejected as a canonical change. It reached instantaneous XY error as low as `0.000052 m`, but the estimated strict hold was still only two 10 Hz ticks, final `MOVING_TO_START` XY was about `0.004 m`, contact-topic samples were zero, and the run aborted safely before descent.
 
 ## Current Success Criteria
 
@@ -149,6 +150,12 @@ It improved joint tracking and the strict-gate hold window without contact
 regression, but it still failed before descent. Treat it as evidence for a
 targeted controller/physics stabilization path, not as a canonical robot model
 change.
+
+Combining 2x damping with `position_gain:=1500` also failed the strict hold gate.
+It produced a near-zero instantaneous XY sample but still only achieved an
+estimated two stable state-loop ticks and did not capture a reliable
+axis-align command for command-attributed tracking analysis. Do not adopt it as
+the canonical setting.
 
 A same-target refresh experiment was tested and rejected: repeated MOVING_TO_START target publication produced hard-force aborts and did not improve XY gate convergence.
 

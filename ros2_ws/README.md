@@ -1,10 +1,10 @@
 # ROS 2 Jazzy / Gazebo Peg-in-Hole Research Workspace
 
-Current status as of 2026-06-02: this is an active ROS 2 Jazzy workspace for a Gazebo-based KUKA LBR iisy 6 R1300 peg-in-hole research baseline. The project has a working robot spawn path, active ros2_control controllers, a fixed grasped peg model, a fixed hole fixture, force/torque bridge plumbing, contact observability, and an admittance-style insertion controller.
+Current status as of 2026-06-03: this is an active ROS 2 Jazzy workspace for a Gazebo-based KUKA LBR iisy 6 R1300 peg-in-hole research baseline. The project has a working robot spawn path, active ros2_control controllers, a fixed grasped peg model, a fixed hole fixture, force/torque bridge plumbing, contact observability, and an admittance-style insertion controller.
 
 The strongest historical insertion evidence remains a **single simulated insertion-depth event**: measured insertion depth about 0.011 m with sustained contact around 142.9 N. This is not robust autonomous peg-in-hole success. The current safer iisy6 baseline has corrected the peg-tip frame and removed a reproduced robot-link clearance collision, but it still aborts honestly before descent because it only crosses the strict 2 mm above-hole XY gate transiently. Known unresolved concerns include unstable above-hole hold behavior, high raw F/T spikes, large approach tracking errors, broken multi-point INSERT behavior, and failed repeated validation.
 
-Latest hold evidence shows the corrected post-tool runs do not satisfy the required five 10 Hz stable ticks inside the 2 mm no-contact gate. The best estimated state-loop hold among the recent post-tool variants was one tick, despite minimum replayed XY errors below 0.5 mm in several runs. Older approach evidence also localizes the descent blocker to `joint_2`: normal, slow-descent, and high-gain approach diagnostics all left `joint_2` about 0.107-0.111 rad from target, keeping the peg tip about 67-70 mm above the commanded touch pose. This supports endpoint hold and controller/physics investigation before any learning or insertion-claim work.
+Latest hold evidence shows the corrected post-tool runs do not satisfy the required five 10 Hz stable ticks inside the 2 mm no-contact gate. The best estimated state-loop hold among the recent post-tool variants is two ticks, reached by 2x damping and by 2x damping plus `position_gain:=1500`; both still aborted safely in `MOVING_TO_START`. Older approach evidence also localizes the descent blocker to `joint_2`: normal, slow-descent, and high-gain approach diagnostics all left `joint_2` about 0.107-0.111 rad from target, keeping the peg tip about 67-70 mm above the commanded touch pose. This supports endpoint hold and controller/physics investigation before any learning or insertion-claim work.
 
 ## Milestones
 
@@ -68,6 +68,7 @@ Latest hold evidence shows the corrected post-tool runs do not satisfy the requi
 | research_baseline_moving_to_start_tracking_analyzer | Completed: reusable selector-based analyzer localizes post-tool start hold drift without false retreat-command attribution |
 | research_baseline_start_endpoint_correction_v1 | Rejected: bounded endpoint corrections improved final XY but still failed the five-tick strict hold gate |
 | research_baseline_joint_damping_scale_2p0_v1 | Rejected: 2x damping improved tracking and best hold to two ticks, but still failed the strict gate |
+| research_baseline_damping_2p0_gain_1500_v1 | Rejected: 2x damping plus gain 1500 still failed the strict hold gate and only captured retreat-command tracking |
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
