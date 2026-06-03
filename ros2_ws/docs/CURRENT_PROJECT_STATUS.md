@@ -89,6 +89,7 @@ until repeated validation demonstrates robust success.
 - Timing evidence from that run shows the INSERT command was observed for `23.111 s` after a `20.000 s` command. The prior failed behavior advanced to RETREAT after about `10.6 s` of controller-state INSERT time.
 - Success classification now uses `max_insert_contact_force_N`, not global contact, so RETREAT contact cannot create a false insertion success.
 - The passive Gazebo contact observer still recorded contact-topic rows only in `RETREAT` for the latest successful run; RETREAT contact reached `249.593329 N`. This remains the next safety-critical withdrawal limitation.
+- A staged vertical-lift-then-home withdrawal diagnostic preserved insertion success but was rejected because it worsened RETREAT contact to `486.746287 N` over `307` rows and raised max raw force norm to `285.8 N`.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
@@ -151,11 +152,12 @@ This confirms the baseline is not robust. It also confirms that the high-force c
 
 Reason: `research_baseline_insert_sim_time_completion_v4` produced one
 credible simulated insertion success, but passive contact topics still recorded
-RETREAT contact up to `249.593329 N` after successful insertion. The next
-safety-critical improvement should withdraw vertically or otherwise clear the
-fixture after a successful insert before moving laterally to `SAFE_HOME`, then
-rerun the same analyzers. Repeated validation should follow only after
-successful-insert withdrawal contact is reduced.
+RETREAT contact up to `249.593329 N` after successful insertion. A first staged
+vertical-lift-then-home withdrawal was rejected because it worsened contact to
+`486.746287 N`. The next safety-critical improvement should diagnose and
+reduce fixture/hole contact during vertical extraction before moving laterally
+to `SAFE_HOME`, then rerun the same analyzers. Repeated validation should
+follow only after successful-insert withdrawal contact is reduced.
 
 Historical context: force-safe insert stabilization blocked unsafe INSERT when peg Z was too high, but validation still failed. The 2026-06-01 force-safe validation (`diagnostics/research_baseline_force_safe_insert_v3`) showed:
 
@@ -372,6 +374,33 @@ Limitations:
 - This is one successful simulated trial, not robust success.
 - Gazebo contact-topic rows were recorded only in `RETREAT` for this run; INSERT contact evidence is from the task F/T estimator.
 - RETREAT contact-topic max force was `249.593329 N`, mainly peg versus target plate right collision. Successful-insert withdrawal/contact reduction is the next safety-critical milestone before repeated-validation claims.
+
+## 2026-06-03 Staged Withdrawal Diagnostic
+
+Milestone: `research_baseline_staged_withdrawal_v1`
+
+Evidence: `diagnostics/research_baseline_staged_withdrawal_v1/summary.md`
+
+A staged vertical-lift-then-home RETREAT was tested to reduce successful-insert
+withdrawal contact. The run preserved insertion success:
+
+- final outcome `SUCCESS`;
+- insertion depth `0.0208 m`;
+- task-side insert contact evidence `59.5 N`;
+- phase sequence MOVING_TO_START, APPROACH, SEARCH, INSERT, RETREAT all OK.
+
+However, the staged withdrawal worsened contact evidence:
+
+- v4 RETREAT contact rows `41`;
+- staged v1 RETREAT contact rows `307`;
+- v4 RETREAT max contact force `249.593329 N`;
+- staged v1 RETREAT max contact force `486.746287 N`;
+- v4 max raw force norm `211.14 N`;
+- staged v1 max raw force norm `285.8 N`.
+
+Decision: rejected and source change removed. The next withdrawal fix should
+inspect fixture/hole contact geometry and peg load during vertical extraction
+rather than only splitting the trajectory into lift and home stages.
 
 ## 2026-06-02 Joint-State Source Integrity
 

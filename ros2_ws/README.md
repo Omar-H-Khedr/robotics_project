@@ -80,6 +80,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_insert_retreat_contact_analyzer_v1 | Completed: failed INSERT depth and RETREAT collision attribution analyzer added |
 | research_baseline_retreat_clearance_lift_v1 | Completed: failed-insert RETREAT contact reduced; INSERT still failed |
 | research_baseline_insert_sim_time_completion_v4 | Completed: single validated iisy6 insertion success; repeat validation and retreat-contact reduction pending |
+| research_baseline_staged_withdrawal_v1 | Rejected: staged lift/home preserved success but worsened RETREAT contact |
 
 ## 2026-06-03 Controller-State Tracking V2
 
@@ -196,6 +197,28 @@ The passive Gazebo contact observer still recorded contact-topic rows only in
 `RETREAT` for this run, and RETREAT contact reached `249.593329 N`. The next
 safety-critical milestone should reduce successful-insert withdrawal contact
 and then run repeated validation.
+
+## 2026-06-03 Staged Withdrawal Diagnostic
+
+Milestone: `research_baseline_staged_withdrawal_v1`
+
+Evidence: `diagnostics/research_baseline_staged_withdrawal_v1/summary.md`
+
+A staged vertical-lift-then-home RETREAT was tested after the v4 success
+because v4 still produced RETREAT contact. The experiment preserved insertion
+success (`0.0208 m` depth, `59.5 N` insert contact evidence), but worsened
+withdrawal contact:
+
+- v4 RETREAT contact rows: `41`;
+- staged v1 RETREAT contact rows: `307`;
+- v4 RETREAT max contact force: `249.593329 N`;
+- staged v1 RETREAT max contact force: `486.746287 N`;
+- v4 max raw force norm: `211.14 N`;
+- staged v1 max raw force norm: `285.8 N`.
+
+The staged withdrawal source change was removed. Future withdrawal work should
+diagnose fixture/hole contact during vertical extraction rather than simply
+splitting lift and home trajectories.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
