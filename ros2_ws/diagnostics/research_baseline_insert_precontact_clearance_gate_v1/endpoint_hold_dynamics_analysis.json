@@ -1,0 +1,94 @@
+{
+  "input_dir": "diagnostics/research_baseline_insert_precontact_clearance_gate_v1",
+  "result": "OK",
+  "tracking_source": "trajectory_controller_state_samples.csv",
+  "command_index": 0,
+  "samples": 1572,
+  "hold_start_s": 42.421,
+  "hold_end_s": 48.708,
+  "hold_duration_s": 6.283999999999999,
+  "next_command_stamp_s": 48.709,
+  "strict_xy_m": 0.002,
+  "xy_error_min_m": 9.199946918611475e-05,
+  "xy_error_mean_m": 0.0021257159054430064,
+  "xy_error_p95_m": 0.003887411705254879,
+  "xy_error_max_m": 0.005396969501085669,
+  "cartesian_error_min_m": 0.00016419535145099218,
+  "cartesian_error_mean_m": 0.0026283014853862073,
+  "cartesian_error_p95_m": 0.0045406925634508,
+  "cartesian_error_max_m": 0.0064053067477838725,
+  "x_range_m": 0.009501677583098944,
+  "y_range_m": 0.007930348052921699,
+  "z_range_m": 0.007836349428248957,
+  "strict_xy_sample_count": 737,
+  "strict_xy_sample_fraction": 0.4688295165394402,
+  "strict_bin_count": 0,
+  "max_consecutive_strict_bins": 0,
+  "estimated_state_loop_hz": 10.0,
+  "largest_feedback_range_joint": {
+    "joint": "joint_6",
+    "feedback_range_rad": 0.019903997
+  },
+  "joint_hold_dynamics": [
+    {
+      "joint": "joint_1",
+      "target_rad": -0.50256933,
+      "feedback_min_rad": -0.508498348,
+      "feedback_max_rad": -0.496548788,
+      "feedback_range_rad": 0.011949560000000026,
+      "mean_abs_error_rad": 0.002152156459923664,
+      "p95_abs_error_rad": 0.004661856,
+      "final_error_rad": -0.002193278
+    },
+    {
+      "joint": "joint_2",
+      "target_rad": -0.992067746,
+      "feedback_min_rad": -0.995377813,
+      "feedback_max_rad": -0.98593341,
+      "feedback_range_rad": 0.009444402999999935,
+      "mean_abs_error_rad": 0.0016564997894402036,
+      "p95_abs_error_rad": 0.004195281,
+      "final_error_rad": 0.002362032
+    },
+    {
+      "joint": "joint_3",
+      "target_rad": 2.340681722,
+      "feedback_min_rad": 2.336449044,
+      "feedback_max_rad": 2.346720502,
+      "feedback_range_rad": 0.010271458000000067,
+      "mean_abs_error_rad": 0.001514435784351145,
+      "p95_abs_error_rad": 0.003450829,
+      "final_error_rad": -6.7688e-05
+    },
+    {
+      "joint": "joint_4",
+      "target_rad": -0.112780859,
+      "feedback_min_rad": -0.121324545,
+      "feedback_max_rad": -0.104627817,
+      "feedback_range_rad": 0.016696728000000008,
+      "mean_abs_error_rad": 0.002500765012722646,
+      "p95_abs_error_rad": 0.005806519,
+      "final_error_rad": -0.001002639
+    },
+    {
+      "joint": "joint_5",
+      "target_rad": -1.349980297,
+      "feedback_min_rad": -1.357082376,
+      "feedback_max_rad": -1.34160496,
+      "feedback_range_rad": 0.015477415999999966,
+      "mean_abs_error_rad": 0.0026281958015267177,
+      "p95_abs_error_rad": 0.005767958,
+      "final_error_rad": -0.004764469
+    },
+    {
+      "joint": "joint_6",
+      "target_rad": 0.024802178,
+      "feedback_min_rad": 0.014732304,
+      "feedback_max_rad": 0.034636301,
+      "feedback_range_rad": 0.019903997,
+      "mean_abs_error_rad": 0.003949525256361323,
+      "p95_abs_error_rad": 0.008288437,
+      "final_error_rad": 0.003025368
+    }
+  ]
+}

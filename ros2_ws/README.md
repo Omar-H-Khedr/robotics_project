@@ -4,7 +4,7 @@ Current status as of 2026-06-03: this is an active ROS 2 Jazzy workspace for a G
 
 The strongest historical iisy6 evidence is a controller-driven simulated insertion-depth event from `diagnostics/research_baseline_insert_sim_time_completion_v4`: final outcome `SUCCESS` under older depth/contact criteria, insertion depth `0.0191 m`, task F/T insert-contact evidence `60.1 N`, max raw `|Fz|=133.33 N`, and no safety abort or invalid timeout. That claim is now superseded by a stricter physical-clearance gate: `diagnostics/research_baseline_insert_physical_xy_gate_v1` reached depth `0.0177 m` and insert contact `55.4 N`, but correctly reported `DEGRADED` because final insertion XY error `0.0030 m` exceeds the 25 mm peg / 27 mm hole radial clearance of `0.0010 m`. Current status: no validated physical insertion success under the latest criteria.
 
-Latest timing evidence shows the prior failed insert was partly a clock-domain bug: the task advanced to RETREAT after about `10.6 s` of controller-state INSERT time despite commanding a `20 s` trajectory. The current task node uses ROS/Gazebo time for INSERT completion and now also checks final insertion XY against physical hole clearance. The latest XY drift diagnostic shows controller feedback can exceed the `0.001 m` physical radial clearance before or during early INSERT, so future work should add a no-contact INSERT clearance gate before deeper descent and then reduce single-point INSERT path drift; do not treat depth/contact alone as robust autonomous peg-in-hole performance.
+Latest timing evidence shows the prior failed insert was partly a clock-domain bug: the task advanced to RETREAT after about `10.6 s` of controller-state INSERT time despite commanding a `20 s` trajectory. The current task node uses ROS/Gazebo time for INSERT completion and now checks final insertion XY against physical hole clearance. The latest runtime gate aborts INSERT before meaningful depth when no-contact XY feedback exceeds the `0.001 m` physical radial clearance, so future work should reduce or constrain single-point INSERT path drift; do not treat depth/contact alone as robust autonomous peg-in-hole performance.
 
 ## Milestones
 
@@ -85,6 +85,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_insert_physical_xy_gate_v1 | Completed: depth/contact event correctly downgraded because final inserted XY exceeds physical clearance |
 | research_baseline_insert_sideload_abort_v1 | Completed: INSERT aborts safely when inserted-depth XY exceeds physical clearance |
 | research_baseline_insert_xy_drift_diagnostic_v1 | Completed: analyzer shows INSERT XY can violate physical clearance before or during early descent |
+| research_baseline_insert_precontact_clearance_gate_v1 | Completed: INSERT aborts before meaningful depth when no-contact XY exceeds physical clearance |
 
 ## 2026-06-03 Controller-State Tracking V2
 
@@ -324,6 +325,36 @@ similar early clearance risk and later side-load: first meaningful depth
 This confirms the next control change must preserve the side-load abort and
 gate no-contact INSERT motion against the physical clearance before attempting
 deeper descent or learning.
+
+## 2026-06-03 Insert Pre-Contact Clearance Gate
+
+Milestone: `research_baseline_insert_precontact_clearance_gate_v1`
+
+Evidence: `diagnostics/research_baseline_insert_precontact_clearance_gate_v1/summary.md`
+
+The task now requires direct INSERT entry and SEARCH convergence to satisfy the
+physical radial clearance `0.0010 m`. During INSERT it aborts before meaningful
+depth if no-contact XY error exceeds that clearance for three control ticks.
+The existing inserted-depth side-load and hard-force aborts remain active.
+
+Validation passed Python syntax and targeted `colcon build --packages-select
+kuka_task_control thesis_bringup`. The first sandboxed launch failed before
+spawn because DDS/Gazebo could not create local sockets; the same command was
+rerun with escalated permissions and reached task `DONE`.
+
+Runtime result:
+
+- final outcome `ABORTED`;
+- reason `INSERT aborted: no-contact XY error 0.0027m exceeds physical clearance 0.0010m before meaningful insertion depth 0.0010m for 3 ticks.`;
+- insertion depth `0.0000 m`;
+- SEARCH converged at pre-insertion XY `0.0006 m`;
+- max physical depth from analyzer `0.000000 m`;
+- positive contact-topic samples `0`;
+- max raw force norm `205.09 N`.
+
+This is a safer fail-closed behavior, not task success. The remaining blocker is
+the one-point INSERT command drifting outside physical clearance almost
+immediately after SEARCH has centered the peg.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 

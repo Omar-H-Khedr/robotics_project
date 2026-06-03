@@ -72,6 +72,16 @@ The latest INSERT drift diagnostic is
 - prior physical-XY-gate run first side-load: `0.001274 m` depth at XY error `0.002153 m`;
 - reason: controller-state feedback can violate the `0.0010 m` physical radial clearance before or during early INSERT.
 
+The latest runtime safety validation is
+`diagnostics/research_baseline_insert_precontact_clearance_gate_v1`:
+
+- final outcome: `ABORTED`;
+- reason: no-contact INSERT XY error `0.0027 m` exceeded physical clearance before meaningful depth;
+- insertion depth: `0.0000 m`;
+- pre-insertion XY after SEARCH: `0.0006 m`;
+- positive contact-topic samples: `0`;
+- reason: fail closed before descending into the hole when XY feedback drifts outside physical clearance.
+
 Repeated validation on 2026-06-01 produced 0/3 physical successes:
 
 - one DEGRADED INSERT with only 0.0037 m depth and a 1237.45 N peak raw Fz spike;
@@ -96,7 +106,8 @@ This is not robust autonomous peg-in-hole success. The honest claim is now:
 - Withdrawal contact timing analysis showed the staged run's contact occurred during vertical extraction, not later home motion; the peak occurred at `0.019732 m` insertion depth with about `0.006 m` XY error.
 - The latest clearance-aware validation downgraded depth/contact to `DEGRADED` because final insertion XY error `0.0030 m` exceeds the `0.0010 m` physical radial clearance.
 - INSERT side-load abort now prevents continuing deeper after inserted-depth XY drift exceeds physical clearance, but this means the current baseline fails honestly before physical success.
-- INSERT XY drift diagnostics show the next safety change should gate no-contact INSERT motion against the `0.0010 m` physical radial clearance before deeper descent, then address single-point INSERT path drift.
+- INSERT XY drift diagnostics motivated the no-contact INSERT gate against the `0.0010 m` physical radial clearance before deeper descent.
+- INSERT pre-contact clearance gating now prevents descent when XY feedback leaves physical clearance before meaningful depth. The remaining blocker is reducing or constraining the one-point INSERT path drift after SEARCH centers the peg.
 - Gazebo contact physics are adequate for early simulation evidence but not final safety fidelity.
 - Some older docs still describe stale iisy3 state and must not be used as current truth.
 - A 2026-06-02 source-integrity run confirmed `joint_state_broadcaster` as the intended `/joint_states` publisher, but the same run still timed out in `MOVING_TO_START` with large XY error.
@@ -270,7 +281,9 @@ the canonical setting.
 
 A same-target refresh experiment was tested and rejected: repeated MOVING_TO_START target publication produced hard-force aborts and did not improve XY gate convergence.
 
-The next step remains tracking stabilization. The joint-state source integrity milestone removed one measurement ambiguity; it did not solve the large no-contact XY error.
+The current next step is INSERT path stabilization. The joint-state source
+integrity milestone removed one measurement ambiguity; the latest pre-contact
+gate now prevents descent when XY drift exceeds physical clearance.
 
 Tracking stabilization should now focus on final above-hole XY settling with
 the corrected tool frame, then approach IK trajectory realization, `joint_2`

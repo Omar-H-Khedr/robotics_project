@@ -146,6 +146,7 @@ class AdmittanceInsertionNode(Node):
     PEG_RADIUS_M = 0.0125
     HOLE_RADIUS_M = 0.0135
     INSERT_FINAL_XY_TOLERANCE = HOLE_RADIUS_M - PEG_RADIUS_M
+    INSERT_PRECONTACT_CLEARANCE_TICKS = 3
     INSERT_SIDELOAD_DEPTH_GATE_M = 0.001
     INSERT_SIDELOAD_SETTLE_TICKS = 3
 
@@ -203,6 +204,7 @@ class AdmittanceInsertionNode(Node):
         self._correction_ticks: int = 0
         self._insert_traj_dur: float = 20.0
         self._insert_command_start_s: float = 0.0
+        self._insert_precontact_clearance_ticks: int = 0
         self._insert_sideload_ticks: int = 0
 
         self.current_joints: np.ndarray = np.zeros(6)
@@ -568,6 +570,7 @@ class AdmittanceInsertionNode(Node):
             self._max_insert_contact_force = 0.0
             self._insertion_depth_m = 0.0
             self._final_insertion_xy_error_m = 0.0
+            self._insert_precontact_clearance_ticks = 0
             self._insert_sideload_ticks = 0
             self._begin_phase(self.MOVING_TO_START)
             self._set_state(self.MOVING_TO_START)
@@ -848,7 +851,7 @@ class AdmittanceInsertionNode(Node):
             f'Fz={self._get_fz():.1f}N  baseline={self._baseline_fz:.1f}N'
         )
         # Check XY alignment before insertion
-        if self._pre_insertion_xy_error > self.INSERTION_XY_TOLERANCE:
+        if self._pre_insertion_xy_error > self.INSERT_FINAL_XY_TOLERANCE:
             if current_pos[2] > self.INSERT_PRECONDITION_MAX_Z:
                 self._abort_reason = (
                     f'SEARCH blocked: peg_z {current_pos[2]:.4f}m is above '
@@ -876,7 +879,7 @@ class AdmittanceInsertionNode(Node):
                 return
             self.get_logger().warn(
                 f'Pre-insertion XY error {self._pre_insertion_xy_error:.4f}m exceeds '
-                f'tolerance {self.INSERTION_XY_TOLERANCE:.4f}m. '
+                f'physical clearance {self.INSERT_FINAL_XY_TOLERANCE:.4f}m. '
                 f'Attempting search phase.'
             )
             self._end_phase(True, cart_err, joint_err, phase_timed_out,
@@ -940,9 +943,9 @@ class AdmittanceInsertionNode(Node):
             self._state_entry_ticks += 1
             peg, _ = self._kinematics.pose(self.current_joints)
             xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
-            if xy_err < self.INSERTION_XY_TOLERANCE:
+            if xy_err <= self.INSERT_FINAL_XY_TOLERANCE:
                 self.get_logger().info(
-                    f'SEARCH converged. XY error {xy_err:.4f}m within tolerance.'
+                    f'SEARCH converged. XY error {xy_err:.4f}m within physical clearance.'
                 )
                 self._end_phase(True, xy_err, 0.0, False, 'SEARCH converged')
                 self._pre_insertion_xy_error = xy_err
@@ -967,7 +970,7 @@ class AdmittanceInsertionNode(Node):
                 self._abort_reason = (
                     f'SEARCH exhausted at radius {self._search_radius:.3f}m. '
                     f'XY error {self._pre_insertion_xy_error:.4f}m still > '
-                    f'tolerance {self.INSERTION_XY_TOLERANCE:.4f}m.'
+                    f'physical clearance {self.INSERT_FINAL_XY_TOLERANCE:.4f}m.'
                 )
                 self.get_logger().error(self._abort_reason)
                 self._end_phase(False, self._pre_insertion_xy_error, 0.0,
@@ -1024,6 +1027,14 @@ class AdmittanceInsertionNode(Node):
             self.get_logger().error(self._abort_reason)
             self._end_phase(False, xy_err, 0.0, False, self._abort_reason)
             return False
+        if xy_err > self.INSERT_FINAL_XY_TOLERANCE:
+            self._abort_reason = (
+                f'INSERT blocked: no-contact XY error {xy_err:.4f}m exceeds '
+                f'physical radial clearance {self.INSERT_FINAL_XY_TOLERANCE:.4f}m.'
+            )
+            self.get_logger().error(self._abort_reason)
+            self._end_phase(False, xy_err, 0.0, False, self._abort_reason)
+            return False
         if peg[2] > self.INSERT_PRECONDITION_MAX_Z:
             self._abort_reason = (
                 f'INSERT blocked: peg_z {peg[2]:.4f}m is above force-safe '
@@ -1067,6 +1078,29 @@ class AdmittanceInsertionNode(Node):
                 f'at physical depth {current_depth:.4f}m.'
             )
             self.get_logger().warn(self._abort_reason)
+            self._end_phase(False, xy_error, 0.0, False, self._abort_reason)
+            self._set_state(self.ABORT)
+            return
+
+        precontact_misaligned = (
+            current_depth < self.INSERT_SIDELOAD_DEPTH_GATE_M
+            and xy_error > self.INSERT_FINAL_XY_TOLERANCE
+        )
+        self._insert_precontact_clearance_ticks = (
+            self._insert_precontact_clearance_ticks + 1
+            if precontact_misaligned
+            else 0
+        )
+        if self._insert_precontact_clearance_ticks >= self.INSERT_PRECONTACT_CLEARANCE_TICKS:
+            self._abort_reason = (
+                f'INSERT aborted: no-contact XY error {xy_error:.4f}m exceeds '
+                f'physical clearance {self.INSERT_FINAL_XY_TOLERANCE:.4f}m '
+                f'before meaningful insertion depth '
+                f'{self.INSERT_SIDELOAD_DEPTH_GATE_M:.4f}m for '
+                f'{self._insert_precontact_clearance_ticks} ticks.'
+            )
+            self.get_logger().warn(self._abort_reason)
+            self._final_insertion_xy_error_m = xy_error
             self._end_phase(False, xy_error, 0.0, False, self._abort_reason)
             self._set_state(self.ABORT)
             return

@@ -85,7 +85,7 @@ until repeated validation demonstrates robust success.
 - Spawn: x=0.80, y=-0.75, z=0.735, yaw=1.5708.
 - Controller stack: `joint_state_broadcaster` and `joint_trajectory_controller`.
 - Canonical controller parameters: `thesis_bringup/config/research_baseline_ros2_control.yaml` loaded by `spawn_robot_sdf.py`.
-- Latest validated baseline milestone: `research_baseline_insert_xy_drift_diagnostic_v1` adds an offline INSERT drift analyzer and shows controller feedback can exceed the 25 mm peg / 27 mm hole radial clearance before or during early INSERT. The preceding `research_baseline_insert_sideload_abort_v1` run remains the latest runtime safety behavior: it reported `ABORTED` at depth `0.0011 m` and XY error `0.0032 m`, reducing passive contact-topic rows from `1293` to `2` compared with the prior physical-XY-gate run.
+- Latest validated baseline milestone: `research_baseline_insert_precontact_clearance_gate_v1` aborts INSERT before meaningful depth when no-contact XY feedback exceeds the 25 mm peg / 27 mm hole radial clearance. It reported `ABORTED` with depth `0.0000 m`, final insertion XY error `0.0027 m`, and zero positive contact-topic samples.
 - Previous milestone `research_baseline_insert_physical_xy_gate_v1` reached depth `0.0177 m` and task-side INSERT contact `55.4 N`, but correctly reported `DEGRADED` because final insertion XY error `0.0030 m` exceeds the physical radial clearance of `0.0010 m`.
 - Historical milestone `research_baseline_insert_sim_time_completion_v4` reached final outcome `SUCCESS` under older depth/contact criteria, but that wording is now superseded by the physical-clearance gate.
 - Timing evidence from that run shows the INSERT command was observed for `23.111 s` after a `20.000 s` command. The prior failed behavior advanced to RETREAT after about `10.6 s` of controller-state INSERT time.
@@ -95,7 +95,8 @@ until repeated validation demonstrates robust success.
 - Withdrawal contact timing analysis shows contact occurs during the first post-insert extraction command, before the home command. In the rejected staged run, all `307` contact samples occurred during the vertical lift stage and the peak force occurred while the peg was still inserted `0.019732 m`.
 - Physical XY gate validation shows the same issue in the current run: RETREAT peak contact `589.942680 N` occurred at depth `0.017561 m` and XY error `0.005906 m`.
 - INSERT side-load abort validation reduced this extraction-contact failure mode: only `2` passive contact-topic rows were recorded, both with `0.000000 N` max force, after aborting at shallow side-loaded insertion.
-- INSERT XY drift analysis shows the remaining blocker is not only final success classification: in `research_baseline_insert_sideload_abort_v1`, the controller-state feedback already had pre-command final XY `0.001569 m` and command-window initial XY `0.002539 m`; in `research_baseline_insert_physical_xy_gate_v1`, first side-load occurred at depth `0.001274 m` with XY `0.002153 m`. The next control change should add a no-contact INSERT clearance gate before deeper descent, then address single-point INSERT path drift.
+- INSERT XY drift analysis showed the remaining blocker was not only final success classification: in `research_baseline_insert_sideload_abort_v1`, the controller-state feedback already had pre-command final XY `0.001569 m` and command-window initial XY `0.002539 m`; in `research_baseline_insert_physical_xy_gate_v1`, first side-load occurred at depth `0.001274 m` with XY `0.002153 m`. The no-contact INSERT clearance gate now addresses the unsafe descent part; single-point INSERT path drift remains.
+- INSERT pre-contact clearance gate validation now prevents that descent: SEARCH reached `0.0006 m` pre-insertion XY, then INSERT aborted at XY `0.0027 m` before meaningful depth. The next implementation should reduce or constrain one-point INSERT path drift; do not relax the new gate.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
@@ -546,6 +547,47 @@ Interpretation: the baseline can violate physical radial clearance before or
 during early INSERT. Do not loosen side-load or final XY gates. The next
 implementation should add a no-contact INSERT clearance gate before deeper
 descent, then reduce single-point INSERT path drift.
+
+## 2026-06-03 Insert Pre-Contact Clearance Gate
+
+Milestone: `research_baseline_insert_precontact_clearance_gate_v1`
+
+Evidence: `diagnostics/research_baseline_insert_precontact_clearance_gate_v1/summary.md`
+
+The task now fails closed before meaningful depth if no-contact INSERT XY error
+exceeds the physical clearance `0.0010 m` for `3` control ticks. Direct INSERT
+entry and SEARCH convergence now also use the physical clearance rather than
+the older nominal `0.002 m` insertion tolerance.
+
+Validation passed:
+
+```bash
+python3 -m py_compile src/kuka_task_control/kuka_task_control/admittance_insertion_node.py
+source /opt/ros/jazzy/setup.bash
+colcon build --symlink-install --packages-select kuka_task_control thesis_bringup
+source install/setup.bash
+timeout 430s ros2 launch thesis_bringup research_baseline.launch.py use_gui:=false joint_damping_scale:=5.0 tracking_log_dir:=diagnostics/research_baseline_insert_precontact_clearance_gate_v1
+```
+
+The first sandboxed launch failed before robot spawn because DDS/Gazebo local
+transport sockets were blocked. The same command was rerun with escalated
+permissions and reached task `DONE`.
+
+Runtime result:
+
+- final outcome `ABORTED`;
+- reason `INSERT aborted: no-contact XY error 0.0027m exceeds physical clearance 0.0010m before meaningful insertion depth 0.0010m for 3 ticks.`;
+- insertion depth `0.0000 m`;
+- SEARCH converged at pre-insertion XY `0.0006 m`;
+- `insert_xy_drift_analyzer` reported first clearance violation `0.005 s` after INSERT command receipt;
+- `insert_retreat_contact_analyzer` reported max physical depth `0.000000 m`;
+- `withdrawal_contact_timing_analyzer` and `contact_state_summary` reported `0` positive contact samples.
+
+Interpretation: this is a safety improvement, not task success. The current
+blocker is now clearly the one-point INSERT command drifting outside physical
+clearance almost immediately after SEARCH centers the peg. The next change
+should reduce or constrain INSERT path drift while preserving the clearance
+gate and hard-force abort.
 
 ## 2026-06-02 Joint-State Source Integrity
 

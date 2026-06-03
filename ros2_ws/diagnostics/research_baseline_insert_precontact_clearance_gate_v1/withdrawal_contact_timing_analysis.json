@@ -1,0 +1,63 @@
+{
+  "command_windows": [
+    {
+      "duration_s": 40.0,
+      "index": 0,
+      "label": "MOVING_TO_START",
+      "next_command_stamp_s": 48.709,
+      "point_count": 20,
+      "receipt_stamp_s": 2.421,
+      "target_xyz_m": [
+        0.5200003473316399,
+        -0.20000031769695203,
+        0.8850008831257807
+      ]
+    },
+    {
+      "duration_s": 15.0,
+      "index": 1,
+      "label": "APPROACH",
+      "next_command_stamp_s": 63.203,
+      "point_count": 8,
+      "receipt_stamp_s": 48.709,
+      "target_xyz_m": [
+        0.5200000075096189,
+        -0.20000001526211686,
+        0.830000010315963
+      ]
+    },
+    {
+      "duration_s": 20.0,
+      "index": 2,
+      "label": "INSERT",
+      "next_command_stamp_s": 63.718,
+      "point_count": 1,
+      "receipt_stamp_s": 63.203,
+      "target_xyz_m": [
+        0.5200035473246374,
+        -0.20000114203522545,
+        0.79000402196391
+      ]
+    },
+    {
+      "duration_s": 25.0,
+      "index": 3,
+      "label": "RETREAT_1",
+      "next_command_stamp_s": null,
+      "point_count": 16,
+      "receipt_stamp_s": 63.718,
+      "target_xyz_m": [
+        0.8000000000000002,
+        0.09905620187530717,
+        1.0398718589107658
+      ]
+    }
+  ],
+  "contact_by_command": {},
+  "first_20_events": [],
+  "input_dir": "diagnostics/research_baseline_insert_precontact_clearance_gate_v1",
+  "insert_command_index": 2,
+  "positive_contact_samples": 0,
+  "top_20_force_events": [],
+  "tracking_source": "trajectory_controller_state_samples.csv"
+}

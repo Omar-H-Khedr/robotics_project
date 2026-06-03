@@ -1,0 +1,59 @@
+{
+  "trial_outcome": "ABORTED",
+  "reason": "INSERT aborted: no-contact XY error 0.0027m exceeds physical clearance 0.0010m before meaningful insertion depth 0.0010m for 3 ticks.",
+  "phases": [
+    {
+      "phase": "MOVING_TO_START",
+      "success": true,
+      "cart_error_m": 0.002212,
+      "joint_error_rad": 0.005533,
+      "timed_out": false,
+      "duration_s": 46.3,
+      "message": ""
+    },
+    {
+      "phase": "APPROACH",
+      "success": true,
+      "cart_error_m": 0.012411,
+      "joint_error_rad": 0.021296,
+      "timed_out": false,
+      "duration_s": 12.1,
+      "message": ""
+    },
+    {
+      "phase": "SEARCH",
+      "success": true,
+      "cart_error_m": 0.000587,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 2.3,
+      "message": "SEARCH converged"
+    },
+    {
+      "phase": "INSERT",
+      "success": false,
+      "cart_error_m": 0.002664,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 0.5,
+      "message": "INSERT aborted: no-contact XY error 0.0027m exceeds physical clearance 0.0010m before meaningful insertion depth 0.0010m for 3 ticks."
+    }
+  ],
+  "metrics": {
+    "initial_xy_error_m": 0.0016,
+    "pre_insertion_xy_error_m": 0.0006,
+    "final_insertion_xy_error_m": 0.0027,
+    "insert_final_xy_tolerance_m": 0.001,
+    "insertion_depth_m": 0.0,
+    "max_fz_N": 129.4,
+    "max_abs_fz_N": 129.4,
+    "max_force_norm_N": 205.09,
+    "baseline_fz_N": 63.29,
+    "max_contact_force_N": 75.02,
+    "max_insert_contact_force_N": 22.56,
+    "contact_threshold_N": 5.0,
+    "gravity_baseline_valid": true,
+    "baseline_window_samples": 50
+  },
+  "status": "DONE"
+}
