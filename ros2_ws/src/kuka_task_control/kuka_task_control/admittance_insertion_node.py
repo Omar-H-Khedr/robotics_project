@@ -140,6 +140,7 @@ class AdmittanceInsertionNode(Node):
     SEARCH_RADIUS_MAX = 0.015
     SEARCH_STEPS = 8
     SEARCH_TIMEOUT_S = 45.0
+    SEARCH_CONVERGENCE_TICKS = 8
     INSERT_PRECONDITION_XY_TOLERANCE = 0.015
     INSERT_PRECONDITION_MAX_Z = 0.845
     APPROACH_START_XY_TOLERANCE = INSERTION_XY_TOLERANCE
@@ -263,6 +264,7 @@ class AdmittanceInsertionNode(Node):
         self._search_radius: float = self.SEARCH_RADIUS_INIT
         self._search_step: int = 0
         self._search_total_ticks: int = 0
+        self._search_convergence_ticks: int = 0
 
         period = 1.0 / self._control_rate
         self._timer = self.create_timer(period, self._control_loop)
@@ -487,6 +489,8 @@ class AdmittanceInsertionNode(Node):
             self._insert_handoff_stable_ticks = 0
             self._insert_precontact_clearance_ticks = 0
             self._insert_sideload_ticks = 0
+        if new_state == self.SEARCH:
+            self._search_convergence_ticks = 0
 
         state_msg = String()
         state_msg.data = self._state
@@ -906,6 +910,7 @@ class AdmittanceInsertionNode(Node):
             self._begin_phase(self.SEARCH)
             self._search_angle = 0.0
             self._search_radius = self.SEARCH_RADIUS_INIT
+            self._search_convergence_ticks = 0
             self._set_state(self.SEARCH)
             return
 
@@ -962,19 +967,37 @@ class AdmittanceInsertionNode(Node):
             peg, _ = self._kinematics.pose(self.current_joints)
             xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
             if xy_err <= self.INSERT_FINAL_XY_TOLERANCE:
-                self.get_logger().info(
-                    f'SEARCH converged. XY error {xy_err:.4f}m within physical clearance.'
-                )
-                self._end_phase(True, xy_err, 0.0, False, 'SEARCH converged')
-                self._pre_insertion_xy_error = xy_err
-                if not self._insert_preconditions_ok(peg):
-                    self._set_state(self.ABORT)
+                self._search_convergence_ticks += 1
+                if self._search_convergence_ticks >= self.SEARCH_CONVERGENCE_TICKS:
+                    self.get_logger().info(
+                        f'SEARCH converged. XY error {xy_err:.4f}m within '
+                        f'physical clearance for '
+                        f'{self._search_convergence_ticks} ticks.'
+                    )
+                    self._end_phase(
+                        True,
+                        xy_err,
+                        0.0,
+                        False,
+                        'SEARCH converged with sustained physical clearance',
+                    )
+                    self._pre_insertion_xy_error = xy_err
+                    if not self._insert_preconditions_ok(peg):
+                        self._set_state(self.ABORT)
+                        return
+                    self._insert_start_z = peg[2]
+                    self._progress = 0.0
+                    self._begin_phase(self.INSERT)
+                    self._set_state(self.INSERT)
                     return
-                self._insert_start_z = peg[2]
-                self._progress = 0.0
-                self._begin_phase(self.INSERT)
-                self._set_state(self.INSERT)
-                return
+            else:
+                self._search_convergence_ticks = 0
+            if self._state_entry_ticks % 10 == 0:
+                self.get_logger().info(
+                    f'SEARCH settling: xy_error={xy_err:.4f}m, stable='
+                    f'{self._search_convergence_ticks}/'
+                    f'{self.SEARCH_CONVERGENCE_TICKS}'
+                )
             return  # keep waiting for settling
 
         if self._search_step >= n_steps:
@@ -983,6 +1006,7 @@ class AdmittanceInsertionNode(Node):
             self._search_angle = 0.0
             self._search_step = 0
             self._state_entry_ticks = 0
+            self._search_convergence_ticks = 0
 
             if self._search_radius >= self.SEARCH_RADIUS_MAX:
                 self._abort_reason = (
@@ -1028,6 +1052,7 @@ class AdmittanceInsertionNode(Node):
         self._search_angle += d_angle
         self._search_step += 1
         self._state_entry_ticks = 0
+        self._search_convergence_ticks = 0
 
     # --- INSERT -------------------------------------------------------------
 

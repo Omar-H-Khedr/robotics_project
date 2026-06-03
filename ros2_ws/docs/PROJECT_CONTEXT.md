@@ -110,6 +110,17 @@ The latest INSERT handoff settle validation is
 - reason: handoff feedback exceeded physical clearance before meaningful depth;
 - decision: keep the handoff descent gate as a safety improvement, then make SEARCH convergence sustained rather than accepting a transient inside-clearance sample.
 
+The latest SEARCH sustained-clearance validation is
+`diagnostics/research_baseline_search_sustained_clearance_v1`:
+
+- final outcome: `ABORTED`;
+- reason: `SEARCH timeout (45s). XY error 0.0028m remains above tolerance.`;
+- no INSERT phase was entered;
+- insertion depth: `0.0000 m`;
+- SEARCH samples inside physical clearance: `308/4500`;
+- longest consecutive inside-clearance run: `2` observer samples;
+- decision: keep the sustained SEARCH gate; improve no-contact centering stability before attempting INSERT.
+
 Repeated validation on 2026-06-01 produced 0/3 physical successes:
 
 - one DEGRADED INSERT with only 0.0037 m depth and a 1237.45 N peak raw Fz spike;
@@ -139,6 +150,7 @@ This is not robust autonomous peg-in-hole success. The honest claim is now:
 - A centered multi-waypoint Cartesian INSERT descent was tested and rejected; the next attempt should address immediate post-INSERT command handoff/hold dynamics, not just add more waypoints.
 - INSERT handoff reference analysis shows that a centered multi-waypoint reference can remain within physical clearance while feedback leaves clearance within `0.005 s`, so the problem is now feedback/plant stabilization at handoff rather than a simple FK target error.
 - INSERT handoff settle prevents publishing the final descent when feedback is already invalid, but validation still aborts. SEARCH convergence is now suspect because it accepted one transient inside-clearance sample and handed off with feedback already outside clearance.
+- Sustained SEARCH clearance gating now prevents that transient handoff. The active blocker is stable no-contact centering near the hole surface, not success classification or INSERT descent timing.
 - Gazebo contact physics are adequate for early simulation evidence but not final safety fidelity.
 - Some older docs still describe stale iisy3 state and must not be used as current truth.
 - A 2026-06-02 source-integrity run confirmed `joint_state_broadcaster` as the intended `/joint_states` publisher, but the same run still timed out in `MOVING_TO_START` with large XY error.

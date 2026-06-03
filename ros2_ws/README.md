@@ -89,6 +89,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_insert_cartesian_descent_v1 | Rejected: multi-waypoint Cartesian INSERT still violated clearance immediately; source reverted |
 | research_baseline_insert_handoff_reference_v1 | Completed: analyzer shows centered INSERT reference but feedback leaves physical clearance within 5 ms |
 | research_baseline_insert_handoff_settle_v1 | Completed safety gate: final INSERT descent is withheld unless handoff feedback is stable; validation still aborted before depth |
+| research_baseline_search_sustained_clearance_v1 | Completed safety gate: SEARCH now requires sustained physical clearance; validation fails closed in SEARCH |
 
 ## 2026-06-03 Controller-State Tracking V2
 
@@ -444,6 +445,35 @@ handoff hold prevents descent when feedback is already outside clearance. The
 next blocker is SEARCH convergence quality: SEARCH accepted a transient
 inside-clearance sample, but feedback was `0.002773 m` off center by the
 handoff command boundary.
+
+## 2026-06-03 Sustained SEARCH Clearance
+
+Milestone: `research_baseline_search_sustained_clearance_v1`
+
+Evidence: `diagnostics/research_baseline_search_sustained_clearance_v1/summary.md`
+
+SEARCH now requires `8` consecutive control ticks inside the `0.0010 m`
+physical clearance before it may enter INSERT. This prevents a transient
+inside-clearance sample from triggering the INSERT handoff.
+
+Validation passed syntax, targeted build, and a headless runtime run with
+`joint_damping_scale:=5.0`.
+
+Runtime result:
+
+- final outcome `ABORTED`;
+- reason `SEARCH timeout (45s). XY error 0.0028m remains above tolerance.`;
+- no INSERT phase was entered;
+- insertion depth `0.0000 m`;
+- contact-topic samples `0`;
+- max raw `|Fz|=129.1 N`;
+- max raw force norm `211.4 N`;
+- SEARCH samples inside `0.0010 m`: `308/4500`;
+- longest consecutive inside-clearance run: `2` observer samples.
+
+Interpretation: the new gate is stricter and safer. The next blocker is not
+INSERT command generation; the controller must hold no-contact XY alignment
+inside the physical clearance long enough for a credible handoff.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 

@@ -100,6 +100,7 @@ until repeated validation demonstrates robust success.
 - A centered multi-waypoint Cartesian INSERT descent diagnostic was tested and rejected. It still violated physical clearance `0.005 s` after INSERT command receipt and was reverted.
 - The INSERT handoff reference diagnostic shows the rejected multi-waypoint command was centered at the JTC reference level: reference XY stayed within `0.000510 m`, but feedback violated the `0.0010 m` physical clearance after `0.005 s` and reached `0.004264 m` in the first `0.5 s`.
 - INSERT handoff settle now withholds the final descent command unless feedback remains stable inside physical clearance. Validation still aborted before depth, with no descent-to-final INSERT command published; SEARCH had accepted a transient inside-clearance sample but feedback was already `0.002773 m` off center by the handoff boundary.
+- SEARCH now requires sustained physical clearance for `8` consecutive control ticks before INSERT. Validation failed closed in SEARCH instead of entering INSERT: `308/4500` SEARCH samples were inside `0.0010 m`, but the longest consecutive inside-clearance run was only `2` observer samples.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
@@ -688,6 +689,36 @@ Handoff analysis on command index `2` reported pre-command final feedback XY
 `0.002773 m`, initial command-window XY `0.001747 m`, and max feedback XY
 `0.004553 m`. The next implementation should make SEARCH require sustained,
 controller-state-confirmed clearance before it may enter INSERT.
+
+## 2026-06-03 Sustained SEARCH Clearance
+
+Milestone: `research_baseline_search_sustained_clearance_v1`
+
+Evidence: `diagnostics/research_baseline_search_sustained_clearance_v1/summary.md`
+
+SEARCH now requires `8` consecutive feedback ticks inside the `0.0010 m`
+physical clearance before entering INSERT. This removes the unsafe transient
+handoff behavior seen in the handoff-settle validation.
+
+Validation passed Python syntax, targeted build, and a headless runtime run
+with `joint_damping_scale:=5.0`.
+
+Runtime result:
+
+- final outcome `ABORTED`;
+- reason `SEARCH timeout (45s). XY error 0.0028m remains above tolerance.`;
+- no INSERT phase was entered;
+- insertion depth `0.0000 m`;
+- contact-topic samples `0`;
+- max raw `|Fz|=129.1 N`;
+- max raw force norm `211.4 N`;
+- observed commands `10`, ending with abort retreat;
+- SEARCH samples inside `0.0010 m`: `308/4500`;
+- longest consecutive inside-clearance run: `2` observer samples.
+
+Interpretation: this is a correct fail-closed result. The next implementation
+should improve sustained no-contact centering, not weaken the SEARCH or INSERT
+clearance gates.
 
 ## 2026-06-02 Joint-State Source Integrity
 
