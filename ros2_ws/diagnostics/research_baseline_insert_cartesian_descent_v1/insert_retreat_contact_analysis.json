@@ -1,0 +1,86 @@
+{
+  "command_duration_s": 20.0,
+  "command_index": 2,
+  "command_receipt_stamp_s": 61.711,
+  "contact_summary": {
+    "available": true,
+    "states": {}
+  },
+  "final_cartesian_error_norm_m": 0.03832717010087824,
+  "final_cartesian_error_xyz_m": [
+    -0.0024361182853128716,
+    0.0011051740747728411,
+    -0.0382337009182484
+  ],
+  "final_feedback_xyz_m": [
+    0.5224361189099642,
+    -0.20110517460186617,
+    0.8282337059281607
+  ],
+  "final_feedback_z_m": 0.8282337059281607,
+  "final_physical_depth_m": 0.0,
+  "hole_top_z_m": 0.81,
+  "input_dir": "diagnostics/research_baseline_insert_cartesian_descent_v1",
+  "max_abs_position_error_rad": 0.009622129,
+  "max_physical_depth_m": 0.0,
+  "mean_rms_position_error_rad": 0.002616807133333333,
+  "min_feedback_z_m": 0.8271239606315944,
+  "missing_descent_to_target_m": 0.0382337009182484,
+  "next_command_stamp_s": 62.008,
+  "observed_window_s": 0.29700000000000415,
+  "p95_max_abs_position_error_rad": 0.007322041,
+  "samples": 75,
+  "target_xyz_m": [
+    0.5200000006246513,
+    -0.20000000052709332,
+    0.7900000050099123
+  ],
+  "tracking_source": "trajectory_controller_state_samples.csv",
+  "wrench_summary": {
+    "available": true,
+    "states": {
+      "ABORT": {
+        "max_abs_fz_n": 130.54719553,
+        "max_force_norm_n": 205.964963158,
+        "mean_xy_error_m": 0.11914469328663968,
+        "samples": 2470
+      },
+      "APPROACH": {
+        "max_abs_fz_n": 130.63811668,
+        "max_force_norm_n": 210.620983693,
+        "mean_xy_error_m": 0.002106806776068376,
+        "samples": 1170
+      },
+      "DONE": {
+        "max_abs_fz_n": 128.391793722,
+        "max_force_norm_n": 187.167429142,
+        "mean_xy_error_m": 0.40921795582719395,
+        "samples": 3692
+      },
+      "INSERT": {
+        "max_abs_fz_n": 110.301511793,
+        "max_force_norm_n": 175.470887317,
+        "mean_xy_error_m": 0.0015970614,
+        "samples": 30
+      },
+      "MOVING_TO_START": {
+        "max_abs_fz_n": 129.565946072,
+        "max_force_norm_n": 199.660664565,
+        "mean_xy_error_m": 0.21117850424976722,
+        "samples": 4296
+      },
+      "SEARCH": {
+        "max_abs_fz_n": 125.325475907,
+        "max_force_norm_n": 201.486693368,
+        "mean_xy_error_m": 0.0020392817384615384,
+        "samples": 390
+      },
+      "UNKNOWN": {
+        "max_abs_fz_n": 111.24130867,
+        "max_force_norm_n": 177.865050685,
+        "mean_xy_error_m": 0.40962171340131576,
+        "samples": 305
+      }
+    }
+  }
+}

@@ -97,6 +97,7 @@ until repeated validation demonstrates robust success.
 - INSERT side-load abort validation reduced this extraction-contact failure mode: only `2` passive contact-topic rows were recorded, both with `0.000000 N` max force, after aborting at shallow side-loaded insertion.
 - INSERT XY drift analysis showed the remaining blocker was not only final success classification: in `research_baseline_insert_sideload_abort_v1`, the controller-state feedback already had pre-command final XY `0.001569 m` and command-window initial XY `0.002539 m`; in `research_baseline_insert_physical_xy_gate_v1`, first side-load occurred at depth `0.001274 m` with XY `0.002153 m`. The no-contact INSERT clearance gate now addresses the unsafe descent part; single-point INSERT path drift remains.
 - INSERT pre-contact clearance gate validation now prevents that descent: SEARCH reached `0.0006 m` pre-insertion XY, then INSERT aborted at XY `0.0027 m` before meaningful depth. The next implementation should reduce or constrain one-point INSERT path drift; do not relax the new gate.
+- A centered multi-waypoint Cartesian INSERT descent diagnostic was tested and rejected. It still violated physical clearance `0.005 s` after INSERT command receipt and was reverted.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
@@ -588,6 +589,33 @@ blocker is now clearly the one-point INSERT command drifting outside physical
 clearance almost immediately after SEARCH centers the peg. The next change
 should reduce or constrain INSERT path drift while preserving the clearance
 gate and hard-force abort.
+
+## 2026-06-03 Insert Cartesian Descent Diagnostic
+
+Milestone: `research_baseline_insert_cartesian_descent_v1`
+
+Evidence: `diagnostics/research_baseline_insert_cartesian_descent_v1/summary.md`
+
+Status: rejected; source reverted.
+
+A centered, axis-aligned, multi-waypoint Cartesian INSERT descent was tested
+with a `20 s` minimum duration while preserving the pre-contact clearance gate.
+The change built and ran, but did not improve the current blocker.
+
+Runtime result:
+
+- final outcome `ABORTED`;
+- reason `INSERT aborted: no-contact XY error 0.0026m exceeds physical clearance 0.0010m before meaningful insertion depth 0.0010m for 3 ticks.`;
+- INSERT command point count `6`;
+- observed INSERT window `0.297 s`;
+- first clearance violation `0.005 s` after command receipt;
+- max physical depth `0.000000 m`;
+- positive contact-topic samples `0`.
+
+Interpretation: adding centered INSERT waypoints alone does not solve the
+handoff/hold dynamics. The active source is reverted to the validated
+pre-contact clearance gate state. Future work should address the immediate
+post-INSERT XY drift rather than retrying the same waypoint-only change.
 
 ## 2026-06-02 Joint-State Source Integrity
 

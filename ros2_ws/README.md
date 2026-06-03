@@ -86,6 +86,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_insert_sideload_abort_v1 | Completed: INSERT aborts safely when inserted-depth XY exceeds physical clearance |
 | research_baseline_insert_xy_drift_diagnostic_v1 | Completed: analyzer shows INSERT XY can violate physical clearance before or during early descent |
 | research_baseline_insert_precontact_clearance_gate_v1 | Completed: INSERT aborts before meaningful depth when no-contact XY exceeds physical clearance |
+| research_baseline_insert_cartesian_descent_v1 | Rejected: multi-waypoint Cartesian INSERT still violated clearance immediately; source reverted |
 
 ## 2026-06-03 Controller-State Tracking V2
 
@@ -355,6 +356,29 @@ Runtime result:
 This is a safer fail-closed behavior, not task success. The remaining blocker is
 the one-point INSERT command drifting outside physical clearance almost
 immediately after SEARCH has centered the peg.
+
+## 2026-06-03 Insert Cartesian Descent Diagnostic
+
+Milestone: `research_baseline_insert_cartesian_descent_v1`
+
+Evidence: `diagnostics/research_baseline_insert_cartesian_descent_v1/summary.md`
+
+Status: rejected; source reverted.
+
+A centered, axis-aligned, multi-waypoint Cartesian INSERT descent was tested
+with a `20 s` duration and the pre-contact clearance gate preserved. The
+command published `6` points, but the run still aborted before meaningful
+depth:
+
+- final outcome `ABORTED`;
+- reason `INSERT aborted: no-contact XY error 0.0026m exceeds physical clearance 0.0010m before meaningful insertion depth 0.0010m for 3 ticks.`;
+- first clearance violation `0.005 s` after INSERT command receipt;
+- max physical depth `0.000000 m`;
+- positive contact-topic samples `0`.
+
+The source was reverted to the validated pre-contact clearance gate state. The
+next implementation should address INSERT command handoff/hold dynamics rather
+than simply adding more waypoints.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 

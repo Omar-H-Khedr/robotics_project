@@ -82,6 +82,15 @@ The latest runtime safety validation is
 - positive contact-topic samples: `0`;
 - reason: fail closed before descending into the hole when XY feedback drifts outside physical clearance.
 
+The latest rejected INSERT-path diagnostic is
+`diagnostics/research_baseline_insert_cartesian_descent_v1`:
+
+- tested change: centered, axis-aligned, multi-waypoint Cartesian INSERT descent;
+- final outcome: `ABORTED`;
+- first clearance violation: `0.005 s` after INSERT command receipt;
+- max physical depth: `0.0000 m`;
+- decision: source reverted because waypoint-only INSERT did not preserve physical clearance.
+
 Repeated validation on 2026-06-01 produced 0/3 physical successes:
 
 - one DEGRADED INSERT with only 0.0037 m depth and a 1237.45 N peak raw Fz spike;
@@ -108,6 +117,7 @@ This is not robust autonomous peg-in-hole success. The honest claim is now:
 - INSERT side-load abort now prevents continuing deeper after inserted-depth XY drift exceeds physical clearance, but this means the current baseline fails honestly before physical success.
 - INSERT XY drift diagnostics motivated the no-contact INSERT gate against the `0.0010 m` physical radial clearance before deeper descent.
 - INSERT pre-contact clearance gating now prevents descent when XY feedback leaves physical clearance before meaningful depth. The remaining blocker is reducing or constraining the one-point INSERT path drift after SEARCH centers the peg.
+- A centered multi-waypoint Cartesian INSERT descent was tested and rejected; the next attempt should address immediate post-INSERT command handoff/hold dynamics, not just add more waypoints.
 - Gazebo contact physics are adequate for early simulation evidence but not final safety fidelity.
 - Some older docs still describe stale iisy3 state and must not be used as current truth.
 - A 2026-06-02 source-integrity run confirmed `joint_state_broadcaster` as the intended `/joint_states` publisher, but the same run still timed out in `MOVING_TO_START` with large XY error.
