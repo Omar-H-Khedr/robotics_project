@@ -146,6 +146,8 @@ class AdmittanceInsertionNode(Node):
     PEG_RADIUS_M = 0.0125
     HOLE_RADIUS_M = 0.0135
     INSERT_FINAL_XY_TOLERANCE = HOLE_RADIUS_M - PEG_RADIUS_M
+    INSERT_SIDELOAD_DEPTH_GATE_M = 0.001
+    INSERT_SIDELOAD_SETTLE_TICKS = 3
 
     def __init__(self) -> None:
         super().__init__('admittance_insertion_node')
@@ -201,6 +203,7 @@ class AdmittanceInsertionNode(Node):
         self._correction_ticks: int = 0
         self._insert_traj_dur: float = 20.0
         self._insert_command_start_s: float = 0.0
+        self._insert_sideload_ticks: int = 0
 
         self.current_joints: np.ndarray = np.zeros(6)
         self.current_wrench: Wrench = Wrench()
@@ -565,6 +568,7 @@ class AdmittanceInsertionNode(Node):
             self._max_insert_contact_force = 0.0
             self._insertion_depth_m = 0.0
             self._final_insertion_xy_error_m = 0.0
+            self._insert_sideload_ticks = 0
             self._begin_phase(self.MOVING_TO_START)
             self._set_state(self.MOVING_TO_START)
 
@@ -1063,6 +1067,27 @@ class AdmittanceInsertionNode(Node):
                 f'at physical depth {current_depth:.4f}m.'
             )
             self.get_logger().warn(self._abort_reason)
+            self._end_phase(False, xy_error, 0.0, False, self._abort_reason)
+            self._set_state(self.ABORT)
+            return
+
+        side_loaded = (
+            current_depth >= self.INSERT_SIDELOAD_DEPTH_GATE_M
+            and xy_error > self.INSERT_FINAL_XY_TOLERANCE
+        )
+        self._insert_sideload_ticks = (
+            self._insert_sideload_ticks + 1 if side_loaded else 0
+        )
+        if self._insert_sideload_ticks >= self.INSERT_SIDELOAD_SETTLE_TICKS:
+            self._abort_reason = (
+                f'INSERT aborted: side-loaded peg at depth '
+                f'{current_depth:.4f}m with XY error {xy_error:.4f}m, '
+                f'exceeding physical clearance '
+                f'{self.INSERT_FINAL_XY_TOLERANCE:.4f}m for '
+                f'{self._insert_sideload_ticks} ticks.'
+            )
+            self.get_logger().warn(self._abort_reason)
+            self._final_insertion_xy_error_m = xy_error
             self._end_phase(False, xy_error, 0.0, False, self._abort_reason)
             self._set_state(self.ABORT)
             return

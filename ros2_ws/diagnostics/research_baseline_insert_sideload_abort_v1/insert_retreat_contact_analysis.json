@@ -1,0 +1,94 @@
+{
+  "command_duration_s": 20.0,
+  "command_index": 2,
+  "command_receipt_stamp_s": 54.808,
+  "contact_summary": {
+    "available": true,
+    "states": {
+      "ABORT": {
+        "first_stamp_s": 67.717,
+        "max_contact_force_n": 0.0,
+        "positive_samples": 2,
+        "samples": 2,
+        "top_collision_pairs": [
+          {
+            "collision_pair": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+            "max_force_n": 0.0,
+            "samples": 2
+          }
+        ]
+      }
+    }
+  },
+  "final_cartesian_error_norm_m": 0.01952165584212895,
+  "final_cartesian_error_xyz_m": [
+    0.0026538976343390974,
+    0.0008190293136083326,
+    -0.01932307080017115
+  ],
+  "final_feedback_xyz_m": [
+    0.5173461024699122,
+    -0.20081902958366216,
+    0.8093230705784963
+  ],
+  "final_feedback_z_m": 0.8093230705784963,
+  "final_physical_depth_m": 0.0006769294215037691,
+  "hole_top_z_m": 0.81,
+  "input_dir": "diagnostics/research_baseline_insert_sideload_abort_v1",
+  "max_abs_position_error_rad": 0.010429848,
+  "max_physical_depth_m": 0.006159573567366294,
+  "mean_rms_position_error_rad": 0.002893012723384327,
+  "min_feedback_z_m": 0.8038404264326338,
+  "missing_descent_to_target_m": 0.01932307080017115,
+  "next_command_stamp_s": 67.618,
+  "observed_window_s": 12.809999999999995,
+  "p95_max_abs_position_error_rad": 0.0083568,
+  "samples": 3203,
+  "target_xyz_m": [
+    0.5200000001042513,
+    -0.20000000027005382,
+    0.7899999997783251
+  ],
+  "tracking_source": "trajectory_controller_state_samples.csv",
+  "wrench_summary": {
+    "available": true,
+    "states": {
+      "ABORT": {
+        "max_abs_fz_n": 124.883748232,
+        "max_force_norm_n": 204.140105333,
+        "mean_xy_error_m": 0.10497516783967611,
+        "samples": 2470
+      },
+      "APPROACH": {
+        "max_abs_fz_n": 128.381883373,
+        "max_force_norm_n": 199.020907801,
+        "mean_xy_error_m": 0.002319050512605042,
+        "samples": 1190
+      },
+      "DONE": {
+        "max_abs_fz_n": 125.77486697,
+        "max_force_norm_n": 188.319737643,
+        "mean_xy_error_m": 0.409260886044942,
+        "samples": 12416
+      },
+      "INSERT": {
+        "max_abs_fz_n": 126.773956262,
+        "max_force_norm_n": 200.165295605,
+        "mean_xy_error_m": 0.0029094831515625,
+        "samples": 1280
+      },
+      "MOVING_TO_START": {
+        "max_abs_fz_n": 128.534594766,
+        "max_force_norm_n": 201.745460566,
+        "mean_xy_error_m": 0.2272148708214464,
+        "samples": 4010
+      },
+      "UNKNOWN": {
+        "max_abs_fz_n": 116.810784424,
+        "max_force_norm_n": 177.865050685,
+        "mean_xy_error_m": 0.4095311122,
+        "samples": 271
+      }
+    }
+  }
+}

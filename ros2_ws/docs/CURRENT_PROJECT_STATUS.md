@@ -85,14 +85,16 @@ until repeated validation demonstrates robust success.
 - Spawn: x=0.80, y=-0.75, z=0.735, yaw=1.5708.
 - Controller stack: `joint_state_broadcaster` and `joint_trajectory_controller`.
 - Canonical controller parameters: `thesis_bringup/config/research_baseline_ros2_control.yaml` loaded by `spawn_robot_sdf.py`.
-- Latest validated baseline milestone: `research_baseline_insert_physical_xy_gate_v1` reached depth `0.0177 m` and task-side INSERT contact `55.4 N`, but correctly reported `DEGRADED` because final insertion XY error `0.0030 m` exceeds the 25 mm peg / 27 mm hole radial clearance of `0.0010 m`.
+- Latest validated baseline milestone: `research_baseline_insert_sideload_abort_v1` aborts INSERT when inserted-depth XY error exceeds the 25 mm peg / 27 mm hole radial clearance. It reported `ABORTED` at depth `0.0011 m` and XY error `0.0032 m`, reducing passive contact-topic rows from `1293` to `2` compared with the prior physical-XY-gate run.
+- Previous milestone `research_baseline_insert_physical_xy_gate_v1` reached depth `0.0177 m` and task-side INSERT contact `55.4 N`, but correctly reported `DEGRADED` because final insertion XY error `0.0030 m` exceeds the physical radial clearance of `0.0010 m`.
 - Historical milestone `research_baseline_insert_sim_time_completion_v4` reached final outcome `SUCCESS` under older depth/contact criteria, but that wording is now superseded by the physical-clearance gate.
 - Timing evidence from that run shows the INSERT command was observed for `23.111 s` after a `20.000 s` command. The prior failed behavior advanced to RETREAT after about `10.6 s` of controller-state INSERT time.
 - Success classification now uses `max_insert_contact_force_N`, not global contact, so RETREAT contact cannot create a false insertion success.
-- The passive Gazebo contact observer still recorded contact-topic rows only in `RETREAT` for the latest successful run; RETREAT contact reached `249.593329 N`. This remains the next safety-critical withdrawal limitation.
+- The passive Gazebo contact observer recorded contact-topic rows only in `RETREAT` for the historical v4 depth/contact run; RETREAT contact reached `249.593329 N`. This remains important historical withdrawal evidence.
 - A staged vertical-lift-then-home withdrawal diagnostic preserved insertion success but was rejected because it worsened RETREAT contact to `486.746287 N` over `307` rows and raised max raw force norm to `285.8 N`.
 - Withdrawal contact timing analysis shows contact occurs during the first post-insert extraction command, before the home command. In the rejected staged run, all `307` contact samples occurred during the vertical lift stage and the peak force occurred while the peg was still inserted `0.019732 m`.
 - Physical XY gate validation shows the same issue in the current run: RETREAT peak contact `589.942680 N` occurred at depth `0.017561 m` and XY error `0.005906 m`.
+- INSERT side-load abort validation reduced this extraction-contact failure mode: only `2` passive contact-topic rows were recorded, both with `0.000000 N` max force, after aborting at shallow side-loaded insertion.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
@@ -153,14 +155,13 @@ This confirms the baseline is not robust. It also confirms that the high-force c
 
 `research_baseline_insert_centering_and_extraction_contact_reduction`
 
-Reason: `research_baseline_insert_physical_xy_gate_v1` proved that depth and
-contact are not enough. The latest run reached depth `0.0177 m` and INSERT
-contact `55.4 N`, but final insertion XY error `0.0030 m` exceeded the
-`0.0010 m` physical radial clearance and RETREAT contact reached
-`589.942680 N` while the peg was still inserted. The next safety-critical
-improvement should reduce inserted-depth XY drift and side-loaded extraction
-contact, then rerun the same analyzers. Repeated validation should follow only
-after the physical success gate is satisfied and extraction contact is reduced.
+Reason: `research_baseline_insert_sideload_abort_v1` now fails closed when
+inserted-depth XY drift exceeds physical clearance, preventing the deeper
+invalid insertion and high-force extraction seen in
+`research_baseline_insert_physical_xy_gate_v1`. The next safety-critical
+improvement should reduce the cause of the side-load abort, especially XY drift
+during INSERT, then rerun the same analyzers. Repeated validation should follow
+only after the physical success gate is satisfied without triggering this abort.
 
 Historical context: force-safe insert stabilization blocked unsafe INSERT when peg Z was too high, but validation still failed. The 2026-06-01 force-safe validation (`diagnostics/research_baseline_force_safe_insert_v3`) showed:
 
@@ -476,6 +477,39 @@ Decision: this supersedes the earlier v4 success wording. The current baseline
 has a controller-driven insertion-depth/contact event, not validated physical
 success. The next implementation should reduce inserted-depth XY drift and
 side-loaded extraction contact before repeated-validation or learning claims.
+
+## 2026-06-03 Insert Sideload Abort
+
+Milestone: `research_baseline_insert_sideload_abort_v1`
+
+Evidence: `diagnostics/research_baseline_insert_sideload_abort_v1/summary.md`
+
+The task now aborts INSERT when the peg is at least `0.0010 m` below the hole
+top and XY error exceeds the physical radial clearance `0.0010 m` for `3`
+consecutive control ticks.
+
+Validation:
+
+- Python syntax passed;
+- targeted `colcon build --symlink-install --packages-select kuka_task_control thesis_bringup` passed;
+- headless launch reached task `DONE`;
+- moving-to-start, endpoint-hold, approach, insert/retreat, and withdrawal timing analyzers ran.
+
+Runtime result:
+
+- final outcome `ABORTED`;
+- reason `INSERT aborted: side-loaded peg at depth 0.0011m with XY error 0.0032m, exceeding physical clearance 0.0010m for 3 ticks.`;
+- insertion depth metric `0.0038 m`;
+- max task-side INSERT contact `53.75 N`;
+- max raw `|Fz|=128.53 N`;
+- max raw force norm `204.14 N`;
+- passive contact-topic rows `2`;
+- max passive contact-topic force `0.000000 N`.
+
+Comparison: the prior physical-XY-gate run recorded `1293` passive contact rows
+and RETREAT contact max `589.942680 N`. This side-load abort is a safety
+improvement and an honest failure, not task success. The next implementation
+should reduce the inserted-depth XY drift that triggers the abort.
 
 ## 2026-06-02 Joint-State Source Integrity
 

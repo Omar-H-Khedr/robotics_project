@@ -83,6 +83,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_staged_withdrawal_v1 | Rejected: staged lift/home preserved success but worsened RETREAT contact |
 | research_baseline_withdrawal_contact_timing_v1 | Completed: RETREAT contact occurs during first extraction command before home motion |
 | research_baseline_insert_physical_xy_gate_v1 | Completed: depth/contact event correctly downgraded because final inserted XY exceeds physical clearance |
+| research_baseline_insert_sideload_abort_v1 | Completed: INSERT aborts safely when inserted-depth XY exceeds physical clearance |
 
 ## 2026-06-03 Controller-State Tracking V2
 
@@ -272,6 +273,28 @@ This supersedes the earlier v4 success wording. The current baseline has an
 insertion-depth/contact event, not validated physical insertion success. The
 next implementation should reduce inserted-depth XY drift and side-loaded
 extraction contact.
+
+## 2026-06-03 Insert Sideload Abort
+
+Milestone: `research_baseline_insert_sideload_abort_v1`
+
+Evidence: `diagnostics/research_baseline_insert_sideload_abort_v1/summary.md`
+
+The controller now aborts INSERT when the peg is at least `0.0010 m` below the
+hole top and XY error exceeds the physical radial clearance `0.0010 m` for
+three consecutive control ticks. Validation produced an honest safety abort:
+
+- final outcome `ABORTED`;
+- reason `INSERT aborted: side-loaded peg at depth 0.0011m with XY error 0.0032m`;
+- max raw force norm `204.14 N`;
+- contact-topic rows `2`;
+- max contact-topic force `0.000000 N`.
+
+Compared with `research_baseline_insert_physical_xy_gate_v1`, passive contact
+rows dropped from `1293` to `2` and RETREAT max contact force dropped from
+`589.942680 N` to `0.000000 N`. This is not task success; it is a safer
+fail-closed behavior. The next step is reducing the inserted-depth XY drift
+that triggers this abort.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 

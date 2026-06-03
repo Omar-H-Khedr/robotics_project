@@ -54,6 +54,16 @@ The current stricter validation is
 - physical radial clearance: `0.0010 m`;
 - reason: side-loaded insertion must not count as physical success.
 
+The latest safety validation is
+`diagnostics/research_baseline_insert_sideload_abort_v1`:
+
+- final outcome: `ABORTED`;
+- abort depth: `0.0011 m`;
+- abort XY error: `0.0032 m`;
+- passive contact-topic rows: `2`;
+- max passive contact-topic force: `0.000000 N`;
+- reason: fail closed on side-loaded INSERT before deeper invalid extraction.
+
 Repeated validation on 2026-06-01 produced 0/3 physical successes:
 
 - one DEGRADED INSERT with only 0.0037 m depth and a 1237.45 N peak raw Fz spike;
@@ -72,11 +82,12 @@ This is not robust autonomous peg-in-hole success. The honest claim is now:
 - Peak raw Fz spikes around 1237 N and 3716 N have now been observed in repeated validation.
 - Multi-point INSERT trajectory behavior is broken; current INSERT uses a single-point trajectory.
 - Contact/gravity estimation depends on median Fz baseline validity and needs more validation.
-- Latest successful INSERT contact is task F/T evidence; the passive Gazebo contact observer recorded contact-topic rows only during RETREAT in the v4 run.
+- Historical v4 INSERT contact is task F/T evidence; the passive Gazebo contact observer recorded contact-topic rows only during RETREAT in that run.
 - Successful-insert RETREAT still produced contact-topic force up to `249.593329 N`, so withdrawal contact reduction is the next safety-critical blocker.
 - A staged vertical-lift-then-home withdrawal diagnostic was rejected because it worsened RETREAT contact to `486.746287 N` over `307` rows.
 - Withdrawal contact timing analysis showed the staged run's contact occurred during vertical extraction, not later home motion; the peak occurred at `0.019732 m` insertion depth with about `0.006 m` XY error.
 - The latest clearance-aware validation downgraded depth/contact to `DEGRADED` because final insertion XY error `0.0030 m` exceeds the `0.0010 m` physical radial clearance.
+- INSERT side-load abort now prevents continuing deeper after inserted-depth XY drift exceeds physical clearance, but this means the current baseline fails honestly before physical success.
 - Gazebo contact physics are adequate for early simulation evidence but not final safety fidelity.
 - Some older docs still describe stale iisy3 state and must not be used as current truth.
 - A 2026-06-02 source-integrity run confirmed `joint_state_broadcaster` as the intended `/joint_states` publisher, but the same run still timed out in `MOVING_TO_START` with large XY error.
@@ -138,12 +149,12 @@ Robust success requires repeated validation with a documented success rate and f
 
 `research_baseline_insert_centering_and_extraction_contact_reduction`
 
-Reason: the current physical-clearance evidence includes depth `0.0177 m` and
-INSERT contact `55.4 N`, but final insertion XY error `0.0030 m` exceeds the
-`0.0010 m` radial clearance and RETREAT contact reached `589.942680 N` while
-the peg was still inserted. The next implementation should reduce
-inserted-depth XY drift and side-loaded extraction contact, then rerun the same
-analyzers and only then attempt repeated validation.
+Reason: the current side-load abort evidence shows the controller now fails
+closed when inserted-depth XY drift exceeds the `0.0010 m` physical clearance.
+This prevents deeper invalid extraction contact, but it also means the baseline
+still has no validated physical insertion success. The next implementation
+should reduce XY drift during INSERT and then rerun the same analyzers before
+attempting repeated validation.
 
 Historical context: after the peg-tip frame correction, the canonical blocker
 was stable above-hole holding. The corrected tool frame removed the reproduced

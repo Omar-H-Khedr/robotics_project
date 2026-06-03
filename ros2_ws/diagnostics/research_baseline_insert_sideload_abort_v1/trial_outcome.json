@@ -1,0 +1,50 @@
+{
+  "trial_outcome": "ABORTED",
+  "reason": "INSERT aborted: side-loaded peg at depth 0.0011m with XY error 0.0032m, exceeding physical clearance 0.0010m for 3 ticks.",
+  "phases": [
+    {
+      "phase": "MOVING_TO_START",
+      "success": true,
+      "cart_error_m": 0.000774,
+      "joint_error_rad": 0.005668,
+      "timed_out": false,
+      "duration_s": 40.2,
+      "message": ""
+    },
+    {
+      "phase": "APPROACH",
+      "success": true,
+      "cart_error_m": 0.014107,
+      "joint_error_rad": 0.024155,
+      "timed_out": false,
+      "duration_s": 11.8,
+      "message": ""
+    },
+    {
+      "phase": "INSERT",
+      "success": false,
+      "cart_error_m": 0.003162,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 12.8,
+      "message": "INSERT aborted: side-loaded peg at depth 0.0011m with XY error 0.0032m, exceeding physical clearance 0.0010m for 3 ticks."
+    }
+  ],
+  "metrics": {
+    "initial_xy_error_m": 0.0006,
+    "pre_insertion_xy_error_m": 0.0008,
+    "final_insertion_xy_error_m": 0.0032,
+    "insert_final_xy_tolerance_m": 0.001,
+    "insertion_depth_m": 0.0038,
+    "max_fz_N": 128.53,
+    "max_abs_fz_N": 128.53,
+    "max_force_norm_N": 204.14,
+    "baseline_fz_N": 68.64,
+    "max_contact_force_N": 79.77,
+    "max_insert_contact_force_N": 53.75,
+    "contact_threshold_N": 5.0,
+    "gravity_baseline_valid": true,
+    "baseline_window_samples": 50
+  },
+  "status": "DONE"
+}
