@@ -92,6 +92,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_sustained_clearance_v1 | Completed safety gate: SEARCH now requires sustained physical clearance; validation fails closed in SEARCH |
 | research_baseline_search_centered_hold_v1 | Rejected: centered SEARCH hold remained unstable and source was reverted |
 | research_baseline_xy_stability_analyzer_v1 | Completed: per-state passive-log analyzer confirms recent SEARCH runs only sustain 1 mm clearance for two estimated control ticks |
+| research_baseline_search_recenter_on_coarse_band_v1 | Improved but failed safely: SEARCH recenters inside 2 mm coarse band; best 1 mm window improved to four ticks but INSERT remains blocked |
 
 ## 2026-06-03 Controller-State Tracking V2
 
@@ -538,6 +539,40 @@ Interpretation: both recent runs hit sub-millimeter samples, but neither holds
 physical clearance beyond two estimated 10 Hz control ticks in SEARCH. This
 supports preserving the sustained 1 mm gate and targeting feedback/control
 stability before attempting INSERT again.
+
+## 2026-06-03 SEARCH Recenter On Coarse Band
+
+Milestone: `research_baseline_search_recenter_on_coarse_band_v1`
+
+Evidence:
+
+- `diagnostics/research_baseline_search_recenter_on_coarse_band_v1/summary.md`
+- `diagnostics/research_baseline_search_recenter_on_coarse_band_v1/xy_stability_analysis.md`
+
+SEARCH now recenters at the current peg Z whenever feedback is inside the older
+`0.0020 m` pre-contact band but has not sustained the physical `0.0010 m`
+clearance gate. Spiral offsets, timeout, hard-force abort, and INSERT gates
+remain bounded and unchanged.
+
+Validation passed syntax, targeted build, and a headless run with
+`joint_damping_scale:=5.0`.
+
+Runtime result:
+
+- final outcome `ABORTED`;
+- reason `SEARCH timeout (45s). XY error 0.0037m remains above tolerance.`;
+- no INSERT phase was entered;
+- insertion depth `0.0000 m`;
+- contact-topic samples `0`;
+- max raw `|Fz|=128.6 N`;
+- max raw force norm `209.9 N`;
+- observed SEARCH recenter attempts: `2`;
+- best estimated SEARCH `0.0010 m` clearance window: `4` controller ticks;
+- best estimated SEARCH `0.0020 m` window: `9` controller ticks.
+
+Decision: keep as an improvement but do not claim success. The change doubled
+the best 1 mm SEARCH stability window compared with the previous two ticks, but
+still did not satisfy the required eight ticks for a credible INSERT handoff.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 

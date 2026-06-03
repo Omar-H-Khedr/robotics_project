@@ -103,6 +103,7 @@ until repeated validation demonstrates robust success.
 - SEARCH now requires sustained physical clearance for `8` consecutive control ticks before INSERT. Validation failed closed in SEARCH instead of entering INSERT: `308/4500` SEARCH samples were inside `0.0010 m`, but the longest consecutive inside-clearance run was only `2` observer samples.
 - A centered SEARCH hold diagnostic was tested and rejected. It improved inside-clearance occupancy to `365/4500` SEARCH samples and the longest run to `4` observer samples, but still timed out in SEARCH with final XY `0.0048 m`; source was reverted.
 - The new `xy_stability_analyzer` confirms this is not a success-metric artifact. Replaying recent passive logs at the task controller cadence shows both `research_baseline_search_sustained_clearance_v1` and the rejected centered-hold run achieved only `2` estimated SEARCH ticks inside `0.0010 m`, though both reached `6` estimated ticks inside `0.0020 m`.
+- SEARCH recenter-on-coarse-band is the latest active SEARCH behavior. Validation still failed closed in SEARCH, but improved the best estimated physical-clearance window from `2` to `4` control ticks and produced no contact-topic samples.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
@@ -782,6 +783,41 @@ for a credible INSERT handoff. The next implementation should improve
 controller/feedback stability around the centered no-contact pose or add a
 bounded settling strategy that is validated by this analyzer. Do not weaken the
 1 mm gate to convert transient crossings into apparent success.
+
+## 2026-06-03 SEARCH Recenter On Coarse Band
+
+Milestone: `research_baseline_search_recenter_on_coarse_band_v1`
+
+Evidence:
+
+- `diagnostics/research_baseline_search_recenter_on_coarse_band_v1/summary.md`
+- `diagnostics/research_baseline_search_recenter_on_coarse_band_v1/xy_stability_analysis.md`
+
+SEARCH now publishes a centered no-contact hold at current peg Z when feedback
+is inside the older `0.0020 m` pre-contact band but has not sustained the
+physical `0.0010 m` clearance gate. This prevents near-centered feedback from
+being immediately pushed into another spiral offset. The SEARCH timeout and all
+INSERT gates are unchanged.
+
+Validation passed syntax, targeted build, and a headless run with
+`joint_damping_scale:=5.0`.
+
+Runtime result:
+
+- outcome `ABORTED`;
+- reason `SEARCH timeout (45s). XY error 0.0037m remains above tolerance.`;
+- insertion depth `0.0000 m`;
+- INSERT was not entered;
+- contact-topic samples `0`;
+- max raw `|Fz|=128.6 N`;
+- max raw force norm `209.9 N`;
+- observed SEARCH recenter attempts `2`;
+- best estimated SEARCH `0.0010 m` window `4` controller ticks;
+- best estimated SEARCH `0.0020 m` window `9` controller ticks.
+
+Decision: keep this as an incremental safety-preserving improvement, not a
+success. The next milestone should continue stabilizing near-centered SEARCH
+feedback while preserving the `0.0010 m` gate and bounded SEARCH timeout.
 
 ## 2026-06-02 Joint-State Source Integrity
 

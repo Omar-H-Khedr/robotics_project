@@ -145,6 +145,18 @@ The latest XY stability diagnostic is
 - decision: keep the physical clearance gate and target feedback/control
   stability before attempting INSERT again.
 
+The latest active SEARCH behavior is
+`diagnostics/research_baseline_search_recenter_on_coarse_band_v1`:
+
+- final outcome: `ABORTED`;
+- reason: `SEARCH timeout (45s). XY error 0.0037m remains above tolerance.`;
+- no INSERT phase was entered;
+- contact-topic samples: `0`;
+- best estimated SEARCH `0.0010 m` window: `4` controller ticks;
+- best estimated SEARCH `0.0020 m` window: `9` controller ticks;
+- decision: keep the recentering behavior as an improvement, but continue
+  treating sustained no-contact centering as unresolved.
+
 Repeated validation on 2026-06-01 produced 0/3 physical successes:
 
 - one DEGRADED INSERT with only 0.0037 m depth and a 1237.45 N peak raw Fz spike;
@@ -177,6 +189,7 @@ This is not robust autonomous peg-in-hole success. The honest claim is now:
 - Sustained SEARCH clearance gating now prevents that transient handoff. The active blocker is stable no-contact centering near the hole surface, not success classification or INSERT descent timing.
 - A centered SEARCH hold was tested and rejected; it was safe but insufficient. Continue treating sustained no-contact centering as the blocker.
 - Per-state XY stability analysis confirms both recent SEARCH runs only held physical clearance for two estimated state-loop ticks. Do not treat sub-millimeter minima as readiness for INSERT.
+- SEARCH recenter-on-coarse-band improved the best estimated physical-clearance window to four state-loop ticks without contact-topic samples, but still timed out before INSERT. Continue improving no-contact stability rather than loosening gates.
 - Gazebo contact physics are adequate for early simulation evidence but not final safety fidelity.
 - Some older docs still describe stale iisy3 state and must not be used as current truth.
 - A 2026-06-02 source-integrity run confirmed `joint_state_broadcaster` as the intended `/joint_states` publisher, but the same run still timed out in `MOVING_TO_START` with large XY error.

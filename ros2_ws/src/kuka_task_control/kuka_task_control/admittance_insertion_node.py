@@ -141,6 +141,8 @@ class AdmittanceInsertionNode(Node):
     SEARCH_STEPS = 8
     SEARCH_TIMEOUT_S = 45.0
     SEARCH_CONVERGENCE_TICKS = 8
+    SEARCH_RECENTER_XY_TOLERANCE = INSERTION_XY_TOLERANCE
+    SEARCH_RECENTER_DURATION_S = 3.0
     INSERT_PRECONDITION_XY_TOLERANCE = 0.015
     INSERT_PRECONDITION_MAX_Z = 0.845
     APPROACH_START_XY_TOLERANCE = INSERTION_XY_TOLERANCE
@@ -265,6 +267,7 @@ class AdmittanceInsertionNode(Node):
         self._search_step: int = 0
         self._search_total_ticks: int = 0
         self._search_convergence_ticks: int = 0
+        self._search_recenter_attempts: int = 0
 
         period = 1.0 / self._control_rate
         self._timer = self.create_timer(period, self._control_loop)
@@ -490,7 +493,9 @@ class AdmittanceInsertionNode(Node):
             self._insert_precontact_clearance_ticks = 0
             self._insert_sideload_ticks = 0
         if new_state == self.SEARCH:
+            self._search_total_ticks = 0
             self._search_convergence_ticks = 0
+            self._search_recenter_attempts = 0
 
         state_msg = String()
         state_msg.data = self._state
@@ -910,7 +915,9 @@ class AdmittanceInsertionNode(Node):
             self._begin_phase(self.SEARCH)
             self._search_angle = 0.0
             self._search_radius = self.SEARCH_RADIUS_INIT
+            self._search_total_ticks = 0
             self._search_convergence_ticks = 0
+            self._search_recenter_attempts = 0
             self._set_state(self.SEARCH)
             return
 
@@ -1020,10 +1027,34 @@ class AdmittanceInsertionNode(Node):
                 self._set_state(self.ABORT)
                 return
 
+        peg, _ = self._kinematics.pose(self.current_joints)
+        xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
+        if xy_err <= self.SEARCH_RECENTER_XY_TOLERANCE:
+            recenter_target = np.array([
+                self.HOLE_CENTRE_XY[0],
+                self.HOLE_CENTRE_XY[1],
+                peg[2],
+            ])
+            q = self._solve_ik(recenter_target, seed=self.current_joints)
+            if q is not None:
+                self._send_trajectory_goal(q, self.SEARCH_RECENTER_DURATION_S)
+                self._search_recenter_attempts += 1
+                self.get_logger().info(
+                    f'SEARCH recenter {self._search_recenter_attempts}: '
+                    f'xy_error={xy_err:.4f}m is inside coarse band '
+                    f'{self.SEARCH_RECENTER_XY_TOLERANCE:.4f}m but not '
+                    f'sustained physical clearance '
+                    f'{self.INSERT_FINAL_XY_TOLERANCE:.4f}m; '
+                    f'holding centered target for '
+                    f'{self.SEARCH_RECENTER_DURATION_S:.1f}s.'
+                )
+                self._state_entry_ticks = 0
+                self._search_convergence_ticks = 0
+                return
+
         offset_x = self._search_radius * math.cos(self._search_angle)
         offset_y = self._search_radius * math.sin(self._search_angle)
 
-        peg, _ = self._kinematics.pose(self.current_joints)
         search_target = np.array([
             self.HOLE_CENTRE_XY[0] + offset_x,
             self.HOLE_CENTRE_XY[1] + offset_y,
