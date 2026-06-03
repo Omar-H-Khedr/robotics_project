@@ -88,6 +88,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_insert_precontact_clearance_gate_v1 | Completed: INSERT aborts before meaningful depth when no-contact XY exceeds physical clearance |
 | research_baseline_insert_cartesian_descent_v1 | Rejected: multi-waypoint Cartesian INSERT still violated clearance immediately; source reverted |
 | research_baseline_insert_handoff_reference_v1 | Completed: analyzer shows centered INSERT reference but feedback leaves physical clearance within 5 ms |
+| research_baseline_insert_handoff_settle_v1 | Completed safety gate: final INSERT descent is withheld unless handoff feedback is stable; validation still aborted before depth |
 
 ## 2026-06-03 Controller-State Tracking V2
 
@@ -412,6 +413,37 @@ JTC reference level, but the simulated plant/controller feedback drifted out
 of clearance immediately. The next implementation should target INSERT
 handoff/feedback stabilization or bounded pre-insert settling, not another
 waypoint-count change or a looser clearance gate.
+
+## 2026-06-03 Insert Handoff Settle
+
+Milestone: `research_baseline_insert_handoff_settle_v1`
+
+Evidence: `diagnostics/research_baseline_insert_handoff_settle_v1/summary.md`
+
+The INSERT state now runs a bounded non-descending handoff hold before
+publishing the final descent command. It requires `8` stable ticks inside the
+`0.0010 m` physical clearance after a `2.0 s` hold and preserves the
+pre-contact clearance abort.
+
+Validation passed Python syntax, targeted `colcon build --packages-select
+kuka_task_control thesis_bringup`, and a headless runtime run with
+`joint_damping_scale:=5.0`.
+
+Runtime result:
+
+- final outcome `ABORTED`;
+- reason `INSERT aborted: no-contact XY error 0.0024m exceeds physical clearance 0.0010m before meaningful insertion depth 0.0010m for 3 ticks.`;
+- insertion depth `0.0000 m`;
+- no final descent-to-`z=0.790 m` INSERT command was published;
+- contact-topic samples `0`;
+- max raw `|Fz|=127.6 N`;
+- max raw force norm `213.6 N`.
+
+Interpretation: this is a safety improvement, not insertion success. The
+handoff hold prevents descent when feedback is already outside clearance. The
+next blocker is SEARCH convergence quality: SEARCH accepted a transient
+inside-clearance sample, but feedback was `0.002773 m` off center by the
+handoff command boundary.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 

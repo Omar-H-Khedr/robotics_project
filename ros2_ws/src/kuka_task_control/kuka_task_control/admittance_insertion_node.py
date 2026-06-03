@@ -149,6 +149,9 @@ class AdmittanceInsertionNode(Node):
     INSERT_PRECONTACT_CLEARANCE_TICKS = 3
     INSERT_SIDELOAD_DEPTH_GATE_M = 0.001
     INSERT_SIDELOAD_SETTLE_TICKS = 3
+    INSERT_HANDOFF_HOLD_DURATION_S = 2.0
+    INSERT_HANDOFF_SETTLE_TICKS = 8
+    INSERT_HANDOFF_TIMEOUT_S = 6.0
 
     def __init__(self) -> None:
         super().__init__('admittance_insertion_node')
@@ -204,6 +207,10 @@ class AdmittanceInsertionNode(Node):
         self._correction_ticks: int = 0
         self._insert_traj_dur: float = 20.0
         self._insert_command_start_s: float = 0.0
+        self._insert_command_sent: bool = False
+        self._insert_handoff_hold_sent: bool = False
+        self._insert_handoff_hold_start_s: float = 0.0
+        self._insert_handoff_stable_ticks: int = 0
         self._insert_precontact_clearance_ticks: int = 0
         self._insert_sideload_ticks: int = 0
 
@@ -473,6 +480,13 @@ class AdmittanceInsertionNode(Node):
 
         if new_state in (self.RETREAT, self.ABORT):
             self._retreat_sent = False
+        if new_state == self.INSERT:
+            self._insert_command_sent = False
+            self._insert_handoff_hold_sent = False
+            self._insert_handoff_hold_start_s = 0.0
+            self._insert_handoff_stable_ticks = 0
+            self._insert_precontact_clearance_ticks = 0
+            self._insert_sideload_ticks = 0
 
         state_msg = String()
         state_msg.data = self._state
@@ -570,6 +584,10 @@ class AdmittanceInsertionNode(Node):
             self._max_insert_contact_force = 0.0
             self._insertion_depth_m = 0.0
             self._final_insertion_xy_error_m = 0.0
+            self._insert_command_sent = False
+            self._insert_handoff_hold_sent = False
+            self._insert_handoff_hold_start_s = 0.0
+            self._insert_handoff_stable_ticks = 0
             self._insert_precontact_clearance_ticks = 0
             self._insert_sideload_ticks = 0
             self._begin_phase(self.MOVING_TO_START)
@@ -1054,6 +1072,109 @@ class AdmittanceInsertionNode(Node):
             return False
         return True
 
+    def _send_insert_descent(self, peg: np.ndarray) -> bool:
+        insert_range = self._insert_start_z - self.FINAL_INSERTION_POSE[2]
+        final_target = np.array([
+            self.AXIS_ALIGN_POSE[0],
+            self.AXIS_ALIGN_POSE[1],
+            self.FINAL_INSERTION_POSE[2],
+        ])
+        q = self._solve_ik(final_target)
+        if q is None:
+            self.get_logger().error('INSERT: IK failed for final target, aborting')
+            self._abort_reason = 'IK failed for final insertion target'
+            self._end_phase(False, 0.0, 0.0, False, self._abort_reason)
+            self._set_state(self.ABORT)
+            return False
+
+        self._insert_traj_dur = 20.0
+        self._send_trajectory_goal(q, self._insert_traj_dur)
+        self._insert_command_start_s = self._now_s()
+        self._insert_command_sent = True
+
+        q_current = self.current_joints.copy()
+        q_dist = np.max(np.abs(q_current - q))
+        xy_error = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
+        self.get_logger().info(
+            f'INSERT descent started after handoff settle: '
+            f'{self._insert_traj_dur:.0f}s trajectory, '
+            f'{insert_range:.3f}m descent, q_dist={q_dist:.4f}, '
+            f'xy_error={xy_error:.4f}m'
+        )
+        return True
+
+    def _handle_insert_handoff_settle(
+        self,
+        peg: np.ndarray,
+        xy_error: float,
+        current_depth: float,
+        fz: float,
+    ) -> bool:
+        if not self._insert_handoff_hold_sent:
+            hold_target = np.array([
+                self.HOLE_CENTRE_XY[0],
+                self.HOLE_CENTRE_XY[1],
+                peg[2],
+            ])
+            q = self._solve_ik(hold_target, self.current_joints, max_iter=100)
+            if q is None:
+                self._abort_reason = 'INSERT handoff hold IK failed'
+                self.get_logger().error(self._abort_reason)
+                self._end_phase(False, xy_error, 0.0, False, self._abort_reason)
+                self._set_state(self.ABORT)
+                return False
+
+            self._send_trajectory_goal(q, self.INSERT_HANDOFF_HOLD_DURATION_S)
+            self._insert_handoff_hold_start_s = self._now_s()
+            self._insert_handoff_hold_sent = True
+            self._insert_handoff_stable_ticks = 0
+            self.get_logger().info(
+                f'INSERT handoff hold started: duration='
+                f'{self.INSERT_HANDOFF_HOLD_DURATION_S:.1f}s, '
+                f'xy_error={xy_error:.4f}m, peg_z={peg[2]:.4f}m'
+            )
+            return False
+
+        elapsed = self._now_s() - self._insert_handoff_hold_start_s
+        ready_to_count = elapsed >= self.INSERT_HANDOFF_HOLD_DURATION_S
+        stable = (
+            ready_to_count
+            and current_depth < self.INSERT_SIDELOAD_DEPTH_GATE_M
+            and xy_error <= self.INSERT_FINAL_XY_TOLERANCE
+            and fz <= self._safety_threshold
+        )
+        self._insert_handoff_stable_ticks = (
+            self._insert_handoff_stable_ticks + 1 if stable else 0
+        )
+
+        if self._state_entry_ticks % 10 == 0:
+            self.get_logger().info(
+                f'INSERT handoff settle t={elapsed:.1f}s  '
+                f'xy_error={xy_error:.4f}m  '
+                f'depth={current_depth:.4f}m  '
+                f'fz={fz:.1f}N  '
+                f'stable={self._insert_handoff_stable_ticks}/'
+                f'{self.INSERT_HANDOFF_SETTLE_TICKS}'
+            )
+
+        if self._insert_handoff_stable_ticks >= self.INSERT_HANDOFF_SETTLE_TICKS:
+            return self._send_insert_descent(peg)
+
+        if elapsed >= self.INSERT_HANDOFF_TIMEOUT_S:
+            self._abort_reason = (
+                f'INSERT handoff settle timeout: XY error {xy_error:.4f}m did '
+                f'not remain within physical clearance '
+                f'{self.INSERT_FINAL_XY_TOLERANCE:.4f}m for '
+                f'{self.INSERT_HANDOFF_SETTLE_TICKS} ticks before descent.'
+            )
+            self.get_logger().warn(self._abort_reason)
+            self._final_insertion_xy_error_m = xy_error
+            self._end_phase(False, xy_error, 0.0, True, self._abort_reason)
+            self._set_state(self.ABORT)
+            return False
+
+        return False
+
     def _handle_insert(self) -> None:
         self._state_entry_ticks += 1
         contact_force = self._get_contact_force()
@@ -1140,33 +1261,9 @@ class AdmittanceInsertionNode(Node):
 
 
 
-        # --- On first entry: compute and send a slow insertion trajectory ---
-        # Use single-point trajectory (same as SEARCH, which works).
-        if self._state_entry_ticks == 1:
-            insert_range = self._insert_start_z - self.FINAL_INSERTION_POSE[2]
-            final_target = np.array([
-                self.AXIS_ALIGN_POSE[0],
-                self.AXIS_ALIGN_POSE[1],
-                self.FINAL_INSERTION_POSE[2],
-            ])
-            q = self._solve_ik(final_target)
-            if q is not None:
-                self._insert_traj_dur = 20.0
-                self._send_trajectory_goal(q, self._insert_traj_dur)
-                self._insert_command_start_s = self._now_s()
-
-                q_current = self.current_joints.copy()
-                q_dist = np.max(np.abs(q_current - q))
-                self.get_logger().info(
-                    f'INSERT started: {self._insert_traj_dur:.0f}s trajectory, '
-                    f'{insert_range:.3f}m descent, q_dist={q_dist:.4f}'
-                )
-            else:
-                self.get_logger().error('INSERT: IK failed for final target, aborting')
-                self._abort_reason = 'IK failed for final insertion target'
-                self._end_phase(False, 0.0, 0.0, False, self._abort_reason)
-                self._set_state(self.ABORT)
-                return
+        if not self._insert_command_sent:
+            self._handle_insert_handoff_settle(peg, xy_error, current_depth, fz)
+            return
 
         # --- Logging ---
         if self._state_entry_ticks % 10 == 0:

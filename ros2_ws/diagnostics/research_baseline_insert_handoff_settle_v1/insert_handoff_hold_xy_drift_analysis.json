@@ -1,0 +1,87 @@
+{
+  "command_duration_s": 2.0,
+  "command_index": 2,
+  "command_point_count": 1,
+  "command_receipt_stamp_s": 55.703,
+  "final_depth_m": 0.0,
+  "final_xy_error_m": 0.0031382741820682996,
+  "first_clearance_violation": {
+    "depth_m": 0.0,
+    "elapsed_s": 0.0,
+    "feedback_xyz_m": [
+      0.5186995607339585,
+      -0.19883354356008964,
+      0.8389678865571186
+    ],
+    "max_abs_joint_error_rad": 0.0,
+    "rms_joint_error_rad": 0.0,
+    "stamp_s": 55.703,
+    "worst_joint_error_rad": 0.0,
+    "worst_joint_name": "joint_1",
+    "xy_error_m": 0.0017469295666600153,
+    "z_m": 0.8389678865571186
+  },
+  "first_depth": null,
+  "first_sideload": null,
+  "hole_centre_xy_m": [
+    0.52,
+    -0.2
+  ],
+  "hole_top_z_m": 0.81,
+  "initial_xy_error_m": 0.0017469295666600153,
+  "input_dir": "ros2_ws/diagnostics/research_baseline_insert_handoff_settle_v1",
+  "max_abs_joint_error_rad": 0.009806683,
+  "max_depth_m": 0.0,
+  "max_xy_error_m": 0.004553061155775594,
+  "mean_depth_m": 0.0,
+  "mean_xy_error_m": 0.0020470413608890555,
+  "meaningful_depth_m": 0.001,
+  "nearest_contact_at_first_clearance_violation_n": 0.0,
+  "nearest_fz_at_first_clearance_violation_n": 10.891801396,
+  "next_command_stamp_s": 56.002,
+  "observed_window_s": 0.2989999999999995,
+  "p95_max_abs_joint_error_rad": 0.008186363,
+  "p95_xy_error_m": 0.003678072925525227,
+  "physical_clearance_m": 0.001,
+  "pre_command_final_sample": {
+    "depth_m": 0.0,
+    "elapsed_s": -0.0040000000000048885,
+    "feedback_xyz_m": [
+      0.5182490380443731,
+      -0.19785033686492137,
+      0.8406977739883303
+    ],
+    "max_abs_joint_error_rad": 0.005070241,
+    "rms_joint_error_rad": 0.0031736,
+    "stamp_s": 55.699,
+    "worst_joint_error_rad": 0.005070241,
+    "worst_joint_name": "joint_5",
+    "xy_error_m": 0.0027725294163216947,
+    "z_m": 0.8406977739883303
+  },
+  "pre_command_max_xy_sample": {
+    "depth_m": 0.0,
+    "elapsed_s": -0.13600000000000279,
+    "feedback_xyz_m": [
+      0.5156860761563884,
+      -0.2004493838959549,
+      0.8418730080810363
+    ],
+    "max_abs_joint_error_rad": 0.009369403,
+    "rms_joint_error_rad": 0.004554918,
+    "stamp_s": 55.567,
+    "worst_joint_error_rad": 0.009369403,
+    "worst_joint_name": "joint_6",
+    "xy_error_m": 0.0043372669752304235,
+    "z_m": 0.8418730080810363
+  },
+  "pre_command_samples": 250,
+  "pre_command_window_s": 1.0,
+  "samples": 74,
+  "target_xyz_m": [
+    0.5200002539256792,
+    -0.20000033537246542,
+    0.8406973240155463
+  ],
+  "tracking_source": "trajectory_controller_state_samples.csv"
+}

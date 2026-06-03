@@ -99,6 +99,7 @@ until repeated validation demonstrates robust success.
 - INSERT pre-contact clearance gate validation now prevents that descent: SEARCH reached `0.0006 m` pre-insertion XY, then INSERT aborted at XY `0.0027 m` before meaningful depth. The next implementation should reduce or constrain one-point INSERT path drift; do not relax the new gate.
 - A centered multi-waypoint Cartesian INSERT descent diagnostic was tested and rejected. It still violated physical clearance `0.005 s` after INSERT command receipt and was reverted.
 - The INSERT handoff reference diagnostic shows the rejected multi-waypoint command was centered at the JTC reference level: reference XY stayed within `0.000510 m`, but feedback violated the `0.0010 m` physical clearance after `0.005 s` and reached `0.004264 m` in the first `0.5 s`.
+- INSERT handoff settle now withholds the final descent command unless feedback remains stable inside physical clearance. Validation still aborted before depth, with no descent-to-final INSERT command published; SEARCH had accepted a transient inside-clearance sample but feedback was already `0.002773 m` off center by the handoff boundary.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
@@ -656,6 +657,37 @@ Interpretation: the immediate post-INSERT failure is not explained by an
 off-center final target in the rejected waypoint experiment. The next
 implementation should stabilize feedback at the INSERT handoff or add bounded
 settling before descent while preserving the `0.0010 m` clearance gate.
+
+## 2026-06-03 Insert Handoff Settle
+
+Milestone: `research_baseline_insert_handoff_settle_v1`
+
+Evidence: `diagnostics/research_baseline_insert_handoff_settle_v1/summary.md`
+
+The INSERT state now starts with a bounded no-contact handoff hold at centered
+XY and current peg Z. It requires `8` stable ticks inside the `0.0010 m`
+physical clearance after a `2.0 s` hold before publishing the final descent,
+and it preserves the pre-contact clearance abort.
+
+Validation passed Python syntax, targeted build, and a headless runtime run
+with `joint_damping_scale:=5.0`.
+
+Runtime result:
+
+- final outcome `ABORTED`;
+- reason `INSERT aborted: no-contact XY error 0.0024m exceeds physical clearance 0.0010m before meaningful insertion depth 0.0010m for 3 ticks.`;
+- insertion depth `0.0000 m`;
+- no final descent-to-`z=0.790 m` INSERT command was published;
+- command index `2` was the new `2.000 s` handoff hold;
+- command index `3` was abort retreat;
+- contact-topic samples `0`;
+- max raw `|Fz|=127.6 N`;
+- max raw force norm `213.6 N`.
+
+Handoff analysis on command index `2` reported pre-command final feedback XY
+`0.002773 m`, initial command-window XY `0.001747 m`, and max feedback XY
+`0.004553 m`. The next implementation should make SEARCH require sustained,
+controller-state-confirmed clearance before it may enter INSERT.
 
 ## 2026-06-02 Joint-State Source Integrity
 
