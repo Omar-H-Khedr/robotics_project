@@ -87,6 +87,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_insert_xy_drift_diagnostic_v1 | Completed: analyzer shows INSERT XY can violate physical clearance before or during early descent |
 | research_baseline_insert_precontact_clearance_gate_v1 | Completed: INSERT aborts before meaningful depth when no-contact XY exceeds physical clearance |
 | research_baseline_insert_cartesian_descent_v1 | Rejected: multi-waypoint Cartesian INSERT still violated clearance immediately; source reverted |
+| research_baseline_insert_handoff_reference_v1 | Completed: analyzer shows centered INSERT reference but feedback leaves physical clearance within 5 ms |
 
 ## 2026-06-03 Controller-State Tracking V2
 
@@ -379,6 +380,38 @@ depth:
 The source was reverted to the validated pre-contact clearance gate state. The
 next implementation should address INSERT command handoff/hold dynamics rather
 than simply adding more waypoints.
+
+## 2026-06-03 Insert Handoff Reference Diagnostic
+
+Milestone: `research_baseline_insert_handoff_reference_v1`
+
+Evidence: `diagnostics/research_baseline_insert_handoff_reference_v1/summary.md`
+
+The workspace now includes `insert_handoff_reference_analyzer`, an offline
+diagnostic that compares JTC Cartesian reference and feedback at the selected
+INSERT command. It uses `trajectory_controller_state_samples.csv` and writes
+Markdown/JSON evidence without publishing commands or changing safety gates.
+
+Validation passed Python syntax, installed `ros2 run` execution, and targeted
+`colcon build --packages-select thesis_bringup`.
+
+Key result from the rejected multi-waypoint Cartesian descent run:
+
+- INSERT command point count `6`;
+- pre-command final reference XY error `0.000000 m`;
+- pre-command final feedback XY error `0.001660 m`;
+- initial reference and feedback XY error `0.000458 m`;
+- reference stayed inside the `0.0010 m` physical clearance for the first `0.5 s`;
+- feedback violated clearance `0.005 s` after INSERT command receipt;
+- max reference XY error `0.000510 m`;
+- max feedback XY error `0.004264 m`;
+- max Cartesian reference-feedback error `0.004571 m`.
+
+Interpretation: the rejected waypoint-only INSERT command was centered at the
+JTC reference level, but the simulated plant/controller feedback drifted out
+of clearance immediately. The next implementation should target INSERT
+handoff/feedback stabilization or bounded pre-insert settling, not another
+waypoint-count change or a looser clearance gate.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 

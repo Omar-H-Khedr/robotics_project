@@ -91,6 +91,15 @@ The latest rejected INSERT-path diagnostic is
 - max physical depth: `0.0000 m`;
 - decision: source reverted because waypoint-only INSERT did not preserve physical clearance.
 
+The latest INSERT handoff reference diagnostic is
+`diagnostics/research_baseline_insert_handoff_reference_v1`:
+
+- rejected Cartesian descent reference stayed inside physical clearance for the analyzed first `0.5 s`;
+- feedback violated physical clearance `0.005 s` after INSERT command receipt;
+- max reference XY error: `0.000510 m`;
+- max feedback XY error: `0.004264 m`;
+- decision: the next implementation should stabilize INSERT handoff feedback or add bounded pre-insert settling, not retry waypoint-only descent or loosen clearance.
+
 Repeated validation on 2026-06-01 produced 0/3 physical successes:
 
 - one DEGRADED INSERT with only 0.0037 m depth and a 1237.45 N peak raw Fz spike;
@@ -118,6 +127,7 @@ This is not robust autonomous peg-in-hole success. The honest claim is now:
 - INSERT XY drift diagnostics motivated the no-contact INSERT gate against the `0.0010 m` physical radial clearance before deeper descent.
 - INSERT pre-contact clearance gating now prevents descent when XY feedback leaves physical clearance before meaningful depth. The remaining blocker is reducing or constraining the one-point INSERT path drift after SEARCH centers the peg.
 - A centered multi-waypoint Cartesian INSERT descent was tested and rejected; the next attempt should address immediate post-INSERT command handoff/hold dynamics, not just add more waypoints.
+- INSERT handoff reference analysis shows that a centered multi-waypoint reference can remain within physical clearance while feedback leaves clearance within `0.005 s`, so the problem is now feedback/plant stabilization at handoff rather than a simple FK target error.
 - Gazebo contact physics are adequate for early simulation evidence but not final safety fidelity.
 - Some older docs still describe stale iisy3 state and must not be used as current truth.
 - A 2026-06-02 source-integrity run confirmed `joint_state_broadcaster` as the intended `/joint_states` publisher, but the same run still timed out in `MOVING_TO_START` with large XY error.

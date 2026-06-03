@@ -98,6 +98,7 @@ until repeated validation demonstrates robust success.
 - INSERT XY drift analysis showed the remaining blocker was not only final success classification: in `research_baseline_insert_sideload_abort_v1`, the controller-state feedback already had pre-command final XY `0.001569 m` and command-window initial XY `0.002539 m`; in `research_baseline_insert_physical_xy_gate_v1`, first side-load occurred at depth `0.001274 m` with XY `0.002153 m`. The no-contact INSERT clearance gate now addresses the unsafe descent part; single-point INSERT path drift remains.
 - INSERT pre-contact clearance gate validation now prevents that descent: SEARCH reached `0.0006 m` pre-insertion XY, then INSERT aborted at XY `0.0027 m` before meaningful depth. The next implementation should reduce or constrain one-point INSERT path drift; do not relax the new gate.
 - A centered multi-waypoint Cartesian INSERT descent diagnostic was tested and rejected. It still violated physical clearance `0.005 s` after INSERT command receipt and was reverted.
+- The INSERT handoff reference diagnostic shows the rejected multi-waypoint command was centered at the JTC reference level: reference XY stayed within `0.000510 m`, but feedback violated the `0.0010 m` physical clearance after `0.005 s` and reached `0.004264 m` in the first `0.5 s`.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
@@ -616,6 +617,45 @@ Interpretation: adding centered INSERT waypoints alone does not solve the
 handoff/hold dynamics. The active source is reverted to the validated
 pre-contact clearance gate state. Future work should address the immediate
 post-INSERT XY drift rather than retrying the same waypoint-only change.
+
+## 2026-06-03 Insert Handoff Reference Diagnostic
+
+Milestone: `research_baseline_insert_handoff_reference_v1`
+
+Evidence: `diagnostics/research_baseline_insert_handoff_reference_v1/summary.md`
+
+Added `insert_handoff_reference_analyzer`, a passive offline analyzer for the
+selected INSERT command. It maps JTC `controller_state` reference and feedback
+joint vectors through the local iisy6 peg-tip kinematics, then reports
+reference XY, feedback XY, depth, Cartesian reference-feedback error, and first
+clearance violations.
+
+Validation:
+
+```bash
+python3 -m py_compile src/thesis_bringup/thesis_bringup/insert_handoff_reference_analyzer.py
+source /opt/ros/jazzy/setup.bash
+source install/setup.bash
+ros2 run thesis_bringup insert_handoff_reference_analyzer diagnostics/research_baseline_insert_cartesian_descent_v1
+colcon build --symlink-install --packages-select thesis_bringup
+```
+
+Result on rejected `research_baseline_insert_cartesian_descent_v1`:
+
+- INSERT command point count `6`;
+- pre-command final reference XY error `0.000000 m`;
+- pre-command final feedback XY error `0.001660 m`;
+- initial reference and feedback XY error `0.000458 m`;
+- reference stayed inside physical clearance during the analyzed first `0.5 s`;
+- feedback violated physical clearance `0.005 s` after command receipt;
+- max reference XY error `0.000510 m`;
+- max feedback XY error `0.004264 m`;
+- max Cartesian reference-feedback error `0.004571 m`.
+
+Interpretation: the immediate post-INSERT failure is not explained by an
+off-center final target in the rejected waypoint experiment. The next
+implementation should stabilize feedback at the INSERT handoff or add bounded
+settling before descent while preserving the `0.0010 m` clearance gate.
 
 ## 2026-06-02 Joint-State Source Integrity
 
