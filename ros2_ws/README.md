@@ -101,6 +101,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_tracking_sensitivity_v1 | Completed diagnostic: measured joint tracking error explains millimeter-scale centered-hold XY drift; dominant p95 contributor is joint_1 |
 | research_baseline_search_derivative_gain_v1 | Validated safely: added `position_derivative_gain` plumbing and tested D=0.5; SEARCH still fails closed but centered-hold p95 XY drift and best 1 mm window unchanged |
 | research_baseline_search_derivative_gain_v2 | Validated safely: D=5.0 marginally tightens SEARCH final XY and reduces centered-hold p95 JTC joint error; centered-hold p95 actual XY drift still around 4 mm and SEARCH best 1 mm window remains 3 ticks |
+| research_baseline_search_derivative_gain_v3 | Validated safely: gain=3000 + D=10.0 doubles best 2 mm SEARCH window to 10 ticks; best 1 mm window still 3 ticks and SEARCH still fails closed |
 
 ## 2026-06-03 SEARCH Derivative Gain Plumbing
 
@@ -156,23 +157,31 @@ element.
 
 Two headless Gazebo diagnostics were run with `position_gain:=2000.0`,
 `joint_damping_scale:=5.0`, and `position_derivative_gain:=0.5` then
-`5.0`. Both used the new `tracking_log_dir` and ran the same sustained
-SEARCH/clearance safety gates.
+`5.0`. A third diagnostic combined `position_gain:=3000.0` with
+`position_derivative_gain:=10.0` to test a stiffer, more damped
+controller. All three used the new `tracking_log_dir` and ran the same
+sustained SEARCH/clearance safety gates.
 
-| Run | `position_derivative_gain` | Outcome | SEARCH best 1 mm window | SEARCH final XY m | Centered-hold p95 actual XY drift m | Centered-hold p95 JTC joint error rad |
-| --- | ---: | --- | ---: | ---: | ---: | ---: |
-| streak-preservation (no D-term) | 0 | ABORTED SEARCH timeout | 3 | 0.002779 | 0.003981 | 0.008404 |
-| derivative_gain_v1 | 0.5 | ABORTED SEARCH timeout | 3 | 0.003823 | 0.003919 | 0.008617 |
-| derivative_gain_v2 | 5.0 | ABORTED SEARCH timeout | 3 | 0.002667 | 0.004018 | 0.008434 |
+| Run | Gain | D-term | Outcome | SEARCH best 1 mm window | SEARCH best 2 mm window | SEARCH final XY m | Centered-hold p95 actual XY drift m | Centered-hold p95 JTC joint error rad |
+| --- | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: |
+| streak-preservation (no D-term) | 2000 | 0 | ABORTED SEARCH timeout | 3 | n/a | 0.002779 | 0.003981 | 0.008404 |
+| derivative_gain_v1 | 2000 | 0.5 | ABORTED SEARCH timeout | 3 | n/a | 0.003823 | 0.003919 | 0.008617 |
+| derivative_gain_v2 | 2000 | 5.0 | ABORTED SEARCH timeout | 3 | 7 | 0.002667 | 0.004018 | 0.008434 |
+| derivative_gain_v3 | 3000 | 10.0 | ABORTED SEARCH timeout | 3 | 10 | 0.002974 | 0.004029 | 0.008481 |
 
 `position_derivative_gain=5.0` reduced SEARCH final XY and the centered-hold
 p95 JTC joint error marginally, but it did not extend the best 1 mm
-sustained window and the centered-hold p95 actual XY drift stayed around
-4 mm. `joint_1` is still the dominant p95 XY contributor. The D-term
-plumbing is correctly applied, the safety gates are unchanged, and no
-insertion success is claimed. The next iteration should combine the D-term
-with a different lever (controller rate, controller type, or higher-level
-feedback shaping) rather than scale the D-term further.
+sustained window. The combined `position_gain=3000.0` and
+`position_derivative_gain=10.0` run doubled the best 2 mm SEARCH window to
+10 task ticks, but the best 1 mm window stayed at 3 ticks and SEARCH
+still failed closed before INSERT. The D-term plumbing is correctly
+applied, the safety gates are unchanged, and no insertion success is
+claimed. The next iteration should look beyond the position controller
+gains and D-term: the centered-hold reference is correct, the controller
+tracks it within the predicted Jacobian, and the residual drift is
+dominated by factors that gain increases alone cannot remove (sensor
+noise, contact/FT gravity baseline drift, residual controller lag at the
+10 Hz control loop).
 
 ## 2026-06-03 Rejected Feedback-Compensated Recenter
 
