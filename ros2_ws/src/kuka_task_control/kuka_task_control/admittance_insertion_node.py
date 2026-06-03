@@ -100,6 +100,7 @@ class AdmittanceInsertionNode(Node):
     HOLD_POSE = np.array([0.520, -0.200, 0.810])
     FINAL_INSERTION_POSE = np.array([0.520, -0.200, 0.790])
     HOLE_TOP_Z = 0.810
+    RETREAT_CLEARANCE_Z = AXIS_ALIGN_POSE[2]
 
     # Hole centre XY (used for alignment checks)
     HOLE_CENTRE_XY = np.array([0.520, -0.200])
@@ -411,6 +412,34 @@ class AdmittanceInsertionNode(Node):
             )
             return None
         return q
+
+    def _build_vertical_clearance_waypoints(self) -> list[np.ndarray]:
+        peg, _ = self._kinematics.pose(self.current_joints)
+        clearance_z = max(self.RETREAT_CLEARANCE_Z, float(peg[2]) + 0.015)
+        z_lift = clearance_z - float(peg[2])
+        if z_lift <= 0.010:
+            return [self.current_joints.copy()]
+
+        q_prev = self.current_joints.copy()
+        waypoints = [q_prev.copy()]
+        n_cart_waypoints = max(3, min(12, int(z_lift / 0.01) + 1))
+        for i in range(1, n_cart_waypoints + 1):
+            alpha = i / n_cart_waypoints
+            target = np.array([
+                peg[0],
+                peg[1],
+                peg[2] + alpha * z_lift,
+            ])
+            q = self._solve_ik(target, q_prev, max_iter=100)
+            if q is None:
+                self.get_logger().warn(
+                    'RETREAT clearance lift IK failed; falling back to '
+                    'joint-space retreat to SAFE_HOME.'
+                )
+                return [self.current_joints.copy()]
+            waypoints.append(q.copy())
+            q_prev = q
+        return waypoints
 
     # --- State machine ------------------------------------------------------
 
@@ -1112,25 +1141,34 @@ class AdmittanceInsertionNode(Node):
 
     def _handle_retreat(self) -> None:
         if not self._retreat_sent:
-            q_current = self.current_joints.copy()
-            dist = np.max(np.abs(q_current - self.SAFE_HOME))
-            duration = max(5.0, min(15.0, dist * 10.0))
-            n_waypoints = max(2, min(10, int(dist / 0.2) + 1))
+            clearance_waypoints = self._build_vertical_clearance_waypoints()
+            q_after_clearance = clearance_waypoints[-1]
+            dist = float(np.max(np.abs(q_after_clearance - self.SAFE_HOME)))
+            home_waypoint_count = max(2, min(10, int(dist / 0.2) + 1))
 
-            if n_waypoints > 1:
-                waypoints = [q_current.copy()]
-                for i in range(1, n_waypoints):
-                    alpha = i / (n_waypoints - 1)
-                    q_interp = q_current + alpha * (self.SAFE_HOME - q_current)
-                    waypoints.append(q_interp)
-                self._publish_multi_point_trajectory(waypoints, duration)
-            else:
-                self._send_trajectory_goal(self.SAFE_HOME, duration)
+            waypoints = list(clearance_waypoints)
+            for i in range(1, home_waypoint_count):
+                alpha = i / (home_waypoint_count - 1)
+                q_interp = (
+                    q_after_clearance
+                    + alpha * (self.SAFE_HOME - q_after_clearance)
+                )
+                waypoints.append(q_interp)
+
+            lift_waypoints = max(0, len(clearance_waypoints) - 1)
+            duration = max(
+                8.0,
+                min(25.0, lift_waypoints * 1.0 + dist * 10.0),
+            )
+            self._publish_multi_point_trajectory(waypoints, duration)
 
             self._start_ticks = 0
             self._retreat_sent = True
             self.get_logger().info(
-                f'Retreating to SAFE_HOME. duration={duration:.1f}s'
+                f'Retreating to SAFE_HOME via clearance lift. '
+                f'duration={duration:.1f}s, '
+                f'lift_waypoints={lift_waypoints}, '
+                f'home_waypoints={home_waypoint_count}'
             )
 
         if self._start_ticks < 0:

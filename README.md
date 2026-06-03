@@ -15,6 +15,8 @@ The latest safety-gate correction makes `APPROACH` completion require the same p
 
 The latest insert/retreat analyzer confirms the failed insert command targeted peg-tip `z=0.790008 m`, but feedback only reached minimum `z=0.811899 m` against `HOLE_TOP_Z=0.810000 m`, so physical depth remained zero. It also attributes high retreat contact to peg-target and right-finger-target collision pairs. Evidence is in `ros2_ws/diagnostics/research_baseline_insert_retreat_contact_analyzer_v1/` and `ros2_ws/diagnostics/research_baseline_approach_z_precondition_gate_v1/insert_retreat_contact_analysis.md`.
 
+The latest retreat-safety fix adds a vertical clearance lift before returning to `SAFE_HOME`. Validation reached `DONE` with outcome `DEGRADED`, not success: INSERT depth was only `0.0008 m`. RETREAT contact improved from `1970.434828 N` over 7776 contact rows to `36.335073 N` over 4 rows, and RETREAT max raw `|Fz|` dropped from `594.283889 N` to `128.114936 N`. Evidence is in `ros2_ws/diagnostics/research_baseline_retreat_clearance_lift_v1/`.
+
 The canonical `research_baseline.launch.py` now uses a project-local bridge config that omits Gazebo `/joint_states`; `joint_state_broadcaster` is the intended single ROS 2 joint-state source. Evidence is in `ros2_ws/diagnostics/research_baseline_joint_state_source_integrity/`.
 
 The latest tracking audit confirms the above-hole IK target is reachable offline, but Gazebo/controller tracking remains unstable. Gain 250 and repeated bounded refinement were rejected; the retained baseline keeps the 2 mm no-contact gate and exposes `position_gain` only for documented experiments.

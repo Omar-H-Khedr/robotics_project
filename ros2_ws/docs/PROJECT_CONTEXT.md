@@ -83,6 +83,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - A 2026-06-03 `joint_damping_scale:=5.0` diagnostic improved the baseline enough to satisfy MOVING_TO_START and enter APPROACH without contact-topic samples or high raw-force regression. It still aborted before INSERT because the approach ended at `z=0.849622 m` against a `z=0.830000 m` target, above the preserved `0.8450 m` force-safe precondition.
 - A 2026-06-03 approach Z-precondition gate correction made `APPROACH` completion require `peg_z <= 0.8450 m`, matching the preserved INSERT precondition. With `joint_damping_scale:=5.0`, validation reached `APPROACH complete` only after `peg_z=0.8417 m`, then ran `SEARCH` and `INSERT`. The insert trajectory still reported `physical_depth=0.0000 m`, contact-topic rows began only in `RETREAT`, and retreat contact reached `1970.434828 N`, so this is not insertion success and makes retreat collision/depth interpretation the next safety-critical blocker.
 - A 2026-06-03 insert/retreat contact analyzer confirmed that `HOLE_TOP_Z=0.810 m` is consistent with the target plate top and that the latest failed INSERT missed the commanded final target: target peg-tip Z was `0.790008 m`, minimum feedback Z was `0.811899 m`, and max physical depth was `0.000000 m`. RETREAT contact was attributed to peg-target and right-finger-target collision pairs, so the next motion fix should add clearance-aware retreat behavior after failed insertion.
+- A 2026-06-03 retreat clearance-lift fix added vertical peg-tip lift waypoints before moving to `SAFE_HOME`. Validation reached `DONE` with `DEGRADED` outcome because INSERT depth was only `0.0008 m`, but RETREAT contact improved from `1970.434828 N` over `7776` contact rows to `36.335073 N` over `4` rows. This resolves the immediate retreat-collision safety regression while leaving insertion-depth realization as the next blocker.
 - A 2026-06-02 broad damping-reduction diagnostic was rejected. `joint_damping_scale:=0.2` preserved safety gates but hard-aborted in `MOVING_TO_START` at raw `|Fz|=1181.0 N` before reaching the no-contact gate or approach phase.
 - A 2026-06-02 effort-authority diagnostic was rejected. `joint_effort_scale:=2.0` reached the no-contact gate faster and entered `APPROACH`, but hard-aborted after 0.5 s with force norm `1009.7 N` and target-source contact rows while the peg was still at `z=0.890982 m` against the `z=0.830000 m` target.
 - A 2026-06-02 contact-pair attribution diagnostic added exact collision-pair logging to the passive contact observer. A reproduced doubled-effort run aborted in `MOVING_TO_START` with raw `|Fz|=1018.9 N` and showed target-source contact from `lbr_iisy6_r1300::link_5::link_5_collision <-> target_plate::plate_link::target_plate_collision`. This is invalid robot-link clearance contact, not peg insertion contact.
@@ -191,6 +192,12 @@ zero depth is consistent with measured peg-tip feedback staying above the plate
 top, not a stale hole-top constant. The next implementation should therefore
 target failed-insert recovery and retreat clearance, especially preventing the
 peg and right finger from sweeping through the target plate during RETREAT.
+
+The retreat clearance-lift implementation substantially reduced retreat
+contact without claiming success. The remaining implementation problem is the
+INSERT command itself: the peg reaches at most `0.000836 m` physical depth
+while the final target is near `z=0.790 m`. Future changes should focus on
+insert trajectory execution, timing, and monitored depth progress.
 
 Use the enhanced MOVING_TO_START tracking analyzer to judge command-attributed
 XY stability by distribution and final-window range. A single minimum or final

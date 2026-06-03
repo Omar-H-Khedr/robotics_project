@@ -1,0 +1,100 @@
+{
+  "command_duration_s": 20.0,
+  "command_index": 2,
+  "command_receipt_stamp_s": 60.054,
+  "contact_summary": {
+    "available": true,
+    "states": {
+      "RETREAT": {
+        "first_stamp_s": 72.194,
+        "max_contact_force_n": 36.335072965,
+        "positive_samples": 4,
+        "samples": 4,
+        "top_collision_pairs": [
+          {
+            "collision_pair": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_rear_collision",
+            "max_force_n": 36.335072965,
+            "samples": 4
+          }
+        ]
+      }
+    }
+  },
+  "final_cartesian_error_norm_m": 0.02567853399624808,
+  "final_cartesian_error_xyz_m": [
+    0.0011216591363858441,
+    -0.0013588183944180932,
+    -0.025618013224081637
+  ],
+  "final_feedback_xyz_m": [
+    0.5188824278047317,
+    -0.19864226702706078,
+    0.8156255472450434
+  ],
+  "final_feedback_z_m": 0.8156255472450434,
+  "final_physical_depth_m": 0.0,
+  "hole_top_z_m": 0.81,
+  "input_dir": "diagnostics/research_baseline_retreat_clearance_lift_v1",
+  "max_abs_position_error_rad": 0.010381778,
+  "max_physical_depth_m": 0.0008359815881306965,
+  "mean_rms_position_error_rad": 0.0028848913907610755,
+  "min_feedback_z_m": 0.8091640184118694,
+  "missing_descent_to_target_m": 0.025618013224081637,
+  "next_command_stamp_s": 70.621,
+  "observed_window_s": 10.566999999999993,
+  "p95_max_abs_position_error_rad": 0.008309814,
+  "samples": 2641,
+  "target_xyz_m": [
+    0.5200040869411175,
+    -0.20000108542147887,
+    0.7900075340209618
+  ],
+  "tracking_source": "trajectory_controller_state_samples.csv",
+  "wrench_summary": {
+    "available": true,
+    "states": {
+      "APPROACH": {
+        "max_abs_fz_n": 125.802256691,
+        "max_force_norm_n": 198.884871733,
+        "mean_xy_error_m": 0.002140742138047138,
+        "samples": 1188
+      },
+      "DONE": {
+        "max_abs_fz_n": 127.133583327,
+        "max_force_norm_n": 181.336821345,
+        "mean_xy_error_m": 0.40910891971485147,
+        "samples": 1515
+      },
+      "INSERT": {
+        "max_abs_fz_n": 124.064035921,
+        "max_force_norm_n": 202.630103784,
+        "mean_xy_error_m": 0.002599353909348442,
+        "samples": 1059
+      },
+      "MOVING_TO_START": {
+        "max_abs_fz_n": 127.919569969,
+        "max_force_norm_n": 208.495439617,
+        "mean_xy_error_m": 0.19971932938503972,
+        "samples": 4532
+      },
+      "RETREAT": {
+        "max_abs_fz_n": 128.114935734,
+        "max_force_norm_n": 200.880896515,
+        "mean_xy_error_m": 0.10516079072908205,
+        "samples": 2462
+      },
+      "SEARCH": {
+        "max_abs_fz_n": 74.433305058,
+        "max_force_norm_n": 128.896467588,
+        "mean_xy_error_m": 0.0017534352,
+        "samples": 5
+      },
+      "UNKNOWN": {
+        "max_abs_fz_n": 116.648061171,
+        "max_force_norm_n": 167.972037938,
+        "mean_xy_error_m": 0.40954856700729925,
+        "samples": 275
+      }
+    }
+  }
+}

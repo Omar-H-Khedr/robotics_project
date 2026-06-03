@@ -90,6 +90,7 @@ until repeated validation demonstrates robust success.
 - A 5x damping diagnostic now clears the strict MOVING_TO_START gate and reaches APPROACH with lower force/tracking error, but still aborts before INSERT because final approach feedback remains at `z=0.849622 m` for a `z=0.830000 m` target, above the `0.8450 m` force-safe precondition.
 - The latest approach Z-precondition gate correction makes `APPROACH` completion require `peg_z <= 0.8450 m`, matching the preserved INSERT precondition. With `joint_damping_scale:=5.0`, validation reached INSERT only after `APPROACH` reached `peg_z=0.8417 m`; INSERT then reported `physical_depth=0.0000 m`, and contact-topic rows appeared during `RETREAT` with max contact force `1970.434828 N`.
 - The latest insert/retreat contact analyzer confirms the failed INSERT target was near `z=0.790008 m`, but feedback only reached minimum `z=0.811899 m` against `HOLE_TOP_Z=0.810000 m`. RETREAT contact is attributed to peg-target and right-finger-target collision pairs, so retreat clearance after failed insertion is now the next safety-critical blocker.
+- The latest retreat clearance-lift validation reached `DONE` with `DEGRADED` outcome, not success. It reduced RETREAT contact from `1970.434828 N` over `7776` rows to `36.335073 N` over `4` rows, but INSERT depth was only `0.0008 m`.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
 - Insertion controller: topic-based trajectory publishing with median Fz baseline, SEARCH phase, single-point INSERT, final JSON outcome logging.
@@ -277,6 +278,44 @@ This confirms that zero depth in the latest run is consistent with measured
 feedback staying above the plate top. The next implementation should prevent a
 failed insert from retreating laterally through the plate; a clearance-lift
 segment before moving toward `SAFE_HOME` is the technically next candidate.
+
+## 2026-06-03 Retreat Clearance Lift
+
+Milestone: `research_baseline_retreat_clearance_lift_v1`
+
+Evidence: `diagnostics/research_baseline_retreat_clearance_lift_v1/summary.md`
+
+`RETREAT` now publishes a vertical peg-tip clearance lift before moving toward
+`SAFE_HOME`. The lift uses axis-constrained IK waypoints at the current peg XY,
+then follows joint-space waypoints to home from the lifted posture. If lift IK
+fails, the controller falls back to the old joint-space retreat.
+
+Validation passed Python syntax, targeted `colcon build --packages-select
+kuka_task_control thesis_bringup`, a headless launch with
+`joint_damping_scale:=5.0`, and passive analyzers.
+
+Runtime result:
+
+- final outcome `DEGRADED`;
+- reason `Phase(s) failed: INSERT`;
+- depth `0.0008 m`;
+- max raw `|Fz|=128.1 N`;
+- max raw force norm `208.5 N`;
+- final XY error `0.0011 m`;
+- phase sequence: MOVING_TO_START OK, APPROACH OK, SEARCH OK, INSERT FAIL, RETREAT OK.
+
+Retreat contact improved materially:
+
+- previous RETREAT contact rows: `7776`;
+- new RETREAT contact rows: `4`;
+- previous RETREAT max contact force: `1970.434828 N`;
+- new RETREAT max contact force: `36.335073 N`;
+- previous RETREAT max raw `|Fz|`: `594.283889 N`;
+- new RETREAT max raw `|Fz|`: `128.114936 N`.
+
+This is a retreat safety improvement, not insertion success. The next blocker
+is insertion-depth realization: the insert target remains near `z=0.790 m`,
+but the latest run reached only `0.000836 m` maximum physical depth.
 
 ## 2026-06-02 Joint-State Source Integrity
 
