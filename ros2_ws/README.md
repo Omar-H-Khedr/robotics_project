@@ -74,6 +74,7 @@ Latest hold evidence shows the corrected post-tool runs do not satisfy the requi
 | research_baseline_moving_to_start_xy_distribution_analyzer_v1 | Completed: command-attributed analyzer now reports XY distribution and final-window oscillation |
 | research_baseline_jtc_controller_state_observer_v1 | Completed: trajectory observer now subscribes to JTC `controller_state` and records nonzero state samples |
 | research_baseline_controller_state_tracking_v2 | Failed safely: canonical run records JTC controller-state tracking but still times out before descent |
+| research_baseline_endpoint_hold_dynamics_analyzer_v1 | Completed: endpoint hold analyzer shows multi-centimeter hold oscillation and zero strict 10 Hz bins |
 
 ## 2026-06-03 Controller-State Tracking V2
 
@@ -105,6 +106,32 @@ final outcome before the wrapper timeout:
 The instrumentation is validated, but the canonical baseline remains blocked
 before descent. Do not claim insertion success from this run and do not loosen
 the strict no-contact gate.
+
+## 2026-06-03 Endpoint Hold Dynamics Analyzer
+
+Milestone: `research_baseline_endpoint_hold_dynamics_analyzer_v1`
+
+Evidence: `diagnostics/research_baseline_endpoint_hold_dynamics_analyzer_v1/summary.md`
+
+The workspace now includes `endpoint_hold_dynamics_analyzer`, an offline
+diagnostic that isolates the post-axis-align hold window from passive
+trajectory logs. It prefers JTC controller-state rows when present and reports
+Cartesian hold ranges, strict-gate occupancy, estimated 10 Hz strict bins, and
+per-joint feedback ranges.
+
+Running it on `research_baseline_controller_state_tracking_v2` showed that the
+post-command hold is not a small static offset:
+
+- hold duration `23.716 s`;
+- XY error mean `0.009221 m`;
+- XY error p95 `0.015782 m`;
+- X/Y/Z ranges `0.041273 / 0.035843 / 0.033742 m`;
+- strict XY samples `140 / 5930`;
+- strict 10 Hz bins `0`;
+- largest joint feedback range `joint_1`, `0.057121 rad`.
+
+This supports endpoint hold dynamics or damping-authority work as the next
+technical step. It does not support relaxing the 2 mm safety gate.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
