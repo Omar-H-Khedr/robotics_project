@@ -97,6 +97,42 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_hold_window_reference_analyzer_v1 | Completed: command-window analyzer shows centered hold references but feedback still fails sustained 1 mm clearance |
 | research_baseline_search_post_command_stability_gate_v1 | Completed safety gate: SEARCH only counts stability after command duration; validation still fails closed before INSERT |
 | research_baseline_search_streak_preservation_v1 | Completed safety sequencing: SEARCH preserves active stability streaks, but validation still fails closed before INSERT |
+| research_baseline_search_feedback_compensated_recenter_v1 | Rejected: bounded feedback-compensated recenter still failed SEARCH and worsened mean/final XY; source reverted |
+
+## 2026-06-03 Rejected Feedback-Compensated Recenter
+
+Milestone: `research_baseline_search_feedback_compensated_recenter_v1`
+
+Evidence: `diagnostics/research_baseline_search_feedback_compensated_recenter_v1/summary.md`
+
+A bounded feedback-compensated SEARCH recenter target was tested and rejected.
+The experiment biased recenter targets opposite the measured feedback offset,
+capped at `0.0020 m`, while keeping the measured-feedback `0.0010 m` sustained
+gate unchanged.
+
+Validation passed Python syntax, targeted `colcon build --packages-select
+kuka_task_control thesis_bringup`, and a headless Gazebo run with
+`joint_damping_scale:=5.0`. Runtime result:
+
+- `Outcome: ABORTED`;
+- `Reason: SEARCH timeout (45s). XY error 0.0033m remains above physical clearance 0.0010m.`;
+- insertion depth `0.0000 m`;
+- contact-topic samples `0`;
+- max raw `|Fz|=128.2 N`;
+- max raw force norm `207.5 N`;
+- observed trajectory commands `10`;
+- controller-state p95 max absolute joint-position error `0.011345 rad`.
+
+Analyzer result:
+
+- SEARCH best estimated `0.0010 m` window: `4` task ticks;
+- SEARCH best estimated `0.0020 m` window: `11` task ticks;
+- hold-like command count: `7`;
+- best feedback hold inside `0.0010 m`: `4` task ticks;
+- SEARCH mean XY `0.002472 m` and final XY `0.003319 m`.
+
+Decision: source reverted. The experiment added reference bias away from the
+hole center and did not produce enough stability to unblock INSERT.
 
 ## 2026-06-03 Search Streak Preservation
 

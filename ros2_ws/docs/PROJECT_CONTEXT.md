@@ -203,6 +203,19 @@ The latest SEARCH sequencing diagnostic is
 - decision: keep active-streak preservation as safe sequencing, but sustained
   feedback centering remains unresolved.
 
+The latest rejected SEARCH recenter experiment is
+`diagnostics/research_baseline_search_feedback_compensated_recenter_v1`:
+
+- tested a bounded opposite-feedback recenter target capped to `0.0020 m`;
+- final outcome: `ABORTED`;
+- no INSERT phase was entered;
+- contact-topic samples: `0`;
+- SEARCH best estimated `0.0010 m` window: `4` task ticks;
+- best feedback `0.0010 m` hold window: `4` task ticks;
+- SEARCH mean/final XY worsened to `0.002472 m` / `0.003319 m`;
+- decision: source reverted. Keep centered recentering with post-command and
+  active-streak gates.
+
 Repeated validation on 2026-06-01 produced 0/3 physical successes:
 
 - one DEGRADED INSERT with only 0.0037 m depth and a 1237.45 N peak raw Fz spike;
