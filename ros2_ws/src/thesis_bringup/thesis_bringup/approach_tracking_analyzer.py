@@ -15,6 +15,12 @@ import numpy as np
 from kuka_task_control.robot_kinematics import RobotKinematics
 
 
+TOUCH_POSE = np.array([0.520, -0.200, 0.830])
+COMMAND_TARGET_TOLERANCE_M = 0.03
+CONTROLLER_STATE_TRACKING_FILE = "trajectory_controller_state_samples.csv"
+JOINT_STATE_TRACKING_FILE = "trajectory_tracking_samples.csv"
+
+
 @dataclass(frozen=True)
 class CommandRow:
     receipt_stamp_s: float
@@ -22,6 +28,7 @@ class CommandRow:
     point_count: int
     final_time_from_start_s: float
     final_positions_rad: list[float]
+    target_xyz_m: list[float]
 
 
 @dataclass(frozen=True)
@@ -47,17 +54,21 @@ def _float_list(text: str) -> list[float]:
 
 
 def _read_commands(path: Path) -> list[CommandRow]:
+    kin = RobotKinematics()
     with path.open(newline="", encoding="utf-8") as handle:
         reader = csv.DictReader(handle)
         rows: list[CommandRow] = []
         for row in reader:
+            final_positions = _float_list(row["final_positions_rad"])
+            target_xyz, _ = kin.pose(np.array(final_positions, dtype=float))
             rows.append(
                 CommandRow(
                     receipt_stamp_s=float(row["receipt_stamp_s"]),
                     joint_names=row["joint_names"].split(),
                     point_count=int(row["point_count"]),
                     final_time_from_start_s=float(row["final_time_from_start_s"]),
-                    final_positions_rad=_float_list(row["final_positions_rad"]),
+                    final_positions_rad=final_positions,
+                    target_xyz_m=[float(value) for value in target_xyz],
                 )
             )
     return rows
@@ -91,6 +102,8 @@ def _format_vec(values: np.ndarray | list[float], digits: int = 6) -> str:
 def _write_summary(
     output_path: Path,
     input_dir: Path,
+    tracking_source: str,
+    command_index: int,
     approach_command: CommandRow,
     next_command_stamp_s: float | None,
     approach_samples: list[TrackingSample],
@@ -114,7 +127,7 @@ def _write_summary(
     feedback_pos, _feedback_rot = kin.pose(feedback_q)
     cart_error = target_pos - feedback_pos
     cart_error_norm = float(np.linalg.norm(cart_error))
-    missing_descent_m = float(target_pos[2] - feedback_pos[2])
+    missing_descent_m = float(feedback_pos[2] - target_pos[2])
 
     per_joint_lines: list[str] = []
     worst_joint_by_p95 = ("", 0.0)
@@ -159,6 +172,8 @@ def _write_summary(
         "# Approach Tracking Analysis",
         "",
         f"- input_dir: `{input_dir}`",
+        f"- tracking_source: `{tracking_source}`",
+        f"- command_index: `{command_index}`",
         f"- command_receipt_stamp_s: `{start_s:.3f}`",
         f"- next_command_stamp_s: `{next_command_stamp_s:.3f}`" if next_command_stamp_s is not None else "- next_command_stamp_s: `none`",
         f"- approach_command_duration_s: `{approach_command.final_time_from_start_s:.3f}`",
@@ -191,9 +206,29 @@ def _write_summary(
     output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def _select_approach_command(commands: list[CommandRow]) -> int | None:
+    best_index: int | None = None
+    best_error = math.inf
+    for index, command in enumerate(commands):
+        target = np.array(command.target_xyz_m, dtype=float)
+        error = float(np.linalg.norm(target - TOUCH_POSE))
+        if error < best_error:
+            best_error = error
+            best_index = index
+    if best_index is None or best_error > COMMAND_TARGET_TOLERANCE_M:
+        return None
+    return best_index
+
+
 def analyze_directory(input_dir: Path, output_name: str, command_index: int) -> Path:
     commands_path = input_dir / "trajectory_commands.csv"
-    tracking_path = input_dir / "trajectory_tracking_samples.csv"
+    controller_tracking_path = input_dir / CONTROLLER_STATE_TRACKING_FILE
+    joint_tracking_path = input_dir / JOINT_STATE_TRACKING_FILE
+    tracking_path = (
+        controller_tracking_path
+        if controller_tracking_path.exists()
+        else joint_tracking_path
+    )
     if not commands_path.exists():
         raise FileNotFoundError(f"missing {commands_path}")
     if not tracking_path.exists():
@@ -202,6 +237,14 @@ def analyze_directory(input_dir: Path, output_name: str, command_index: int) -> 
     commands = _read_commands(commands_path)
     if not commands:
         raise RuntimeError(f"no commands in {commands_path}")
+    if command_index < 0:
+        selected = _select_approach_command(commands)
+        if selected is None:
+            raise RuntimeError(
+                "no command target matched the canonical approach/touch pose "
+                f"within {COMMAND_TARGET_TOLERANCE_M} m"
+            )
+        command_index = selected
     if command_index < 0 or command_index >= len(commands):
         raise RuntimeError(
             f"command_index {command_index} out of range for {len(commands)} commands"
@@ -221,7 +264,15 @@ def analyze_directory(input_dir: Path, output_name: str, command_index: int) -> 
         and (next_stamp is None or sample.stamp_s < next_stamp)
     ]
     output_path = input_dir / output_name
-    _write_summary(output_path, input_dir, approach_command, next_stamp, approach_samples)
+    _write_summary(
+        output_path,
+        input_dir,
+        tracking_path.name,
+        command_index,
+        approach_command,
+        next_stamp,
+        approach_samples,
+    )
     return output_path
 
 
@@ -236,10 +287,10 @@ def main() -> None:
     parser.add_argument(
         "--command-index",
         type=int,
-        default=0,
+        default=-1,
         help=(
-            "Zero-based command index to analyze. Use 1 when the observer "
-            "captured MOVING_TO_START before APPROACH."
+            "Zero-based command index to analyze. The default -1 selects the "
+            "command whose FK target matches the canonical approach/touch pose."
         ),
     )
     args = parser.parse_args()

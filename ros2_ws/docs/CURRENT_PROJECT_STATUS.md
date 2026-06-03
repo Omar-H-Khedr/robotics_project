@@ -66,6 +66,8 @@ The project must not claim final autonomous peg-in-hole success yet. The defensi
 - `diagnostics/research_baseline_controller_state_tracking_v2/endpoint_hold_dynamics_analysis.md`
 - `diagnostics/research_baseline_controller_state_tracking_v2/trajectory_tracking_summary.md`
 - `diagnostics/research_baseline_endpoint_hold_dynamics_analyzer_v1/summary.md`
+- `diagnostics/research_baseline_joint_damping_scale_5p0_v1/summary.md`
+- `diagnostics/research_baseline_joint_damping_scale_5p0_v1/approach_tracking_analysis.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -85,6 +87,7 @@ until repeated validation demonstrates robust success.
 - Canonical controller parameters: `thesis_bringup/config/research_baseline_ros2_control.yaml` loaded by `spawn_robot_sdf.py`.
 - Latest canonical controller-state tracking validation: `research_baseline_controller_state_tracking_v2` aborted safely in `MOVING_TO_START` after 120.0 s with final logged `xy_err=0.013 m`, zero insertion depth, zero contact-topic samples, and JTC controller-state p95 max position error `0.023935 rad` over the axis-align command window.
 - Endpoint hold dynamics from that run show multi-centimeter post-command oscillation: X/Y/Z ranges `0.041273 / 0.035843 / 0.033742 m`, strict 10 Hz bins `0`, and largest joint feedback range `joint_1=0.057121 rad`.
+- A 5x damping diagnostic now clears the strict MOVING_TO_START gate and reaches APPROACH with lower force/tracking error, but still aborts before INSERT because final approach feedback remains at `z=0.849622 m` for a `z=0.830000 m` target, above the `0.8450 m` force-safe precondition.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
 - Insertion controller: topic-based trajectory publishing with median Fz baseline, SEARCH phase, single-point INSERT, final JSON outcome logging.

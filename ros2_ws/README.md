@@ -75,6 +75,7 @@ Latest hold evidence shows the corrected post-tool runs do not satisfy the requi
 | research_baseline_jtc_controller_state_observer_v1 | Completed: trajectory observer now subscribes to JTC `controller_state` and records nonzero state samples |
 | research_baseline_controller_state_tracking_v2 | Failed safely: canonical run records JTC controller-state tracking but still times out before descent |
 | research_baseline_endpoint_hold_dynamics_analyzer_v1 | Completed: endpoint hold analyzer shows multi-centimeter hold oscillation and zero strict 10 Hz bins |
+| research_baseline_joint_damping_scale_5p0_v1 | Improved but failed safely: 5x damping reaches APPROACH but INSERT remains blocked by Z precondition |
 
 ## 2026-06-03 Controller-State Tracking V2
 
@@ -132,6 +133,32 @@ post-command hold is not a small static offset:
 
 This supports endpoint hold dynamics or damping-authority work as the next
 technical step. It does not support relaxing the 2 mm safety gate.
+
+## 2026-06-03 Joint Damping Scale 5.0 Diagnostic
+
+Milestone: `research_baseline_joint_damping_scale_5p0_v1`
+
+Evidence: `diagnostics/research_baseline_joint_damping_scale_5p0_v1/summary.md`
+
+The 5x SDF joint damping diagnostic was run because endpoint-hold evidence
+showed multi-centimeter oscillation and prior 2x damping improved but did not
+clear the strict gate. This diagnostic keeps the canonical targets, safety
+gates, force thresholds, and success criteria unchanged.
+
+Runtime result:
+
+- `Outcome: ABORTED`;
+- `Reason: INSERT blocked: peg_z 0.8534m is above force-safe precondition 0.8450m`;
+- MOVING_TO_START reached strict no-contact stability and transitioned to APPROACH;
+- insertion depth `0.0000 m`;
+- contact-topic samples `0`;
+- max raw force norm `209.198759 N`;
+- approach final feedback `z=0.849622 m` for target `z=0.830000 m`;
+- approach missing descent `0.019622 m`.
+
+This is a meaningful stabilization improvement, not physical insertion success.
+The next blocker has moved from start hold to approach depth realization before
+INSERT.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
