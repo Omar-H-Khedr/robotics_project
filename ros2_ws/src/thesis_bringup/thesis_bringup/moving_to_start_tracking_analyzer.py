@@ -20,6 +20,8 @@ AXIS_ALIGN_POSE = np.array([0.520, -0.200, 0.885])
 COMMAND_TARGET_TOLERANCE_M = 0.02
 STRICT_XY_M = 0.002
 FINAL_XY_WINDOW_S = 1.0
+CONTROLLER_STATE_TRACKING_FILE = "trajectory_controller_state_samples.csv"
+JOINT_STATE_TRACKING_FILE = "trajectory_tracking_samples.csv"
 
 
 @dataclass(frozen=True)
@@ -112,7 +114,13 @@ def _select_axis_align_command(commands: list[CommandRow]) -> int | None:
 
 def analyze(input_dir: Path) -> dict[str, object]:
     commands_path = input_dir / "trajectory_commands.csv"
-    tracking_path = input_dir / "trajectory_tracking_samples.csv"
+    controller_tracking_path = input_dir / CONTROLLER_STATE_TRACKING_FILE
+    joint_tracking_path = input_dir / JOINT_STATE_TRACKING_FILE
+    tracking_path = (
+        controller_tracking_path
+        if controller_tracking_path.exists()
+        else joint_tracking_path
+    )
     if not commands_path.exists():
         raise FileNotFoundError(f"missing {commands_path}")
     if not tracking_path.exists():
@@ -149,6 +157,7 @@ def analyze(input_dir: Path) -> dict[str, object]:
             "result": "NO_TRACKING_SAMPLES_FOR_AXIS_ALIGN_COMMAND",
             "command_index": command_index,
             "command_receipt_stamp_s": command.receipt_stamp_s,
+            "tracking_source": tracking_path.name,
         }
 
     kin = RobotKinematics()
@@ -198,6 +207,7 @@ def analyze(input_dir: Path) -> dict[str, object]:
     return {
         "input_dir": str(input_dir),
         "result": "OK",
+        "tracking_source": tracking_path.name,
         "command_index": command_index,
         "command_receipt_stamp_s": command.receipt_stamp_s,
         "next_command_stamp_s": next_stamp,
@@ -281,6 +291,7 @@ def write_outputs(input_dir: Path, result: dict[str, object]) -> None:
     lines.extend(
         [
             f"- command_index: `{result.get('command_index')}`",
+            f"- tracking_source: `{result.get('tracking_source')}`",
             f"- command_duration_s: `{_fmt(result.get('command_duration_s'), 3)}`",
             f"- post_command_hold_before_next_command_s: `{_fmt(result.get('post_command_hold_before_next_command_s'), 3)}`",
             f"- samples: `{result.get('samples')}`",

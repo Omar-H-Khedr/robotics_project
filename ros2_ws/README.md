@@ -4,7 +4,7 @@ Current status as of 2026-06-03: this is an active ROS 2 Jazzy workspace for a G
 
 The strongest historical insertion evidence remains a **single simulated insertion-depth event**: measured insertion depth about 0.011 m with sustained contact around 142.9 N. This is not robust autonomous peg-in-hole success. The current safer iisy6 baseline has corrected the peg-tip frame and removed a reproduced robot-link clearance collision, but it still aborts honestly before descent because it only crosses the strict 2 mm above-hole XY gate transiently. Known unresolved concerns include unstable above-hole hold behavior, high raw F/T spikes, large approach tracking errors, broken multi-point INSERT behavior, and failed repeated validation.
 
-Latest hold evidence shows the corrected post-tool runs do not satisfy the required five 10 Hz stable ticks inside the 2 mm no-contact gate. The best estimated state-loop hold among the recent post-tool variants is two ticks, reached by 2x damping and by 2x damping plus `position_gain:=1500`; both still aborted safely in `MOVING_TO_START`. Older approach evidence also localizes the descent blocker to `joint_2`: normal, slow-descent, and high-gain approach diagnostics all left `joint_2` about 0.107-0.111 rad from target, keeping the peg tip about 67-70 mm above the commanded touch pose. This supports endpoint hold and controller/physics investigation before any learning or insertion-claim work.
+Latest hold evidence shows the corrected post-tool runs do not satisfy the required five 10 Hz stable ticks inside the 2 mm no-contact gate. The 2026-06-03 controller-state tracking run captured the JTC's own reference/feedback/error and still aborted in `MOVING_TO_START`: final logged `xy_err=0.013 m`, zero insertion depth, zero contact-topic samples, and only `143 / 15930` command-window samples inside the strict 2 mm XY band. Older approach evidence also localizes the descent blocker to `joint_2`: normal, slow-descent, and high-gain approach diagnostics all left `joint_2` about 0.107-0.111 rad from target, keeping the peg tip about 67-70 mm above the commanded touch pose. This supports endpoint hold and controller/physics investigation before any learning or insertion-claim work.
 
 ## Milestones
 
@@ -73,6 +73,38 @@ Latest hold evidence shows the corrected post-tool runs do not satisfy the requi
 | research_baseline_canonical_after_command_capture_v1 | Failed safely: canonical run captures MOVING_TO_START command but still fails the strict above-hole hold gate |
 | research_baseline_moving_to_start_xy_distribution_analyzer_v1 | Completed: command-attributed analyzer now reports XY distribution and final-window oscillation |
 | research_baseline_jtc_controller_state_observer_v1 | Completed: trajectory observer now subscribes to JTC `controller_state` and records nonzero state samples |
+| research_baseline_controller_state_tracking_v2 | Failed safely: canonical run records JTC controller-state tracking but still times out before descent |
+
+## 2026-06-03 Controller-State Tracking V2
+
+Milestone: `research_baseline_controller_state_tracking_v2`
+
+Evidence: `diagnostics/research_baseline_controller_state_tracking_v2/summary.md`
+
+The passive trajectory observer now writes
+`trajectory_controller_state_samples.csv` from
+`/joint_trajectory_controller/controller_state`, and
+`moving_to_start_tracking_analyzer` prefers that controller-state source when
+present. This removes the remaining ambiguity between locally interpolated
+command reference and the JTC's own reference/feedback/error stream.
+
+Validation passed Python syntax and targeted `colcon build --packages-select
+thesis_bringup`. A canonical 190 s headless run reached the task node's own
+final outcome before the wrapper timeout:
+
+- `Outcome: ABORTED`;
+- `Reason: MOVING_TO_START timeout/failure (120.0s). cart_err=0.018m, xy_err=0.013m, joint_err=0.017rad, stable=0/5`;
+- insertion depth `0.0000 m`;
+- JTC controller-state records `23878`;
+- analyzer tracking source `trajectory_controller_state_samples.csv`;
+- strict XY samples `143 / 15930`;
+- final 1 s XY range `0.000589-0.023077 m`;
+- contact-topic samples `0`;
+- max raw force norm `272.806449 N`.
+
+The instrumentation is validated, but the canonical baseline remains blocked
+before descent. Do not claim insertion success from this run and do not loosen
+the strict no-contact gate.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 

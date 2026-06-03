@@ -39,6 +39,10 @@ def _duration_to_sec(duration) -> float:
     return float(duration.sec) + float(duration.nanosec) * 1.0e-9
 
 
+def _stamp_to_sec(stamp) -> float:
+    return float(stamp.sec) + float(stamp.nanosec) * 1.0e-9
+
+
 class TrajectoryTrackingObserver(Node):
     """Write JTC reference/feedback/error samples and rolling summaries."""
 
@@ -62,11 +66,16 @@ class TrajectoryTrackingObserver(Node):
         self._output_dir = Path(str(self.get_parameter("output_dir").value))
         self._output_dir.mkdir(parents=True, exist_ok=True)
         self._csv_path = self._output_dir / "trajectory_tracking_samples.csv"
+        self._controller_csv_path = self._output_dir / "trajectory_controller_state_samples.csv"
         self._command_path = self._output_dir / "trajectory_commands.csv"
         self._summary_path = self._output_dir / "trajectory_tracking_summary.md"
 
         self._csv_file = self._csv_path.open("w", newline="", encoding="utf-8")
         self._writer = csv.writer(self._csv_file)
+        self._controller_csv_file = self._controller_csv_path.open(
+            "w", newline="", encoding="utf-8"
+        )
+        self._controller_writer = csv.writer(self._controller_csv_file)
         self._command_file = self._command_path.open("w", newline="", encoding="utf-8")
         self._command_writer = csv.writer(self._command_file)
         self._command_writer.writerow(
@@ -79,17 +88,25 @@ class TrajectoryTrackingObserver(Node):
             ]
         )
         self._header_written = False
+        self._controller_header_written = False
         self._joint_names: list[str] = []
+        self._controller_joint_names: list[str] = []
         self._active_command: JointTrajectory | None = None
         self._active_command_start_s: float | None = None
         self._command_count = 0
         self._sample_count = 0
         self._jtc_state_sample_count = 0
+        self._jtc_state_record_count = 0
         self._max_abs_errors: list[float] = []
         self._rms_errors: list[float] = []
+        self._jtc_max_abs_errors: list[float] = []
+        self._jtc_rms_errors: list[float] = []
         self._final_max_abs_error = 0.0
+        self._jtc_final_max_abs_error = 0.0
         self._first_stamp: float | None = None
         self._last_stamp: float | None = None
+        self._jtc_first_stamp: float | None = None
+        self._jtc_last_stamp: float | None = None
 
         self.create_subscription(
             JointTrajectoryControllerState,
@@ -134,8 +151,61 @@ class TrajectoryTrackingObserver(Node):
         self._header_written = True
         self._joint_names = joint_names
 
+    def _write_controller_header(self, joint_names: list[str]) -> None:
+        header = [
+            "stamp_s",
+            "max_abs_position_error_rad",
+            "rms_position_error_rad",
+        ]
+        for name in joint_names:
+            header.extend(
+                [
+                    f"{name}_reference_rad",
+                    f"{name}_feedback_rad",
+                    f"{name}_error_rad",
+                    f"{name}_reference_velocity_rad_s",
+                    f"{name}_feedback_velocity_rad_s",
+                    f"{name}_error_velocity_rad_s",
+                ]
+            )
+        self._controller_writer.writerow(header)
+        self._controller_header_written = True
+        self._controller_joint_names = joint_names
+
     def _on_state(self, msg: JointTrajectoryControllerState) -> None:
         self._jtc_state_sample_count += 1
+        if not msg.joint_names:
+            return
+        if not msg.reference.positions or not msg.feedback.positions:
+            return
+        joint_names = list(msg.joint_names)
+        if len(msg.reference.positions) < len(joint_names):
+            return
+        if len(msg.feedback.positions) < len(joint_names):
+            return
+        if len(msg.error.positions) >= len(joint_names):
+            errors = [float(value) for value in msg.error.positions[: len(joint_names)]]
+        else:
+            errors = [
+                float(reference) - float(feedback)
+                for reference, feedback in zip(
+                    msg.reference.positions[: len(joint_names)],
+                    msg.feedback.positions[: len(joint_names)],
+                )
+            ]
+        stamp_s = _stamp_to_sec(msg.header.stamp)
+        if stamp_s <= 0.0:
+            stamp_s = self.get_clock().now().nanoseconds * 1.0e-9
+        self._record_controller_state_sample(
+            stamp_s,
+            joint_names,
+            [float(value) for value in msg.reference.positions[: len(joint_names)]],
+            [float(value) for value in msg.feedback.positions[: len(joint_names)]],
+            errors,
+            [float(value) for value in msg.reference.velocities[: len(joint_names)]],
+            [float(value) for value in msg.feedback.velocities[: len(joint_names)]],
+            [float(value) for value in msg.error.velocities[: len(joint_names)]],
+        )
 
     def _on_command(self, msg: JointTrajectory) -> None:
         if not msg.joint_names or not msg.points:
@@ -233,17 +303,65 @@ class TrajectoryTrackingObserver(Node):
             self._first_stamp = stamp_s
         self._last_stamp = stamp_s
 
+    def _record_controller_state_sample(
+        self,
+        stamp_s: float,
+        joint_names: list[str],
+        reference_positions: list[float],
+        feedback_positions: list[float],
+        errors: list[float],
+        reference_velocities: list[float],
+        feedback_velocities: list[float],
+        error_velocities: list[float],
+    ) -> None:
+        if not self._controller_header_written:
+            self._write_controller_header(joint_names)
+        max_abs_error = max((abs(value) for value in errors), default=0.0)
+        rms_error = _rms(errors)
+        row: list[float | str] = [f"{stamp_s:.9f}", f"{max_abs_error:.9f}", f"{rms_error:.9f}"]
+        for index, _name in enumerate(joint_names):
+            row.extend(
+                [
+                    f"{reference_positions[index]:.9f}",
+                    f"{feedback_positions[index]:.9f}",
+                    f"{errors[index]:.9f}",
+                    f"{reference_velocities[index] if index < len(reference_velocities) else 0.0:.9f}",
+                    f"{feedback_velocities[index] if index < len(feedback_velocities) else 0.0:.9f}",
+                    f"{error_velocities[index] if index < len(error_velocities) else 0.0:.9f}",
+                ]
+            )
+        self._controller_writer.writerow(row)
+        self._jtc_state_record_count += 1
+        self._jtc_max_abs_errors.append(max_abs_error)
+        self._jtc_rms_errors.append(rms_error)
+        self._jtc_final_max_abs_error = max_abs_error
+        if self._jtc_first_stamp is None:
+            self._jtc_first_stamp = stamp_s
+        self._jtc_last_stamp = stamp_s
+
     def _write_summary(self) -> None:
         if self._csv_file.closed:
             return
         self._csv_file.flush()
+        self._controller_csv_file.flush()
         max_error = max(self._max_abs_errors, default=0.0)
         mean_max_error = mean(self._max_abs_errors) if self._max_abs_errors else 0.0
         p95_error = _percentile(self._max_abs_errors, 95.0)
         mean_rms_error = mean(self._rms_errors) if self._rms_errors else 0.0
+        jtc_max_error = max(self._jtc_max_abs_errors, default=0.0)
+        jtc_mean_max_error = (
+            mean(self._jtc_max_abs_errors) if self._jtc_max_abs_errors else 0.0
+        )
+        jtc_p95_error = _percentile(self._jtc_max_abs_errors, 95.0)
+        jtc_mean_rms_error = mean(self._jtc_rms_errors) if self._jtc_rms_errors else 0.0
         duration = (
             (self._last_stamp - self._first_stamp)
             if self._first_stamp is not None and self._last_stamp is not None
+            else 0.0
+        )
+        jtc_duration = (
+            (self._jtc_last_stamp - self._jtc_first_stamp)
+            if self._jtc_first_stamp is not None and self._jtc_last_stamp is not None
             else 0.0
         )
         lines = [
@@ -254,6 +372,7 @@ class TrajectoryTrackingObserver(Node):
             f"- joint_state_topic: `{self._joint_state_topic}`",
             f"- observed_commands: `{self._command_count}`",
             f"- jtc_state_samples: `{self._jtc_state_sample_count}`",
+            f"- jtc_state_records: `{self._jtc_state_record_count}`",
             f"- samples: `{self._sample_count}`",
             f"- duration_s: `{duration:.3f}`",
             f"- joints: `{', '.join(self._joint_names)}`",
@@ -262,6 +381,13 @@ class TrajectoryTrackingObserver(Node):
             f"- p95_max_abs_position_error_rad: `{p95_error:.6f}`",
             f"- mean_rms_position_error_rad: `{mean_rms_error:.6f}`",
             f"- final_max_abs_position_error_rad: `{self._final_max_abs_error:.6f}`",
+            f"- controller_state_duration_s: `{jtc_duration:.3f}`",
+            f"- controller_state_joints: `{', '.join(self._controller_joint_names)}`",
+            f"- controller_state_max_abs_position_error_rad: `{jtc_max_error:.6f}`",
+            f"- controller_state_mean_max_abs_position_error_rad: `{jtc_mean_max_error:.6f}`",
+            f"- controller_state_p95_max_abs_position_error_rad: `{jtc_p95_error:.6f}`",
+            f"- controller_state_mean_rms_position_error_rad: `{jtc_mean_rms_error:.6f}`",
+            f"- controller_state_final_max_abs_position_error_rad: `{self._jtc_final_max_abs_error:.6f}`",
             "",
             "This observer is passive. It does not publish commands or alter controller behavior.",
         ]
@@ -271,6 +397,8 @@ class TrajectoryTrackingObserver(Node):
         self._write_summary()
         if not self._csv_file.closed:
             self._csv_file.close()
+        if not self._controller_csv_file.closed:
+            self._controller_csv_file.close()
         if not self._command_file.closed:
             self._command_file.close()
         return super().destroy_node()

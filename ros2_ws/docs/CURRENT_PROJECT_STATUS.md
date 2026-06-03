@@ -61,6 +61,9 @@ The project must not claim final autonomous peg-in-hole success yet. The defensi
 - `diagnostics/research_baseline_moving_to_start_xy_distribution_analyzer_v1/summary.md`
 - `diagnostics/research_baseline_jtc_controller_state_observer_v1/summary.md`
 - `diagnostics/research_baseline_jtc_controller_state_observer_v1/trajectory_tracking_summary.md`
+- `diagnostics/research_baseline_controller_state_tracking_v2/summary.md`
+- `diagnostics/research_baseline_controller_state_tracking_v2/moving_to_start_tracking_analysis.md`
+- `diagnostics/research_baseline_controller_state_tracking_v2/trajectory_tracking_summary.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -78,6 +81,7 @@ until repeated validation demonstrates robust success.
 - Spawn: x=0.80, y=-0.75, z=0.735, yaw=1.5708.
 - Controller stack: `joint_state_broadcaster` and `joint_trajectory_controller`.
 - Canonical controller parameters: `thesis_bringup/config/research_baseline_ros2_control.yaml` loaded by `spawn_robot_sdf.py`.
+- Latest canonical controller-state tracking validation: `research_baseline_controller_state_tracking_v2` aborted safely in `MOVING_TO_START` after 120.0 s with final logged `xy_err=0.013 m`, zero insertion depth, zero contact-topic samples, and JTC controller-state p95 max position error `0.023935 rad` over the axis-align command window.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
 - Insertion controller: topic-based trajectory publishing with median Fz baseline, SEARCH phase, single-point INSERT, final JSON outcome logging.
