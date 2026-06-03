@@ -216,6 +216,27 @@ The latest rejected SEARCH recenter experiment is
 - decision: source reverted. Keep centered recentering with post-command and
   active-streak gates.
 
+The latest SEARCH tracking sensitivity diagnostic is
+`diagnostics/research_baseline_search_tracking_sensitivity_v1`:
+
+- analyzer evidence:
+  `diagnostics/research_baseline_search_streak_preservation_v1/search_tracking_sensitivity_analysis.md`,
+  `diagnostics/research_baseline_search_post_command_stability_gate_v1_repeat2/search_tracking_sensitivity_analysis.md`,
+  and
+  `diagnostics/research_baseline_search_feedback_compensated_recenter_v1/search_tracking_sensitivity_analysis.md`;
+- centered hold targets were effectively at the hole center, but measured
+  feedback drifted by millimeters;
+- in `research_baseline_search_streak_preservation_v1`, max centered-hold p95
+  actual reference-feedback XY drift was `0.003981 m` with max centered-hold
+  p95 joint error `0.008404 rad`;
+- the linearized `J_xy * (feedback - reference)` estimate matched actual XY
+  drift within about `0.000020 m`;
+- dominant p95 XY contributor: `joint_1`;
+- decision: this points to controller/physics tracking accuracy at the
+  no-contact centered hold, not a controller-state target-frame mismatch. Keep
+  the `0.0010 m` physical gate and reduce measured hold tracking error before
+  attempting INSERT again.
+
 Repeated validation on 2026-06-01 produced 0/3 physical successes:
 
 - one DEGRADED INSERT with only 0.0037 m depth and a 1237.45 N peak raw Fz spike;

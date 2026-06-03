@@ -98,6 +98,42 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_post_command_stability_gate_v1 | Completed safety gate: SEARCH only counts stability after command duration; validation still fails closed before INSERT |
 | research_baseline_search_streak_preservation_v1 | Completed safety sequencing: SEARCH preserves active stability streaks, but validation still fails closed before INSERT |
 | research_baseline_search_feedback_compensated_recenter_v1 | Rejected: bounded feedback-compensated recenter still failed SEARCH and worsened mean/final XY; source reverted |
+| research_baseline_search_tracking_sensitivity_v1 | Completed diagnostic: measured joint tracking error explains millimeter-scale centered-hold XY drift; dominant p95 contributor is joint_1 |
+
+## 2026-06-03 SEARCH Tracking Sensitivity Diagnostic
+
+Milestone: `research_baseline_search_tracking_sensitivity_v1`
+
+Evidence: `diagnostics/research_baseline_search_tracking_sensitivity_v1/summary.md`
+
+Added passive analyzer
+`thesis_bringup.search_tracking_sensitivity_analyzer`, exposed as
+`ros2 run thesis_bringup search_tracking_sensitivity_analyzer`. It reads
+`trajectory_commands.csv` and `trajectory_controller_state_samples.csv`, computes
+peg-tip reference/feedback poses with `RobotKinematics`, and compares actual
+reference-feedback XY drift with the finite-difference Jacobian estimate
+`J_xy * (feedback - reference)`.
+
+Validation passed Python syntax, targeted `colcon build --packages-select
+thesis_bringup kuka_task_control`, and offline analysis of:
+
+- `diagnostics/research_baseline_search_streak_preservation_v1`;
+- `diagnostics/research_baseline_search_post_command_stability_gate_v1_repeat2`;
+- `diagnostics/research_baseline_search_feedback_compensated_recenter_v1`.
+
+Result: centered SEARCH/hold targets are effectively at the hole center, but
+controller feedback drifts by millimeters. In the accepted
+`research_baseline_search_streak_preservation_v1` run, centered hold commands
+had max p95 actual reference-feedback XY drift `0.003981 m` with max centered
+hold p95 joint error `0.008404 rad`. The linearized estimate matched within
+about `0.000020 m`, so the controller-state tracking error is sufficient to
+explain the remaining XY error in this log path. `joint_1` is the dominant p95
+XY contributor.
+
+Decision: this does not justify loosening the `0.0010 m` physical clearance
+gate and does not show a target-frame mismatch. The next credible fix should
+reduce or compensate no-contact hold tracking error/dynamics, then rerun the
+same sustained SEARCH gate.
 
 ## 2026-06-03 Rejected Feedback-Compensated Recenter
 

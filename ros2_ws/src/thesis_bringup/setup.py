@@ -29,6 +29,7 @@ setup(
             "insert_retreat_contact_analyzer = thesis_bringup.insert_retreat_contact_analyzer:main",
             "insert_handoff_reference_analyzer = thesis_bringup.insert_handoff_reference_analyzer:main",
             "hold_window_reference_analyzer = thesis_bringup.hold_window_reference_analyzer:main",
+            "search_tracking_sensitivity_analyzer = thesis_bringup.search_tracking_sensitivity_analyzer:main",
             "insert_xy_drift_analyzer = thesis_bringup.insert_xy_drift_analyzer:main",
             "withdrawal_contact_timing_analyzer = thesis_bringup.withdrawal_contact_timing_analyzer:main",
             "moving_to_start_tracking_analyzer = thesis_bringup.moving_to_start_tracking_analyzer:main",
