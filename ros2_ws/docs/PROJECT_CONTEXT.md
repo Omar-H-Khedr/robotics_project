@@ -64,6 +64,14 @@ The latest safety validation is
 - max passive contact-topic force: `0.000000 N`;
 - reason: fail closed on side-loaded INSERT before deeper invalid extraction.
 
+The latest INSERT drift diagnostic is
+`diagnostics/research_baseline_insert_xy_drift_diagnostic_v1`:
+
+- side-load abort run pre-command final XY error: `0.001569 m`;
+- side-load abort run first meaningful depth: `0.001316 m` at XY error `0.002488 m`;
+- prior physical-XY-gate run first side-load: `0.001274 m` depth at XY error `0.002153 m`;
+- reason: controller-state feedback can violate the `0.0010 m` physical radial clearance before or during early INSERT.
+
 Repeated validation on 2026-06-01 produced 0/3 physical successes:
 
 - one DEGRADED INSERT with only 0.0037 m depth and a 1237.45 N peak raw Fz spike;
@@ -88,6 +96,7 @@ This is not robust autonomous peg-in-hole success. The honest claim is now:
 - Withdrawal contact timing analysis showed the staged run's contact occurred during vertical extraction, not later home motion; the peak occurred at `0.019732 m` insertion depth with about `0.006 m` XY error.
 - The latest clearance-aware validation downgraded depth/contact to `DEGRADED` because final insertion XY error `0.0030 m` exceeds the `0.0010 m` physical radial clearance.
 - INSERT side-load abort now prevents continuing deeper after inserted-depth XY drift exceeds physical clearance, but this means the current baseline fails honestly before physical success.
+- INSERT XY drift diagnostics show the next safety change should gate no-contact INSERT motion against the `0.0010 m` physical radial clearance before deeper descent, then address single-point INSERT path drift.
 - Gazebo contact physics are adequate for early simulation evidence but not final safety fidelity.
 - Some older docs still describe stale iisy3 state and must not be used as current truth.
 - A 2026-06-02 source-integrity run confirmed `joint_state_broadcaster` as the intended `/joint_states` publisher, but the same run still timed out in `MOVING_TO_START` with large XY error.

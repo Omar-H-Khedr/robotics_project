@@ -1,0 +1,117 @@
+{
+  "command_duration_s": 20.0,
+  "command_index": 2,
+  "command_point_count": 1,
+  "command_receipt_stamp_s": 62.602,
+  "final_depth_m": 0.01791579525909981,
+  "final_xy_error_m": 0.004332123011242506,
+  "first_clearance_violation": {
+    "depth_m": 0.0,
+    "elapsed_s": 0.0010000000000047748,
+    "feedback_xyz_m": [
+      0.5209047169000927,
+      -0.19928879376722441,
+      0.8405353152408744
+    ],
+    "max_abs_joint_error_rad": 0.0,
+    "rms_joint_error_rad": 0.0,
+    "stamp_s": 62.603,
+    "worst_joint_error_rad": 0.0,
+    "worst_joint_name": "joint_1",
+    "xy_error_m": 0.0011507940627462805,
+    "z_m": 0.8405353152408744
+  },
+  "first_depth": {
+    "depth_m": 0.0011034717532842908,
+    "elapsed_s": 10.702000000000005,
+    "feedback_xyz_m": [
+      0.5199929147623814,
+      -0.20032320963439187,
+      0.8088965282467158
+    ],
+    "max_abs_joint_error_rad": 0.00603455,
+    "rms_joint_error_rad": 0.003436017,
+    "stamp_s": 73.304,
+    "worst_joint_error_rad": -0.00603455,
+    "worst_joint_name": "joint_2",
+    "xy_error_m": 0.0003232872845563743,
+    "z_m": 0.8088965282467158
+  },
+  "first_sideload": {
+    "depth_m": 0.001274263917421914,
+    "elapsed_s": 10.83400000000001,
+    "feedback_xyz_m": [
+      0.5181814117292084,
+      -0.20115253106699427,
+      0.8087257360825781
+    ],
+    "max_abs_joint_error_rad": 0.007046984,
+    "rms_joint_error_rad": 0.00440798,
+    "stamp_s": 73.436,
+    "worst_joint_error_rad": 0.007046984,
+    "worst_joint_name": "joint_6",
+    "xy_error_m": 0.002153042303125458,
+    "z_m": 0.8087257360825781
+  },
+  "hole_centre_xy_m": [
+    0.52,
+    -0.2
+  ],
+  "hole_top_z_m": 0.81,
+  "initial_xy_error_m": 0.0011507940627462805,
+  "input_dir": "diagnostics/research_baseline_insert_physical_xy_gate_v1",
+  "max_abs_joint_error_rad": 0.010498259,
+  "max_depth_m": 0.024904562406092512,
+  "max_xy_error_m": 0.005837751891179734,
+  "mean_depth_m": 0.006641632405493842,
+  "mean_xy_error_m": 0.002180191133244233,
+  "meaningful_depth_m": 0.001,
+  "nearest_contact_at_first_clearance_violation_n": 130.162090606,
+  "nearest_fz_at_first_clearance_violation_n": -10.358430589,
+  "next_command_stamp_s": 85.702,
+  "observed_window_s": 23.1,
+  "p95_max_abs_joint_error_rad": 0.008380906,
+  "p95_xy_error_m": 0.00401374142903291,
+  "physical_clearance_m": 0.001,
+  "pre_command_final_sample": {
+    "depth_m": 0.0,
+    "elapsed_s": -0.001999999999995339,
+    "feedback_xyz_m": [
+      0.518981999164949,
+      -0.20093153848719425,
+      0.8407907111539934
+    ],
+    "max_abs_joint_error_rad": 0.006702323,
+    "rms_joint_error_rad": 0.003582603,
+    "stamp_s": 62.6,
+    "worst_joint_error_rad": 0.006702323,
+    "worst_joint_name": "joint_6",
+    "xy_error_m": 0.0013798875509579206,
+    "z_m": 0.8407907111539934
+  },
+  "pre_command_max_xy_sample": {
+    "depth_m": 0.0,
+    "elapsed_s": -0.5700000000000003,
+    "feedback_xyz_m": [
+      0.517344480183334,
+      -0.2042195020489832,
+      0.8414510015928673
+    ],
+    "max_abs_joint_error_rad": 0.006460313,
+    "rms_joint_error_rad": 0.004308664,
+    "stamp_s": 62.032,
+    "worst_joint_error_rad": 0.006460313,
+    "worst_joint_name": "joint_6",
+    "xy_error_m": 0.004985577502965853,
+    "z_m": 0.8414510015928673
+  },
+  "pre_command_samples": 250,
+  "pre_command_window_s": 1.0,
+  "samples": 5775,
+  "target_xyz_m": [
+    0.5200000001607523,
+    -0.2000000002345692,
+    0.7900000000075214
+  ],
+  "tracking_source": "trajectory_controller_state_samples.csv"
+}

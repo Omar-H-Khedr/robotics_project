@@ -4,7 +4,7 @@ Current status as of 2026-06-03: this is an active ROS 2 Jazzy workspace for a G
 
 The strongest historical iisy6 evidence is a controller-driven simulated insertion-depth event from `diagnostics/research_baseline_insert_sim_time_completion_v4`: final outcome `SUCCESS` under older depth/contact criteria, insertion depth `0.0191 m`, task F/T insert-contact evidence `60.1 N`, max raw `|Fz|=133.33 N`, and no safety abort or invalid timeout. That claim is now superseded by a stricter physical-clearance gate: `diagnostics/research_baseline_insert_physical_xy_gate_v1` reached depth `0.0177 m` and insert contact `55.4 N`, but correctly reported `DEGRADED` because final insertion XY error `0.0030 m` exceeds the 25 mm peg / 27 mm hole radial clearance of `0.0010 m`. Current status: no validated physical insertion success under the latest criteria.
 
-Latest timing evidence shows the prior failed insert was partly a clock-domain bug: the task advanced to RETREAT after about `10.6 s` of controller-state INSERT time despite commanding a `20 s` trajectory. The current task node uses ROS/Gazebo time for INSERT completion and now also checks final insertion XY against physical hole clearance. Future work should reduce inserted-depth XY drift and side-loaded extraction contact; do not treat depth/contact alone as robust autonomous peg-in-hole performance.
+Latest timing evidence shows the prior failed insert was partly a clock-domain bug: the task advanced to RETREAT after about `10.6 s` of controller-state INSERT time despite commanding a `20 s` trajectory. The current task node uses ROS/Gazebo time for INSERT completion and now also checks final insertion XY against physical hole clearance. The latest XY drift diagnostic shows controller feedback can exceed the `0.001 m` physical radial clearance before or during early INSERT, so future work should add a no-contact INSERT clearance gate before deeper descent and then reduce single-point INSERT path drift; do not treat depth/contact alone as robust autonomous peg-in-hole performance.
 
 ## Milestones
 
@@ -84,6 +84,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_withdrawal_contact_timing_v1 | Completed: RETREAT contact occurs during first extraction command before home motion |
 | research_baseline_insert_physical_xy_gate_v1 | Completed: depth/contact event correctly downgraded because final inserted XY exceeds physical clearance |
 | research_baseline_insert_sideload_abort_v1 | Completed: INSERT aborts safely when inserted-depth XY exceeds physical clearance |
+| research_baseline_insert_xy_drift_diagnostic_v1 | Completed: analyzer shows INSERT XY can violate physical clearance before or during early descent |
 
 ## 2026-06-03 Controller-State Tracking V2
 
@@ -295,6 +296,34 @@ rows dropped from `1293` to `2` and RETREAT max contact force dropped from
 `589.942680 N` to `0.000000 N`. This is not task success; it is a safer
 fail-closed behavior. The next step is reducing the inserted-depth XY drift
 that triggers this abort.
+
+## 2026-06-03 Insert XY Drift Diagnostic
+
+Milestone: `research_baseline_insert_xy_drift_diagnostic_v1`
+
+Evidence: `diagnostics/research_baseline_insert_xy_drift_diagnostic_v1/summary.md`
+
+Added `insert_xy_drift_analyzer`, an offline analyzer over
+`trajectory_commands.csv` plus controller-state tracking samples. It reconstructs
+peg-tip Cartesian feedback through the project kinematics and reports
+pre-command boundary XY, the first physical-clearance violation, the first
+meaningful insertion depth, and the first side-loaded depth event.
+
+Validation passed Python syntax and targeted `colcon build --packages-select
+thesis_bringup`. The analyzer was run on both
+`research_baseline_insert_sideload_abort_v1` and
+`research_baseline_insert_physical_xy_gate_v1`.
+
+Result: current side-load abort evidence shows pre-command final XY
+`0.001569 m`, command-window initial XY `0.002539 m`, and first meaningful
+depth `0.001316 m` at XY `0.002488 m`. The prior physical-XY-gate run shows a
+similar early clearance risk and later side-load: first meaningful depth
+`0.001103 m` at XY `0.000323 m`, then side-load at depth `0.001274 m` with XY
+`0.002153 m`.
+
+This confirms the next control change must preserve the side-load abort and
+gate no-contact INSERT motion against the physical clearance before attempting
+deeper descent or learning.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
