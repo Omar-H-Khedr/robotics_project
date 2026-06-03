@@ -27,6 +27,7 @@ setup(
             "approach_tracking_analyzer = thesis_bringup.approach_tracking_analyzer:main",
             "endpoint_hold_dynamics_analyzer = thesis_bringup.endpoint_hold_dynamics_analyzer:main",
             "insert_retreat_contact_analyzer = thesis_bringup.insert_retreat_contact_analyzer:main",
+            "withdrawal_contact_timing_analyzer = thesis_bringup.withdrawal_contact_timing_analyzer:main",
             "moving_to_start_tracking_analyzer = thesis_bringup.moving_to_start_tracking_analyzer:main",
             "trajectory_tracking_observer = thesis_bringup.trajectory_tracking_observer:main",
             "wrench_state_observer = thesis_bringup.wrench_state_observer:main",

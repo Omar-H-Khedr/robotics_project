@@ -64,6 +64,7 @@ This is not robust autonomous peg-in-hole success. The honest claim is now:
 - Latest successful INSERT contact is task F/T evidence; the passive Gazebo contact observer recorded contact-topic rows only during RETREAT in the v4 run.
 - Successful-insert RETREAT still produced contact-topic force up to `249.593329 N`, so withdrawal contact reduction is the next safety-critical blocker.
 - A staged vertical-lift-then-home withdrawal diagnostic was rejected because it worsened RETREAT contact to `486.746287 N` over `307` rows.
+- Withdrawal contact timing analysis showed the staged run's contact occurred during vertical extraction, not later home motion; the peak occurred at `0.019732 m` insertion depth with about `0.006 m` XY error.
 - Gazebo contact physics are adequate for early simulation evidence but not final safety fidelity.
 - Some older docs still describe stale iisy3 state and must not be used as current truth.
 - A 2026-06-02 source-integrity run confirmed `joint_state_broadcaster` as the intended `/joint_states` publisher, but the same run still timed out in `MOVING_TO_START` with large XY error.
@@ -122,15 +123,17 @@ Robust success requires repeated validation with a documented success rate and f
 
 ## Next Technical Milestone
 
-`research_baseline_successful_insert_withdrawal_contact_reduction`
+`research_baseline_successful_insert_extraction_contact_reduction`
 
 Reason: the current v4 evidence includes one controller-driven simulated
 insertion success, but successful-insert RETREAT still creates contact-topic
 rows up to `249.593329 N`. A staged vertical-lift-then-home diagnostic was
-rejected after worsening RETREAT contact to `486.746287 N`. The next
-implementation should diagnose fixture/hole contact during vertical extraction
-and reduce withdrawal contact after successful insertion, then rerun the same
-analyzers and only then attempt repeated validation.
+rejected after worsening RETREAT contact to `486.746287 N`. Timing analysis
+then showed the worsened contact occurred during vertical extraction, before
+the later home command, with the peak while the peg was still inserted
+`0.019732 m`. The next implementation should reduce side-loaded extraction or
+fixture/hole contact after successful insertion, then rerun the same analyzers
+and only then attempt repeated validation.
 
 Historical context: after the peg-tip frame correction, the canonical blocker
 was stable above-hole holding. The corrected tool frame removed the reproduced

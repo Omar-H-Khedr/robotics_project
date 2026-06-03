@@ -81,6 +81,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_retreat_clearance_lift_v1 | Completed: failed-insert RETREAT contact reduced; INSERT still failed |
 | research_baseline_insert_sim_time_completion_v4 | Completed: single validated iisy6 insertion success; repeat validation and retreat-contact reduction pending |
 | research_baseline_staged_withdrawal_v1 | Rejected: staged lift/home preserved success but worsened RETREAT contact |
+| research_baseline_withdrawal_contact_timing_v1 | Completed: RETREAT contact occurs during first extraction command before home motion |
 
 ## 2026-06-03 Controller-State Tracking V2
 
@@ -219,6 +220,32 @@ withdrawal contact:
 The staged withdrawal source change was removed. Future withdrawal work should
 diagnose fixture/hole contact during vertical extraction rather than simply
 splitting lift and home trajectories.
+
+## 2026-06-03 Withdrawal Contact Timing
+
+Milestone: `research_baseline_withdrawal_contact_timing_v1`
+
+Evidence: `diagnostics/research_baseline_withdrawal_contact_timing_v1/summary.md`
+
+The new `withdrawal_contact_timing_analyzer` correlates recorded contact rows
+with active trajectory-command windows and controller-state peg-tip feedback.
+It was run on both the v4 insertion success and the rejected staged-withdrawal
+run.
+
+Result:
+
+- v4: all `41` positive contact samples occurred in `RETREAT_1`; first contact
+  was `0.554 s` after the RETREAT command while the peg was still inserted
+  `0.022622 m`;
+- staged v1: all `307` positive contact samples occurred in the vertical
+  `RETREAT_1` lift; none were attributed to the later `RETREAT_2` home command;
+- staged v1 highest contact was `486.746287 N` at depth `0.019732 m` with
+  `0.005979 m` XY error.
+
+Interpretation: the current withdrawal blocker is side-loaded extraction while
+the peg is still inside or near the hole, not late lateral home motion. The next
+motion change should reduce initial extraction contact or fixture collision
+geometry before repeated-validation claims.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 

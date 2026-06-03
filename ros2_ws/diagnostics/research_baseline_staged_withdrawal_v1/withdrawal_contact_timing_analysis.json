@@ -1,0 +1,788 @@
+{
+  "command_windows": [
+    {
+      "duration_s": 40.0,
+      "index": 0,
+      "label": "MOVING_TO_START",
+      "next_command_stamp_s": 45.211,
+      "point_count": 20,
+      "receipt_stamp_s": 2.608,
+      "target_xyz_m": [
+        0.5200003473316399,
+        -0.20000031769695203,
+        0.8850008831257807
+      ]
+    },
+    {
+      "duration_s": 15.0,
+      "index": 1,
+      "label": "APPROACH",
+      "next_command_stamp_s": 57.307,
+      "point_count": 8,
+      "receipt_stamp_s": 45.211,
+      "target_xyz_m": [
+        0.5200000067065246,
+        -0.20000001366197062,
+        0.8300000088464351
+      ]
+    },
+    {
+      "duration_s": 20.0,
+      "index": 2,
+      "label": "INSERT",
+      "next_command_stamp_s": 80.422,
+      "point_count": 1,
+      "receipt_stamp_s": 57.307,
+      "target_xyz_m": [
+        0.519999999911416,
+        -0.20000000005741625,
+        0.7899999999923213
+      ]
+    },
+    {
+      "duration_s": 20.856819347,
+      "index": 3,
+      "label": "RETREAT_1",
+      "next_command_stamp_s": 99.702,
+      "point_count": 11,
+      "receipt_stamp_s": 80.422,
+      "target_xyz_m": [
+        0.5172566942147918,
+        -0.20009510359891314,
+        0.8850000066241662
+      ]
+    },
+    {
+      "duration_s": 25.0,
+      "index": 4,
+      "label": "RETREAT_2",
+      "next_command_stamp_s": null,
+      "point_count": 10,
+      "receipt_stamp_s": 99.702,
+      "target_xyz_m": [
+        0.8000000000000002,
+        0.09905620187530717,
+        1.0398718589107658
+      ]
+    }
+  ],
+  "contact_by_command": {
+    "RETREAT_1": {
+      "first_stamp_s": 82.187,
+      "last_stamp_s": 85.966,
+      "max_depth_m": 0.020597809091418395,
+      "max_force_n": 486.746286704,
+      "max_peg_tip_z_m": 0.8093268682565352,
+      "max_xy_error_m": 0.007042090477660838,
+      "mean_depth_m": 0.01049662970473964,
+      "mean_xy_error_m": 0.0054355828495232725,
+      "min_peg_tip_z_m": 0.7894021909085817,
+      "samples": 307,
+      "sources": {
+        "hole": 7,
+        "peg": 150,
+        "target": 150
+      },
+      "top_collision_pairs": [
+        {
+          "collision_pair": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+          "max_force_n": 486.746286704,
+          "samples": 300
+        },
+        {
+          "collision_pair": "hole_fixture::fixture_link::fixture_left_collision <-> lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2",
+          "max_force_n": 253.647191386,
+          "samples": 14
+        }
+      ]
+    }
+  },
+  "first_20_events": [
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.019461255541289524,
+      "force_n": 281.519697383,
+      "peg_tip_xyz_m": [
+        0.514118028460759,
+        -0.20128241437414973,
+        0.7905387444587105
+      ],
+      "source": "peg",
+      "stamp_s": 82.187,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.0010000000000047748,
+      "xy_error_m": 0.006020147491172174
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.019461255541289524,
+      "force_n": 281.519697383,
+      "peg_tip_xyz_m": [
+        0.514118028460759,
+        -0.20128241437414973,
+        0.7905387444587105
+      ],
+      "source": "target",
+      "stamp_s": 82.187,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.0010000000000047748,
+      "xy_error_m": 0.006020147491172174
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.019461255541289524,
+      "force_n": 71.83213873,
+      "peg_tip_xyz_m": [
+        0.514118028460759,
+        -0.20128241437414973,
+        0.7905387444587105
+      ],
+      "source": "peg",
+      "stamp_s": 82.188,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.0,
+      "xy_error_m": 0.006020147491172174
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.019461255541289524,
+      "force_n": 71.83213873,
+      "peg_tip_xyz_m": [
+        0.514118028460759,
+        -0.20128241437414973,
+        0.7905387444587105
+      ],
+      "source": "target",
+      "stamp_s": 82.188,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.0,
+      "xy_error_m": 0.006020147491172174
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.019461255541289524,
+      "force_n": 32.912998237,
+      "peg_tip_xyz_m": [
+        0.514118028460759,
+        -0.20128241437414973,
+        0.7905387444587105
+      ],
+      "source": "peg",
+      "stamp_s": 82.189,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.000999999999990564,
+      "xy_error_m": 0.006020147491172174
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.019461255541289524,
+      "force_n": 32.912998237,
+      "peg_tip_xyz_m": [
+        0.514118028460759,
+        -0.20128241437414973,
+        0.7905387444587105
+      ],
+      "source": "target",
+      "stamp_s": 82.189,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.000999999999990564,
+      "xy_error_m": 0.006020147491172174
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.01938917996933398,
+      "force_n": 0.0,
+      "peg_tip_xyz_m": [
+        0.5165815440477195,
+        -0.20101513591390807,
+        0.7906108200306661
+      ],
+      "source": "peg",
+      "stamp_s": 82.19,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.001999999999995339,
+      "xy_error_m": 0.0035659980400146135
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.01938917996933398,
+      "force_n": 0.0,
+      "peg_tip_xyz_m": [
+        0.5165815440477195,
+        -0.20101513591390807,
+        0.7906108200306661
+      ],
+      "source": "target",
+      "stamp_s": 82.19,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.001999999999995339,
+      "xy_error_m": 0.0035659980400146135
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.01938917996933398,
+      "force_n": 0.0,
+      "peg_tip_xyz_m": [
+        0.5165815440477195,
+        -0.20101513591390807,
+        0.7906108200306661
+      ],
+      "source": "peg",
+      "stamp_s": 82.191,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.000999999999990564,
+      "xy_error_m": 0.0035659980400146135
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.01938917996933398,
+      "force_n": 0.0,
+      "peg_tip_xyz_m": [
+        0.5165815440477195,
+        -0.20101513591390807,
+        0.7906108200306661
+      ],
+      "source": "target",
+      "stamp_s": 82.191,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.000999999999990564,
+      "xy_error_m": 0.0035659980400146135
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.01938917996933398,
+      "force_n": 0.0,
+      "peg_tip_xyz_m": [
+        0.5165815440477195,
+        -0.20101513591390807,
+        0.7906108200306661
+      ],
+      "source": "peg",
+      "stamp_s": 82.191,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.000999999999990564,
+      "xy_error_m": 0.0035659980400146135
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.01938917996933398,
+      "force_n": 0.0,
+      "peg_tip_xyz_m": [
+        0.5165815440477195,
+        -0.20101513591390807,
+        0.7906108200306661
+      ],
+      "source": "target",
+      "stamp_s": 82.191,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.000999999999990564,
+      "xy_error_m": 0.0035659980400146135
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.01938917996933398,
+      "force_n": 0.0,
+      "peg_tip_xyz_m": [
+        0.5165815440477195,
+        -0.20101513591390807,
+        0.7906108200306661
+      ],
+      "source": "peg",
+      "stamp_s": 82.192,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.0,
+      "xy_error_m": 0.0035659980400146135
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.01938917996933398,
+      "force_n": 0.0,
+      "peg_tip_xyz_m": [
+        0.5165815440477195,
+        -0.20101513591390807,
+        0.7906108200306661
+      ],
+      "source": "target",
+      "stamp_s": 82.192,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.0,
+      "xy_error_m": 0.0035659980400146135
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.018440223419466495,
+      "force_n": 200.105457411,
+      "peg_tip_xyz_m": [
+        0.5143934861705498,
+        -0.19932157548050566,
+        0.7915597765805336
+      ],
+      "source": "peg",
+      "stamp_s": 82.301,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.0010000000000047748,
+      "xy_error_m": 0.0056474115441029794
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.018440223419466495,
+      "force_n": 200.105457411,
+      "peg_tip_xyz_m": [
+        0.5143934861705498,
+        -0.19932157548050566,
+        0.7915597765805336
+      ],
+      "source": "target",
+      "stamp_s": 82.301,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.0010000000000047748,
+      "xy_error_m": 0.0056474115441029794
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.018440223419466495,
+      "force_n": 33.263347398,
+      "peg_tip_xyz_m": [
+        0.5143934861705498,
+        -0.19932157548050566,
+        0.7915597765805336
+      ],
+      "source": "peg",
+      "stamp_s": 82.301,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.0010000000000047748,
+      "xy_error_m": 0.0056474115441029794
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.018440223419466495,
+      "force_n": 33.263347398,
+      "peg_tip_xyz_m": [
+        0.5143934861705498,
+        -0.19932157548050566,
+        0.7915597765805336
+      ],
+      "source": "target",
+      "stamp_s": 82.301,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.0010000000000047748,
+      "xy_error_m": 0.0056474115441029794
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.018365692128953004,
+      "force_n": 0.0,
+      "peg_tip_xyz_m": [
+        0.5148297223748872,
+        -0.19882379465419564,
+        0.791634307871047
+      ],
+      "source": "peg",
+      "stamp_s": 82.303,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.0,
+      "xy_error_m": 0.005302379629585267
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.018365692128953004,
+      "force_n": 0.0,
+      "peg_tip_xyz_m": [
+        0.5148297223748872,
+        -0.19882379465419564,
+        0.791634307871047
+      ],
+      "source": "target",
+      "stamp_s": 82.303,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.0,
+      "xy_error_m": 0.005302379629585267
+    }
+  ],
+  "input_dir": "diagnostics/research_baseline_staged_withdrawal_v1",
+  "insert_command_index": 2,
+  "positive_contact_samples": 307,
+  "top_20_force_events": [
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.01973155701579221,
+      "force_n": 486.746286704,
+      "peg_tip_xyz_m": [
+        0.514224685433898,
+        -0.20154706327836502,
+        0.7902684429842078
+      ],
+      "source": "target",
+      "stamp_s": 82.399,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.0010000000000047748,
+      "xy_error_m": 0.00597893494902694
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.01973155701579221,
+      "force_n": 486.746286704,
+      "peg_tip_xyz_m": [
+        0.514224685433898,
+        -0.20154706327836502,
+        0.7902684429842078
+      ],
+      "source": "peg",
+      "stamp_s": 82.399,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.0010000000000047748,
+      "xy_error_m": 0.00597893494902694
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.01851610638151968,
+      "force_n": 443.11872403,
+      "peg_tip_xyz_m": [
+        0.5144075088362868,
+        -0.20130402604393483,
+        0.7914838936184804
+      ],
+      "source": "peg",
+      "stamp_s": 82.538,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.0020000000000095497,
+      "xy_error_m": 0.005742511762240488
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.01851610638151968,
+      "force_n": 443.11872403,
+      "peg_tip_xyz_m": [
+        0.5144075088362868,
+        -0.20130402604393483,
+        0.7914838936184804
+      ],
+      "source": "target",
+      "stamp_s": 82.538,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.0020000000000095497,
+      "xy_error_m": 0.005742511762240488
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.0007506234834520065,
+      "force_n": 365.800830349,
+      "peg_tip_xyz_m": [
+        0.514446524511456,
+        -0.1995824213316304,
+        0.809249376516548
+      ],
+      "source": "target",
+      "stamp_s": 85.911,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.0010000000000047748,
+      "xy_error_m": 0.00556915271348672
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.0007506234834520065,
+      "force_n": 365.800830349,
+      "peg_tip_xyz_m": [
+        0.514446524511456,
+        -0.1995824213316304,
+        0.809249376516548
+      ],
+      "source": "peg",
+      "stamp_s": 85.912,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.0,
+      "xy_error_m": 0.00556915271348672
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.013076553070787256,
+      "force_n": 355.59359522,
+      "peg_tip_xyz_m": [
+        0.5141264950108664,
+        -0.19905721615332173,
+        0.7969234469292128
+      ],
+      "source": "peg",
+      "stamp_s": 83.207,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.0010000000000047748,
+      "xy_error_m": 0.005948689119372035
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.013076553070787256,
+      "force_n": 355.59359522,
+      "peg_tip_xyz_m": [
+        0.5141264950108664,
+        -0.19905721615332173,
+        0.7969234469292128
+      ],
+      "source": "target",
+      "stamp_s": 83.207,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.0010000000000047748,
+      "xy_error_m": 0.005948689119372035
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.012513105121377155,
+      "force_n": 348.429292186,
+      "peg_tip_xyz_m": [
+        0.5143372699925091,
+        -0.19887957811952917,
+        0.7974868948786229
+      ],
+      "source": "peg",
+      "stamp_s": 83.328,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.0020000000000095497,
+      "xy_error_m": 0.005772508668505952
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.012513105121377155,
+      "force_n": 348.429292186,
+      "peg_tip_xyz_m": [
+        0.5143372699925091,
+        -0.19887957811952917,
+        0.7974868948786229
+      ],
+      "source": "target",
+      "stamp_s": 83.328,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.0020000000000095497,
+      "xy_error_m": 0.005772508668505952
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.006533870306503764,
+      "force_n": 324.057731887,
+      "peg_tip_xyz_m": [
+        0.5142873958362382,
+        -0.200484067823809,
+        0.8034661296934963
+      ],
+      "source": "peg",
+      "stamp_s": 84.787,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.000999999999990564,
+      "xy_error_m": 0.005733076660038341
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.006533870306503764,
+      "force_n": 324.057731887,
+      "peg_tip_xyz_m": [
+        0.5142873958362382,
+        -0.200484067823809,
+        0.8034661296934963
+      ],
+      "source": "target",
+      "stamp_s": 84.787,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.000999999999990564,
+      "xy_error_m": 0.005733076660038341
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.01973155701579221,
+      "force_n": 306.69885842,
+      "peg_tip_xyz_m": [
+        0.514224685433898,
+        -0.20154706327836502,
+        0.7902684429842078
+      ],
+      "source": "peg",
+      "stamp_s": 82.4,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.0,
+      "xy_error_m": 0.00597893494902694
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.01973155701579221,
+      "force_n": 306.69885842,
+      "peg_tip_xyz_m": [
+        0.514224685433898,
+        -0.20154706327836502,
+        0.7902684429842078
+      ],
+      "source": "target",
+      "stamp_s": 82.4,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.0,
+      "xy_error_m": 0.00597893494902694
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.0018870057824769138,
+      "force_n": 283.71293643,
+      "peg_tip_xyz_m": [
+        0.5143756496602246,
+        -0.2014210395462347,
+        0.8081129942175231
+      ],
+      "source": "target",
+      "stamp_s": 85.81,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.001999999999995339,
+      "xy_error_m": 0.005801092150319131
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.0018870057824769138,
+      "force_n": 283.71293643,
+      "peg_tip_xyz_m": [
+        0.5143756496602246,
+        -0.2014210395462347,
+        0.8081129942175231
+      ],
+      "source": "peg",
+      "stamp_s": 85.811,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.000999999999990564,
+      "xy_error_m": 0.005801092150319131
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.019461255541289524,
+      "force_n": 281.519697383,
+      "peg_tip_xyz_m": [
+        0.514118028460759,
+        -0.20128241437414973,
+        0.7905387444587105
+      ],
+      "source": "peg",
+      "stamp_s": 82.187,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.0010000000000047748,
+      "xy_error_m": 0.006020147491172174
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.019461255541289524,
+      "force_n": 281.519697383,
+      "peg_tip_xyz_m": [
+        0.514118028460759,
+        -0.20128241437414973,
+        0.7905387444587105
+      ],
+      "source": "target",
+      "stamp_s": 82.187,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": -0.0010000000000047748,
+      "xy_error_m": 0.006020147491172174
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.007284155930227687,
+      "force_n": 265.106264971,
+      "peg_tip_xyz_m": [
+        0.5145025100338534,
+        -0.19824953893396557,
+        0.8027158440697724
+      ],
+      "source": "peg",
+      "stamp_s": 84.314,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.001999999999995339,
+      "xy_error_m": 0.00576944623612919
+    },
+    {
+      "collision_pairs": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_left_collision",
+      "command_index": 3,
+      "command_label": "RETREAT_1",
+      "depth_m": 0.007284155930227687,
+      "force_n": 265.106264971,
+      "peg_tip_xyz_m": [
+        0.5145025100338534,
+        -0.19824953893396557,
+        0.8027158440697724
+      ],
+      "source": "target",
+      "stamp_s": 84.314,
+      "state": "RETREAT",
+      "tracking_stamp_delay_s": 0.001999999999995339,
+      "xy_error_m": 0.00576944623612919
+    }
+  ],
+  "tracking_source": "trajectory_controller_state_samples.csv"
+}

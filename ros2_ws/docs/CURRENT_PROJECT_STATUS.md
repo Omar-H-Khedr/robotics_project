@@ -90,6 +90,7 @@ until repeated validation demonstrates robust success.
 - Success classification now uses `max_insert_contact_force_N`, not global contact, so RETREAT contact cannot create a false insertion success.
 - The passive Gazebo contact observer still recorded contact-topic rows only in `RETREAT` for the latest successful run; RETREAT contact reached `249.593329 N`. This remains the next safety-critical withdrawal limitation.
 - A staged vertical-lift-then-home withdrawal diagnostic preserved insertion success but was rejected because it worsened RETREAT contact to `486.746287 N` over `307` rows and raised max raw force norm to `285.8 N`.
+- Withdrawal contact timing analysis shows contact occurs during the first post-insert extraction command, before the home command. In the rejected staged run, all `307` contact samples occurred during the vertical lift stage and the peak force occurred while the peg was still inserted `0.019732 m`.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
@@ -148,16 +149,19 @@ This confirms the baseline is not robust. It also confirms that the high-force c
 
 ## Next Milestone
 
-`research_baseline_successful_insert_withdrawal_contact_reduction`
+`research_baseline_successful_insert_extraction_contact_reduction`
 
 Reason: `research_baseline_insert_sim_time_completion_v4` produced one
 credible simulated insertion success, but passive contact topics still recorded
 RETREAT contact up to `249.593329 N` after successful insertion. A first staged
 vertical-lift-then-home withdrawal was rejected because it worsened contact to
-`486.746287 N`. The next safety-critical improvement should diagnose and
-reduce fixture/hole contact during vertical extraction before moving laterally
-to `SAFE_HOME`, then rerun the same analyzers. Repeated validation should
-follow only after successful-insert withdrawal contact is reduced.
+`486.746287 N`. Follow-up timing analysis showed all staged contact occurred
+during the vertical lift command, not the later home command, with the peak
+force while the peg was still inserted `0.019732 m`. The next safety-critical
+improvement should reduce side-loaded extraction or fixture/hole contact before
+moving laterally to `SAFE_HOME`, then rerun the same analyzers. Repeated
+validation should follow only after successful-insert withdrawal contact is
+reduced.
 
 Historical context: force-safe insert stabilization blocked unsafe INSERT when peg Z was too high, but validation still failed. The 2026-06-01 force-safe validation (`diagnostics/research_baseline_force_safe_insert_v3`) showed:
 
@@ -401,6 +405,42 @@ However, the staged withdrawal worsened contact evidence:
 Decision: rejected and source change removed. The next withdrawal fix should
 inspect fixture/hole contact geometry and peg load during vertical extraction
 rather than only splitting the trajectory into lift and home stages.
+
+## 2026-06-03 Withdrawal Contact Timing
+
+Milestone: `research_baseline_withdrawal_contact_timing_v1`
+
+Evidence: `diagnostics/research_baseline_withdrawal_contact_timing_v1/summary.md`
+
+The new `withdrawal_contact_timing_analyzer` reads recorded
+`trajectory_commands.csv`, `contact_state_samples.csv`, and controller-state
+tracking feedback, then attributes positive contact rows to the active command
+window and peg-tip feedback pose.
+
+Validation:
+
+- Python syntax passed for the analyzer;
+- `colcon build --symlink-install --packages-select thesis_bringup` passed;
+- analyzer ran on `research_baseline_insert_sim_time_completion_v4` and
+  `research_baseline_staged_withdrawal_v1`.
+
+Findings:
+
+- v4: all `41` positive contact samples occurred in `RETREAT_1`; first contact
+  was `0.554 s` after RETREAT receipt while the peg was still inserted
+  `0.022622 m`;
+- v4 peak contact was `249.593329 N` at depth `0.003927 m` and XY error
+  `0.005688 m`, peg versus target plate right collision;
+- staged v1: all `307` positive contact samples occurred in the vertical
+  `RETREAT_1` command; no contact rows were attributed to the later
+  `RETREAT_2` home command;
+- staged v1 peak contact was `486.746287 N` at depth `0.019732 m` and XY error
+  `0.005979 m`, peg versus target plate left collision.
+
+Interpretation: successful-insert withdrawal contact is generated during
+initial extraction while the peg is still inside or near the hole. The next
+implementation should address side-loaded extraction/contact geometry rather
+than only splitting or delaying home motion.
 
 ## 2026-06-02 Joint-State Source Integrity
 
