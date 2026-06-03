@@ -157,6 +157,21 @@ The latest active SEARCH behavior is
 - decision: keep bounded 4 mm recentering as an improvement, but continue
   treating sustained no-contact centering as unresolved.
 
+The latest hold-window reference diagnostic is
+`research_baseline_hold_window_reference_analyzer_v1`:
+
+- analyzer evidence:
+  `diagnostics/research_baseline_search_recenter_4mm_v1/hold_window_reference_analysis.md`
+  and
+  `diagnostics/research_baseline_search_recenter_4mm_v1_repeat2/hold_window_reference_analysis.md`;
+- direct INSERT handoff hold best feedback `0.0010 m` window: `3` estimated
+  task ticks;
+- repeated SEARCH recenter holds best feedback `0.0010 m` window: `2`
+  estimated task ticks;
+- decision: hold references can be centered or near-centered, but feedback
+  stability remains below the required `8` ticks. Continue with feedback
+  stabilization or command sequencing, not gate loosening.
+
 Repeated validation on 2026-06-01 produced 0/3 physical successes:
 
 - one DEGRADED INSERT with only 0.0037 m depth and a 1237.45 N peak raw Fz spike;

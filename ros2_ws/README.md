@@ -94,6 +94,38 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_xy_stability_analyzer_v1 | Completed: per-state passive-log analyzer confirms recent SEARCH runs only sustain 1 mm clearance for two estimated control ticks |
 | research_baseline_search_recenter_on_coarse_band_v1 | Improved but failed safely: SEARCH recenters inside 2 mm coarse band; best 1 mm window improved to four ticks but INSERT remains blocked |
 | research_baseline_search_recenter_4mm_v1 | Improved but failed safely: bounded 4 mm recenter reduces final SEARCH XY to 1.7 mm but still does not satisfy the 1 mm sustained gate |
+| research_baseline_hold_window_reference_analyzer_v1 | Completed: command-window analyzer shows centered hold references but feedback still fails sustained 1 mm clearance |
+
+## 2026-06-03 Hold Window Reference Analyzer
+
+Milestone: `research_baseline_hold_window_reference_analyzer_v1`
+
+Evidence: `diagnostics/research_baseline_hold_window_reference_analyzer_v1/summary.md`
+
+The workspace now includes `hold_window_reference_analyzer`, an offline
+diagnostic that groups `trajectory_controller_state_samples.csv` by
+`trajectory_commands.csv` command windows and reconstructs peg-tip Cartesian
+reference/feedback for each command. Single-point trajectories lasting at least
+1 s are reported as hold-like command windows.
+
+Validation passed Python syntax, targeted `colcon build --packages-select
+thesis_bringup`, and analyzer runs over the two 4 mm recenter diagnostics:
+
+- `diagnostics/research_baseline_search_recenter_4mm_v1/hold_window_reference_analysis.md`;
+- `diagnostics/research_baseline_search_recenter_4mm_v1_repeat2/hold_window_reference_analysis.md`.
+
+Findings:
+
+- the direct INSERT handoff hold in `research_baseline_search_recenter_4mm_v1`
+  had a centered target but only `3` estimated feedback ticks inside
+  `0.0010 m`;
+- the repeated SEARCH recenter run observed `7` hold-like commands, but the
+  best feedback hold was only `2` estimated ticks inside `0.0010 m`;
+- centered references frequently stayed inside clearance longer than feedback,
+  so the remaining blocker is feedback stabilization/command sequencing, not a
+  reason to loosen the physical gate.
+
+No insertion success is claimed from this milestone.
 
 ## 2026-06-03 Controller-State Tracking V2
 
