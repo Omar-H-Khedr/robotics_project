@@ -1,0 +1,105 @@
+{
+  "command_duration_s": 20.0,
+  "command_index": 2,
+  "command_receipt_stamp_s": 57.608,
+  "contact_summary": {
+    "available": true,
+    "states": {
+      "RETREAT": {
+        "first_stamp_s": 81.273,
+        "max_contact_force_n": 249.593329228,
+        "positive_samples": 41,
+        "samples": 41,
+        "top_collision_pairs": [
+          {
+            "collision_pair": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_right_collision",
+            "max_force_n": 249.593329228,
+            "samples": 34
+          },
+          {
+            "collision_pair": "hole_fixture::fixture_link::fixture_right_collision <-> lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2",
+            "max_force_n": 9.205135927,
+            "samples": 14
+          }
+        ]
+      }
+    }
+  },
+  "final_cartesian_error_norm_m": 0.0015521326902840484,
+  "final_cartesian_error_xyz_m": [
+    0.001384670830396617,
+    -0.0004262734211302188,
+    -0.0005568604404472266
+  ],
+  "final_feedback_xyz_m": [
+    0.5186153293170797,
+    -0.19957372623602743,
+    0.7905568607948441
+  ],
+  "final_feedback_z_m": 0.7905568607948441,
+  "final_physical_depth_m": 0.019443139205155946,
+  "hole_top_z_m": 0.81,
+  "input_dir": "diagnostics/research_baseline_insert_sim_time_completion_v4",
+  "max_abs_position_error_rad": 0.010551644,
+  "max_physical_depth_m": 0.02434956016809764,
+  "mean_rms_position_error_rad": 0.0028712269892696434,
+  "min_feedback_z_m": 0.7856504398319024,
+  "missing_descent_to_target_m": 0.0005568604404472266,
+  "next_command_stamp_s": 80.719,
+  "observed_window_s": 23.110999999999997,
+  "p95_max_abs_position_error_rad": 0.00832107,
+  "samples": 5778,
+  "target_xyz_m": [
+    0.5200000001474763,
+    -0.19999999965715765,
+    0.7900000003543969
+  ],
+  "tracking_source": "trajectory_controller_state_samples.csv",
+  "wrench_summary": {
+    "available": true,
+    "states": {
+      "APPROACH": {
+        "max_abs_fz_n": 133.32986107,
+        "max_force_norm_n": 205.630220809,
+        "mean_xy_error_m": 0.0022116685731092436,
+        "samples": 1190
+      },
+      "DONE": {
+        "max_abs_fz_n": 128.954801629,
+        "max_force_norm_n": 182.718042088,
+        "mean_xy_error_m": 0.4092495072413928,
+        "samples": 2556
+      },
+      "INSERT": {
+        "max_abs_fz_n": 123.085612867,
+        "max_force_norm_n": 206.668556737,
+        "mean_xy_error_m": 0.0020859755231702037,
+        "samples": 2309
+      },
+      "MOVING_TO_START": {
+        "max_abs_fz_n": 129.035041357,
+        "max_force_norm_n": 211.137237357,
+        "mean_xy_error_m": 0.21270494305314686,
+        "samples": 4290
+      },
+      "RETREAT": {
+        "max_abs_fz_n": 124.504805259,
+        "max_force_norm_n": 200.945040302,
+        "mean_xy_error_m": 0.0954682007617896,
+        "samples": 2481
+      },
+      "SEARCH": {
+        "max_abs_fz_n": 109.065096644,
+        "max_force_norm_n": 192.266852285,
+        "mean_xy_error_m": 0.0022727022,
+        "samples": 20
+      },
+      "UNKNOWN": {
+        "max_abs_fz_n": 108.427390232,
+        "max_force_norm_n": 181.47675143,
+        "mean_xy_error_m": 0.409437860416,
+        "samples": 251
+      }
+    }
+  }
+}

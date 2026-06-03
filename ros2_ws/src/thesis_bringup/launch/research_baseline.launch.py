@@ -381,6 +381,7 @@ def launch_setup(context, *args, **kwargs):
                 "safety_threshold": 350.0,
                 "control_rate": 10.0,
                 "approach_speed": 0.01,
+                "use_sim_time": simulation["use_sim_time"],
             }
         ],
         output="screen",

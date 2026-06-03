@@ -34,11 +34,14 @@ The current workspace contains a Gazebo workcell with:
 - task-level admittance insertion node with phase logging;
 - dry-run experiment/context scaffolds from earlier proposal milestones.
 
-The strongest historical single-run insertion evidence so far is one simulated insertion-depth event:
+The strongest current single-run iisy6 insertion evidence is
+`diagnostics/research_baseline_insert_sim_time_completion_v4`:
 
-- insertion depth: about 0.011 m;
-- sustained contact: about 142.9 N;
-- final phase sequence reached RETREAT/DONE in that run.
+- final outcome: `SUCCESS`;
+- insertion depth: `0.0191 m`;
+- task-side insert-contact evidence: `60.1 N`;
+- max raw `|Fz|`: `133.33 N`;
+- final phase sequence: MOVING_TO_START, APPROACH, SEARCH, INSERT, RETREAT all OK.
 
 Repeated validation on 2026-06-01 produced 0/3 physical successes:
 
@@ -46,9 +49,9 @@ Repeated validation on 2026-06-01 produced 0/3 physical successes:
 - one ABORTED INSERT with a 3716.2 N peak raw Fz spike;
 - one SEARCH timeout/no-outcome before final insertion evaluation.
 
-This is not robust autonomous peg-in-hole success. The honest claim remains:
+This is not robust autonomous peg-in-hole success. The honest claim is now:
 
-**first simulated insertion event with measured insertion depth.**
+**single validated controller-driven simulated insertion success; repeat validation pending.**
 
 ## Known Open Risks
 
@@ -58,6 +61,8 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - Peak raw Fz spikes around 1237 N and 3716 N have now been observed in repeated validation.
 - Multi-point INSERT trajectory behavior is broken; current INSERT uses a single-point trajectory.
 - Contact/gravity estimation depends on median Fz baseline validity and needs more validation.
+- Latest successful INSERT contact is task F/T evidence; the passive Gazebo contact observer recorded contact-topic rows only during RETREAT in the v4 run.
+- Successful-insert RETREAT still produced contact-topic force up to `249.593329 N`, so withdrawal contact reduction is the next safety-critical blocker.
 - Gazebo contact physics are adequate for early simulation evidence but not final safety fidelity.
 - Some older docs still describe stale iisy3 state and must not be used as current truth.
 - A 2026-06-02 source-integrity run confirmed `joint_state_broadcaster` as the intended `/joint_states` publisher, but the same run still timed out in `MOVING_TO_START` with large XY error.
@@ -107,7 +112,7 @@ A state machine reaching DONE is insufficient. A physical success trial requires
 
 - final trial outcome `SUCCESS`;
 - measured insertion depth at least 0.010 m;
-- contact force above the configured insertion/contact threshold;
+- INSERT-phase contact evidence above the configured insertion/contact threshold;
 - no safety abort;
 - no unresolved timeout that invalidates task execution;
 - recorded peak raw Fz and Cartesian-error metrics.
@@ -116,14 +121,20 @@ Robust success requires repeated validation with a documented success rate and f
 
 ## Next Technical Milestone
 
-`research_baseline_above_hole_hold_tracking_stabilization`
+`research_baseline_successful_insert_withdrawal_contact_reduction`
 
-Reason: after the peg-tip frame correction, the current canonical blocker is
-again stable above-hole holding. The corrected tool frame removed the
-reproduced `link_5` target-plate collision, but the controller does not hold
-the peg inside the strict 2 mm no-contact XY gate for the required consecutive
-state-machine ticks. A post-correction slow settle crossed the gate only
-transiently and was rejected.
+Reason: the current v4 evidence includes one controller-driven simulated
+insertion success, but successful-insert RETREAT still creates contact-topic
+rows up to `249.593329 N`. The next implementation should reduce withdrawal
+contact after successful insertion, then rerun the same analyzers and only then
+attempt repeated validation.
+
+Historical context: after the peg-tip frame correction, the canonical blocker
+was stable above-hole holding. The corrected tool frame removed the reproduced
+`link_5` target-plate collision, but the controller did not hold the peg inside
+the strict 2 mm no-contact XY gate for the required consecutive state-machine
+ticks. A post-correction slow settle crossed the gate only transiently and was
+rejected.
 
 Post-correction global gain increases were also rejected. Gain 2000 improved
 the final error but still did not meet the consecutive strict-gate requirement;

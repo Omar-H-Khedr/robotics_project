@@ -2,9 +2,9 @@
 
 Current status as of 2026-06-03: this is an active ROS 2 Jazzy workspace for a Gazebo-based KUKA LBR iisy 6 R1300 peg-in-hole research baseline. The project has a working robot spawn path, active ros2_control controllers, a fixed grasped peg model, a fixed hole fixture, force/torque bridge plumbing, contact observability, and an admittance-style insertion controller.
 
-The strongest historical insertion evidence remains a **single simulated insertion-depth event**: measured insertion depth about 0.011 m with sustained contact around 142.9 N. This is not robust autonomous peg-in-hole success. The current safer iisy6 baseline has corrected the peg-tip frame and removed a reproduced robot-link clearance collision, but it still aborts honestly before descent because it only crosses the strict 2 mm above-hole XY gate transiently. Known unresolved concerns include unstable above-hole hold behavior, high raw F/T spikes, large approach tracking errors, broken multi-point INSERT behavior, and failed repeated validation.
+The strongest current iisy6 evidence is a **single controller-driven simulated insertion success event** from `diagnostics/research_baseline_insert_sim_time_completion_v4`: final outcome `SUCCESS`, insertion depth `0.0191 m`, task F/T insert-contact evidence `60.1 N`, max raw `|Fz|=133.33 N`, and no safety abort or invalid timeout. This is not a robustness claim. Known unresolved concerns include retreat contact after successful insertion, failed older repeated validation, high raw F/T spikes in some scenarios, contact-topic gaps during INSERT, and the need for repeated validation before any learning or robustness claim.
 
-Latest hold evidence shows the corrected post-tool runs do not satisfy the required five 10 Hz stable ticks inside the 2 mm no-contact gate. The 2026-06-03 controller-state tracking run captured the JTC's own reference/feedback/error and still aborted in `MOVING_TO_START`: final logged `xy_err=0.013 m`, zero insertion depth, zero contact-topic samples, and only `143 / 15930` command-window samples inside the strict 2 mm XY band. Older approach evidence also localizes the descent blocker to `joint_2`: normal, slow-descent, and high-gain approach diagnostics all left `joint_2` about 0.107-0.111 rad from target, keeping the peg tip about 67-70 mm above the commanded touch pose. This supports endpoint hold and controller/physics investigation before any learning or insertion-claim work.
+Latest timing evidence shows the prior failed insert was partly a clock-domain bug: the task advanced to RETREAT after about `10.6 s` of controller-state INSERT time despite commanding a `20 s` trajectory. The current task node uses ROS/Gazebo time for INSERT completion and the validated run held INSERT for `23.111 s` before RETREAT. Future work should reduce successful-insert RETREAT contact and run repeated validation; do not treat one success event as robust autonomous peg-in-hole performance.
 
 ## Milestones
 
@@ -76,6 +76,10 @@ Latest hold evidence shows the corrected post-tool runs do not satisfy the requi
 | research_baseline_controller_state_tracking_v2 | Failed safely: canonical run records JTC controller-state tracking but still times out before descent |
 | research_baseline_endpoint_hold_dynamics_analyzer_v1 | Completed: endpoint hold analyzer shows multi-centimeter hold oscillation and zero strict 10 Hz bins |
 | research_baseline_joint_damping_scale_5p0_v1 | Improved but failed safely: 5x damping reaches APPROACH but INSERT remains blocked by Z precondition |
+| research_baseline_approach_z_precondition_gate_v1 | Completed: APPROACH must satisfy INSERT Z precondition before SEARCH/INSERT |
+| research_baseline_insert_retreat_contact_analyzer_v1 | Completed: failed INSERT depth and RETREAT collision attribution analyzer added |
+| research_baseline_retreat_clearance_lift_v1 | Completed: failed-insert RETREAT contact reduced; INSERT still failed |
+| research_baseline_insert_sim_time_completion_v4 | Completed: single validated iisy6 insertion success; repeat validation and retreat-contact reduction pending |
 
 ## 2026-06-03 Controller-State Tracking V2
 
@@ -159,6 +163,39 @@ Runtime result:
 This is a meaningful stabilization improvement, not physical insertion success.
 The next blocker has moved from start hold to approach depth realization before
 INSERT.
+
+## 2026-06-03 Insert Sim-Time Completion
+
+Milestone: `research_baseline_insert_sim_time_completion_v4`
+
+Evidence: `diagnostics/research_baseline_insert_sim_time_completion_v4/summary.md`
+
+The INSERT phase now waits on ROS/Gazebo time from the moment the INSERT
+trajectory is published. `research_baseline.launch.py` passes `use_sim_time` to
+`admittance_insertion_node`, and the final success contract now requires
+`max_insert_contact_force_N` so RETREAT contact cannot create a false insertion
+success.
+
+Validation passed Python syntax, targeted `colcon build --packages-select
+kuka_task_control thesis_bringup`, a headless launch with
+`joint_damping_scale:=5.0`, and the passive analyzers.
+
+Runtime result:
+
+- final outcome `SUCCESS`;
+- reason `Full cycle completed. Insertion depth 0.019m, contact 60.1N during INSERT`;
+- final insertion depth `0.0191 m`;
+- max task-side insert contact `60.1 N`;
+- max raw `|Fz|=133.33 N`;
+- max raw force norm `211.14 N`;
+- pre-insertion XY error `0.0006 m`;
+- INSERT command observed for `23.111 s` after a `20.000 s` command, fixing the previous about `10.6 s` premature RETREAT transition.
+
+This is a single credible simulated insertion success, not a robustness claim.
+The passive Gazebo contact observer still recorded contact-topic rows only in
+`RETREAT` for this run, and RETREAT contact reached `249.593329 N`. The next
+safety-critical milestone should reduce successful-insert withdrawal contact
+and then run repeated validation.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 

@@ -85,12 +85,11 @@ until repeated validation demonstrates robust success.
 - Spawn: x=0.80, y=-0.75, z=0.735, yaw=1.5708.
 - Controller stack: `joint_state_broadcaster` and `joint_trajectory_controller`.
 - Canonical controller parameters: `thesis_bringup/config/research_baseline_ros2_control.yaml` loaded by `spawn_robot_sdf.py`.
-- Latest canonical controller-state tracking validation: `research_baseline_controller_state_tracking_v2` aborted safely in `MOVING_TO_START` after 120.0 s with final logged `xy_err=0.013 m`, zero insertion depth, zero contact-topic samples, and JTC controller-state p95 max position error `0.023935 rad` over the axis-align command window.
-- Endpoint hold dynamics from that run show multi-centimeter post-command oscillation: X/Y/Z ranges `0.041273 / 0.035843 / 0.033742 m`, strict 10 Hz bins `0`, and largest joint feedback range `joint_1=0.057121 rad`.
-- A 5x damping diagnostic now clears the strict MOVING_TO_START gate and reaches APPROACH with lower force/tracking error, but still aborts before INSERT because final approach feedback remains at `z=0.849622 m` for a `z=0.830000 m` target, above the `0.8450 m` force-safe precondition.
-- The latest approach Z-precondition gate correction makes `APPROACH` completion require `peg_z <= 0.8450 m`, matching the preserved INSERT precondition. With `joint_damping_scale:=5.0`, validation reached INSERT only after `APPROACH` reached `peg_z=0.8417 m`; INSERT then reported `physical_depth=0.0000 m`, and contact-topic rows appeared during `RETREAT` with max contact force `1970.434828 N`.
-- The latest insert/retreat contact analyzer confirms the failed INSERT target was near `z=0.790008 m`, but feedback only reached minimum `z=0.811899 m` against `HOLE_TOP_Z=0.810000 m`. RETREAT contact is attributed to peg-target and right-finger-target collision pairs, so retreat clearance after failed insertion is now the next safety-critical blocker.
-- The latest retreat clearance-lift validation reached `DONE` with `DEGRADED` outcome, not success. It reduced RETREAT contact from `1970.434828 N` over `7776` rows to `36.335073 N` over `4` rows, but INSERT depth was only `0.0008 m`.
+- Latest validated baseline milestone: `research_baseline_insert_sim_time_completion_v4` reached a single controller-driven simulated insertion success with final outcome `SUCCESS`, insertion depth `0.0191 m`, task-side INSERT contact evidence `60.1 N`, max raw `|Fz|=133.33 N`, max raw force norm `211.14 N`, pre-insertion XY error `0.0006 m`, no safety abort, and no invalid timeout.
+- Timing evidence from that run shows the INSERT command was observed for `23.111 s` after a `20.000 s` command. The prior failed behavior advanced to RETREAT after about `10.6 s` of controller-state INSERT time.
+- Success classification now uses `max_insert_contact_force_N`, not global contact, so RETREAT contact cannot create a false insertion success.
+- The passive Gazebo contact observer still recorded contact-topic rows only in `RETREAT` for the latest successful run; RETREAT contact reached `249.593329 N`. This remains the next safety-critical withdrawal limitation.
+- Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
 - Insertion controller: topic-based trajectory publishing with median Fz baseline, SEARCH phase, single-point INSERT, final JSON outcome logging.
@@ -148,9 +147,17 @@ This confirms the baseline is not robust. It also confirms that the high-force c
 
 ## Next Milestone
 
-`research_baseline_above_hole_hold_tracking_stabilization`
+`research_baseline_successful_insert_withdrawal_contact_reduction`
 
-Reason: force-safe insert stabilization blocked unsafe INSERT when peg Z was too high, but validation still failed. The 2026-06-01 force-safe validation (`diagnostics/research_baseline_force_safe_insert_v3`) showed:
+Reason: `research_baseline_insert_sim_time_completion_v4` produced one
+credible simulated insertion success, but passive contact topics still recorded
+RETREAT contact up to `249.593329 N` after successful insertion. The next
+safety-critical improvement should withdraw vertically or otherwise clear the
+fixture after a successful insert before moving laterally to `SAFE_HOME`, then
+rerun the same analyzers. Repeated validation should follow only after
+successful-insert withdrawal contact is reduced.
+
+Historical context: force-safe insert stabilization blocked unsafe INSERT when peg Z was too high, but validation still failed. The 2026-06-01 force-safe validation (`diagnostics/research_baseline_force_safe_insert_v3`) showed:
 
 | Trial | Outcome | Reason |
 |---|---|---|
@@ -316,6 +323,55 @@ Retreat contact improved materially:
 This is a retreat safety improvement, not insertion success. The next blocker
 is insertion-depth realization: the insert target remains near `z=0.790 m`,
 but the latest run reached only `0.000836 m` maximum physical depth.
+
+## 2026-06-03 Insert Sim-Time Completion
+
+Milestone: `research_baseline_insert_sim_time_completion_v4`
+
+Evidence: `diagnostics/research_baseline_insert_sim_time_completion_v4/summary.md`
+
+The task controller now evaluates INSERT completion with ROS/Gazebo time, not
+control-loop tick count. The launch file passes `use_sim_time` to
+`admittance_insertion_node`, matching the controller manager and passive
+observers. The controller also records `max_insert_contact_force_N` and uses it
+for insert success and final outcome, preventing RETREAT contact from satisfying
+the insertion-contact requirement.
+
+Validation passed Python syntax, targeted `colcon build --packages-select
+kuka_task_control thesis_bringup`, a headless launch with
+`joint_damping_scale:=5.0`, and the passive tracking/contact analyzers.
+
+Runtime result:
+
+- final outcome `SUCCESS`;
+- reason `Full cycle completed. Insertion depth 0.019m, contact 60.1N during INSERT`;
+- final insertion depth `0.0191 m`;
+- max task-side insert contact `60.1 N`;
+- max global task-side contact `85.0 N`;
+- max raw `|Fz|=133.33 N`;
+- max raw force norm `211.14 N`;
+- pre-insertion XY error `0.0006 m`;
+- phase sequence: MOVING_TO_START OK, APPROACH OK, SEARCH OK, INSERT OK, RETREAT OK.
+
+Controller-state timing:
+
+- INSERT command receipt `57.608 s`;
+- RETREAT command receipt `80.719 s`;
+- INSERT command duration `20.000 s`;
+- observed INSERT window `23.111 s`.
+
+Offline analyzer result:
+
+- final peg-tip feedback `(0.518615, -0.199574, 0.790557)`;
+- final physical depth `0.019443 m`;
+- maximum physical depth `0.024350 m`;
+- INSERT p95 max joint position error `0.008321 rad`.
+
+Limitations:
+
+- This is one successful simulated trial, not robust success.
+- Gazebo contact-topic rows were recorded only in `RETREAT` for this run; INSERT contact evidence is from the task F/T estimator.
+- RETREAT contact-topic max force was `249.593329 N`, mainly peg versus target plate right collision. Successful-insert withdrawal/contact reduction is the next safety-critical milestone before repeated-validation claims.
 
 ## 2026-06-02 Joint-State Source Integrity
 

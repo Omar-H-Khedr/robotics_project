@@ -127,6 +127,7 @@ class AdmittanceInsertionNode(Node):
     TRAJECTORY_TIMEOUT_S = 90.0
     ABORT_RETREAT_TIMEOUT_S = 20.0
     ABORT_SETTLE_TICKS = 3
+    INSERT_SETTLE_MARGIN_S = 3.0
 
     # Gravity baseline filter
     FZ_WINDOW_SIZE = 50
@@ -196,6 +197,7 @@ class AdmittanceInsertionNode(Node):
         self._abort_ticks: int = 0
         self._correction_ticks: int = 0
         self._insert_traj_dur: float = 20.0
+        self._insert_command_start_s: float = 0.0
 
         self.current_joints: np.ndarray = np.zeros(6)
         self.current_wrench: Wrench = Wrench()
@@ -236,6 +238,7 @@ class AdmittanceInsertionNode(Node):
         self._max_fz: float = 0.0
         self._max_force_norm: float = 0.0
         self._max_contact_force: float = 0.0
+        self._max_insert_contact_force: float = 0.0
         self._insertion_depth_m: float = 0.0
         self._raw_force_abort_reason: str = ''
 
@@ -385,6 +388,10 @@ class AdmittanceInsertionNode(Node):
             point.time_from_start = Duration(sec=sec, nanosec=nsec)
             msg.points.append(point)
         self._traj_pub.publish(msg)
+
+    def _now_s(self) -> float:
+        now = self.get_clock().now()
+        return now.nanoseconds * 1e-9
 
     # --- IK helper ----------------------------------------------------------
 
@@ -551,6 +558,7 @@ class AdmittanceInsertionNode(Node):
             self._max_fz = 0.0
             self._max_force_norm = 0.0
             self._max_contact_force = 0.0
+            self._max_insert_contact_force = 0.0
             self._insertion_depth_m = 0.0
             self._begin_phase(self.MOVING_TO_START)
             self._set_state(self.MOVING_TO_START)
@@ -1032,6 +1040,10 @@ class AdmittanceInsertionNode(Node):
         fz = self._get_fz()
         self._max_fz = max(self._max_fz, fz)
         self._max_contact_force = max(self._max_contact_force, contact_force)
+        self._max_insert_contact_force = max(
+            self._max_insert_contact_force,
+            contact_force,
+        )
 
         force_active = self._state_entry_ticks >= 5
         peg, _ = self._kinematics.pose(self.current_joints)
@@ -1077,6 +1089,7 @@ class AdmittanceInsertionNode(Node):
             if q is not None:
                 self._insert_traj_dur = 20.0
                 self._send_trajectory_goal(q, self._insert_traj_dur)
+                self._insert_command_start_s = self._now_s()
 
                 q_current = self.current_joints.copy()
                 q_dist = np.max(np.abs(q_current - q))
@@ -1102,8 +1115,12 @@ class AdmittanceInsertionNode(Node):
             )
 
         # --- Check completion: wait for trajectory to finish then evaluate ---
-        settle_ticks = int(self._insert_traj_dur * self._control_rate) + 30
-        if self._state_entry_ticks >= settle_ticks:
+        elapsed_since_command = self._now_s() - self._insert_command_start_s
+        insert_elapsed = (
+            elapsed_since_command
+            >= self._insert_traj_dur + self.INSERT_SETTLE_MARGIN_S
+        )
+        if insert_elapsed:
             final_depth = self._physical_insertion_depth(peg[2])
             self._insertion_depth_m = final_depth
             self.get_logger().info(
@@ -1113,20 +1130,25 @@ class AdmittanceInsertionNode(Node):
                 f'Fz={fz:.1f}N  contact={contact_force:.1f}N  '
                 f'max_abs_Fz={self._max_fz:.1f}N  '
                 f'max_force_norm={self._max_force_norm:.1f}N  '
-                f'max_contact={self._max_contact_force:.1f}N'
+                f'max_contact={self._max_contact_force:.1f}N  '
+                f'max_insert_contact={self._max_insert_contact_force:.1f}N'
             )
 
             depth_ok = final_depth >= 0.010
-            contact_pattern_ok = contact_force > self._contact_threshold
+            contact_pattern_ok = (
+                self._max_insert_contact_force >= self._contact_threshold
+            )
 
             if depth_ok and contact_pattern_ok:
                 self._end_phase(True, 0.0, 0.0, False,
                                 f'Insertion depth {final_depth:.3f}m with '
-                                f'contact {contact_force:.1f}N')
+                                f'insert contact evidence '
+                                f'{self._max_insert_contact_force:.1f}N')
             elif depth_ok and not contact_pattern_ok:
-                self._end_phase(True, 0.0, 0.0, False,
+                self._end_phase(False, 0.0, 0.0, False,
                                 f'Depth reached ({final_depth:.3f}m) but '
-                                f'contact force ({contact_force:.1f}N) below '
+                                f'max insert contact '
+                                f'({self._max_insert_contact_force:.1f}N) below '
                                 f'threshold ({self._contact_threshold:.1f}N). '
                                 f'Peg may not have entered hole.')
             else:
@@ -1211,7 +1233,7 @@ class AdmittanceInsertionNode(Node):
                           if r.name not in (self.RETREAT,))
 
         depth_ok = self._insertion_depth_m >= 0.010
-        contact_ok = self._max_contact_force >= self._contact_threshold
+        contact_ok = self._max_insert_contact_force >= self._contact_threshold
 
         if self._abort_reason:
             self._trial_outcome = 'ABORTED'
@@ -1232,7 +1254,9 @@ class AdmittanceInsertionNode(Node):
             self._trial_outcome = 'DEGRADED'
             reason = (
                 f'Max contact force ({self._max_contact_force:.1f}N) below '
-                f'insertion contact threshold ({self._contact_threshold:.1f}N). '
+                f'insertion contact threshold ({self._contact_threshold:.1f}N), '
+                f'with insert contact '
+                f'{self._max_insert_contact_force:.1f}N. '
                 f'Peg likely did not enter hole.'
             )
         elif had_timeout:
@@ -1243,7 +1267,7 @@ class AdmittanceInsertionNode(Node):
             reason = (
                 f'Full cycle completed. Insertion depth '
                 f'{self._insertion_depth_m:.3f}m, contact '
-                f'{self._max_contact_force:.1f}N.'
+                f'{self._max_insert_contact_force:.1f}N during INSERT.'
             )
 
         outcome = {
@@ -1259,6 +1283,10 @@ class AdmittanceInsertionNode(Node):
                 'max_force_norm_N': round(self._max_force_norm, 2),
                 'baseline_fz_N': round(self._baseline_fz, 2),
                 'max_contact_force_N': round(self._max_contact_force, 2),
+                'max_insert_contact_force_N': round(
+                    self._max_insert_contact_force,
+                    2,
+                ),
                 'contact_threshold_N': self._contact_threshold,
                 'gravity_baseline_valid': self._baseline_valid,
                 'baseline_window_samples': len(self._fz_buffer),
