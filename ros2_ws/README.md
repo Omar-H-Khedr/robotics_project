@@ -90,6 +90,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_insert_handoff_reference_v1 | Completed: analyzer shows centered INSERT reference but feedback leaves physical clearance within 5 ms |
 | research_baseline_insert_handoff_settle_v1 | Completed safety gate: final INSERT descent is withheld unless handoff feedback is stable; validation still aborted before depth |
 | research_baseline_search_sustained_clearance_v1 | Completed safety gate: SEARCH now requires sustained physical clearance; validation fails closed in SEARCH |
+| research_baseline_search_centered_hold_v1 | Rejected: centered SEARCH hold remained unstable and source was reverted |
 
 ## 2026-06-03 Controller-State Tracking V2
 
@@ -474,6 +475,32 @@ Runtime result:
 Interpretation: the new gate is stricter and safer. The next blocker is not
 INSERT command generation; the controller must hold no-contact XY alignment
 inside the physical clearance long enough for a credible handoff.
+
+## 2026-06-03 Rejected SEARCH Centered Hold
+
+Milestone: `research_baseline_search_centered_hold_v1`
+
+Evidence: `diagnostics/research_baseline_search_centered_hold_v1/summary.md`
+
+A no-contact centered hold at current SEARCH Z was tested before spiral search
+offsets. It preserved the sustained `8` tick clearance gate and all INSERT
+safety gates.
+
+Runtime result:
+
+- final outcome `ABORTED`;
+- reason `SEARCH timeout (45s). XY error 0.0048m remains above tolerance.`;
+- no INSERT phase was entered;
+- insertion depth `0.0000 m`;
+- contact-topic samples `0`;
+- max raw `|Fz|=130.8 N`;
+- max raw force norm `208.5 N`;
+- SEARCH samples inside `0.0010 m`: `365/4500`;
+- longest consecutive inside-clearance run: `4` observer samples.
+
+Decision: rejected; source reverted. The centered hold was safe but did not
+meet the sustained clearance gate and ended with worse final SEARCH XY than the
+previous sustained-clearance run.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 

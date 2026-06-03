@@ -101,6 +101,7 @@ until repeated validation demonstrates robust success.
 - The INSERT handoff reference diagnostic shows the rejected multi-waypoint command was centered at the JTC reference level: reference XY stayed within `0.000510 m`, but feedback violated the `0.0010 m` physical clearance after `0.005 s` and reached `0.004264 m` in the first `0.5 s`.
 - INSERT handoff settle now withholds the final descent command unless feedback remains stable inside physical clearance. Validation still aborted before depth, with no descent-to-final INSERT command published; SEARCH had accepted a transient inside-clearance sample but feedback was already `0.002773 m` off center by the handoff boundary.
 - SEARCH now requires sustained physical clearance for `8` consecutive control ticks before INSERT. Validation failed closed in SEARCH instead of entering INSERT: `308/4500` SEARCH samples were inside `0.0010 m`, but the longest consecutive inside-clearance run was only `2` observer samples.
+- A centered SEARCH hold diagnostic was tested and rejected. It improved inside-clearance occupancy to `365/4500` SEARCH samples and the longest run to `4` observer samples, but still timed out in SEARCH with final XY `0.0048 m`; source was reverted.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
@@ -719,6 +720,32 @@ Runtime result:
 Interpretation: this is a correct fail-closed result. The next implementation
 should improve sustained no-contact centering, not weaken the SEARCH or INSERT
 clearance gates.
+
+## 2026-06-03 Rejected SEARCH Centered Hold
+
+Milestone: `research_baseline_search_centered_hold_v1`
+
+Evidence: `diagnostics/research_baseline_search_centered_hold_v1/summary.md`
+
+A no-contact centered hold at current SEARCH Z was tested before spiral search
+offsets. It preserved the sustained `8` tick clearance gate and all INSERT
+safety gates.
+
+Runtime result:
+
+- final outcome `ABORTED`;
+- reason `SEARCH timeout (45s). XY error 0.0048m remains above tolerance.`;
+- no INSERT phase was entered;
+- insertion depth `0.0000 m`;
+- contact-topic samples `0`;
+- max raw `|Fz|=130.8 N`;
+- max raw force norm `208.5 N`;
+- observed commands `11`, including the centered hold and abort retreat;
+- SEARCH samples inside `0.0010 m`: `365/4500`;
+- longest consecutive inside-clearance run: `4` observer samples.
+
+Decision: rejected; source reverted. The centered hold did not satisfy
+sustained no-contact alignment and should not be carried as an active behavior.
 
 ## 2026-06-02 Joint-State Source Integrity
 
