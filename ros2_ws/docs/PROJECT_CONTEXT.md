@@ -131,6 +131,20 @@ The latest rejected SEARCH centered-hold diagnostic is
 - longest consecutive inside-clearance run: `4` observer samples;
 - decision: source reverted because centered hold did not meet the sustained gate.
 
+The latest XY stability diagnostic is
+`research_baseline_xy_stability_analyzer_v1`:
+
+- analyzer evidence:
+  `diagnostics/research_baseline_search_sustained_clearance_v1/xy_stability_analysis.md`
+  and
+  `diagnostics/research_baseline_search_centered_hold_v1/xy_stability_analysis.md`;
+- sustained-clearance SEARCH best estimated 1 mm window: `2` controller ticks;
+- centered-hold SEARCH best estimated 1 mm window: `2` controller ticks;
+- both runs reached `6` estimated SEARCH ticks inside the older `0.0020 m`
+  band, but not inside the physical `0.0010 m` clearance;
+- decision: keep the physical clearance gate and target feedback/control
+  stability before attempting INSERT again.
+
 Repeated validation on 2026-06-01 produced 0/3 physical successes:
 
 - one DEGRADED INSERT with only 0.0037 m depth and a 1237.45 N peak raw Fz spike;
@@ -162,6 +176,7 @@ This is not robust autonomous peg-in-hole success. The honest claim is now:
 - INSERT handoff settle prevents publishing the final descent when feedback is already invalid, but validation still aborts. SEARCH convergence is now suspect because it accepted one transient inside-clearance sample and handed off with feedback already outside clearance.
 - Sustained SEARCH clearance gating now prevents that transient handoff. The active blocker is stable no-contact centering near the hole surface, not success classification or INSERT descent timing.
 - A centered SEARCH hold was tested and rejected; it was safe but insufficient. Continue treating sustained no-contact centering as the blocker.
+- Per-state XY stability analysis confirms both recent SEARCH runs only held physical clearance for two estimated state-loop ticks. Do not treat sub-millimeter minima as readiness for INSERT.
 - Gazebo contact physics are adequate for early simulation evidence but not final safety fidelity.
 - Some older docs still describe stale iisy3 state and must not be used as current truth.
 - A 2026-06-02 source-integrity run confirmed `joint_state_broadcaster` as the intended `/joint_states` publisher, but the same run still timed out in `MOVING_TO_START` with large XY error.

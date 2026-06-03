@@ -31,6 +31,7 @@ setup(
             "insert_xy_drift_analyzer = thesis_bringup.insert_xy_drift_analyzer:main",
             "withdrawal_contact_timing_analyzer = thesis_bringup.withdrawal_contact_timing_analyzer:main",
             "moving_to_start_tracking_analyzer = thesis_bringup.moving_to_start_tracking_analyzer:main",
+            "xy_stability_analyzer = thesis_bringup.xy_stability_analyzer:main",
             "trajectory_tracking_observer = thesis_bringup.trajectory_tracking_observer:main",
             "wrench_state_observer = thesis_bringup.wrench_state_observer:main",
             "contact_state_observer = thesis_bringup.contact_state_observer:main",

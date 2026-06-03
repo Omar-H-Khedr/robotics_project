@@ -91,6 +91,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_insert_handoff_settle_v1 | Completed safety gate: final INSERT descent is withheld unless handoff feedback is stable; validation still aborted before depth |
 | research_baseline_search_sustained_clearance_v1 | Completed safety gate: SEARCH now requires sustained physical clearance; validation fails closed in SEARCH |
 | research_baseline_search_centered_hold_v1 | Rejected: centered SEARCH hold remained unstable and source was reverted |
+| research_baseline_xy_stability_analyzer_v1 | Completed: per-state passive-log analyzer confirms recent SEARCH runs only sustain 1 mm clearance for two estimated control ticks |
 
 ## 2026-06-03 Controller-State Tracking V2
 
@@ -501,6 +502,42 @@ Runtime result:
 Decision: rejected; source reverted. The centered hold was safe but did not
 meet the sustained clearance gate and ended with worse final SEARCH XY than the
 previous sustained-clearance run.
+
+## 2026-06-03 XY Stability Analyzer
+
+Milestone: `research_baseline_xy_stability_analyzer_v1`
+
+Evidence:
+
+- `diagnostics/research_baseline_search_sustained_clearance_v1/xy_stability_analysis.md`
+- `diagnostics/research_baseline_search_centered_hold_v1/xy_stability_analysis.md`
+
+The workspace now includes `xy_stability_analyzer`, an offline passive-log
+diagnostic for `wrench_state_samples.csv`. It groups samples by task state and
+estimates longest clearance windows at the task controller cadence (`10 Hz`) for
+both the physical `0.0010 m` peg/hole radial clearance and the older `0.0020 m`
+pre-contact alignment band.
+
+Validation commands:
+
+```bash
+python3 -m py_compile src/thesis_bringup/thesis_bringup/xy_stability_analyzer.py
+colcon build --symlink-install --packages-select thesis_bringup
+ros2 run thesis_bringup xy_stability_analyzer diagnostics/research_baseline_search_sustained_clearance_v1
+ros2 run thesis_bringup xy_stability_analyzer diagnostics/research_baseline_search_centered_hold_v1
+```
+
+Result:
+
+| Run | SEARCH min XY m | SEARCH mean XY m | SEARCH final XY m | Best SEARCH 1 mm ticks | Best SEARCH 2 mm ticks |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| sustained-clearance | 0.000037 | 0.003108 | 0.004354 | 2 | 6 |
+| centered-hold | 0.000062 | 0.003157 | 0.004772 | 2 | 6 |
+
+Interpretation: both recent runs hit sub-millimeter samples, but neither holds
+physical clearance beyond two estimated 10 Hz control ticks in SEARCH. This
+supports preserving the sustained 1 mm gate and targeting feedback/control
+stability before attempting INSERT again.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 

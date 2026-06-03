@@ -102,6 +102,7 @@ until repeated validation demonstrates robust success.
 - INSERT handoff settle now withholds the final descent command unless feedback remains stable inside physical clearance. Validation still aborted before depth, with no descent-to-final INSERT command published; SEARCH had accepted a transient inside-clearance sample but feedback was already `0.002773 m` off center by the handoff boundary.
 - SEARCH now requires sustained physical clearance for `8` consecutive control ticks before INSERT. Validation failed closed in SEARCH instead of entering INSERT: `308/4500` SEARCH samples were inside `0.0010 m`, but the longest consecutive inside-clearance run was only `2` observer samples.
 - A centered SEARCH hold diagnostic was tested and rejected. It improved inside-clearance occupancy to `365/4500` SEARCH samples and the longest run to `4` observer samples, but still timed out in SEARCH with final XY `0.0048 m`; source was reverted.
+- The new `xy_stability_analyzer` confirms this is not a success-metric artifact. Replaying recent passive logs at the task controller cadence shows both `research_baseline_search_sustained_clearance_v1` and the rejected centered-hold run achieved only `2` estimated SEARCH ticks inside `0.0010 m`, though both reached `6` estimated ticks inside `0.0020 m`.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
@@ -746,6 +747,41 @@ Runtime result:
 
 Decision: rejected; source reverted. The centered hold did not satisfy
 sustained no-contact alignment and should not be carried as an active behavior.
+
+## 2026-06-03 XY Stability Analyzer
+
+Milestone: `research_baseline_xy_stability_analyzer_v1`
+
+Evidence:
+
+- `diagnostics/research_baseline_search_sustained_clearance_v1/xy_stability_analysis.md`
+- `diagnostics/research_baseline_search_centered_hold_v1/xy_stability_analysis.md`
+
+Added `thesis_bringup.xy_stability_analyzer`, an offline passive-log analyzer
+that groups `wrench_state_samples.csv` by task state and estimates longest
+clearance windows at the controller's 10 Hz state cadence.
+
+Validation passed:
+
+```bash
+python3 -m py_compile src/thesis_bringup/thesis_bringup/xy_stability_analyzer.py
+colcon build --symlink-install --packages-select thesis_bringup
+ros2 run thesis_bringup xy_stability_analyzer diagnostics/research_baseline_search_sustained_clearance_v1
+ros2 run thesis_bringup xy_stability_analyzer diagnostics/research_baseline_search_centered_hold_v1
+```
+
+Key result:
+
+| Run | SEARCH min XY m | SEARCH mean XY m | SEARCH final XY m | Best SEARCH 1 mm ticks | Best SEARCH 2 mm ticks |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| sustained-clearance | 0.000037 | 0.003108 | 0.004354 | 2 | 6 |
+| centered-hold | 0.000062 | 0.003157 | 0.004772 | 2 | 6 |
+
+Interpretation: the physical 1 mm clearance gate is not being held long enough
+for a credible INSERT handoff. The next implementation should improve
+controller/feedback stability around the centered no-contact pose or add a
+bounded settling strategy that is validated by this analyzer. Do not weaken the
+1 mm gate to convert transient crossings into apparent success.
 
 ## 2026-06-02 Joint-State Source Integrity
 
