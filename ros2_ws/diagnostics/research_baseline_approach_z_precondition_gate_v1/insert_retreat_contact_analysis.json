@@ -1,0 +1,115 @@
+{
+  "command_duration_s": 20.0,
+  "command_index": 2,
+  "command_receipt_stamp_s": 55.5,
+  "contact_summary": {
+    "available": true,
+    "states": {
+      "RETREAT": {
+        "first_stamp_s": 67.281,
+        "max_contact_force_n": 1970.434828471,
+        "positive_samples": 7776,
+        "samples": 7776,
+        "top_collision_pairs": [
+          {
+            "collision_pair": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::target_plate_collision",
+            "max_force_n": 1970.434828471,
+            "samples": 6144
+          },
+          {
+            "collision_pair": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__gripper_right_finger_collision_4 <-> target_plate::plate_link::target_plate_collision",
+            "max_force_n": 1970.434828471,
+            "samples": 3660
+          },
+          {
+            "collision_pair": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_right_collision",
+            "max_force_n": 1970.434828471,
+            "samples": 1294
+          },
+          {
+            "collision_pair": "lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_rear_collision",
+            "max_force_n": 404.994129997,
+            "samples": 6
+          }
+        ]
+      }
+    }
+  },
+  "final_cartesian_error_norm_m": 0.024079965568318335,
+  "final_cartesian_error_xyz_m": [
+    0.0017774385129716297,
+    0.00133727761591107,
+    -0.023977012797302022
+  ],
+  "final_feedback_xyz_m": [
+    0.5182266935256077,
+    -0.20133808180492674,
+    0.8139851619936198
+  ],
+  "final_feedback_z_m": 0.8139851619936198,
+  "final_physical_depth_m": 0.0,
+  "hole_top_z_m": 0.81,
+  "input_dir": "diagnostics/research_baseline_approach_z_precondition_gate_v1",
+  "max_abs_position_error_rad": 0.010353508,
+  "max_physical_depth_m": 0.0,
+  "mean_rms_position_error_rad": 0.0029152702723041117,
+  "min_feedback_z_m": 0.811899197823817,
+  "missing_descent_to_target_m": 0.023977012797302022,
+  "next_command_stamp_s": 65.826,
+  "observed_window_s": 10.325999999999993,
+  "p95_max_abs_position_error_rad": 0.008407195,
+  "samples": 2578,
+  "target_xyz_m": [
+    0.5200041320385793,
+    -0.20000080418901567,
+    0.7900081491963178
+  ],
+  "tracking_source": "trajectory_controller_state_samples.csv",
+  "wrench_summary": {
+    "available": true,
+    "states": {
+      "APPROACH": {
+        "max_abs_fz_n": 127.543218888,
+        "max_force_norm_n": 208.030910609,
+        "mean_xy_error_m": 0.0020418238539898132,
+        "samples": 1178
+      },
+      "IDLE": {
+        "max_abs_fz_n": 116.365116017,
+        "max_force_norm_n": 175.929637424,
+        "mean_xy_error_m": 0.40922669897530867,
+        "samples": 81
+      },
+      "INSERT": {
+        "max_abs_fz_n": 125.636942925,
+        "max_force_norm_n": 209.244996246,
+        "mean_xy_error_m": 0.0027752594937198068,
+        "samples": 1035
+      },
+      "MOVING_TO_START": {
+        "max_abs_fz_n": 128.7290118,
+        "max_force_norm_n": 207.792380663,
+        "mean_xy_error_m": 0.22156609388654033,
+        "samples": 4116
+      },
+      "RETREAT": {
+        "max_abs_fz_n": 594.283888804,
+        "max_force_norm_n": 949.25774368,
+        "mean_xy_error_m": 0.018549982667149058,
+        "samples": 691
+      },
+      "SEARCH": {
+        "max_abs_fz_n": 94.361819422,
+        "max_force_norm_n": 105.167668031,
+        "mean_xy_error_m": 0.002660698,
+        "samples": 5
+      },
+      "UNKNOWN": {
+        "max_abs_fz_n": 100.296453419,
+        "max_force_norm_n": 168.150419191,
+        "mean_xy_error_m": 0.40948917442424243,
+        "samples": 166
+      }
+    }
+  }
+}

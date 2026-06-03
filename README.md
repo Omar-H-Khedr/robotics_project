@@ -13,6 +13,8 @@ The active baseline targets the KUKA LBR iisy 6 R1300 and is controller-driven i
 
 The latest safety-gate correction makes `APPROACH` completion require the same peg-Z precondition used before `INSERT` (`peg_z <= 0.8450 m`). The validation no longer allowed `APPROACH` to complete while the peg was above that force-safe precondition; it reached `APPROACH complete` at `peg_z=0.8417 m`, ran `SEARCH`, then executed `INSERT` with zero physical insertion depth. Contact-topic rows began during `RETREAT`, not `INSERT`, and reached `max_contact_force_n=1970.434828`. Evidence is in `ros2_ws/diagnostics/research_baseline_approach_z_precondition_gate_v1/`.
 
+The latest insert/retreat analyzer confirms the failed insert command targeted peg-tip `z=0.790008 m`, but feedback only reached minimum `z=0.811899 m` against `HOLE_TOP_Z=0.810000 m`, so physical depth remained zero. It also attributes high retreat contact to peg-target and right-finger-target collision pairs. Evidence is in `ros2_ws/diagnostics/research_baseline_insert_retreat_contact_analyzer_v1/` and `ros2_ws/diagnostics/research_baseline_approach_z_precondition_gate_v1/insert_retreat_contact_analysis.md`.
+
 The canonical `research_baseline.launch.py` now uses a project-local bridge config that omits Gazebo `/joint_states`; `joint_state_broadcaster` is the intended single ROS 2 joint-state source. Evidence is in `ros2_ws/diagnostics/research_baseline_joint_state_source_integrity/`.
 
 The latest tracking audit confirms the above-hole IK target is reachable offline, but Gazebo/controller tracking remains unstable. Gain 250 and repeated bounded refinement were rejected; the retained baseline keeps the 2 mm no-contact gate and exposes `position_gain` only for documented experiments.

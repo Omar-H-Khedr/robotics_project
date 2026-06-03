@@ -89,6 +89,7 @@ until repeated validation demonstrates robust success.
 - Endpoint hold dynamics from that run show multi-centimeter post-command oscillation: X/Y/Z ranges `0.041273 / 0.035843 / 0.033742 m`, strict 10 Hz bins `0`, and largest joint feedback range `joint_1=0.057121 rad`.
 - A 5x damping diagnostic now clears the strict MOVING_TO_START gate and reaches APPROACH with lower force/tracking error, but still aborts before INSERT because final approach feedback remains at `z=0.849622 m` for a `z=0.830000 m` target, above the `0.8450 m` force-safe precondition.
 - The latest approach Z-precondition gate correction makes `APPROACH` completion require `peg_z <= 0.8450 m`, matching the preserved INSERT precondition. With `joint_damping_scale:=5.0`, validation reached INSERT only after `APPROACH` reached `peg_z=0.8417 m`; INSERT then reported `physical_depth=0.0000 m`, and contact-topic rows appeared during `RETREAT` with max contact force `1970.434828 N`.
+- The latest insert/retreat contact analyzer confirms the failed INSERT target was near `z=0.790008 m`, but feedback only reached minimum `z=0.811899 m` against `HOLE_TOP_Z=0.810000 m`. RETREAT contact is attributed to peg-target and right-finger-target collision pairs, so retreat clearance after failed insertion is now the next safety-critical blocker.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
 - Insertion controller: topic-based trajectory publishing with median Fz baseline, SEARCH phase, single-point INSERT, final JSON outcome logging.
@@ -244,6 +245,38 @@ Runtime evidence:
 This is not task success. It is evidence that the phase transition is now more
 honest and that the next blocker has moved to insertion-depth/contact
 interpretation plus retreat collision safety.
+
+## 2026-06-03 Insert / Retreat Contact Analyzer
+
+Milestone: `research_baseline_insert_retreat_contact_analyzer_v1`
+
+Evidence: `diagnostics/research_baseline_insert_retreat_contact_analyzer_v1/summary.md`
+
+Added a passive offline analyzer for INSERT tracking and RETREAT contact
+attribution. It selects the insert command by FK target near the canonical final
+insertion pose, computes peg-tip depth relative to `HOLE_TOP_Z=0.810 m`, and
+summarizes contact pairs and wrench peaks by state.
+
+Validation passed Python syntax, targeted `colcon build --packages-select
+thesis_bringup`, and analyzer execution on
+`diagnostics/research_baseline_approach_z_precondition_gate_v1`.
+
+Analyzer result:
+
+- selected INSERT command index `2`;
+- target peg-tip pose `(0.520004, -0.200001, 0.790008)`;
+- final feedback pose `(0.518227, -0.201338, 0.813985)`;
+- missing descent to target `0.023977 m`;
+- minimum feedback Z `0.811899 m`;
+- max physical insertion depth `0.000000 m`;
+- contact-topic rows only attributed to `RETREAT`;
+- top RETREAT pair: `grasped_peg_collision_2 <-> target_plate_collision`;
+- additional high-force RETREAT pair: `gripper_right_finger_collision_4 <-> target_plate_collision`.
+
+This confirms that zero depth in the latest run is consistent with measured
+feedback staying above the plate top. The next implementation should prevent a
+failed insert from retreating laterally through the plate; a clearance-lift
+segment before moving toward `SAFE_HOME` is the technically next candidate.
 
 ## 2026-06-02 Joint-State Source Integrity
 
