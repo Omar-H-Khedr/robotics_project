@@ -99,8 +99,10 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_streak_preservation_v1 | Completed safety sequencing: SEARCH preserves active stability streaks, but validation still fails closed before INSERT |
 | research_baseline_search_feedback_compensated_recenter_v1 | Rejected: bounded feedback-compensated recenter still failed SEARCH and worsened mean/final XY; source reverted |
 | research_baseline_search_tracking_sensitivity_v1 | Completed diagnostic: measured joint tracking error explains millimeter-scale centered-hold XY drift; dominant p95 contributor is joint_1 |
+| research_baseline_search_derivative_gain_v1 | Validated safely: added `position_derivative_gain` plumbing and tested D=0.5; SEARCH still fails closed but centered-hold p95 XY drift and best 1 mm window unchanged |
+| research_baseline_search_derivative_gain_v2 | Validated safely: D=5.0 marginally tightens SEARCH final XY and reduces centered-hold p95 JTC joint error; centered-hold p95 actual XY drift still around 4 mm and SEARCH best 1 mm window remains 3 ticks |
 
-## 2026-06-03 SEARCH Tracking Sensitivity Diagnostic
+## 2026-06-03 SEARCH Derivative Gain Plumbing
 
 Milestone: `research_baseline_search_tracking_sensitivity_v1`
 
@@ -134,6 +136,43 @@ Decision: this does not justify loosening the `0.0010 m` physical clearance
 gate and does not show a target-frame mismatch. The next credible fix should
 reduce or compensate no-contact hold tracking error/dynamics, then rerun the
 same sustained SEARCH gate.
+
+## 2026-06-03 SEARCH Derivative Gain Plumbing
+
+Milestone: `research_baseline_search_derivative_gain_v1` and
+`research_baseline_search_derivative_gain_v2`
+
+Evidence:
+
+- `diagnostics/research_baseline_search_derivative_gain_v1/summary.md`
+- `diagnostics/research_baseline_search_derivative_gain_v2/summary.md`
+
+`spawn_robot_sdf.py` and `research_baseline.launch.py` now accept a
+`position_derivative_gain` argument that, when set above `0.0`, injects a
+`<position_derivative_gain>` element into the converted SDF
+`gz_ros2_control` plugin. The canonical launch default is `0.0`, which
+preserves upstream behavior; only explicit diagnostic overrides add the
+element.
+
+Two headless Gazebo diagnostics were run with `position_gain:=2000.0`,
+`joint_damping_scale:=5.0`, and `position_derivative_gain:=0.5` then
+`5.0`. Both used the new `tracking_log_dir` and ran the same sustained
+SEARCH/clearance safety gates.
+
+| Run | `position_derivative_gain` | Outcome | SEARCH best 1 mm window | SEARCH final XY m | Centered-hold p95 actual XY drift m | Centered-hold p95 JTC joint error rad |
+| --- | ---: | --- | ---: | ---: | ---: | ---: |
+| streak-preservation (no D-term) | 0 | ABORTED SEARCH timeout | 3 | 0.002779 | 0.003981 | 0.008404 |
+| derivative_gain_v1 | 0.5 | ABORTED SEARCH timeout | 3 | 0.003823 | 0.003919 | 0.008617 |
+| derivative_gain_v2 | 5.0 | ABORTED SEARCH timeout | 3 | 0.002667 | 0.004018 | 0.008434 |
+
+`position_derivative_gain=5.0` reduced SEARCH final XY and the centered-hold
+p95 JTC joint error marginally, but it did not extend the best 1 mm
+sustained window and the centered-hold p95 actual XY drift stayed around
+4 mm. `joint_1` is still the dominant p95 XY contributor. The D-term
+plumbing is correctly applied, the safety gates are unchanged, and no
+insertion success is claimed. The next iteration should combine the D-term
+with a different lever (controller rate, controller type, or higher-level
+feedback shaping) rather than scale the D-term further.
 
 ## 2026-06-03 Rejected Feedback-Compensated Recenter
 

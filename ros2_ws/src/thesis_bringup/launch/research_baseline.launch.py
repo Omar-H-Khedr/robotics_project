@@ -250,6 +250,8 @@ def launch_setup(context, *args, **kwargs):
         "include_camera:=false",
         "--position-gain",
         LaunchConfiguration("position_gain"),
+        "--position-derivative-gain",
+        LaunchConfiguration("position_derivative_gain"),
         "--joint-damping-scale",
         LaunchConfiguration("joint_damping_scale"),
         "--joint-effort-scale",
@@ -516,6 +518,15 @@ def generate_launch_description():
                     "Gazebo position_proportional_gain for gz_ros2_control. "
                     "The canonical default keeps the upstream-style value; "
                     "override only for documented tracking experiments."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "position_derivative_gain",
+                default_value="0.0",
+                description=(
+                    "gz_ros2_control position_derivative_gain. Adds damping "
+                    "at the controller level to reduce oscillation during "
+                    "centered hold. Default 0.0 preserves canonical behavior."
                 ),
             ),
             DeclareLaunchArgument(

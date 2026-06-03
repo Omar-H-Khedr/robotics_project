@@ -104,6 +104,7 @@ def _inject_ros2_control_plugin(
     root: ET.Element,
     controller_config: str,
     position_proportional_gain: float,
+    position_derivative_gain: float = 0.0,
 ) -> None:
     """Add gz_ros2_control-system <plugin> inside <model>."""
     model = root.find("model")
@@ -125,6 +126,10 @@ def _inject_ros2_control_plugin(
 
     e = ET.SubElement(plugin, "position_proportional_gain")
     e.text = str(position_proportional_gain)
+
+    if position_derivative_gain > 0.0:
+        e = ET.SubElement(plugin, "position_derivative_gain")
+        e.text = str(position_derivative_gain)
 
 
 def _extract_initial_positions(urdf_xml: str) -> dict[str, float]:
@@ -213,8 +218,9 @@ def _inject_plugin(
     urdf_xml: str,
     controller_config: str,
     position_proportional_gain: float,
-    joint_damping_scale: float,
-    joint_effort_scale: float,
+    position_derivative_gain: float = 0.0,
+    joint_damping_scale: float = 1.0,
+    joint_effort_scale: float = 1.0,
 ) -> str:
     """Add ros2_control plugin, FT sensor, and initial positions to the SDF."""
     root = ET.fromstring(sdf_xml)
@@ -229,7 +235,9 @@ def _inject_plugin(
         )
         for change in changes:
             print(f"SDF joint dynamics override: {change}")
-    _inject_ros2_control_plugin(root, controller_config, position_proportional_gain)
+    _inject_ros2_control_plugin(
+        root, controller_config, position_proportional_gain, position_derivative_gain,
+    )
     _inject_ft_sensor(root)
     _inject_peg_contact_sensor(root)
     return '<?xml version="1.0"?>\n' + ET.tostring(root, encoding="unicode")
@@ -259,6 +267,12 @@ def main() -> None:
         type=float,
         default=1000.0,
         help="gz_ros2_control position_proportional_gain",
+    )
+    parser.add_argument(
+        "--position-derivative-gain",
+        type=float,
+        default=0.0,
+        help="gz_ros2_control position_derivative_gain (adds damping at controller level)",
     )
     parser.add_argument(
         "--joint-damping-scale",
@@ -327,6 +341,7 @@ def main() -> None:
         urdf.stdout,
         controller_config_path,
         args.position_gain,
+        args.position_derivative_gain,
         args.joint_damping_scale,
         args.joint_effort_scale,
     )
