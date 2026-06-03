@@ -1,15 +1,17 @@
 # Visuomotor Context-Based Meta-Reinforcement Learning for Safe Peg-in-Hole Assembly
 
 **Repository status:** active doctoral research prototype
-**Latest documented:** `research_baseline_slow_move_to_start_rejected`
-**README last updated:** 2026-06-02
+**Latest documented:** `research_baseline_approach_z_precondition_gate_v1`
+**README last updated:** 2026-06-03
 **Execution scope:** simulation-first validation only; no real-robot claim is made in this repository state.
 
 ---
 
 ## Current Status Note
 
-The active baseline targets the KUKA LBR iisy 6 R1300 and is controller-driven in Gazebo. It must not be described as robust autonomous peg-in-hole success: repeated validation has produced 0/3 physical successes, and the latest 2026-06-02 run timed out safely in `MOVING_TO_START` with XY error still outside the strict no-contact descent gate.
+The active baseline targets the KUKA LBR iisy 6 R1300 and is controller-driven in Gazebo. It must not be described as robust autonomous peg-in-hole success: repeated validation has produced 0/3 physical successes, and the latest 2026-06-03 validation reached `INSERT` only under the diagnostic `joint_damping_scale:=5.0` setting, reported `physical_depth=0.0000 m`, and exposed high `RETREAT` contact.
+
+The latest safety-gate correction makes `APPROACH` completion require the same peg-Z precondition used before `INSERT` (`peg_z <= 0.8450 m`). The validation no longer allowed `APPROACH` to complete while the peg was above that force-safe precondition; it reached `APPROACH complete` at `peg_z=0.8417 m`, ran `SEARCH`, then executed `INSERT` with zero physical insertion depth. Contact-topic rows began during `RETREAT`, not `INSERT`, and reached `max_contact_force_n=1970.434828`. Evidence is in `ros2_ws/diagnostics/research_baseline_approach_z_precondition_gate_v1/`.
 
 The canonical `research_baseline.launch.py` now uses a project-local bridge config that omits Gazebo `/joint_states`; `joint_state_broadcaster` is the intended single ROS 2 joint-state source. Evidence is in `ros2_ws/diagnostics/research_baseline_joint_state_source_integrity/`.
 

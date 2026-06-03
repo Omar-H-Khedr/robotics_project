@@ -88,6 +88,7 @@ until repeated validation demonstrates robust success.
 - Latest canonical controller-state tracking validation: `research_baseline_controller_state_tracking_v2` aborted safely in `MOVING_TO_START` after 120.0 s with final logged `xy_err=0.013 m`, zero insertion depth, zero contact-topic samples, and JTC controller-state p95 max position error `0.023935 rad` over the axis-align command window.
 - Endpoint hold dynamics from that run show multi-centimeter post-command oscillation: X/Y/Z ranges `0.041273 / 0.035843 / 0.033742 m`, strict 10 Hz bins `0`, and largest joint feedback range `joint_1=0.057121 rad`.
 - A 5x damping diagnostic now clears the strict MOVING_TO_START gate and reaches APPROACH with lower force/tracking error, but still aborts before INSERT because final approach feedback remains at `z=0.849622 m` for a `z=0.830000 m` target, above the `0.8450 m` force-safe precondition.
+- The latest approach Z-precondition gate correction makes `APPROACH` completion require `peg_z <= 0.8450 m`, matching the preserved INSERT precondition. With `joint_damping_scale:=5.0`, validation reached INSERT only after `APPROACH` reached `peg_z=0.8417 m`; INSERT then reported `physical_depth=0.0000 m`, and contact-topic rows appeared during `RETREAT` with max contact force `1970.434828 N`.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
 - Insertion controller: topic-based trajectory publishing with median Fz baseline, SEARCH phase, single-point INSERT, final JSON outcome logging.
@@ -214,6 +215,35 @@ force norm to `255.5 N`; trajectory tracking improved to p95 max joint error
 about `0.0158 rad`, and above-hole hold analysis improved to two estimated
 stable ticks. It still aborted in `MOVING_TO_START` with final `xy_err=0.007 m`
 and `stable=0/5`, so it does not justify changing canonical damping.
+
+## 2026-06-03 Approach Z-Precondition Gate
+
+Milestone: `research_baseline_approach_z_precondition_gate_v1`
+
+Evidence: `diagnostics/research_baseline_approach_z_precondition_gate_v1/summary.md`
+
+The task controller now requires the preserved force-safe Z precondition before
+`APPROACH` can complete. This is a safety tightening: it does not loosen the
+strict 2 mm no-contact start gate, the INSERT XY gate, or the hard-force abort.
+
+Validation passed Python syntax, targeted `colcon build --packages-select
+kuka_task_control thesis_bringup`, a headless launch with
+`joint_damping_scale:=5.0`, and the three passive tracking analyzers.
+
+Runtime evidence:
+
+- `MOVING_TO_START` completed with final command-attributed XY error `0.000812 m`;
+- `APPROACH` did not complete while `peg_z=0.8452 m` because the precondition was still false;
+- `APPROACH` completed at `peg_z=0.8417 m`;
+- `SEARCH` was entered for pre-insertion XY `0.0027 m` and converged to about `0.0010 m`;
+- `INSERT` executed, but reported `physical_depth=0.0000 m`;
+- approach analyzer reported target `(0.520000, -0.200000, 0.830000)`, final feedback `(0.517594, -0.202990, 0.840723)`, and missing descent `0.010723 m`;
+- contact-topic rows began during `RETREAT`, not `INSERT`, and reached `max_contact_force_n=1970.434828`;
+- wrench summary recorded `RETREAT` max abs Fz `594.283889 N`.
+
+This is not task success. It is evidence that the phase transition is now more
+honest and that the next blocker has moved to insertion-depth/contact
+interpretation plus retreat collision safety.
 
 ## 2026-06-02 Joint-State Source Integrity
 

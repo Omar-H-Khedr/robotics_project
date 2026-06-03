@@ -81,6 +81,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - A 2026-06-03 controller-state tracking validation added direct JTC `controller_state` recording and made the MOVING_TO_START analyzer prefer that source when available. The canonical run still aborted safely before descent after 120.0 s in `MOVING_TO_START` with final logged `xy_err=0.013 m`, zero insertion depth, zero contact-topic samples, and only `143 / 15930` controller-state samples inside the strict 2 mm XY band.
 - A 2026-06-03 endpoint-hold dynamics analyzer isolated the post-command hold window from that same run. The hold window had X/Y/Z ranges `0.041273 / 0.035843 / 0.033742 m`, zero strict 10 Hz bins, and largest feedback range on `joint_1` at `0.057121 rad`. This points to hold dynamics/control authority rather than a simple target-frame offset.
 - A 2026-06-03 `joint_damping_scale:=5.0` diagnostic improved the baseline enough to satisfy MOVING_TO_START and enter APPROACH without contact-topic samples or high raw-force regression. It still aborted before INSERT because the approach ended at `z=0.849622 m` against a `z=0.830000 m` target, above the preserved `0.8450 m` force-safe precondition.
+- A 2026-06-03 approach Z-precondition gate correction made `APPROACH` completion require `peg_z <= 0.8450 m`, matching the preserved INSERT precondition. With `joint_damping_scale:=5.0`, validation reached `APPROACH complete` only after `peg_z=0.8417 m`, then ran `SEARCH` and `INSERT`. The insert trajectory still reported `physical_depth=0.0000 m`, contact-topic rows began only in `RETREAT`, and retreat contact reached `1970.434828 N`, so this is not insertion success and makes retreat collision/depth interpretation the next safety-critical blocker.
 - A 2026-06-02 broad damping-reduction diagnostic was rejected. `joint_damping_scale:=0.2` preserved safety gates but hard-aborted in `MOVING_TO_START` at raw `|Fz|=1181.0 N` before reaching the no-contact gate or approach phase.
 - A 2026-06-02 effort-authority diagnostic was rejected. `joint_effort_scale:=2.0` reached the no-contact gate faster and entered `APPROACH`, but hard-aborted after 0.5 s with force norm `1009.7 N` and target-source contact rows while the peg was still at `z=0.890982 m` against the `z=0.830000 m` target.
 - A 2026-06-02 contact-pair attribution diagnostic added exact collision-pair logging to the passive contact observer. A reproduced doubled-effort run aborted in `MOVING_TO_START` with raw `|Fz|=1018.9 N` and showed target-source contact from `lbr_iisy6_r1300::link_5::link_5_collision <-> target_plate::plate_link::target_plate_collision`. This is invalid robot-link clearance contact, not peg insertion contact.
@@ -176,6 +177,13 @@ realization still stops above the force-safe INSERT precondition. Future work
 should preserve that precondition and investigate approach-depth tracking,
 trajectory timing, or damping/gain balance rather than claiming insertion from
 an abort-before-INSERT run.
+
+The approach Z-precondition gate now prevents that specific false phase
+completion. The remaining blocker is not gate definition: with the same 5x
+damping diagnostic the task reached INSERT, but physical insertion depth stayed
+at `0.0000 m` and high contact appeared during RETREAT. The next work should
+audit insertion-depth geometry, peg/hole collision pairs during and after
+INSERT, and retreat path clearance before any success or learning claim.
 
 Use the enhanced MOVING_TO_START tracking analyzer to judge command-attributed
 XY stability by distribution and final-window range. A single minimum or final

@@ -731,7 +731,6 @@ class AdmittanceInsertionNode(Node):
         peg, _ = self._kinematics.pose(self.current_joints)
         cart_err = np.linalg.norm(peg - self.TOUCH_POSE)
         xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
-        z_err = abs(peg[2] - self.TOUCH_POSE[2])
         contact_force = self._get_contact_force()
         if peg[2] <= self.TOUCH_POSE[2] + 0.005 and self._check_abort(contact_force):
             self._abort_reason = (
@@ -748,8 +747,11 @@ class AdmittanceInsertionNode(Node):
             np.all(np.abs(self.current_joints - self._touch_joints)
                    < self.JOINT_TOLERANCE)
         )
-        cart_ok = (cart_err < self.CARTESIAN_TOLERANCE
-                   and z_err < 0.025)
+        z_precondition_ok = peg[2] <= self.INSERT_PRECONDITION_MAX_Z
+        cart_ok = (
+            cart_err < self.CARTESIAN_TOLERANCE
+            and z_precondition_ok
+        )
         settled = joints_ok and cart_ok
         self._stable_counter = (self._stable_counter + 1) if settled else 0
         stabilized = self._stable_counter >= self.STABILIZE_TICKS
@@ -760,6 +762,7 @@ class AdmittanceInsertionNode(Node):
                 f'peg=({peg[0]:.4f}, {peg[1]:.4f}, {peg[2]:.4f})  '
                 f'cart_err={cart_err:.3f}  '
                 f'xy_err={xy_err:.3f}  '
+                f'z_ok={z_precondition_ok}  '
                 f'stable={self._stable_counter}/{self.STABILIZE_TICKS}'
             )
 
@@ -778,6 +781,8 @@ class AdmittanceInsertionNode(Node):
             self._abort_reason = (
                 f'APPROACH timeout/degraded failure ({elapsed:.1f}s). '
                 f'cart_err={cart_err:.3f}m, joint_err={joint_err:.3f}rad, '
+                f'peg_z={peg[2]:.4f}m, '
+                f'z_precondition<={self.INSERT_PRECONDITION_MAX_Z:.4f}m, '
                 f'tolerance={self.CARTESIAN_TOLERANCE:.3f}m'
             )
             self.get_logger().error(self._abort_reason)
