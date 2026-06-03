@@ -143,6 +143,9 @@ class AdmittanceInsertionNode(Node):
     INSERT_PRECONDITION_XY_TOLERANCE = 0.015
     INSERT_PRECONDITION_MAX_Z = 0.845
     APPROACH_START_XY_TOLERANCE = INSERTION_XY_TOLERANCE
+    PEG_RADIUS_M = 0.0125
+    HOLE_RADIUS_M = 0.0135
+    INSERT_FINAL_XY_TOLERANCE = HOLE_RADIUS_M - PEG_RADIUS_M
 
     def __init__(self) -> None:
         super().__init__('admittance_insertion_node')
@@ -240,6 +243,7 @@ class AdmittanceInsertionNode(Node):
         self._max_contact_force: float = 0.0
         self._max_insert_contact_force: float = 0.0
         self._insertion_depth_m: float = 0.0
+        self._final_insertion_xy_error_m: float = 0.0
         self._raw_force_abort_reason: str = ''
 
         # Search state
@@ -560,6 +564,7 @@ class AdmittanceInsertionNode(Node):
             self._max_contact_force = 0.0
             self._max_insert_contact_force = 0.0
             self._insertion_depth_m = 0.0
+            self._final_insertion_xy_error_m = 0.0
             self._begin_phase(self.MOVING_TO_START)
             self._set_state(self.MOVING_TO_START)
 
@@ -1123,10 +1128,12 @@ class AdmittanceInsertionNode(Node):
         if insert_elapsed:
             final_depth = self._physical_insertion_depth(peg[2])
             self._insertion_depth_m = final_depth
+            self._final_insertion_xy_error_m = xy_error
             self.get_logger().info(
                 f'INSERT done (trajectory elapsed).  '
                 f'peg=({peg[0]:.4f}, {peg[1]:.4f}, {peg[2]:.4f})  '
                 f'depth={final_depth:.4f}m  '
+                f'xy_error={xy_error:.4f}m  '
                 f'Fz={fz:.1f}N  contact={contact_force:.1f}N  '
                 f'max_abs_Fz={self._max_fz:.1f}N  '
                 f'max_force_norm={self._max_force_norm:.1f}N  '
@@ -1138,12 +1145,23 @@ class AdmittanceInsertionNode(Node):
             contact_pattern_ok = (
                 self._max_insert_contact_force >= self._contact_threshold
             )
+            final_xy_ok = xy_error <= self.INSERT_FINAL_XY_TOLERANCE
 
-            if depth_ok and contact_pattern_ok:
+            if depth_ok and contact_pattern_ok and final_xy_ok:
                 self._end_phase(True, 0.0, 0.0, False,
                                 f'Insertion depth {final_depth:.3f}m with '
                                 f'insert contact evidence '
-                                f'{self._max_insert_contact_force:.1f}N')
+                                f'{self._max_insert_contact_force:.1f}N and '
+                                f'final XY error {xy_error:.4f}m')
+            elif depth_ok and contact_pattern_ok and not final_xy_ok:
+                self._end_phase(False, xy_error, 0.0, False,
+                                f'Depth reached ({final_depth:.3f}m) and '
+                                f'insert contact '
+                                f'{self._max_insert_contact_force:.1f}N, but '
+                                f'final XY error {xy_error:.4f}m exceeds '
+                                f'physical hole clearance '
+                                f'{self.INSERT_FINAL_XY_TOLERANCE:.4f}m. '
+                                f'Insertion is side-loaded.')
             elif depth_ok and not contact_pattern_ok:
                 self._end_phase(False, 0.0, 0.0, False,
                                 f'Depth reached ({final_depth:.3f}m) but '
@@ -1234,10 +1252,23 @@ class AdmittanceInsertionNode(Node):
 
         depth_ok = self._insertion_depth_m >= 0.010
         contact_ok = self._max_insert_contact_force >= self._contact_threshold
+        final_xy_ok = (
+            self._final_insertion_xy_error_m
+            <= self.INSERT_FINAL_XY_TOLERANCE
+        )
 
         if self._abort_reason:
             self._trial_outcome = 'ABORTED'
             reason = self._abort_reason
+        elif depth_ok and contact_ok and not final_xy_ok:
+            self._trial_outcome = 'DEGRADED'
+            reason = (
+                f'Final insertion XY error '
+                f'({self._final_insertion_xy_error_m:.4f}m) exceeds physical '
+                f'hole clearance '
+                f'({self.INSERT_FINAL_XY_TOLERANCE:.4f}m). '
+                f'Peg is side-loaded; do not count as physical success.'
+            )
         elif any_failure:
             self._trial_outcome = 'DEGRADED'
             failures = [
@@ -1277,6 +1308,14 @@ class AdmittanceInsertionNode(Node):
             'metrics': {
                 'initial_xy_error_m': round(self._initial_xy_error, 4),
                 'pre_insertion_xy_error_m': round(self._pre_insertion_xy_error, 4),
+                'final_insertion_xy_error_m': round(
+                    self._final_insertion_xy_error_m,
+                    4,
+                ),
+                'insert_final_xy_tolerance_m': round(
+                    self.INSERT_FINAL_XY_TOLERANCE,
+                    4,
+                ),
                 'insertion_depth_m': round(self._insertion_depth_m, 4),
                 'max_fz_N': round(self._max_fz, 2),
                 'max_abs_fz_N': round(self._max_fz, 2),

@@ -2,9 +2,9 @@
 
 Current status as of 2026-06-03: this is an active ROS 2 Jazzy workspace for a Gazebo-based KUKA LBR iisy 6 R1300 peg-in-hole research baseline. The project has a working robot spawn path, active ros2_control controllers, a fixed grasped peg model, a fixed hole fixture, force/torque bridge plumbing, contact observability, and an admittance-style insertion controller.
 
-The strongest current iisy6 evidence is a **single controller-driven simulated insertion success event** from `diagnostics/research_baseline_insert_sim_time_completion_v4`: final outcome `SUCCESS`, insertion depth `0.0191 m`, task F/T insert-contact evidence `60.1 N`, max raw `|Fz|=133.33 N`, and no safety abort or invalid timeout. This is not a robustness claim. Known unresolved concerns include retreat contact after successful insertion, failed older repeated validation, high raw F/T spikes in some scenarios, contact-topic gaps during INSERT, and the need for repeated validation before any learning or robustness claim.
+The strongest historical iisy6 evidence is a controller-driven simulated insertion-depth event from `diagnostics/research_baseline_insert_sim_time_completion_v4`: final outcome `SUCCESS` under older depth/contact criteria, insertion depth `0.0191 m`, task F/T insert-contact evidence `60.1 N`, max raw `|Fz|=133.33 N`, and no safety abort or invalid timeout. That claim is now superseded by a stricter physical-clearance gate: `diagnostics/research_baseline_insert_physical_xy_gate_v1` reached depth `0.0177 m` and insert contact `55.4 N`, but correctly reported `DEGRADED` because final insertion XY error `0.0030 m` exceeds the 25 mm peg / 27 mm hole radial clearance of `0.0010 m`. Current status: no validated physical insertion success under the latest criteria.
 
-Latest timing evidence shows the prior failed insert was partly a clock-domain bug: the task advanced to RETREAT after about `10.6 s` of controller-state INSERT time despite commanding a `20 s` trajectory. The current task node uses ROS/Gazebo time for INSERT completion and the validated run held INSERT for `23.111 s` before RETREAT. Future work should reduce successful-insert RETREAT contact and run repeated validation; do not treat one success event as robust autonomous peg-in-hole performance.
+Latest timing evidence shows the prior failed insert was partly a clock-domain bug: the task advanced to RETREAT after about `10.6 s` of controller-state INSERT time despite commanding a `20 s` trajectory. The current task node uses ROS/Gazebo time for INSERT completion and now also checks final insertion XY against physical hole clearance. Future work should reduce inserted-depth XY drift and side-loaded extraction contact; do not treat depth/contact alone as robust autonomous peg-in-hole performance.
 
 ## Milestones
 
@@ -79,9 +79,10 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_approach_z_precondition_gate_v1 | Completed: APPROACH must satisfy INSERT Z precondition before SEARCH/INSERT |
 | research_baseline_insert_retreat_contact_analyzer_v1 | Completed: failed INSERT depth and RETREAT collision attribution analyzer added |
 | research_baseline_retreat_clearance_lift_v1 | Completed: failed-insert RETREAT contact reduced; INSERT still failed |
-| research_baseline_insert_sim_time_completion_v4 | Completed: single validated iisy6 insertion success; repeat validation and retreat-contact reduction pending |
+| research_baseline_insert_sim_time_completion_v4 | Superseded: depth/contact success under older criteria; physical XY gate added later |
 | research_baseline_staged_withdrawal_v1 | Rejected: staged lift/home preserved success but worsened RETREAT contact |
 | research_baseline_withdrawal_contact_timing_v1 | Completed: RETREAT contact occurs during first extraction command before home motion |
+| research_baseline_insert_physical_xy_gate_v1 | Completed: depth/contact event correctly downgraded because final inserted XY exceeds physical clearance |
 
 ## 2026-06-03 Controller-State Tracking V2
 
@@ -193,11 +194,12 @@ Runtime result:
 - pre-insertion XY error `0.0006 m`;
 - INSERT command observed for `23.111 s` after a `20.000 s` command, fixing the previous about `10.6 s` premature RETREAT transition.
 
-This is a single credible simulated insertion success, not a robustness claim.
-The passive Gazebo contact observer still recorded contact-topic rows only in
-`RETREAT` for this run, and RETREAT contact reached `249.593329 N`. The next
-safety-critical milestone should reduce successful-insert withdrawal contact
-and then run repeated validation.
+This was a credible simulated insertion-depth/contact event under the older
+criteria, not a robustness claim. It is now superseded by
+`research_baseline_insert_physical_xy_gate_v1`, which requires final inserted
+XY error within the physical 1 mm radial clearance. The passive Gazebo contact
+observer still recorded contact-topic rows only in `RETREAT` for this run, and
+RETREAT contact reached `249.593329 N`.
 
 ## 2026-06-03 Staged Withdrawal Diagnostic
 
@@ -246,6 +248,30 @@ Interpretation: the current withdrawal blocker is side-loaded extraction while
 the peg is still inside or near the hole, not late lateral home motion. The next
 motion change should reduce initial extraction contact or fixture collision
 geometry before repeated-validation claims.
+
+## 2026-06-03 Insert Physical XY Gate
+
+Milestone: `research_baseline_insert_physical_xy_gate_v1`
+
+Evidence: `diagnostics/research_baseline_insert_physical_xy_gate_v1/summary.md`
+
+The success contract now requires final INSERT XY error to fit within the
+physical radial clearance of the task: 25 mm peg, 27 mm hole, so `0.0010 m`.
+Runtime validation with `joint_damping_scale:=5.0` reached depth and contact
+but correctly failed the physical-success gate:
+
+- final outcome `DEGRADED`;
+- insertion depth `0.0177 m`;
+- max task-side INSERT contact `55.4 N`;
+- final insertion XY error `0.0030 m`;
+- final INSERT XY tolerance `0.0010 m`;
+- max raw force norm `234.96 N`;
+- RETREAT contact max `589.942680 N`.
+
+This supersedes the earlier v4 success wording. The current baseline has an
+insertion-depth/contact event, not validated physical insertion success. The
+next implementation should reduce inserted-depth XY drift and side-loaded
+extraction contact.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
@@ -710,7 +736,11 @@ The robot moved from the SAFE_HOME posture towards the task start pose.
 
 ### Next Milestone
 
-`proposal_simulation_cell_v2_17_contact_gated_moving_to_start_transition`
+Historical note: this older proposal-era next milestone is superseded by the
+current status section near the top of this README and by
+`docs/CURRENT_PROJECT_STATUS.md`.
+
+Superseded milestone: `proposal_simulation_cell_v2_17_contact_gated_moving_to_start_transition`
 
 - Why the admittance node stays in MOVING_TO_START after trajectory completion
 - Debug the contact detection threshold (5.0 N) vs. observed contact wrench (~2.7 N, below threshold)
@@ -719,9 +749,14 @@ The robot moved from the SAFE_HOME posture towards the task start pose.
 
 ## admittance_controller_v2_honest_tracking_and_contact_estimation
 
-Status: `first_simulated_insertion_event_observed_repeat_validation_pending`
+Status: `historical_insertion_depth_event_observed_physical_xy_gate_now_required`
 
-The v2 controller has produced one simulated insertion-depth event with measured insertion depth, but that single run is not enough to claim robust autonomous peg-in-hole success. Until repeated validation shows stable behavior, the correct wording is: **first simulated insertion event with measured insertion depth**.
+The v2 controller has produced simulated insertion-depth/contact events with
+measured insertion depth, but these runs are not enough to claim robust
+autonomous peg-in-hole success. The current physical-clearance gate requires
+final inserted XY error within the 25 mm peg / 27 mm hole radial clearance.
+The correct wording is: **controller-driven insertion-depth/contact event, not
+validated physical success**.
 
 ### Fix 1 — State machine honesty
 
@@ -802,7 +837,7 @@ The harness starts a fresh `research_baseline.launch.py use_gui:=false` process 
 - `diagnostics/research_baseline_repeat_validation/summary.md`
 - per-trial launch logs and outcome JSON files
 
-Physical success is counted only when `trial_outcome == SUCCESS`, insertion depth is at least 0.010 m, contact force exceeds the configured threshold, and no safety abort occurs.
+Physical success is counted only when `trial_outcome == SUCCESS`, insertion depth is at least 0.010 m, INSERT contact force exceeds the configured threshold, final inserted XY error is within the physical peg/hole radial clearance, and no safety abort occurs.
 
 ### 2026-06-01 Repeat Validation Result
 
