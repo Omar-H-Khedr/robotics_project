@@ -95,6 +95,42 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_recenter_on_coarse_band_v1 | Improved but failed safely: SEARCH recenters inside 2 mm coarse band; best 1 mm window improved to four ticks but INSERT remains blocked |
 | research_baseline_search_recenter_4mm_v1 | Improved but failed safely: bounded 4 mm recenter reduces final SEARCH XY to 1.7 mm but still does not satisfy the 1 mm sustained gate |
 | research_baseline_hold_window_reference_analyzer_v1 | Completed: command-window analyzer shows centered hold references but feedback still fails sustained 1 mm clearance |
+| research_baseline_search_post_command_stability_gate_v1 | Completed safety gate: SEARCH only counts stability after command duration; validation still fails closed before INSERT |
+
+## 2026-06-03 Search Post-Command Stability Gate
+
+Milestone: `research_baseline_search_post_command_stability_gate_v1`
+
+Evidence: `diagnostics/research_baseline_search_post_command_stability_gate_v1_repeat2/summary.md`
+
+SEARCH now tracks when the active SEARCH trajectory command should be complete
+and only counts physical-clearance stability after that timestamp. This avoids
+counting transient sub-mm samples while a recenter or spiral command is still
+executing. The timeout reason was also corrected so instantaneous-but-not-
+sustained alignment is reported honestly.
+
+Validation passed Python syntax, targeted `colcon build --packages-select
+kuka_task_control thesis_bringup`, and a headless Gazebo run with
+`joint_damping_scale:=5.0`. Runtime result:
+
+- `Outcome: ABORTED`;
+- `Reason: SEARCH timeout (45s). XY error 0.0028m remains above physical clearance 0.0010m.`;
+- insertion depth `0.0000 m`;
+- contact-topic samples `0`;
+- max raw `|Fz|=129.8 N`;
+- max raw force norm `209.0 N`;
+- observed trajectory commands `10`;
+- controller-state p95 max absolute joint-position error `0.011381 rad`.
+
+Analyzer result:
+
+- SEARCH best estimated `0.0010 m` window: `4` task ticks;
+- SEARCH best estimated `0.0020 m` window: `13` task ticks;
+- hold-like command count: `7`;
+- best feedback hold inside `0.0010 m`: `2` task ticks.
+
+This is a safety/measurement improvement, not insertion success. INSERT remains
+blocked until no-contact feedback can sustain the physical clearance.
 
 ## 2026-06-03 Hold Window Reference Analyzer
 

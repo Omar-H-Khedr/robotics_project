@@ -268,6 +268,7 @@ class AdmittanceInsertionNode(Node):
         self._search_total_ticks: int = 0
         self._search_convergence_ticks: int = 0
         self._search_recenter_attempts: int = 0
+        self._search_stability_ready_s: float = 0.0
 
         period = 1.0 / self._control_rate
         self._timer = self.create_timer(period, self._control_loop)
@@ -496,6 +497,7 @@ class AdmittanceInsertionNode(Node):
             self._search_total_ticks = 0
             self._search_convergence_ticks = 0
             self._search_recenter_attempts = 0
+            self._search_stability_ready_s = 0.0
 
         state_msg = String()
         state_msg.data = self._state
@@ -918,6 +920,7 @@ class AdmittanceInsertionNode(Node):
             self._search_total_ticks = 0
             self._search_convergence_ticks = 0
             self._search_recenter_attempts = 0
+            self._search_stability_ready_s = 0.0
             self._set_state(self.SEARCH)
             return
 
@@ -956,10 +959,20 @@ class AdmittanceInsertionNode(Node):
         if elapsed >= self.SEARCH_TIMEOUT_S:
             peg, _ = self._kinematics.pose(self.current_joints)
             xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
-            self._abort_reason = (
-                f'SEARCH timeout ({self.SEARCH_TIMEOUT_S:.0f}s). '
-                f'XY error {xy_err:.4f}m remains above tolerance.'
-            )
+            if xy_err <= self.INSERT_FINAL_XY_TOLERANCE:
+                self._abort_reason = (
+                    f'SEARCH timeout ({self.SEARCH_TIMEOUT_S:.0f}s). '
+                    f'Instantaneous XY error {xy_err:.4f}m is within '
+                    f'physical clearance {self.INSERT_FINAL_XY_TOLERANCE:.4f}m '
+                    f'but was not sustained for '
+                    f'{self.SEARCH_CONVERGENCE_TICKS} post-command ticks.'
+                )
+            else:
+                self._abort_reason = (
+                    f'SEARCH timeout ({self.SEARCH_TIMEOUT_S:.0f}s). '
+                    f'XY error {xy_err:.4f}m remains above physical '
+                    f'clearance {self.INSERT_FINAL_XY_TOLERANCE:.4f}m.'
+                )
             self.get_logger().error(self._abort_reason)
             self._end_phase(False, xy_err, 0.0, True, self._abort_reason)
             self._set_state(self.ABORT)
@@ -973,7 +986,8 @@ class AdmittanceInsertionNode(Node):
             self._state_entry_ticks += 1
             peg, _ = self._kinematics.pose(self.current_joints)
             xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
-            if xy_err <= self.INSERT_FINAL_XY_TOLERANCE:
+            ready_to_count = self._now_s() >= self._search_stability_ready_s
+            if ready_to_count and xy_err <= self.INSERT_FINAL_XY_TOLERANCE:
                 self._search_convergence_ticks += 1
                 if self._search_convergence_ticks >= self.SEARCH_CONVERGENCE_TICKS:
                     self.get_logger().info(
@@ -1003,7 +1017,8 @@ class AdmittanceInsertionNode(Node):
                 self.get_logger().info(
                     f'SEARCH settling: xy_error={xy_err:.4f}m, stable='
                     f'{self._search_convergence_ticks}/'
-                    f'{self.SEARCH_CONVERGENCE_TICKS}'
+                    f'{self.SEARCH_CONVERGENCE_TICKS}, '
+                    f'ready_to_count={ready_to_count}'
                 )
             return  # keep waiting for settling
 
@@ -1014,6 +1029,7 @@ class AdmittanceInsertionNode(Node):
             self._search_step = 0
             self._state_entry_ticks = 0
             self._search_convergence_ticks = 0
+            self._search_stability_ready_s = 0.0
 
             if self._search_radius >= self.SEARCH_RADIUS_MAX:
                 self._abort_reason = (
@@ -1038,6 +1054,9 @@ class AdmittanceInsertionNode(Node):
             q = self._solve_ik(recenter_target, seed=self.current_joints)
             if q is not None:
                 self._send_trajectory_goal(q, self.SEARCH_RECENTER_DURATION_S)
+                self._search_stability_ready_s = (
+                    self._now_s() + self.SEARCH_RECENTER_DURATION_S
+                )
                 self._search_recenter_attempts += 1
                 self.get_logger().info(
                     f'SEARCH recenter {self._search_recenter_attempts}: '
@@ -1066,7 +1085,9 @@ class AdmittanceInsertionNode(Node):
             q_current = self.current_joints.copy()
             q_dist = np.max(np.abs(q_current - q))
             if q_dist > 0.001:
-                self._send_trajectory_goal(q, duration_s=5.0)
+                duration_s = 5.0
+                self._send_trajectory_goal(q, duration_s=duration_s)
+                self._search_stability_ready_s = self._now_s() + duration_s
                 self.get_logger().info(
                     f'SEARCH step {self._search_step + 1}/{n_steps} '
                     f'radius={self._search_radius:.3f}m '
@@ -1074,6 +1095,7 @@ class AdmittanceInsertionNode(Node):
                     f'q_dist={q_dist:.5f}'
                 )
             else:
+                self._search_stability_ready_s = 0.0
                 self.get_logger().warn(
                     f'SEARCH step {self._search_step + 1}/{n_steps} '
                     f'radius={self._search_radius:.3f}m '

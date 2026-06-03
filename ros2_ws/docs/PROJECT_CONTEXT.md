@@ -172,6 +172,22 @@ The latest hold-window reference diagnostic is
   stability remains below the required `8` ticks. Continue with feedback
   stabilization or command sequencing, not gate loosening.
 
+The latest active SEARCH safety gate is
+`diagnostics/research_baseline_search_post_command_stability_gate_v1_repeat2`:
+
+- final outcome: `ABORTED`;
+- no INSERT phase was entered;
+- contact-topic samples: `0`;
+- final SEARCH timeout reason: XY `0.0028 m` remained above the physical
+  clearance `0.0010 m`;
+- SEARCH best estimated `0.0010 m` window: `4` task ticks;
+- SEARCH best estimated `0.0020 m` window: `13` task ticks;
+- hold-like command count: `7`;
+- best feedback `0.0010 m` hold window: `2` task ticks;
+- decision: keep post-command-only stability counting. The next blocker is
+  feedback stabilization inside the physical clearance, not SEARCH/INSERT gate
+  loosening.
+
 Repeated validation on 2026-06-01 produced 0/3 physical successes:
 
 - one DEGRADED INSERT with only 0.0037 m depth and a 1237.45 N peak raw Fz spike;
