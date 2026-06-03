@@ -96,6 +96,41 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_recenter_4mm_v1 | Improved but failed safely: bounded 4 mm recenter reduces final SEARCH XY to 1.7 mm but still does not satisfy the 1 mm sustained gate |
 | research_baseline_hold_window_reference_analyzer_v1 | Completed: command-window analyzer shows centered hold references but feedback still fails sustained 1 mm clearance |
 | research_baseline_search_post_command_stability_gate_v1 | Completed safety gate: SEARCH only counts stability after command duration; validation still fails closed before INSERT |
+| research_baseline_search_streak_preservation_v1 | Completed safety sequencing: SEARCH preserves active stability streaks, but validation still fails closed before INSERT |
+
+## 2026-06-03 Search Streak Preservation
+
+Milestone: `research_baseline_search_streak_preservation_v1`
+
+Evidence: `diagnostics/research_baseline_search_streak_preservation_v1/summary.md`
+
+SEARCH now keeps waiting if a post-command physical-clearance streak is active,
+instead of interrupting that streak with the next search command when the fixed
+settling window expires. This is a sequencing/safety change only: INSERT still
+requires `8` sustained ticks inside the `0.0010 m` radial clearance.
+
+Validation passed Python syntax, targeted `colcon build --packages-select
+kuka_task_control thesis_bringup`, and a headless Gazebo run with
+`joint_damping_scale:=5.0`. Runtime result:
+
+- `Outcome: ABORTED`;
+- `Reason: SEARCH timeout (45s). Instantaneous XY error 0.0010m is within physical clearance 0.0010m but was not sustained for 8 post-command ticks.`;
+- insertion depth `0.0000 m`;
+- contact-topic samples `0`;
+- max raw `|Fz|=132.1 N`;
+- max raw force norm `208.3 N`;
+- observed trajectory commands `10`;
+- controller-state p95 max absolute joint-position error `0.011391 rad`.
+
+Analyzer result:
+
+- SEARCH best estimated `0.0010 m` window: `3` task ticks;
+- SEARCH best estimated `0.0020 m` window: `8` task ticks;
+- hold-like command count: `7`;
+- best feedback hold inside `0.0010 m`: `3` task ticks.
+
+This did not improve enough to unblock INSERT. The next blocker remains
+feedback stabilization inside the physical radial clearance.
 
 ## 2026-06-03 Search Post-Command Stability Gate
 

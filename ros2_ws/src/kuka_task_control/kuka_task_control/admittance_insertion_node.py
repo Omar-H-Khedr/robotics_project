@@ -981,8 +981,16 @@ class AdmittanceInsertionNode(Node):
         n_steps = self.SEARCH_STEPS
         d_angle = 2.0 * math.pi / n_steps
 
-        # Wait for current trajectory to settle before next step
-        if self._search_step < n_steps and self._state_entry_ticks < 60:
+        # Wait for current trajectory to settle before next step. If a
+        # post-command physical-clearance streak has started, keep waiting
+        # instead of interrupting it with the next search command.
+        if (
+            self._search_step < n_steps
+            and (
+                self._state_entry_ticks < 60
+                or self._search_convergence_ticks > 0
+            )
+        ):
             self._state_entry_ticks += 1
             peg, _ = self._kinematics.pose(self.current_joints)
             xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)

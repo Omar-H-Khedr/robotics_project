@@ -188,6 +188,21 @@ The latest active SEARCH safety gate is
   feedback stabilization inside the physical clearance, not SEARCH/INSERT gate
   loosening.
 
+The latest SEARCH sequencing diagnostic is
+`diagnostics/research_baseline_search_streak_preservation_v1`:
+
+- final outcome: `ABORTED`;
+- no INSERT phase was entered;
+- contact-topic samples: `0`;
+- timeout reason: instantaneous XY was within `0.0010 m`, but not sustained for
+  `8` post-command ticks;
+- SEARCH best estimated `0.0010 m` window: `3` task ticks;
+- SEARCH best estimated `0.0020 m` window: `8` task ticks;
+- hold-like command count: `7`;
+- best feedback `0.0010 m` hold window: `3` task ticks;
+- decision: keep active-streak preservation as safe sequencing, but sustained
+  feedback centering remains unresolved.
+
 Repeated validation on 2026-06-01 produced 0/3 physical successes:
 
 - one DEGRADED INSERT with only 0.0037 m depth and a 1237.45 N peak raw Fz spike;
