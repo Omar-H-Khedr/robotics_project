@@ -104,6 +104,7 @@ until repeated validation demonstrates robust success.
 - A centered SEARCH hold diagnostic was tested and rejected. It improved inside-clearance occupancy to `365/4500` SEARCH samples and the longest run to `4` observer samples, but still timed out in SEARCH with final XY `0.0048 m`; source was reverted.
 - The new `xy_stability_analyzer` confirms this is not a success-metric artifact. Replaying recent passive logs at the task controller cadence shows both `research_baseline_search_sustained_clearance_v1` and the rejected centered-hold run achieved only `2` estimated SEARCH ticks inside `0.0010 m`, though both reached `6` estimated ticks inside `0.0020 m`.
 - SEARCH recenter-on-coarse-band is the latest active SEARCH behavior. Validation still failed closed in SEARCH, but improved the best estimated physical-clearance window from `2` to `4` control ticks and produced no contact-topic samples.
+- The latest active SEARCH behavior widens bounded recentering to `0.0040 m`. The first run bypassed SEARCH and aborted in INSERT handoff; the second run exercised SEARCH, made six recenter attempts, and still timed out safely at final SEARCH XY `0.0017 m`. Best estimated physical-clearance stability remained `4` control ticks, below the required `8`.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
@@ -818,6 +819,34 @@ Runtime result:
 Decision: keep this as an incremental safety-preserving improvement, not a
 success. The next milestone should continue stabilizing near-centered SEARCH
 feedback while preserving the `0.0010 m` gate and bounded SEARCH timeout.
+
+## 2026-06-03 SEARCH Recenter 4 mm
+
+Milestone: `research_baseline_search_recenter_4mm_v1`
+
+Evidence:
+
+- `diagnostics/research_baseline_search_recenter_4mm_v1/summary.md`
+- `diagnostics/research_baseline_search_recenter_4mm_v1_repeat2/summary.md`
+- `diagnostics/research_baseline_search_recenter_4mm_v1_repeat2/xy_stability_analysis.md`
+
+The SEARCH recenter trigger is now a bounded `0.0040 m` near-center band. This
+does not loosen the `0.0010 m` physical clearance gate for INSERT.
+
+Validation results:
+
+- run 1: no SEARCH samples; direct INSERT handoff aborted safely at `0.0035 m`
+  XY before meaningful depth;
+- run 2: SEARCH timeout at `0.0017 m` final XY after six recenter attempts;
+- run 2 contact-topic samples `0`;
+- run 2 SEARCH mean XY `0.002402 m`;
+- run 2 best estimated SEARCH `0.0010 m` window `4` controller ticks;
+- run 2 best estimated SEARCH `0.0020 m` window `8` controller ticks.
+
+Decision: keep as an incremental improvement, not success. The blocker is now
+near-centered feedback oscillation: the controller reaches sub-millimeter
+samples often enough to improve occupancy, but still cannot hold physical
+clearance for the required eight ticks.
 
 ## 2026-06-02 Joint-State Source Integrity
 

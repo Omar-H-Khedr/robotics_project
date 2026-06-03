@@ -93,6 +93,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_centered_hold_v1 | Rejected: centered SEARCH hold remained unstable and source was reverted |
 | research_baseline_xy_stability_analyzer_v1 | Completed: per-state passive-log analyzer confirms recent SEARCH runs only sustain 1 mm clearance for two estimated control ticks |
 | research_baseline_search_recenter_on_coarse_band_v1 | Improved but failed safely: SEARCH recenters inside 2 mm coarse band; best 1 mm window improved to four ticks but INSERT remains blocked |
+| research_baseline_search_recenter_4mm_v1 | Improved but failed safely: bounded 4 mm recenter reduces final SEARCH XY to 1.7 mm but still does not satisfy the 1 mm sustained gate |
 
 ## 2026-06-03 Controller-State Tracking V2
 
@@ -573,6 +574,39 @@ Runtime result:
 Decision: keep as an improvement but do not claim success. The change doubled
 the best 1 mm SEARCH stability window compared with the previous two ticks, but
 still did not satisfy the required eight ticks for a credible INSERT handoff.
+
+## 2026-06-03 SEARCH Recenter 4 mm
+
+Milestone: `research_baseline_search_recenter_4mm_v1`
+
+Evidence:
+
+- `diagnostics/research_baseline_search_recenter_4mm_v1/summary.md`
+- `diagnostics/research_baseline_search_recenter_4mm_v1_repeat2/summary.md`
+- `diagnostics/research_baseline_search_recenter_4mm_v1_repeat2/xy_stability_analysis.md`
+
+The SEARCH recenter trigger was widened to a bounded `0.0040 m` near-center
+band. This only affects command selection inside SEARCH; it does not change the
+physical `0.0010 m` clearance required for INSERT.
+
+Two validations were run with `joint_damping_scale:=5.0`:
+
+- first run bypassed SEARCH and aborted safely in INSERT handoff after feedback
+  drifted from a direct-entry `0.0009 m` XY condition to `0.0035 m`;
+- second run exercised SEARCH, made six recenter attempts, and timed out safely
+  at `0.0017 m` final SEARCH XY.
+
+Second-run observer result:
+
+- contact-topic samples `0`;
+- SEARCH mean XY `0.002402 m`;
+- SEARCH final XY `0.001682 m`;
+- best estimated SEARCH `0.0010 m` clearance window `4` controller ticks;
+- best estimated SEARCH `0.0020 m` window `8` controller ticks.
+
+Decision: keep as an incremental improvement. It improves mean/final SEARCH XY
+relative to the 2 mm recenter run, but still does not meet the eight-tick
+physical-clearance gate, so INSERT remains correctly blocked.
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 

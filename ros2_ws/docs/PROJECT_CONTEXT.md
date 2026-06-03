@@ -146,15 +146,15 @@ The latest XY stability diagnostic is
   stability before attempting INSERT again.
 
 The latest active SEARCH behavior is
-`diagnostics/research_baseline_search_recenter_on_coarse_band_v1`:
+`diagnostics/research_baseline_search_recenter_4mm_v1_repeat2`:
 
 - final outcome: `ABORTED`;
-- reason: `SEARCH timeout (45s). XY error 0.0037m remains above tolerance.`;
+- reason: `SEARCH timeout (45s). XY error 0.0017m remains above tolerance.`;
 - no INSERT phase was entered;
 - contact-topic samples: `0`;
 - best estimated SEARCH `0.0010 m` window: `4` controller ticks;
-- best estimated SEARCH `0.0020 m` window: `9` controller ticks;
-- decision: keep the recentering behavior as an improvement, but continue
+- best estimated SEARCH `0.0020 m` window: `8` controller ticks;
+- decision: keep bounded 4 mm recentering as an improvement, but continue
   treating sustained no-contact centering as unresolved.
 
 Repeated validation on 2026-06-01 produced 0/3 physical successes:
@@ -190,6 +190,7 @@ This is not robust autonomous peg-in-hole success. The honest claim is now:
 - A centered SEARCH hold was tested and rejected; it was safe but insufficient. Continue treating sustained no-contact centering as the blocker.
 - Per-state XY stability analysis confirms both recent SEARCH runs only held physical clearance for two estimated state-loop ticks. Do not treat sub-millimeter minima as readiness for INSERT.
 - SEARCH recenter-on-coarse-band improved the best estimated physical-clearance window to four state-loop ticks without contact-topic samples, but still timed out before INSERT. Continue improving no-contact stability rather than loosening gates.
+- Widening the recenter trigger to `0.0040 m` improved final SEARCH XY to `0.0017 m` in the SEARCH-exercising repeat, but still held physical clearance for only four estimated state-loop ticks. INSERT must remain blocked.
 - Gazebo contact physics are adequate for early simulation evidence but not final safety fidelity.
 - Some older docs still describe stale iisy3 state and must not be used as current truth.
 - A 2026-06-02 source-integrity run confirmed `joint_state_broadcaster` as the intended `/joint_states` publisher, but the same run still timed out in `MOVING_TO_START` with large XY error.

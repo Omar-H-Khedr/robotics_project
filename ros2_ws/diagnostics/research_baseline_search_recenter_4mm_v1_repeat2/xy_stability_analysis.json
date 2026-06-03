@@ -1,0 +1,404 @@
+{
+  "input_dir": "diagnostics/research_baseline_search_recenter_4mm_v1_repeat2",
+  "sample_source": "wrench_state_samples.csv",
+  "state_loop_hz": 10.0,
+  "clearance_thresholds_m": [
+    0.001,
+    0.002
+  ],
+  "total_valid_samples": 21611,
+  "states": {
+    "ABORT": {
+      "state": "ABORT",
+      "samples": 2470,
+      "start_s": 105.01,
+      "end_s": 129.7,
+      "duration_s": 24.689999999999984,
+      "min_xy_error_m": 0.000129409,
+      "mean_xy_error_m": 0.11207896672834008,
+      "p95_xy_error_m": 0.367825897,
+      "final_xy_error_m": 0.399791765,
+      "min_peg_z_m": 0.817840961,
+      "max_peg_z_m": 1.025403405,
+      "max_force_norm_n": 211.531301584,
+      "thresholds": {
+        "0.001m": {
+          "samples_inside": 81,
+          "sample_fraction_inside": 0.03279352226720648,
+          "best_observer_window": {
+            "samples": 2,
+            "duration_s": 0.009000000000000341,
+            "start_s": 105.141,
+            "end_s": 105.15,
+            "start_z_m": 0.823664924,
+            "end_z_m": 0.822672536
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 2,
+            "duration_s": 0.2,
+            "start_s": 105.70999999999997,
+            "end_s": 105.80999999999996,
+            "start_z_m": 0.823205319,
+            "end_z_m": 0.823055447
+          }
+        },
+        "0.002m": {
+          "samples_inside": 296,
+          "sample_fraction_inside": 0.11983805668016194,
+          "best_observer_window": {
+            "samples": 5,
+            "duration_s": 0.04000000000000625,
+            "start_s": 105.11,
+            "end_s": 105.15,
+            "start_z_m": 0.82310775,
+            "end_z_m": 0.822672536
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 2,
+            "duration_s": 0.2,
+            "start_s": 105.70999999999997,
+            "end_s": 105.80999999999996,
+            "start_z_m": 0.823205319,
+            "end_z_m": 0.823055447
+          }
+        }
+      }
+    },
+    "APPROACH": {
+      "state": "APPROACH",
+      "samples": 1181,
+      "start_s": 48.21,
+      "end_s": 60.011,
+      "duration_s": 11.801000000000002,
+      "min_xy_error_m": 0.000113199,
+      "mean_xy_error_m": 0.002129501803556308,
+      "p95_xy_error_m": 0.003931077,
+      "final_xy_error_m": 0.003570202,
+      "min_peg_z_m": 0.838847025,
+      "max_peg_z_m": 0.888644791,
+      "max_force_norm_n": 207.642490666,
+      "thresholds": {
+        "0.001m": {
+          "samples_inside": 184,
+          "sample_fraction_inside": 0.15580016934801016,
+          "best_observer_window": {
+            "samples": 4,
+            "duration_s": 0.030999999999998806,
+            "start_s": 52.47,
+            "end_s": 52.501,
+            "start_z_m": 0.873459953,
+            "end_z_m": 0.873015842
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 4,
+            "duration_s": 0.4,
+            "start_s": 49.01000000000001,
+            "end_s": 49.31000000000002,
+            "start_z_m": 0.883406787,
+            "end_z_m": 0.88365217
+          }
+        },
+        "0.002m": {
+          "samples_inside": 571,
+          "sample_fraction_inside": 0.48348856900931414,
+          "best_observer_window": {
+            "samples": 11,
+            "duration_s": 0.09899999999999665,
+            "start_s": 52.591,
+            "end_s": 52.69,
+            "start_z_m": 0.876002493,
+            "end_z_m": 0.872403287
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 11,
+            "duration_s": 1.1,
+            "start_s": 48.410000000000004,
+            "end_s": 49.41000000000002,
+            "start_z_m": 0.884613187,
+            "end_z_m": 0.883058995
+          }
+        }
+      }
+    },
+    "DONE": {
+      "state": "DONE",
+      "samples": 8641,
+      "start_s": 129.711,
+      "end_s": 216.11,
+      "duration_s": 86.399,
+      "min_xy_error_m": 0.397852338,
+      "mean_xy_error_m": 0.409270176200324,
+      "p95_xy_error_m": 0.412172364,
+      "final_xy_error_m": 0.411976884,
+      "min_peg_z_m": 1.02450594,
+      "max_peg_z_m": 1.042644437,
+      "max_force_norm_n": 186.511426911,
+      "thresholds": {
+        "0.001m": {
+          "samples_inside": 0,
+          "sample_fraction_inside": 0.0,
+          "best_observer_window": {
+            "samples": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          }
+        },
+        "0.002m": {
+          "samples_inside": 0,
+          "sample_fraction_inside": 0.0,
+          "best_observer_window": {
+            "samples": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          }
+        }
+      }
+    },
+    "IDLE": {
+      "state": "IDLE",
+      "samples": 68,
+      "start_s": 1.33,
+      "end_s": 2.0,
+      "duration_s": 0.6699999999999999,
+      "min_xy_error_m": 0.406016931,
+      "mean_xy_error_m": 0.40965233929411765,
+      "p95_xy_error_m": 0.412901893,
+      "final_xy_error_m": 0.412322356,
+      "min_peg_z_m": 1.035453931,
+      "max_peg_z_m": 1.041467315,
+      "max_force_norm_n": 143.213529773,
+      "thresholds": {
+        "0.001m": {
+          "samples_inside": 0,
+          "sample_fraction_inside": 0.0,
+          "best_observer_window": {
+            "samples": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          }
+        },
+        "0.002m": {
+          "samples_inside": 0,
+          "sample_fraction_inside": 0.0,
+          "best_observer_window": {
+            "samples": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          }
+        }
+      }
+    },
+    "MOVING_TO_START": {
+      "state": "MOVING_TO_START",
+      "samples": 4620,
+      "start_s": 2.01,
+      "end_s": 48.201,
+      "duration_s": 46.191,
+      "min_xy_error_m": 8.0412e-05,
+      "mean_xy_error_m": 0.19824134913874458,
+      "p95_xy_error_m": 0.405297934,
+      "final_xy_error_m": 0.001986878,
+      "min_peg_z_m": 0.858696528,
+      "max_peg_z_m": 1.042544129,
+      "max_force_norm_n": 209.249709957,
+      "thresholds": {
+        "0.001m": {
+          "samples_inside": 86,
+          "sample_fraction_inside": 0.018614718614718615,
+          "best_observer_window": {
+            "samples": 3,
+            "duration_s": 0.01899999999999835,
+            "start_s": 43.101,
+            "end_s": 43.12,
+            "start_z_m": 0.885963369,
+            "end_z_m": 0.881529186
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 3,
+            "duration_s": 0.30000000000000004,
+            "start_s": 42.91000000000034,
+            "end_s": 43.11000000000034,
+            "start_z_m": 0.883058242,
+            "end_z_m": 0.881529186
+          }
+        },
+        "0.002m": {
+          "samples_inside": 316,
+          "sample_fraction_inside": 0.0683982683982684,
+          "best_observer_window": {
+            "samples": 10,
+            "duration_s": 0.09000000000000341,
+            "start_s": 42.22,
+            "end_s": 42.31,
+            "start_z_m": 0.883858561,
+            "end_z_m": 0.885923013
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 5,
+            "duration_s": 0.5,
+            "start_s": 46.210000000000385,
+            "end_s": 46.61000000000039,
+            "start_z_m": 0.882829923,
+            "end_z_m": 0.883451689
+          }
+        }
+      }
+    },
+    "SEARCH": {
+      "state": "SEARCH",
+      "samples": 4499,
+      "start_s": 60.02,
+      "end_s": 105.007,
+      "duration_s": 44.987,
+      "min_xy_error_m": 5.738e-05,
+      "mean_xy_error_m": 0.0024015055392309402,
+      "p95_xy_error_m": 0.00461568,
+      "final_xy_error_m": 0.001681762,
+      "min_peg_z_m": 0.82022148,
+      "max_peg_z_m": 0.845883503,
+      "max_force_norm_n": 206.451815026,
+      "thresholds": {
+        "0.001m": {
+          "samples_inside": 519,
+          "sample_fraction_inside": 0.11535896865970216,
+          "best_observer_window": {
+            "samples": 4,
+            "duration_s": 0.030000000000001137,
+            "start_s": 70.95,
+            "end_s": 70.98,
+            "start_z_m": 0.82720713,
+            "end_z_m": 0.828357791
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 4,
+            "duration_s": 0.4,
+            "start_s": 104.61999999999775,
+            "end_s": 104.91999999999773,
+            "start_z_m": 0.823376951,
+            "end_z_m": 0.824892133
+          }
+        },
+        "0.002m": {
+          "samples_inside": 1844,
+          "sample_fraction_inside": 0.40986885974661036,
+          "best_observer_window": {
+            "samples": 15,
+            "duration_s": 0.1389999999999958,
+            "start_s": 87.411,
+            "end_s": 87.55,
+            "start_z_m": 0.829968049,
+            "end_z_m": 0.83008508
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 8,
+            "duration_s": 0.8,
+            "start_s": 87.8199999999987,
+            "end_s": 88.51999999999866,
+            "start_z_m": 0.83214908,
+            "end_z_m": 0.830801973
+          }
+        }
+      }
+    },
+    "UNKNOWN": {
+      "state": "UNKNOWN",
+      "samples": 132,
+      "start_s": 0.01,
+      "end_s": 1.321,
+      "duration_s": 1.311,
+      "min_xy_error_m": 0.405353377,
+      "mean_xy_error_m": 0.4096214034090909,
+      "p95_xy_error_m": 0.412324219,
+      "final_xy_error_m": 0.409581128,
+      "min_peg_z_m": 1.035357889,
+      "max_peg_z_m": 1.041381672,
+      "max_force_norm_n": 170.131238546,
+      "thresholds": {
+        "0.001m": {
+          "samples_inside": 0,
+          "sample_fraction_inside": 0.0,
+          "best_observer_window": {
+            "samples": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          }
+        },
+        "0.002m": {
+          "samples_inside": 0,
+          "sample_fraction_inside": 0.0,
+          "best_observer_window": {
+            "samples": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          }
+        }
+      }
+    }
+  }
+}
