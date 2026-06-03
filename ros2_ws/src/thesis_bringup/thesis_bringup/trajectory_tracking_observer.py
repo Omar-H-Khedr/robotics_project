@@ -46,7 +46,7 @@ class TrajectoryTrackingObserver(Node):
         super().__init__("trajectory_tracking_observer")
         self.declare_parameter(
             "state_topic",
-            "/joint_trajectory_controller/state",
+            "/joint_trajectory_controller/controller_state",
         )
         self.declare_parameter(
             "command_topic",

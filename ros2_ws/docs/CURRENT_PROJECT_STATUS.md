@@ -59,6 +59,8 @@ The project must not claim final autonomous peg-in-hole success yet. The defensi
 - `diagnostics/research_baseline_canonical_after_command_capture_v1/above_hole_hold_analysis.md`
 - `diagnostics/research_baseline_canonical_after_command_capture_v1/moving_to_start_tracking_analysis.md`
 - `diagnostics/research_baseline_moving_to_start_xy_distribution_analyzer_v1/summary.md`
+- `diagnostics/research_baseline_jtc_controller_state_observer_v1/summary.md`
+- `diagnostics/research_baseline_jtc_controller_state_observer_v1/trajectory_tracking_summary.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position

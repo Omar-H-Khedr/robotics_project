@@ -93,6 +93,7 @@ This is not robust autonomous peg-in-hole success. The honest claim remains:
 - A 2026-06-03 trajectory command-capture fix added a bounded first-command discovery wait before the task publishes its first joint trajectory. A short validation run captured the 20-point `MOVING_TO_START` command and the selector-based tracking analyzer attributed it to the canonical axis-align target. This is an instrumentation/reproducibility fix, not insertion evidence.
 - A 2026-06-03 canonical post-command-capture validation failed safely in `MOVING_TO_START`. It captured both the start and abort-retreat commands, attributed command index 0 to the canonical axis-align target, and showed final command-attributed XY error about `0.0036 m`. The strict 2 mm hold gate still failed with only one estimated stable tick, zero contact-topic samples, and zero insertion depth.
 - A 2026-06-03 MOVING_TO_START XY-distribution analyzer enhancement showed why final/minimum samples are insufficient: in the canonical post-command-capture run, command-window minimum XY was `0.000115 m`, but only `138/15524` samples were inside the strict 2 mm band and the final one-second XY range was `0.000575-0.018345 m`.
+- A 2026-06-03 JTC state-topic instrumentation fix changed the trajectory observer from `/joint_trajectory_controller/state` to `/joint_trajectory_controller/controller_state`. A bounded validation run recorded `4186` JTC state samples, closing the previous zero-state-sample observability gap.
 
 ## Current Success Criteria
 

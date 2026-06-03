@@ -327,7 +327,7 @@ def launch_setup(context, *args, **kwargs):
         parameters=[
             {
                 "use_sim_time": simulation["use_sim_time"],
-                "state_topic": "/joint_trajectory_controller/state",
+                "state_topic": "/joint_trajectory_controller/controller_state",
                 "command_topic": "/joint_trajectory_controller/joint_trajectory",
                 "joint_state_topic": "/joint_states",
                 "output_dir": LaunchConfiguration("tracking_log_dir"),

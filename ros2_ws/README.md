@@ -72,6 +72,7 @@ Latest hold evidence shows the corrected post-tool runs do not satisfy the requi
 | research_baseline_trajectory_command_capture_v1 | Completed: bounded first-command discovery wait restores command-attributed MOVING_TO_START tracking logs |
 | research_baseline_canonical_after_command_capture_v1 | Failed safely: canonical run captures MOVING_TO_START command but still fails the strict above-hole hold gate |
 | research_baseline_moving_to_start_xy_distribution_analyzer_v1 | Completed: command-attributed analyzer now reports XY distribution and final-window oscillation |
+| research_baseline_jtc_controller_state_observer_v1 | Completed: trajectory observer now subscribes to JTC `controller_state` and records nonzero state samples |
 
 ## 2026-06-02 Joint 2 Approach Tracking Diagnostic
 
