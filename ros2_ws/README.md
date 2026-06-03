@@ -102,6 +102,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_derivative_gain_v1 | Validated safely: added `position_derivative_gain` plumbing and tested D=0.5; SEARCH still fails closed but centered-hold p95 XY drift and best 1 mm window unchanged |
 | research_baseline_search_derivative_gain_v2 | Validated safely: D=5.0 marginally tightens SEARCH final XY and reduces centered-hold p95 JTC joint error; centered-hold p95 actual XY drift still around 4 mm and SEARCH best 1 mm window remains 3 ticks |
 | research_baseline_search_derivative_gain_v3 | Validated safely: gain=3000 + D=10.0 doubles best 2 mm SEARCH window to 10 ticks; best 1 mm window still 3 ticks and SEARCH still fails closed |
+| research_baseline_search_derivative_gain_v4 | Validated safely: gain=2000 + D=10.0 reaches the best SEARCH final XY in this line of work (0.000342 m); best 1 mm window still 3 ticks and SEARCH still fails closed |
 
 ## 2026-06-03 SEARCH Derivative Gain Plumbing
 
@@ -168,6 +169,7 @@ sustained SEARCH/clearance safety gates.
 | derivative_gain_v1 | 2000 | 0.5 | ABORTED SEARCH timeout | 3 | n/a | 0.003823 | 0.003919 | 0.008617 |
 | derivative_gain_v2 | 2000 | 5.0 | ABORTED SEARCH timeout | 3 | 7 | 0.002667 | 0.004018 | 0.008434 |
 | derivative_gain_v3 | 3000 | 10.0 | ABORTED SEARCH timeout | 3 | 10 | 0.002974 | 0.004029 | 0.008481 |
+| derivative_gain_v4 | 2000 | 10.0 | ABORTED SEARCH timeout | 3 | 7 | 0.000342 | 0.004123 | 0.008472 |
 
 `position_derivative_gain=5.0` reduced SEARCH final XY and the centered-hold
 p95 JTC joint error marginally, but it did not extend the best 1 mm
