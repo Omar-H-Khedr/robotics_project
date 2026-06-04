@@ -20,5 +20,9 @@ setup(
     description="Gazebo RGB-D and perception interface package for peg-in-hole state estimation.",
     license="Apache-2.0",
     extras_require={"test": ["pytest"]},
-    entry_points={"console_scripts": []},
+    entry_points={
+        "console_scripts": [
+            "multimodal_observation_logger = perception_pipeline.multimodal_observation_logger:main",
+        ],
+    },
 )

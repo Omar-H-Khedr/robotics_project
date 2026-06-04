@@ -14,7 +14,7 @@ from launch.substitutions import (
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
-RESEARCH_ROBOT_XACRO = "lbr_iisy3_r760_research_gripper.urdf.xacro"
+RESEARCH_ROBOT_XACRO = "lbr_iisy6_r1300_research_gripper.urdf.xacro"
 
 
 def _moveit_config_directory() -> Path:
@@ -123,7 +123,7 @@ def _robot_description_content() -> Command:
             " ",
             "y:=-0.75",
             " ",
-            "z:=0.75",
+            "z:=0.735",
             " ",
             "roll:=0",
             " ",
