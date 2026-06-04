@@ -498,6 +498,30 @@ def launch_setup(context, *args, **kwargs):
         condition=IfCondition(LaunchConfiguration("enable_contact_observer")),
     )
 
+    perception_observation_logger = Node(
+        package="perception_pipeline",
+        executable="multimodal_observation_logger",
+        parameters=[
+            {
+                "use_sim_time": simulation["use_sim_time"],
+                "output_dir": LaunchConfiguration("perception_log_dir"),
+                "rate_hz": 20.0,
+                "log_rgb": True,
+                "log_depth": True,
+                "rgb_topic": "/d405/color/image_raw",
+                "depth_topic": "/d405/depth/image_rect_raw",
+                "rgb_info_topic": "/d405/color/camera_info",
+                "depth_info_topic": "/d405/depth/camera_info",
+                "joint_state_topic": "/joint_states",
+                "wrench_topic": "/ft_sensor_wrench",
+                "task_phase_topic": "/task_phase",
+                "safety_status_topic": "/safety_status",
+            }
+        ],
+        output="screen",
+        condition=IfCondition(LaunchConfiguration("enable_perception_logging")),
+    )
+
     admittance_insertion = Node(
         package="kuka_task_control",
         executable="admittance_insertion_node",
@@ -606,6 +630,7 @@ def launch_setup(context, *args, **kwargs):
         trajectory_tracking_observer,
         wrench_state_observer,
         contact_state_observer,
+        perception_observation_logger,
     ])
     return actions
 
@@ -760,6 +785,26 @@ def generate_launch_description():
                 "tracking_log_dir",
                 default_value="/tmp/thesis_tracking_logs",
                 description="Directory for passive trajectory tracking observer CSV and summary.",
+            ),
+            DeclareLaunchArgument(
+                "enable_perception_logging",
+                default_value="false",
+                description=(
+                    "If true, spawn the multimodal_observation_logger from "
+                    "perception_pipeline. Subscribes to /d405/*, /joint_states, "
+                    "/ft_sensor_wrench, /task_phase, /safety_status. The D405 "
+                    "RGB-D camera is already defined in peg_in_hole_world.sdf "
+                    "and bridged to ROS by research_baseline_bridge.yaml, so "
+                    "no Gazebo change is required to enable this."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "perception_log_dir",
+                default_value="/tmp/thesis_perception_logs",
+                description=(
+                    "Output directory for multimodal_observation_log.csv "
+                    "when enable_perception_logging is true."
+                ),
             ),
             OpaqueFunction(function=launch_setup),
         ]
