@@ -12,6 +12,7 @@ setup(
         ("share/" + package_name, ["package.xml", "README.md"]),
         ("share/" + package_name + "/launch", glob("launch/*.launch.py")),
         ("share/" + package_name + "/config", glob("config/*")),
+        ("share/" + package_name + "/scripts", glob("scripts/*")),
     ],
     install_requires=["setuptools"],
     zip_safe=True,

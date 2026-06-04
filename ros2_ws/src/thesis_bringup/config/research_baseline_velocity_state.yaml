@@ -1,0 +1,35 @@
+controller_manager:
+  ros__parameters:
+    # Velocity-state diagnostic variant: state_interfaces includes both
+    # `position` and `velocity` so the JTC's D-term
+    # (position_derivative_gain) can use real joint velocity from the
+    # Gazebo system instead of finite-difference of position. Pairs with
+    # the `inject_velocity_state:=true` spawn_robot_sdf flag, which adds
+    # a velocity state_interface to every joint in the URDF so the
+    # GazeboSimSystem actually exposes the velocity state.
+    update_rate: 250  # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    joint_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+joint_trajectory_controller:
+  ros__parameters:
+    joints:
+      - joint_1
+      - joint_2
+      - joint_3
+      - joint_4
+      - joint_5
+      - joint_6
+
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    state_publish_rate: 100.0
+    action_monitor_rate: 50.0
+    allow_nonzero_velocity_at_trajectory_end: false

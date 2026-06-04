@@ -94,54 +94,114 @@ def launch_setup(context, *args, **kwargs):
             RESEARCH_ROBOT_XACRO,
         ]
     )
+    inject_velocity_state = (
+        LaunchConfiguration("inject_velocity_state").perform(context).strip().lower()
+        in ("1", "true", "yes", "on")
+    )
+    inject_script = os.path.join(
+        get_package_share_directory("thesis_bringup"),
+        "scripts",
+        "inject_velocity_state_urdf.py",
+    )
+    xacro_args = [
+        PathJoinSubstitution([FindExecutable(name="xacro")]),
+        " ",
+        robot_description_xacro,
+        " ",
+        "mode:=gazebo",
+        " ",
+        "prefix:=",
+        tf_prefix,
+        " ",
+        "x:=",
+        LaunchConfiguration("x"),
+        " ",
+        "y:=",
+        LaunchConfiguration("y"),
+        " ",
+        "z:=",
+        LaunchConfiguration("z"),
+        " ",
+        "roll:=",
+        LaunchConfiguration("roll"),
+        " ",
+        "pitch:=",
+        LaunchConfiguration("pitch"),
+        " ",
+        "yaw:=",
+        LaunchConfiguration("yaw"),
+        " ",
+        "initial_joint_1:=",
+        str(safe_home_pose[0]),
+        " ",
+        "initial_joint_2:=",
+        str(safe_home_pose[1]),
+        " ",
+        "initial_joint_3:=",
+        str(safe_home_pose[2]),
+        " ",
+        "initial_joint_4:=",
+        str(safe_home_pose[3]),
+        " ",
+        "initial_joint_5:=",
+        str(safe_home_pose[4]),
+        " ",
+        "initial_joint_6:=",
+        str(safe_home_pose[5]),
+    ]
+    if inject_velocity_state:
+        # xacro must find the kuka_lbr_iisy_support package; source the
+        # workspace's setup.bash first. The Command() runs in a subprocess
+        # without our interactive environment, so we need to source it here.
+        # launch.substitutions.Command joins all items with '' then shlex.splits
+        # the result, so the bash -c argument must be a single shlex-quoted
+        # token. We assemble the bash command at this point (launch_setup
+        # runs at launch time) so the substitutions are already resolved.
+        # Important: join xacro_args with '' (not ' ') so that "x:=" and
+        # "0.80" stay adjacent (i.e. "x:=0.80" not "x:= 0.80"); a space
+        # would let bash word-split them into two separate xacro arguments.
+        workspace_setup_str = PathJoinSubstitution([
+            FindPackageShare("thesis_bringup"),
+            "..", "..", "..", "..",
+            "install", "setup.bash",
+        ]).perform(context)
+        inject_py_str = FindExecutable(name="python3").perform(context)
+        xacro_strs = [
+            s.perform(context) if hasattr(s, "perform") else str(s)
+            for s in xacro_args
+        ]
+        xacro_joined = "".join(xacro_strs)
+
+        def _shq(s):
+            """Single-quote a string for safe inclusion in a shell command."""
+            return "'" + s.replace("'", "'\\''") + "'"
+
+        # Build the bash command. Wrap the workspace_setup in single quotes
+        # (its path may contain $ or other shell-special chars), but leave
+        # the xacro call and the python pipe unquoted so bash word-splits
+        # them into argv correctly.
+        bash_inner = (
+            "source /opt/ros/jazzy/setup.bash && source "
+            + _shq(workspace_setup_str)
+            + " && "
+            + xacro_joined
+            + " 2>/dev/null | "
+            + inject_py_str
+            + " "
+            + inject_script
+        )
+        # Wrap the bash command in double quotes for shlex (so the
+        # launch framework's shlex.split gives us a single argv entry for
+        # /bin/bash -c). Escape any embedded double quotes/backslashes.
+        bash_arg = (
+            '"' + bash_inner.replace("\\", "\\\\").replace('"', '\\"') + '"'
+        )
+        xacro_args = ["/bin/bash", " ", "-c", " ", bash_arg]
+    # DEBUG
+    # print("DEBUG xacro_args joined:", ''.join(str(s) for s in xacro_args), flush=True)
     robot_description_content = Command(
-        [
-            PathJoinSubstitution([FindExecutable(name="xacro")]),
-            " ",
-            robot_description_xacro,
-            " ",
-            "mode:=gazebo",
-            " ",
-            "prefix:=",
-            tf_prefix,
-            " ",
-            "x:=",
-            LaunchConfiguration("x"),
-            " ",
-            "y:=",
-            LaunchConfiguration("y"),
-            " ",
-            "z:=",
-            LaunchConfiguration("z"),
-            " ",
-            "roll:=",
-            LaunchConfiguration("roll"),
-            " ",
-            "pitch:=",
-            LaunchConfiguration("pitch"),
-            " ",
-            "yaw:=",
-            LaunchConfiguration("yaw"),
-            " ",
-            "initial_joint_1:=",
-            str(safe_home_pose[0]),
-            " ",
-            "initial_joint_2:=",
-            str(safe_home_pose[1]),
-            " ",
-            "initial_joint_3:=",
-            str(safe_home_pose[2]),
-            " ",
-            "initial_joint_4:=",
-            str(safe_home_pose[3]),
-            " ",
-            "initial_joint_5:=",
-            str(safe_home_pose[4]),
-            " ",
-            "initial_joint_6:=",
-            str(safe_home_pose[5]),
-        ],
-        on_stderr="capture",
+        xacro_args,
+        on_stderr="ignore",
     )
     robot_description = {"robot_description": robot_description_content}
 
@@ -239,6 +299,14 @@ def launch_setup(context, *args, **kwargs):
         if use_position_controller
         else LaunchConfiguration("controller_config_path").perform(context)
     )
+    if (
+        LaunchConfiguration("inject_velocity_state").perform(context).strip().lower()
+        in ("1", "true", "yes", "on")
+        and not use_position_controller
+    ):
+        effective_controller_config_path = (
+            LaunchConfiguration("velocity_state_controller_config_path").perform(context)
+        )
 
     spawn_robot_arguments = [
         "--xacro",
@@ -273,6 +341,12 @@ def launch_setup(context, *args, **kwargs):
         LaunchConfiguration("controller_config_package"),
         "--controller-config-path",
         effective_controller_config_path,
+    ]
+    inject_velocity_state = (
+        LaunchConfiguration("inject_velocity_state").perform(context).strip().lower()
+        in ("1", "true", "yes", "on")
+    )
+    spawn_robot_arguments.extend([
         "--x",
         "0.0",
         "--y",
@@ -285,7 +359,7 @@ def launch_setup(context, *args, **kwargs):
         "0.0",
         "--Y",
         "0.0",
-    ]
+    ])
     if allow_robot_renaming:
         spawn_robot_arguments.append("--allow-renaming")
 
@@ -602,6 +676,20 @@ def generate_launch_description():
                 ),
             ),
             DeclareLaunchArgument(
+                "inject_velocity_state",
+                default_value="false",
+                description=(
+                    "If true, add a velocity state_interface to every joint "
+                    "in the URDF (via spawn_robot_sdf.py) so the JTC's D-term "
+                    "can use real joint velocity from the Gazebo system "
+                    "instead of finite-difference of position. The JTC's "
+                    "state_interfaces list (in the ros2_control YAML) must "
+                    "include velocity as well; see the diagnostic launch "
+                    "for the matching controller config. Default false "
+                    "preserves canonical behavior."
+                ),
+            ),
+            DeclareLaunchArgument(
                 "joint_damping_scale",
                 default_value="1.0",
                 description=(
@@ -633,6 +721,15 @@ def generate_launch_description():
                 description=(
                     "Path inside controller_config_package for the position_controller "
                     "gz_ros2_control parameters. Only used when use_position_controller:=true."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "velocity_state_controller_config_path",
+                default_value="config/research_baseline_velocity_state.yaml",
+                description=(
+                    "Path inside controller_config_package for the JTC "
+                    "gz_ros2_control parameters with velocity state. Only used "
+                    "when inject_velocity_state:=true and use_position_controller:=false."
                 ),
             ),
             DeclareLaunchArgument(

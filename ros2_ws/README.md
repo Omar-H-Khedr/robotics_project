@@ -105,6 +105,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_derivative_gain_v4 | Validated safely: gain=2000 + D=10.0 reaches the best SEARCH final XY in this line of work (0.000342 m); best 1 mm window still 3 ticks and SEARCH still fails closed |
 | research_baseline_search_gain3000_v1 | Validated safely: gain=3000 with no D-term makes SEARCH worse (1 mm window 2 ticks, 2 mm window 4 ticks), confirming the D-term is necessary at higher gain |
 | research_baseline_search_position_controller_v1 / v2 | Validated safely: switch to position_controllers/JointGroupPositionController (driven by a 250 Hz trajectory_position_bridge) does not unblock the SEARCH 1 mm sustained window. 1 mm window 2-4 ticks, 2 mm window 10-12 ticks (best 2 mm seen in this line of work), SEARCH final XY 0.0014-0.0038 m. The position controller plugin is loaded from the extracted `ros-jazzy-position-controllers` deb (system package not installable without sudo). |
+| research_baseline_search_velocity_state_v1 | Validated safely: inject_velocity_state:=true adds a `velocity` state interface to every joint so the JTC's D-term uses real joint velocity from `gz_ros2_control/GazeboSimSystem` (not finite-difference of position). Centered-hold p95 actual XY drift 0.004015 m, SEARCH 1 mm window 2 ticks, SEARCH final XY 0.0018 m. The D-term's input source is not the binding constraint. |
 
 ## 2026-06-03 SEARCH Derivative Gain Plumbing
 
@@ -175,6 +176,7 @@ sustained SEARCH/clearance safety gates.
 | gain3000_v1 | 3000 | 0 | ABORTED SEARCH timeout | 2 | 4 | 0.002071 | 0.004013 | 0.008314 |
 | position_controller v1 | n/a (position_controllers) | n/a | ABORTED SEARCH timeout | 2 | 12 | 0.001782 | n/a (no controller state published) | n/a |
 | position_controller v2 | n/a (position_controllers) | n/a | ABORTED SEARCH timeout | 4 | 10 | 0.003757 | n/a (no controller state published) | n/a |
+| velocity_state v1 | 2000 | 10.0 | ABORTED SEARCH timeout | 2 | n/a | 0.0018 | 0.004015 | 0.008408 |
 
 `position_derivative_gain=5.0` reduced SEARCH final XY and the centered-hold
 p95 JTC joint error marginally, but it did not extend the best 1 mm

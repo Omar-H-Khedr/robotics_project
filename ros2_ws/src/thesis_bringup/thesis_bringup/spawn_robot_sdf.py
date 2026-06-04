@@ -132,6 +132,48 @@ def _inject_ros2_control_plugin(
         e.text = str(position_derivative_gain)
 
 
+def _inject_velocity_state_interfaces(urdf_xml: str) -> str:
+    """Add a velocity state interface to every joint that has only position.
+
+    gz_ros2_control reads the URDF (via the /robot_description topic) to
+    know which command and state interfaces each joint exposes. The
+    upstream kuka_lbr_iisy_ros2_control_macro only declares `position`
+    as a state interface, so the JTC's D-term (position_derivative_gain)
+    has to fall back to finite-difference of position. Adding a
+    velocity state interface lets the JTC use real joint velocity from
+    the Gazebo system. Velocity is computed natively by
+    gz_ros2_control/GazeboSimSystem, so no hardware changes are
+    required. Idempotent: re-running on a URDF that already has
+    velocity is a no-op.
+    """
+    root = ET.fromstring(urdf_xml)
+    for ros2ctrl in root.iter():
+        if not str(ros2ctrl.tag).endswith("ros2_control"):
+            continue
+        for joint in ros2ctrl.findall("joint"):
+            existing = {
+                iface.get("name")
+                for iface in joint.findall("state_interface")
+                if iface.get("name") is not None
+            }
+            if "velocity" in existing:
+                continue
+            ET.SubElement(joint, "state_interface").set("name", "velocity")
+    return '<?xml version="1.0"?>\n' + ET.tostring(root, encoding="unicode")
+
+
+def _inject_velocity_state_interfaces(urdf_xml: str) -> str:
+    """Deprecated: see inject_velocity_state_urdf.py.
+
+    The launch file now uses the helper script
+    ``inject_velocity_state_urdf.py`` to inject velocity state
+    interfaces into the URDF that robot_state_publisher publishes.
+    This function is kept for reference but no longer called by
+    ``main()``.
+    """
+    return urdf_xml
+
+
 def _extract_initial_positions(urdf_xml: str) -> dict[str, float]:
     """Extract joint initial positions from URDF <ros2_control> section.
 
