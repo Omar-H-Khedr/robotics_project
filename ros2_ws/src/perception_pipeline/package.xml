@@ -10,7 +10,10 @@
   <depend>cv_bridge</depend>
   <depend>geometry_msgs</depend>
   <depend>image_transport</depend>
+  <depend>python3-numpy</depend>
+  <depend>python3-pandas</depend>
   <depend>python3-pil</depend>
+  <depend>python3-pyarrow</depend>
   <depend>rclpy</depend>
   <depend>sensor_msgs</depend>
   <depend>std_msgs</depend>

@@ -13,7 +13,7 @@ setup(
         ("share/" + package_name + "/launch", glob("launch/*.launch.py")),
         ("share/" + package_name + "/config", glob("config/*")),
     ],
-    install_requires=["setuptools"],
+    install_requires=["setuptools", "numpy", "pandas", "pyarrow", "Pillow"],
     zip_safe=True,
     maintainer="Omar Khedr",
     maintainer_email="omar.khedr@gu.edu.eg",
@@ -23,6 +23,7 @@ setup(
     entry_points={
         "console_scripts": [
             "multimodal_observation_logger = perception_pipeline.multimodal_observation_logger:main",
+            "context_vector_extractor = perception_pipeline.context_vector_extractor:main",
         ],
     },
 )
