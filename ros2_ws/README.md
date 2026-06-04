@@ -1748,6 +1748,23 @@ The v2.13 proposal simulation sprint adds a deterministic context encoder protot
 
 The prototype does not train a policy, run RL training, create fake learning results, use a real robot, or execute peg insertion. Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v2_13/`.
 
+The v2_13 prototype was later extended to a self-supervised
+74 -> 32 -> 74 MLP autoencoder that the v2_14 (context-conditioned
+action) stage reuses as its encoder. The implementation lives in
+`src/perception_pipeline/perception_pipeline/v2_13_context_encoder.py`,
+is registered as a console script
+(`ros2 run perception_pipeline v2_13_context_encoder -- ...`), and
+ships with a launch wrapper
+(`v2_13_context_encoder.launch.py`) and a feature-spec doc
+(`docs/v2_13_context_encoder.md`). The v1 baseline artifacts are in
+`diagnostics/perception_pipeline_v2_13_encoder/`: `encoder.pt` (40 KB,
+loadable by v2_14), `autoencoder.pt`, `scaler.json`,
+`metadata.json`, `data_validation_report.json`, and
+`training_curve.png`. On the v3 motion trial (3330 valid rows after
+empty-camera filter) the autoencoder reaches `train_mse=0.0035`,
+`test_mse=0.0024` in normalized [0,1] space, with smoke test
+confirming the 32-dim latent and 74-dim reconstruction shapes.
+
 ## proposal_simulation_cell_v2_12_context_vector_extraction
 
 Status: `context_vector_extraction_validated`

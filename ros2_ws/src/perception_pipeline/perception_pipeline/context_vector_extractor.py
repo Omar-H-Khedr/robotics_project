@@ -52,18 +52,26 @@ CONTEXT_DIM = (
 
 PHASE_ENUM = {
     "UNKNOWN": 0,
+    "IDLE": 0,
     "MOVE_TO_START": 1,
+    "MOVING_TO_START": 1,
     "APPROACH": 2,
+    "CHECK_ALIGNMENT": 2,
     "SEARCH": 3,
     "HOVER_ABOVE_HOLE": 4,
     "INSERT": 5,
+    "INSERTING": 5,
+    "RETREAT": 6,
     "INSERTED": 6,
-    "ABORT": 7,
+    "DONE": 7,
+    "ABORT": 8,
     "COMPLETE": 8,
 }
 SAFETY_ENUM = {
     "UNKNOWN": 0,
+    "OK": 1,
     "SAFE": 1,
+    "WARNING": 2,
     "WARN": 2,
     "ABORT": 3,
 }
@@ -102,13 +110,42 @@ def _safe_float_series(df: pd.DataFrame, col: str) -> np.ndarray:
     return arr
 
 
+def _normalize_status_string(v, enum_map: dict) -> str:
+    """Extract the upper-case status token from a string or a JSON object.
+
+    The safety_monitor publishes statuses as
+    `{"level": "OK|WARNING|ABORT", "code": "joint_states_valid", ...}`
+    JSON; the admittance_insertion_node publishes phases as plain
+    strings like `MOVING_TO_START`. Both forms must map cleanly into
+    the enums.
+
+    For safety_status, prefer the `level` field (OK / WARNING / ABORT)
+    over `code` (which is a fine-grained descriptor like
+    `joint_states_valid`).
+    """
+    if v is None:
+        return ""
+    s = str(v).strip()
+    if s.startswith("{"):
+        try:
+            obj = json.loads(s)
+        except (ValueError, TypeError):
+            return s.upper()
+        if isinstance(obj, dict):
+            for key in ("level", "code", "phase", "status", "name"):
+                if key in obj and obj[key] is not None:
+                    return str(obj[key]).strip().upper()
+            return s.upper()
+    return s.upper()
+
+
 def _safe_int_array(values, enum_map: dict, default: int) -> np.ndarray:
     out = np.empty(len(values), dtype=np.int32)
     for i, v in enumerate(values):
         if v is None or (isinstance(v, float) and np.isnan(v)):
             out[i] = default
             continue
-        s = str(v).strip().upper()
+        s = _normalize_status_string(v, enum_map)
         out[i] = enum_map.get(s, default)
     return out
 
