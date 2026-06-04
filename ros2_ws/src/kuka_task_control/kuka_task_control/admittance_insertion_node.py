@@ -227,6 +227,9 @@ class AdmittanceInsertionNode(Node):
         self._state_pub = self.create_publisher(
             String, '/insertion_state', 10,
         )
+        self._task_phase_pub = self.create_publisher(
+            String, '/task_phase', 10,
+        )
         self._traj_pub = self.create_publisher(
             JointTrajectory,
             '/joint_trajectory_controller/joint_trajectory',
@@ -502,6 +505,7 @@ class AdmittanceInsertionNode(Node):
         state_msg = String()
         state_msg.data = self._state
         self._state_pub.publish(state_msg)
+        self._task_phase_pub.publish(state_msg)
 
     def _begin_phase(self, name: str) -> None:
         self._current_phase_result = PhaseResult(name)
@@ -536,6 +540,7 @@ class AdmittanceInsertionNode(Node):
         state_msg = String()
         state_msg.data = self._state
         self._state_pub.publish(state_msg)
+        self._task_phase_pub.publish(state_msg)
 
         self._update_baseline()
         if self._wrench_received:

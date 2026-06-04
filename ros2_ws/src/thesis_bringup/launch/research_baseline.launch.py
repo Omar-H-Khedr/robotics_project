@@ -285,6 +285,20 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
+    safety_monitor = Node(
+        package="safety_layer",
+        executable="safety_monitor",
+        name="safety_monitor",
+        output="screen",
+        parameters=[
+            {
+                "config_path": PathJoinSubstitution(
+                    [FindPackageShare("safety_layer"), "config", "safety_limits.yaml"]
+                ),
+            }
+        ],
+    )
+
     # Resolve spawn position from launch configuration
     spawn_x = LaunchConfiguration("x").perform(context)
     spawn_y = LaunchConfiguration("y").perform(context)
@@ -587,6 +601,7 @@ def launch_setup(context, *args, **kwargs):
         ros_gz_bridge,
         contact_ros_gz_bridge,
         ft_sensor_bridge,
+        safety_monitor,
         RegisterEventHandler(
             OnProcessExit(
                 target_action=spawn_robot,
