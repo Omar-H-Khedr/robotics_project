@@ -104,6 +104,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_derivative_gain_v3 | Validated safely: gain=3000 + D=10.0 doubles best 2 mm SEARCH window to 10 ticks; best 1 mm window still 3 ticks and SEARCH still fails closed |
 | research_baseline_search_derivative_gain_v4 | Validated safely: gain=2000 + D=10.0 reaches the best SEARCH final XY in this line of work (0.000342 m); best 1 mm window still 3 ticks and SEARCH still fails closed |
 | research_baseline_search_gain3000_v1 | Validated safely: gain=3000 with no D-term makes SEARCH worse (1 mm window 2 ticks, 2 mm window 4 ticks), confirming the D-term is necessary at higher gain |
+| research_baseline_search_position_controller_v1 / v2 | Validated safely: switch to position_controllers/JointGroupPositionController (driven by a 250 Hz trajectory_position_bridge) does not unblock the SEARCH 1 mm sustained window. 1 mm window 2-4 ticks, 2 mm window 10-12 ticks (best 2 mm seen in this line of work), SEARCH final XY 0.0014-0.0038 m. The position controller plugin is loaded from the extracted `ros-jazzy-position-controllers` deb (system package not installable without sudo). |
 
 ## 2026-06-03 SEARCH Derivative Gain Plumbing
 
@@ -172,6 +173,8 @@ sustained SEARCH/clearance safety gates.
 | derivative_gain_v3 | 3000 | 10.0 | ABORTED SEARCH timeout | 3 | 10 | 0.002974 | 0.004029 | 0.008481 |
 | derivative_gain_v4 | 2000 | 10.0 | ABORTED SEARCH timeout | 3 | 7 | 0.000342 | 0.004123 | 0.008472 |
 | gain3000_v1 | 3000 | 0 | ABORTED SEARCH timeout | 2 | 4 | 0.002071 | 0.004013 | 0.008314 |
+| position_controller v1 | n/a (position_controllers) | n/a | ABORTED SEARCH timeout | 2 | 12 | 0.001782 | n/a (no controller state published) | n/a |
+| position_controller v2 | n/a (position_controllers) | n/a | ABORTED SEARCH timeout | 4 | 10 | 0.003757 | n/a (no controller state published) | n/a |
 
 `position_derivative_gain=5.0` reduced SEARCH final XY and the centered-hold
 p95 JTC joint error marginally, but it did not extend the best 1 mm

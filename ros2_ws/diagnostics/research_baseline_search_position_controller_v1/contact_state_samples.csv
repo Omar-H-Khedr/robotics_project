@@ -1,0 +1,7 @@
+stamp_s,state,source,contact_count,max_contact_force_n,collision_pairs
+35.969000000,SEARCH,target,1,162.466918106,lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_right_collision
+35.970000000,SEARCH,peg,1,162.466918106,lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_right_collision
+35.970000000,SEARCH,target,1,0.000000000,lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_right_collision
+35.970000000,SEARCH,peg,1,0.000000000,lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_right_collision
+35.970000000,SEARCH,target,1,0.000000000,lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_right_collision
+35.971000000,SEARCH,peg,1,0.000000000,lbr_iisy6_r1300::ft_sensor_link::ft_sensor_link_fixed_joint_lump__grasped_peg_collision_2 <-> target_plate::plate_link::plate_right_collision

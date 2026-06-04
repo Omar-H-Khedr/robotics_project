@@ -75,7 +75,14 @@ def launch_setup(context, *args, **kwargs):
         LaunchConfiguration("allow_robot_renaming").perform(context).strip().lower()
         in ("1", "true", "yes", "on")
     )
-    controller_stack = "joint_state_broadcaster + joint_trajectory_controller"
+    use_position_controller = (
+        LaunchConfiguration("use_position_controller").perform(context).strip().lower()
+        in ("1", "true", "yes", "on")
+    )
+    if use_position_controller:
+        controller_stack = "joint_state_broadcaster + position_controller (via trajectory_position_bridge)"
+    else:
+        controller_stack = "joint_state_broadcaster + joint_trajectory_controller"
     safe_home_pose = _safe_home_pose(robot)
     namespace = LaunchConfiguration("namespace")
     namespace_value = namespace.perform(context)
@@ -227,6 +234,12 @@ def launch_setup(context, *args, **kwargs):
     spawn_yaw = LaunchConfiguration("yaw").perform(context)
     xacro_path = robot_description_xacro.perform(context)
 
+    effective_controller_config_path = (
+        LaunchConfiguration("position_controller_config_path").perform(context)
+        if use_position_controller
+        else LaunchConfiguration("controller_config_path").perform(context)
+    )
+
     spawn_robot_arguments = [
         "--xacro",
         xacro_path,
@@ -259,7 +272,7 @@ def launch_setup(context, *args, **kwargs):
         "--controller-config-package",
         LaunchConfiguration("controller_config_package"),
         "--controller-config-path",
-        LaunchConfiguration("controller_config_path"),
+        effective_controller_config_path,
         "--x",
         "0.0",
         "--y",
@@ -311,10 +324,18 @@ def launch_setup(context, *args, **kwargs):
         )
 
     joint_state_broadcaster = controller_spawner("joint_state_broadcaster", activate=True)
-    joint_trajectory_controller = controller_spawner(
-        "joint_trajectory_controller",
-        activate=True,
-    )
+    if use_position_controller:
+        position_controller = controller_spawner(
+            "position_controller",
+            activate=True,
+        )
+        joint_trajectory_controller = None
+    else:
+        joint_trajectory_controller = controller_spawner(
+            "joint_trajectory_controller",
+            activate=True,
+        )
+        position_controller = None
 
     data_logger = Node(
         package="kuka_task_control",
@@ -323,14 +344,43 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
     )
 
+    if use_position_controller:
+        trajectory_position_bridge = Node(
+            package="thesis_bringup",
+            executable="trajectory_position_bridge",
+            parameters=[
+                {
+                    "input_trajectory_topic": "/joint_trajectory_controller/joint_trajectory",
+                    "output_command_topic": "/position_controller/commands",
+                    "joint_names": [
+                        "joint_1", "joint_2", "joint_3",
+                        "joint_4", "joint_5", "joint_6",
+                    ],
+                    "interp_rate_hz": 250.0,
+                    "publish_on_update": True,
+                    "hold_last_point": True,
+                }
+            ],
+            output="screen",
+        )
+    else:
+        trajectory_position_bridge = None
+
+    if use_position_controller:
+        observer_state_topic = "/position_controller/controller_state"
+        observer_command_topic = "/joint_trajectory_controller/joint_trajectory"
+    else:
+        observer_state_topic = "/joint_trajectory_controller/controller_state"
+        observer_command_topic = "/joint_trajectory_controller/joint_trajectory"
+
     trajectory_tracking_observer = Node(
         package="thesis_bringup",
         executable="trajectory_tracking_observer",
         parameters=[
             {
                 "use_sim_time": simulation["use_sim_time"],
-                "state_topic": "/joint_trajectory_controller/controller_state",
-                "command_topic": "/joint_trajectory_controller/joint_trajectory",
+                "state_topic": observer_state_topic,
+                "command_topic": observer_command_topic,
                 "joint_state_topic": "/joint_states",
                 "output_dir": LaunchConfiguration("tracking_log_dir"),
             }
@@ -389,7 +439,7 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
     )
 
-    return [
+    actions: list = [
         SetEnvironmentVariable("GZ_SIM_RESOURCE_PATH", _prepend_resource_path(model_path)),
         LogInfo(
             msg=(
@@ -445,23 +495,45 @@ def launch_setup(context, *args, **kwargs):
                 on_exit=[joint_state_broadcaster],
             )
         ),
-        RegisterEventHandler(
-            OnProcessExit(
-                target_action=joint_state_broadcaster,
-                on_exit=[joint_trajectory_controller],
-            )
-        ),
-        RegisterEventHandler(
-            OnProcessExit(
-                target_action=joint_trajectory_controller,
-                on_exit=[admittance_insertion],
-            )
-        ),
-        data_logger,
+    ]
+    if use_position_controller:
+        event_chain = [
+            RegisterEventHandler(
+                OnProcessExit(
+                    target_action=joint_state_broadcaster,
+                    on_exit=[position_controller],
+                )
+            ),
+            RegisterEventHandler(
+                OnProcessExit(
+                    target_action=position_controller,
+                    on_exit=[trajectory_position_bridge, admittance_insertion],
+                )
+            ),
+        ]
+    else:
+        event_chain = [
+            RegisterEventHandler(
+                OnProcessExit(
+                    target_action=joint_state_broadcaster,
+                    on_exit=[joint_trajectory_controller],
+                )
+            ),
+            RegisterEventHandler(
+                OnProcessExit(
+                    target_action=joint_trajectory_controller,
+                    on_exit=[admittance_insertion],
+                )
+            ),
+        ]
+    actions.extend(event_chain)
+    actions.append(data_logger)
+    actions.extend([
         trajectory_tracking_observer,
         wrench_state_observer,
         contact_state_observer,
-    ]
+    ])
+    return actions
 
 
 def generate_launch_description():
@@ -556,6 +628,14 @@ def generate_launch_description():
                 description="Path inside controller_config_package for gz_ros2_control parameters.",
             ),
             DeclareLaunchArgument(
+                "position_controller_config_path",
+                default_value="config/research_baseline_position_controller.yaml",
+                description=(
+                    "Path inside controller_config_package for the position_controller "
+                    "gz_ros2_control parameters. Only used when use_position_controller:=true."
+                ),
+            ),
+            DeclareLaunchArgument(
                 "enable_tracking_observer",
                 default_value="true",
                 description="If true, passively log joint trajectory controller tracking error.",
@@ -569,6 +649,15 @@ def generate_launch_description():
                 "enable_contact_observer",
                 default_value="true",
                 description="If true, passively log contact sensor events by insertion state.",
+            ),
+            DeclareLaunchArgument(
+                "use_position_controller",
+                default_value="false",
+                description=(
+                    "If true, spawn position_controllers/JointGroupPositionController "
+                    "and the trajectory_position_bridge node, and skip the JTC spawn. "
+                    "Default false preserves the canonical JTC path."
+                ),
             ),
             DeclareLaunchArgument(
                 "tracking_log_dir",

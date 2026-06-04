@@ -1,0 +1,45 @@
+controller_manager:
+  ros__parameters:
+    # Position-controller variant. Spawned in addition to the
+    # joint_state_broadcaster so the position_bridge node can drive the
+    # arm through Float64MultiArray commands instead of the JTC's
+    # JointTrajectory. The position controller uses per-joint P control
+    # via the ros2_control hardware interface PID. The D-term that the
+    # JTC exposed through `position_derivative_gain` is intentionally
+    # not added here in v1; the bridge itself is the diagnostic.
+    update_rate: 250  # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    position_controller:
+      type: position_controllers/JointGroupPositionController
+
+joint_trajectory_controller:
+  ros__parameters:
+    joints:
+      - joint_1
+      - joint_2
+      - joint_3
+      - joint_4
+      - joint_5
+      - joint_6
+
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+    state_publish_rate: 100.0
+    action_monitor_rate: 50.0
+    allow_nonzero_velocity_at_trajectory_end: false
+
+position_controller:
+  ros__parameters:
+    joints:
+      - joint_1
+      - joint_2
+      - joint_3
+      - joint_4
+      - joint_5
+      - joint_6
+    state_publish_rate: 100.0

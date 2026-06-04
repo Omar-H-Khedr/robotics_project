@@ -1,0 +1,762 @@
+{
+  "centered_hold_like_command_count": 0,
+  "command_source": "trajectory_commands.csv",
+  "commands": [
+    {
+      "command_index": 0,
+      "dominant_joints_by_p95_xy_contribution": [
+        {
+          "joint": "joint_1",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_2",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_3",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_4",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_5",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_6",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        }
+      ],
+      "duration_s": 40.0,
+      "final_actual_reference_to_feedback_xy_drift_m": null,
+      "final_feedback_xy_error_m": null,
+      "final_linearized_xy_drift_m": null,
+      "final_reference_xy_error_m": null,
+      "hold_like": false,
+      "max_abs_joint_error_rad": null,
+      "max_actual_reference_to_feedback_xy_drift_m": null,
+      "max_linearization_residual_m": null,
+      "max_linearized_xy_drift_m": null,
+      "mean_actual_reference_to_feedback_xy_drift_m": null,
+      "mean_feedback_xy_error_m": null,
+      "mean_linearized_xy_drift_m": null,
+      "mean_max_xy_sensitivity_m_per_rad": null,
+      "mean_reference_xy_error_m": null,
+      "mean_rms_joint_error_rad": null,
+      "mean_xy_jacobian_condition_number": null,
+      "next_command_stamp_s": 23.921,
+      "p95_actual_reference_to_feedback_xy_drift_m": null,
+      "p95_linearization_residual_m": null,
+      "p95_linearized_xy_drift_m": null,
+      "p95_max_abs_joint_error_rad": null,
+      "p95_max_xy_sensitivity_m_per_rad": null,
+      "p95_xy_jacobian_condition_number": null,
+      "point_count": 20,
+      "receipt_stamp_s": 2.806,
+      "samples": 0,
+      "target_within_physical_clearance": true,
+      "target_xy_error_m": 4.707128863717415e-07,
+      "target_xyz_m": [
+        0.5200003473316399,
+        -0.20000031769695203,
+        0.8850008831257807
+      ]
+    },
+    {
+      "command_index": 1,
+      "dominant_joints_by_p95_xy_contribution": [
+        {
+          "joint": "joint_1",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_2",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_3",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_4",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_5",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_6",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        }
+      ],
+      "duration_s": 15.0,
+      "final_actual_reference_to_feedback_xy_drift_m": null,
+      "final_feedback_xy_error_m": null,
+      "final_linearized_xy_drift_m": null,
+      "final_reference_xy_error_m": null,
+      "hold_like": false,
+      "max_abs_joint_error_rad": null,
+      "max_actual_reference_to_feedback_xy_drift_m": null,
+      "max_linearization_residual_m": null,
+      "max_linearized_xy_drift_m": null,
+      "mean_actual_reference_to_feedback_xy_drift_m": null,
+      "mean_feedback_xy_error_m": null,
+      "mean_linearized_xy_drift_m": null,
+      "mean_max_xy_sensitivity_m_per_rad": null,
+      "mean_reference_xy_error_m": null,
+      "mean_rms_joint_error_rad": null,
+      "mean_xy_jacobian_condition_number": null,
+      "next_command_stamp_s": 35.901,
+      "p95_actual_reference_to_feedback_xy_drift_m": null,
+      "p95_linearization_residual_m": null,
+      "p95_linearized_xy_drift_m": null,
+      "p95_max_abs_joint_error_rad": null,
+      "p95_max_xy_sensitivity_m_per_rad": null,
+      "p95_xy_jacobian_condition_number": null,
+      "point_count": 8,
+      "receipt_stamp_s": 23.921,
+      "samples": 0,
+      "target_within_physical_clearance": true,
+      "target_xy_error_m": 1.5240879605716032e-08,
+      "target_xyz_m": [
+        0.520000006836167,
+        -0.20000001362171915,
+        0.8300000092368687
+      ]
+    },
+    {
+      "command_index": 2,
+      "dominant_joints_by_p95_xy_contribution": [
+        {
+          "joint": "joint_1",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_2",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_3",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_4",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_5",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_6",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        }
+      ],
+      "duration_s": 5.0,
+      "final_actual_reference_to_feedback_xy_drift_m": null,
+      "final_feedback_xy_error_m": null,
+      "final_linearized_xy_drift_m": null,
+      "final_reference_xy_error_m": null,
+      "hold_like": true,
+      "max_abs_joint_error_rad": null,
+      "max_actual_reference_to_feedback_xy_drift_m": null,
+      "max_linearization_residual_m": null,
+      "max_linearized_xy_drift_m": null,
+      "mean_actual_reference_to_feedback_xy_drift_m": null,
+      "mean_feedback_xy_error_m": null,
+      "mean_linearized_xy_drift_m": null,
+      "mean_max_xy_sensitivity_m_per_rad": null,
+      "mean_reference_xy_error_m": null,
+      "mean_rms_joint_error_rad": null,
+      "mean_xy_jacobian_condition_number": null,
+      "next_command_stamp_s": 42.002,
+      "p95_actual_reference_to_feedback_xy_drift_m": null,
+      "p95_linearization_residual_m": null,
+      "p95_linearized_xy_drift_m": null,
+      "p95_max_abs_joint_error_rad": null,
+      "p95_max_xy_sensitivity_m_per_rad": null,
+      "p95_xy_jacobian_condition_number": null,
+      "point_count": 1,
+      "receipt_stamp_s": 35.901,
+      "samples": 0,
+      "target_within_physical_clearance": false,
+      "target_xy_error_m": 0.003000822297535324,
+      "target_xyz_m": [
+        0.5230008221612166,
+        -0.20000090450914154,
+        0.8265248848115534
+      ]
+    },
+    {
+      "command_index": 3,
+      "dominant_joints_by_p95_xy_contribution": [
+        {
+          "joint": "joint_1",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_2",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_3",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_4",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_5",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_6",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        }
+      ],
+      "duration_s": 5.0,
+      "final_actual_reference_to_feedback_xy_drift_m": null,
+      "final_feedback_xy_error_m": null,
+      "final_linearized_xy_drift_m": null,
+      "final_reference_xy_error_m": null,
+      "hold_like": true,
+      "max_abs_joint_error_rad": null,
+      "max_actual_reference_to_feedback_xy_drift_m": null,
+      "max_linearization_residual_m": null,
+      "max_linearized_xy_drift_m": null,
+      "mean_actual_reference_to_feedback_xy_drift_m": null,
+      "mean_feedback_xy_error_m": null,
+      "mean_linearized_xy_drift_m": null,
+      "mean_max_xy_sensitivity_m_per_rad": null,
+      "mean_reference_xy_error_m": null,
+      "mean_rms_joint_error_rad": null,
+      "mean_xy_jacobian_condition_number": null,
+      "next_command_stamp_s": 48.203,
+      "p95_actual_reference_to_feedback_xy_drift_m": null,
+      "p95_linearization_residual_m": null,
+      "p95_linearized_xy_drift_m": null,
+      "p95_max_abs_joint_error_rad": null,
+      "p95_max_xy_sensitivity_m_per_rad": null,
+      "p95_xy_jacobian_condition_number": null,
+      "point_count": 1,
+      "receipt_stamp_s": 42.002,
+      "samples": 0,
+      "target_within_physical_clearance": true,
+      "target_xy_error_m": 9.13171375670109e-06,
+      "target_xyz_m": [
+        0.5199959450066683,
+        -0.2000081820061852,
+        0.8249907363073908
+      ]
+    },
+    {
+      "command_index": 4,
+      "dominant_joints_by_p95_xy_contribution": [
+        {
+          "joint": "joint_1",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_2",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_3",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_4",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_5",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_6",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        }
+      ],
+      "duration_s": 5.0,
+      "final_actual_reference_to_feedback_xy_drift_m": null,
+      "final_feedback_xy_error_m": null,
+      "final_linearized_xy_drift_m": null,
+      "final_reference_xy_error_m": null,
+      "hold_like": true,
+      "max_abs_joint_error_rad": null,
+      "max_actual_reference_to_feedback_xy_drift_m": null,
+      "max_linearization_residual_m": null,
+      "max_linearized_xy_drift_m": null,
+      "mean_actual_reference_to_feedback_xy_drift_m": null,
+      "mean_feedback_xy_error_m": null,
+      "mean_linearized_xy_drift_m": null,
+      "mean_max_xy_sensitivity_m_per_rad": null,
+      "mean_reference_xy_error_m": null,
+      "mean_rms_joint_error_rad": null,
+      "mean_xy_jacobian_condition_number": null,
+      "next_command_stamp_s": 54.305,
+      "p95_actual_reference_to_feedback_xy_drift_m": null,
+      "p95_linearization_residual_m": null,
+      "p95_linearized_xy_drift_m": null,
+      "p95_max_abs_joint_error_rad": null,
+      "p95_max_xy_sensitivity_m_per_rad": null,
+      "p95_xy_jacobian_condition_number": null,
+      "point_count": 1,
+      "receipt_stamp_s": 48.203,
+      "samples": 0,
+      "target_within_physical_clearance": true,
+      "target_xy_error_m": 7.0995360260557055e-06,
+      "target_xyz_m": [
+        0.5200031548281318,
+        -0.2000063600684937,
+        0.821265277502455
+      ]
+    },
+    {
+      "command_index": 5,
+      "dominant_joints_by_p95_xy_contribution": [
+        {
+          "joint": "joint_1",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_2",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_3",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_4",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_5",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_6",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        }
+      ],
+      "duration_s": 5.0,
+      "final_actual_reference_to_feedback_xy_drift_m": null,
+      "final_feedback_xy_error_m": null,
+      "final_linearized_xy_drift_m": null,
+      "final_reference_xy_error_m": null,
+      "hold_like": true,
+      "max_abs_joint_error_rad": null,
+      "max_actual_reference_to_feedback_xy_drift_m": null,
+      "max_linearization_residual_m": null,
+      "max_linearized_xy_drift_m": null,
+      "mean_actual_reference_to_feedback_xy_drift_m": null,
+      "mean_feedback_xy_error_m": null,
+      "mean_linearized_xy_drift_m": null,
+      "mean_max_xy_sensitivity_m_per_rad": null,
+      "mean_reference_xy_error_m": null,
+      "mean_rms_joint_error_rad": null,
+      "mean_xy_jacobian_condition_number": null,
+      "next_command_stamp_s": 60.403,
+      "p95_actual_reference_to_feedback_xy_drift_m": null,
+      "p95_linearization_residual_m": null,
+      "p95_linearized_xy_drift_m": null,
+      "p95_max_abs_joint_error_rad": null,
+      "p95_max_xy_sensitivity_m_per_rad": null,
+      "p95_xy_jacobian_condition_number": null,
+      "point_count": 1,
+      "receipt_stamp_s": 54.305,
+      "samples": 0,
+      "target_within_physical_clearance": true,
+      "target_xy_error_m": 1.3342916835041458e-06,
+      "target_xyz_m": [
+        0.5199999319336472,
+        -0.20000133255441477,
+        0.8218616513800847
+      ]
+    },
+    {
+      "command_index": 6,
+      "dominant_joints_by_p95_xy_contribution": [
+        {
+          "joint": "joint_1",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_2",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_3",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_4",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_5",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_6",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        }
+      ],
+      "duration_s": 5.0,
+      "final_actual_reference_to_feedback_xy_drift_m": null,
+      "final_feedback_xy_error_m": null,
+      "final_linearized_xy_drift_m": null,
+      "final_reference_xy_error_m": null,
+      "hold_like": true,
+      "max_abs_joint_error_rad": null,
+      "max_actual_reference_to_feedback_xy_drift_m": null,
+      "max_linearization_residual_m": null,
+      "max_linearized_xy_drift_m": null,
+      "mean_actual_reference_to_feedback_xy_drift_m": null,
+      "mean_feedback_xy_error_m": null,
+      "mean_linearized_xy_drift_m": null,
+      "mean_max_xy_sensitivity_m_per_rad": null,
+      "mean_reference_xy_error_m": null,
+      "mean_rms_joint_error_rad": null,
+      "mean_xy_jacobian_condition_number": null,
+      "next_command_stamp_s": 66.501,
+      "p95_actual_reference_to_feedback_xy_drift_m": null,
+      "p95_linearization_residual_m": null,
+      "p95_linearized_xy_drift_m": null,
+      "p95_max_abs_joint_error_rad": null,
+      "p95_max_xy_sensitivity_m_per_rad": null,
+      "p95_xy_jacobian_condition_number": null,
+      "point_count": 1,
+      "receipt_stamp_s": 60.403,
+      "samples": 0,
+      "target_within_physical_clearance": true,
+      "target_xy_error_m": 5.282413313421093e-06,
+      "target_xyz_m": [
+        0.5200049929725861,
+        -0.20000172456231224,
+        0.8233417382737079
+      ]
+    },
+    {
+      "command_index": 7,
+      "dominant_joints_by_p95_xy_contribution": [
+        {
+          "joint": "joint_1",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_2",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_3",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_4",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_5",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_6",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        }
+      ],
+      "duration_s": 5.0,
+      "final_actual_reference_to_feedback_xy_drift_m": null,
+      "final_feedback_xy_error_m": null,
+      "final_linearized_xy_drift_m": null,
+      "final_reference_xy_error_m": null,
+      "hold_like": true,
+      "max_abs_joint_error_rad": null,
+      "max_actual_reference_to_feedback_xy_drift_m": null,
+      "max_linearization_residual_m": null,
+      "max_linearized_xy_drift_m": null,
+      "mean_actual_reference_to_feedback_xy_drift_m": null,
+      "mean_feedback_xy_error_m": null,
+      "mean_linearized_xy_drift_m": null,
+      "mean_max_xy_sensitivity_m_per_rad": null,
+      "mean_reference_xy_error_m": null,
+      "mean_rms_joint_error_rad": null,
+      "mean_xy_jacobian_condition_number": null,
+      "next_command_stamp_s": 72.601,
+      "p95_actual_reference_to_feedback_xy_drift_m": null,
+      "p95_linearization_residual_m": null,
+      "p95_linearized_xy_drift_m": null,
+      "p95_max_abs_joint_error_rad": null,
+      "p95_max_xy_sensitivity_m_per_rad": null,
+      "p95_xy_jacobian_condition_number": null,
+      "point_count": 1,
+      "receipt_stamp_s": 66.501,
+      "samples": 0,
+      "target_within_physical_clearance": true,
+      "target_xy_error_m": 2.3995691715017615e-06,
+      "target_xyz_m": [
+        0.5200022140558382,
+        -0.20000092514266687,
+        0.8242781165071443
+      ]
+    },
+    {
+      "command_index": 8,
+      "dominant_joints_by_p95_xy_contribution": [
+        {
+          "joint": "joint_1",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_2",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_3",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_4",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_5",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_6",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        }
+      ],
+      "duration_s": 5.0,
+      "final_actual_reference_to_feedback_xy_drift_m": null,
+      "final_feedback_xy_error_m": null,
+      "final_linearized_xy_drift_m": null,
+      "final_reference_xy_error_m": null,
+      "hold_like": true,
+      "max_abs_joint_error_rad": null,
+      "max_actual_reference_to_feedback_xy_drift_m": null,
+      "max_linearization_residual_m": null,
+      "max_linearized_xy_drift_m": null,
+      "mean_actual_reference_to_feedback_xy_drift_m": null,
+      "mean_feedback_xy_error_m": null,
+      "mean_linearized_xy_drift_m": null,
+      "mean_max_xy_sensitivity_m_per_rad": null,
+      "mean_reference_xy_error_m": null,
+      "mean_rms_joint_error_rad": null,
+      "mean_xy_jacobian_condition_number": null,
+      "next_command_stamp_s": 74.911,
+      "p95_actual_reference_to_feedback_xy_drift_m": null,
+      "p95_linearization_residual_m": null,
+      "p95_linearized_xy_drift_m": null,
+      "p95_max_abs_joint_error_rad": null,
+      "p95_max_xy_sensitivity_m_per_rad": null,
+      "p95_xy_jacobian_condition_number": null,
+      "point_count": 1,
+      "receipt_stamp_s": 72.601,
+      "samples": 0,
+      "target_within_physical_clearance": true,
+      "target_xy_error_m": 9.62312956217446e-07,
+      "target_xyz_m": [
+        0.5200006060927584,
+        -0.2000007474608979,
+        0.8219973506596611
+      ]
+    },
+    {
+      "command_index": 9,
+      "dominant_joints_by_p95_xy_contribution": [
+        {
+          "joint": "joint_1",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_2",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_3",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_4",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_5",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        },
+        {
+          "joint": "joint_6",
+          "max_abs_xy_contribution_m": null,
+          "mean_abs_xy_contribution_m": null,
+          "p95_abs_xy_contribution_m": null
+        }
+      ],
+      "duration_s": 25.0,
+      "final_actual_reference_to_feedback_xy_drift_m": null,
+      "final_feedback_xy_error_m": null,
+      "final_linearized_xy_drift_m": null,
+      "final_reference_xy_error_m": null,
+      "hold_like": false,
+      "max_abs_joint_error_rad": null,
+      "max_actual_reference_to_feedback_xy_drift_m": null,
+      "max_linearization_residual_m": null,
+      "max_linearized_xy_drift_m": null,
+      "mean_actual_reference_to_feedback_xy_drift_m": null,
+      "mean_feedback_xy_error_m": null,
+      "mean_linearized_xy_drift_m": null,
+      "mean_max_xy_sensitivity_m_per_rad": null,
+      "mean_reference_xy_error_m": null,
+      "mean_rms_joint_error_rad": null,
+      "mean_xy_jacobian_condition_number": null,
+      "next_command_stamp_s": null,
+      "p95_actual_reference_to_feedback_xy_drift_m": null,
+      "p95_linearization_residual_m": null,
+      "p95_linearized_xy_drift_m": null,
+      "p95_max_abs_joint_error_rad": null,
+      "p95_max_xy_sensitivity_m_per_rad": null,
+      "p95_xy_jacobian_condition_number": null,
+      "point_count": 17,
+      "receipt_stamp_s": 74.911,
+      "samples": 0,
+      "target_within_physical_clearance": false,
+      "target_xy_error_m": 0.40967622811201115,
+      "target_xyz_m": [
+        0.8000000000000002,
+        0.09905620187530717,
+        1.0398718589107658
+      ]
+    }
+  ],
+  "hold_like_command_count": 7,
+  "input_dir": "diagnostics/research_baseline_search_position_controller_v1",
+  "max_centered_hold_p95_actual_xy_drift_m": 0.0,
+  "max_centered_hold_p95_joint_error_rad": 0.0,
+  "physical_clearance_m": 0.001,
+  "tracking_source": "trajectory_controller_state_samples.csv"
+}

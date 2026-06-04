@@ -35,6 +35,7 @@ setup(
             "moving_to_start_tracking_analyzer = thesis_bringup.moving_to_start_tracking_analyzer:main",
             "xy_stability_analyzer = thesis_bringup.xy_stability_analyzer:main",
             "trajectory_tracking_observer = thesis_bringup.trajectory_tracking_observer:main",
+            "trajectory_position_bridge = thesis_bringup.trajectory_position_bridge:main",
             "wrench_state_observer = thesis_bringup.wrench_state_observer:main",
             "contact_state_observer = thesis_bringup.contact_state_observer:main",
             "controller_readiness_gate = thesis_bringup.controller_readiness_gate:main",
