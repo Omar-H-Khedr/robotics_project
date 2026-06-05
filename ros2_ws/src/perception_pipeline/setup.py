@@ -25,6 +25,8 @@ setup(
             "multimodal_observation_logger = perception_pipeline.multimodal_observation_logger:main",
             "context_vector_extractor = perception_pipeline.context_vector_extractor:main",
             "v2_13_context_encoder = perception_pipeline.v2_13_context_encoder:main",
+            "v2_14_context_conditioned_action = perception_pipeline.v2_14_context_conditioned_action:main",
+            "v2_15_context_action_ablation = perception_pipeline.v2_15_context_action_ablation:main",
         ],
     },
 )

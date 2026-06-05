@@ -1775,6 +1775,42 @@ publishes /task_phase on a scripted 170s schedule). v2_13_v2 reaches
 multi-modal data. Artifacts in
 `diagnostics/perception_pipeline_v2_13_encoder_v2/`.
 
+## proposal_simulation_cell_v2_14_context_conditioned_guarded_action_validation
+
+Status: `context_conditioned_action_validated`
+
+The v2.14 proposal simulation sprint trains a phase classifier
+and per-phase target-joint regressor on the v2_13 encoder's
+32-dim latent. Implementation in
+`src/perception_pipeline/perception_pipeline/v2_14_context_conditioned_action.py`
+(console script `v2_14_context_conditioned_action`); launch wrapper
+`v2_14_context_conditioned_action.launch.py`; spec doc
+`docs/v2_14_context_conditioned_action.md`. v1 baseline on
+synthetic multi-phase dataset: phase classifier test accuracy
+1.000, test CE 0.0147, per-phase joint regressor test MSE
+0.000000 (target = per-phase mean = initial pose on the frozen
+arm). Artifacts in
+`diagnostics/perception_pipeline_v2_14_action/`.
+
+## proposal_simulation_cell_v2_15_context_action_ablation_validation
+
+Status: `context_action_ablation_validated`
+
+The v2.15 proposal simulation sprint is an A/B ablation that
+trains two heads on the same multi-phase dataset, comparing the
+v2_14 architecture (with the v2_13 frozen encoder, input_dim=32)
+against a raw 74-dim input baseline. Implementation in
+`src/perception_pipeline/perception_pipeline/v2_15_context_action_ablation.py`
+(console script `v2_15_context_action_ablation`); launch wrapper
+`v2_15_context_action_ablation.launch.py`; spec doc
+`docs/v2_15_context_action_ablation.md`. Result: with-encoder
+test_acc=1.000, baseline test_acc=1.000, delta=+0.000 (the
+encoder pre-training is at parity with the raw-input baseline on
+the synthetic multi-phase dataset; this is expected because
+`phase_int` is directly in the 74-dim context vector and is
+trivially learnable without a bottleneck). Artifacts in
+`diagnostics/perception_pipeline_v2_15_ablation/`.
+
 ## proposal_simulation_cell_v2_12_context_vector_extraction
 
 Status: `context_vector_extraction_validated`

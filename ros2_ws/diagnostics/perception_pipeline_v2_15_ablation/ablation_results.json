@@ -1,0 +1,362 @@
+{
+  "version": "v2_15",
+  "ablation": "with_v2_13_encoder vs raw_74_dim_input",
+  "dataset": "diagnostics/perception_pipeline_synthetic_multiphase_v1/context_log.parquet",
+  "encoder_pt": "diagnostics/perception_pipeline_v2_13_encoder_v2/encoder.pt",
+  "scaler_json": "diagnostics/perception_pipeline_v2_13_encoder_v2/scaler.json",
+  "n_rows": 4303,
+  "n_train": 3442,
+  "n_test": 861,
+  "epochs": 200,
+  "batch_size": 64,
+  "lr": 0.001,
+  "seed": 0,
+  "with_encoder": {
+    "input_dim": 32,
+    "final_test_acc": 1.0,
+    "final_test_ce": 0.015576241070644781,
+    "final_test_mse": 9.564058736212797e-07,
+    "per_class_metrics": {
+      "0": {
+        "support": 0,
+        "predicted_count": 0,
+        "true_positive": 0,
+        "precision": 0.0,
+        "recall": 0.0
+      },
+      "1": {
+        "support": 116,
+        "predicted_count": 116,
+        "true_positive": 116,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "2": {
+        "support": 85,
+        "predicted_count": 85,
+        "true_positive": 85,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "3": {
+        "support": 168,
+        "predicted_count": 168,
+        "true_positive": 168,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "4": {
+        "support": 52,
+        "predicted_count": 52,
+        "true_positive": 52,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "5": {
+        "support": 122,
+        "predicted_count": 122,
+        "true_positive": 122,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "6": {
+        "support": 94,
+        "predicted_count": 94,
+        "true_positive": 94,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "7": {
+        "support": 0,
+        "predicted_count": 0,
+        "true_positive": 0,
+        "precision": 0.0,
+        "recall": 0.0
+      },
+      "8": {
+        "support": 224,
+        "predicted_count": 224,
+        "true_positive": 224,
+        "precision": 1.0,
+        "recall": 1.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        116,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        85,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        168,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        52,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        122,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        94,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        224
+      ]
+    ]
+  },
+  "baseline": {
+    "input_dim": 74,
+    "final_test_acc": 1.0,
+    "final_test_ce": 0.011781233517533119,
+    "final_test_mse": 2.887634811727192e-06,
+    "per_class_metrics": {
+      "0": {
+        "support": 0,
+        "predicted_count": 0,
+        "true_positive": 0,
+        "precision": 0.0,
+        "recall": 0.0
+      },
+      "1": {
+        "support": 116,
+        "predicted_count": 116,
+        "true_positive": 116,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "2": {
+        "support": 85,
+        "predicted_count": 85,
+        "true_positive": 85,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "3": {
+        "support": 168,
+        "predicted_count": 168,
+        "true_positive": 168,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "4": {
+        "support": 52,
+        "predicted_count": 52,
+        "true_positive": 52,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "5": {
+        "support": 122,
+        "predicted_count": 122,
+        "true_positive": 122,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "6": {
+        "support": 94,
+        "predicted_count": 94,
+        "true_positive": 94,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "7": {
+        "support": 0,
+        "predicted_count": 0,
+        "true_positive": 0,
+        "precision": 0.0,
+        "recall": 0.0
+      },
+      "8": {
+        "support": 224,
+        "predicted_count": 224,
+        "true_positive": 224,
+        "precision": 1.0,
+        "recall": 1.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        116,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        85,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        168,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        52,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        122,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        94,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        224
+      ]
+    ]
+  },
+  "delta_test_acc": 0.0,
+  "delta_test_ce": 0.003795007553111662,
+  "delta_test_mse": -1.931228938105912e-06,
+  "created_utc": 1780619519
+}

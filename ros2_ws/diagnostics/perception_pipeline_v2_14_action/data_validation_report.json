@@ -1,0 +1,29 @@
+{
+  "n_rows": 4305,
+  "n_features": 74,
+  "any_nan": false,
+  "any_inf": false,
+  "phase_unique": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    8
+  ],
+  "phase_counts": {
+    "0": 2,
+    "1": 600,
+    "2": 400,
+    "3": 800,
+    "4": 300,
+    "5": 599,
+    "6": 400,
+    "8": 1204
+  },
+  "n_phase_classes": 8,
+  "n_rows_dropped_unknown_phase": 0,
+  "input_path": "diagnostics/perception_pipeline_synthetic_multiphase_v1/context_log.parquet"
+}
