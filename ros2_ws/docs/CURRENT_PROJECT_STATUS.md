@@ -1410,3 +1410,132 @@ requires a `2.4145 rad` joint-space move and did not satisfy the strict 2 mm XY
 stability gate before timeout. The next milestone should improve start-pose
 trajectory timing/settling or split the move through a clear staging posture,
 while preserving the hard-force abort and no-contact gate.
+
+## 2026-06-05 Phase 5/6 Perception Pipeline (v2_11 -> v2_15)
+
+This section logs the offline perception / context-encoder work that
+moves the project from the v2_10 search-tuning matrix into the Phase
+5/6 multimodal-observation + context-encoder + context-conditioned
+action pipeline. The JTC is fixed (e10960f reverts the bad velocity
+state from default config), so the arm actually moves; the new
+binding constraint is the 1mm/2mm cartesian precision ceiling, which
+blocks real SEARCH/INSERT/ABORT labeled trials.
+
+### v2_11 multimodal observation logger
+
+  `src/perception_pipeline/perception_pipeline/multimodal_observation_logger.py`
+  subscribes to `/d405/color/image_raw`,
+  `/d405/depth/image_rect_raw`, `/joint_states`, `/ft_sensor_wrench`,
+  `/task_phase`, `/safety_status`; writes 20 Hz CSV with base64-PNG
+  RGB (64x48) and depth stats. Passive observer, no Gazebo change
+  needed (D405 was already in `peg_in_hole_world.sdf` and bridged).
+  Sidecar-enabled via `enable_perception_logging:=true` in
+  `research_baseline.launch.py`.
+  Fix: `src/perception_pipeline/setup.cfg` now has
+  `[install] install_scripts=$base/lib/perception_pipeline` so
+  ament_python installs console scripts to `lib/<pkg>/`, not `bin/`.
+
+### v2_12 context vector extractor
+
+  `src/perception_pipeline/perception_pipeline/context_vector_extractor.py`
+  offline CSV -> parquet, fixed-length CONTEXT_DIM=74 context vector
+  per tick:
+    [0:48]   RGB (8x6 grayscale)
+    [48:54]  depth (w, h, min, max, roi_min, roi_max)
+    [54:60]  wrench (fx,fy,fz,tx,ty,tz)
+    [60:66]  joint position
+    [66:72]  joint velocity
+    [72]     phase_int
+    [73]     safety_int
+  NaN->0, +-inf->+-1e6; JSON safety_status parsing; phase aliases
+  (MOVING_TO_START, INSERTING, RETREAT, DONE, IDLE, CHECK_ALIGNMENT).
+
+### v2_13 self-supervised context encoder
+
+  `src/perception_pipeline/perception_pipeline/v2_13_context_encoder.py`
+  74 -> 32 -> 74 MLP autoencoder. Preprocessing: drop empty-camera
+  rows (rgb_sum<1, depth_w=0, depth_h=0); log1p on depth values
+  50-53; min-max scaling (robust to remaining depth outliers).
+  Model: hidden (32, 32), ReLU + Dropout 0.05, Adam lr 1e-3
+  weight_decay 1e-4, batch 64, 200 epochs, deterministic 80/20
+  split (seed=0).
+  v1 baseline (single-phase v3 motion trial, 3330 valid rows):
+    train_mse=0.0035, test_mse=0.0024 in normalized [0,1] space.
+  v2 baseline (synthetic multi-phase trial, 4303 valid rows):
+    train_mse=0.0070, test_mse=0.0061.
+
+### Synthetic multi-phase trial
+
+  `src/thesis_bringup/thesis_bringup/synthetic_phase_publisher.py`
+  passive publisher that emits /task_phase on a scripted schedule
+  (YAML or builtin 6-step default). Uses sim time. Auto-stops at
+  the end of the schedule. Wired into `research_baseline.launch.py`
+  as `enable_synthetic_phases:=true`; when enabled, the
+  admittance_insertion_node is excluded from the event chain to
+  avoid /task_phase conflict.
+  `src/thesis_bringup/launch/run_synthetic_multiphase_trial.launch.py`
+  is the convenience entry. `synthetic_phase_schedule_v1.yaml` is
+  the 170s schedule (MOVE_TO_START 30s -> APPROACH 20s -> SEARCH
+  40s -> HOVER_ABOVE_HOLE 15s -> INSERT 30s -> INSERTED 10s ->
+  RETREAT 10s -> ABORT 15s). The recorded CSV (10 MB, 4305 rows)
+  spans 7 distinct phases and is the v2_14/v2_15 training data.
+  Arm does NOT execute controller commands in this trial; the
+  /task_phase labels are time-window proxies, not real
+  motor-actuated phases.
+
+### v2_14 context-conditioned action
+
+  `src/perception_pipeline/perception_pipeline/v2_14_context_conditioned_action.py`
+  Loads the v2_13_v2 frozen encoder; trains a small PhaseHead MLP
+  on the 32-dim latent with two output heads (classifier 9-class
+  CE + regressor 6-dim MSE for per-phase target joint pose).
+  Baseline on synthetic multi-phase dataset:
+    test_acc=1.000, test_ce=0.0147, test_mse=0.000000.
+  100% test accuracy is partly because phase_int is directly in
+  the 74-dim context vector (index 72); the classifier can read
+  it off without a bottleneck. The pipeline (encoder bottleneck +
+  head) is validated.
+
+### v2_15 ablation (with-encoder vs raw 74-dim input)
+
+  `src/perception_pipeline/perception_pipeline/v2_15_context_action_ablation.py`
+  A. with_encoder (input_dim=32): test_acc=1.000, test_ce=0.0156.
+  B. baseline (input_dim=74):   test_acc=1.000, test_ce=0.0118.
+  delta_test_acc=+0.000; delta_test_ce=+0.0038 (A slightly higher).
+  Interpretation: encoder pre-training is at parity with the raw
+  baseline on the synthetic dataset, as expected when the phase
+  label is directly in the input. A real ablation requires a
+  multi-phase dataset where the phase is IMPLICIT in the sensor
+  data, not declared by the publisher; that dataset is not
+  reachable in the current simulation (the working JTC's 1mm/2mm
+  precision ceiling blocks real SEARCH/INSERT/ABORT trials).
+
+### Critical context
+
+  The JTC was broken (silently failed to activate) from commit
+  `6347194` until `e10960f`. Every SEARCH diagnostic since
+  `6347194` was measuring a non-existent controller. The 4-lever
+  matrix result (1mm unreachable across D-term, position gain,
+  controller type, velocity source) stands, but the "velocity
+  state injection in default config" lever was always a config
+  bug, not a tested lever. `GazeboSimSystem` does not export
+  velocity state by default; the explicit
+  `inject_velocity_state:=true` path uses an URDF injection
+  that does work and is preserved for that use.
+
+  `[controller_manager]: Unable to activate controller
+  'joint_trajectory_controller' since the state interface
+  'joint_1/velocity' is not available.` is the exact error to
+  grep for if JTC stops working again.
+
+### Artifacts
+
+  diagnostics/perception_pipeline_d405_smoke/         25s smoke, 183 rows
+  diagnostics/perception_pipeline_labeled_trial_v1/  35s, arm frozen
+  diagnostics/perception_pipeline_labeled_trial_v2/  180s, arm frozen
+  diagnostics/perception_pipeline_motion_trial_v3/   360s, working JTC, 3331 rows
+  diagnostics/perception_pipeline_v2_13_encoder/     v1 single-phase baseline
+  diagnostics/perception_pipeline_synthetic_multiphase_v1/  10 MB multi-phase CSV
+  diagnostics/perception_pipeline_v2_13_encoder_v2/ v2 multi-phase baseline
+  diagnostics/perception_pipeline_v2_14_action/      v2_14 phase classifier
+  diagnostics/perception_pipeline_v2_15_ablation/    v2_15 A vs B
