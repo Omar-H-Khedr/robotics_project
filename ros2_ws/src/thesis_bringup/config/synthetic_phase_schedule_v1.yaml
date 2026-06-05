@@ -1,0 +1,17 @@
+schedule:
+  - phase: MOVE_TO_START
+    duration_s: 30.0
+  - phase: APPROACH
+    duration_s: 20.0
+  - phase: SEARCH
+    duration_s: 40.0
+  - phase: HOVER_ABOVE_HOLE
+    duration_s: 15.0
+  - phase: INSERT
+    duration_s: 30.0
+  - phase: INSERTED
+    duration_s: 10.0
+  - phase: RETREAT
+    duration_s: 10.0
+  - phase: ABORT
+    duration_s: 15.0

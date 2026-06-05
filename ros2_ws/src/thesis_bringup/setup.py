@@ -24,6 +24,7 @@ setup(
     entry_points={
         "console_scripts": [
             "spawn_robot_sdf = thesis_bringup.spawn_robot_sdf:main",
+            "synthetic_phase_publisher = thesis_bringup.synthetic_phase_publisher:main",
             "above_hole_hold_analyzer = thesis_bringup.above_hole_hold_analyzer:main",
             "approach_tracking_analyzer = thesis_bringup.approach_tracking_analyzer:main",
             "endpoint_hold_dynamics_analyzer = thesis_bringup.endpoint_hold_dynamics_analyzer:main",

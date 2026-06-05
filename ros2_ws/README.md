@@ -1765,6 +1765,16 @@ empty-camera filter) the autoencoder reaches `train_mse=0.0035`,
 `test_mse=0.0024` in normalized [0,1] space, with smoke test
 confirming the 32-dim latent and 74-dim reconstruction shapes.
 
+A v2_13_v2 multi-phase variant is trained on
+`diagnostics/perception_pipeline_synthetic_multiphase_v1/context_log.parquet`
+(4305 rows, 7 distinct phases) produced by the
+`run_synthetic_multiphase_trial.launch.py` (replaces
+admittance_insertion_node with synthetic_phase_publisher, which
+publishes /task_phase on a scripted 170s schedule). v2_13_v2 reaches
+`train_mse=0.0070`, `test_mse=0.0061`; the higher MSE reflects
+multi-modal data. Artifacts in
+`diagnostics/perception_pipeline_v2_13_encoder_v2/`.
+
 ## proposal_simulation_cell_v2_12_context_vector_extraction
 
 Status: `context_vector_extraction_validated`

@@ -536,6 +536,23 @@ def launch_setup(context, *args, **kwargs):
         condition=IfCondition(LaunchConfiguration("enable_perception_logging")),
     )
 
+    synthetic_phase_publisher_node = Node(
+        package="thesis_bringup",
+        executable="synthetic_phase_publisher",
+        parameters=[
+            {
+                "use_sim_time": simulation["use_sim_time"],
+                "schedule_path": LaunchConfiguration("synthetic_phase_schedule_path"),
+                "publish_rate_hz": 10.0,
+                "loop": False,
+                "autostop": True,
+                "topic": "/task_phase",
+            }
+        ],
+        output="screen",
+        condition=IfCondition(LaunchConfiguration("enable_synthetic_phases")),
+    )
+
     admittance_insertion = Node(
         package="kuka_task_control",
         executable="admittance_insertion_node",
@@ -621,7 +638,8 @@ def launch_setup(context, *args, **kwargs):
                 OnProcessExit(
                     target_action=position_controller,
                     on_exit=[trajectory_position_bridge, admittance_insertion],
-                )
+                ),
+                condition=UnlessCondition(LaunchConfiguration("enable_synthetic_phases")),
             ),
         ]
     else:
@@ -636,7 +654,8 @@ def launch_setup(context, *args, **kwargs):
                 OnProcessExit(
                     target_action=joint_trajectory_controller,
                     on_exit=[admittance_insertion],
-                )
+                ),
+                condition=UnlessCondition(LaunchConfiguration("enable_synthetic_phases")),
             ),
         ]
     actions.extend(event_chain)
@@ -646,6 +665,7 @@ def launch_setup(context, *args, **kwargs):
         wrench_state_observer,
         contact_state_observer,
         perception_observation_logger,
+        synthetic_phase_publisher_node,
     ])
     return actions
 
@@ -819,6 +839,31 @@ def generate_launch_description():
                 description=(
                     "Output directory for multimodal_observation_log.csv "
                     "when enable_perception_logging is true."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "enable_synthetic_phases",
+                default_value="false",
+                description=(
+                    "If true, spawn synthetic_phase_publisher from "
+                    "thesis_bringup to publish /task_phase on a scripted "
+                    "schedule (MOVE_TO_START -> APPROACH -> SEARCH -> "
+                    "INSERT -> INSERTED -> ABORT by default). Combined with "
+                    "enable_perception_logging=true, this produces a "
+                    "multi-phase labeled CSV for v2_14 / v2_15 offline "
+                    "training. The synthetic_phase_publisher and the "
+                    "admittance_insertion_node both publish /task_phase; "
+                    "in synthetic mode, the launch file excludes the "
+                    "admittance_insertion_node so there is no conflict."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "synthetic_phase_schedule_path",
+                default_value="",
+                description=(
+                    "Optional YAML file with top-level 'schedule:' list of "
+                    "{phase, duration_s} entries to override the builtin "
+                    "default schedule of synthetic_phase_publisher."
                 ),
             ),
             OpaqueFunction(function=launch_setup),
