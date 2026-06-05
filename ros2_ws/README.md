@@ -42,6 +42,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | proposal_simulation_cell_v2_14_context_conditioned_guarded_action_validation | Completed |
 | proposal_simulation_cell_v2_15_context_action_ablation_validation | Completed |
 | proposal_simulation_cell_v2_16_guarded_peg_in_hole_objective_validation | Completed (no peg insertion) |
+| live_v2_14_inference_node_validation | Completed (62.6% live accuracy) |
 | research_baseline_v0_1_lbr_iisy6_r1300_end_to_end_fixes | Completed |
 | research_baseline_v0_2_camera_visual_size_fix | Completed |
 | admittance_controller_v2_honest_tracking_and_contact_estimation | Implemented; first insertion-depth event observed; repeat validation pending |
@@ -2070,3 +2071,38 @@ The v1.5 proposal simulation sprint adds a simulation-only runtime safety and vi
 Evidence is stored in `ros2_ws/diagnostics/proposal_simulation_cell_v1_5/`. The validated run used Gazebo fallback because Isaac Sim was unavailable. The contact wrench topic and sample were available, the maximum observed force was `0.0981000000182301 N`, and the final contact state was `contact_below_threshold` against the configured `0.1 N` detection threshold.
 
 Safety constraints are enforced in config and diagnostics: `command_output_enabled=false`, `motion_execution_enabled=false`, no MoveIt, no `/compute_ik`, no controllers, no real robot execution, no `FollowJointTrajectory`, and no command execution.
+
+## live_v2_14_inference_node_validation
+
+This sprint validates the v2_13 encoder and v2_14 head as a live ROS2 node in the research baseline. The live node is a passive inference component: it subscribes to the same topics as the multimodal_observation_logger, computes the 74-dim context vector on the fly, loads the v2_13_v2 encoder and the v2_14 action classifier, and publishes the predicted phase + target joint pose + latent at 20 Hz. It does NOT publish JointTrajectory corrections to the JTC (closed-loop control is a follow-up).
+
+### Files
+
+  src/perception_pipeline/perception_pipeline/context_vector.py
+  src/perception_pipeline/perception_pipeline/live_v2_14_inference_node.py
+  src/thesis_bringup/launch/run_live_v2_14_trial.launch.py
+  src/thesis_bringup/thesis_bringup/live_v2_14_ablation_analyzer.py
+
+### Live trial result
+
+  170s synthetic multi-phase trial (same schedule as training data), arm frozen, 4904 valid ticks.
+  overall_accuracy = 0.626
+  per_class (precision, recall, support):
+    MOVE_TO_START:    1.00, 0.03, 600  (cold-start artifact)
+    APPROACH:         0.33, 0.50, 400
+    SEARCH:           0.54, 0.57, 800
+    HOVER_ABOVE_HOLE: 0.27, 0.50, 300
+    INSERT:           0.50, 0.49, 600
+    INSERTED:         0.43, 0.48, 400
+    ABORT:            0.96, 0.98, 1804
+
+  Confusion is concentrated on adjacent phase boundaries. Diagonal is dominant in every row except MOVE_TO_START (cold-start artifact).
+
+  62.6% live accuracy is well below 100% offline test accuracy because the live input distribution differs in 3 known ways: joint velocities are NaN (Gazebo's default joint_state_broadcaster does not export velocity state), depth has inf values for invalid pixels, and the encoder bottleneck forces a lossy representation. The live node now sanitizes NaN/inf to 0.0 to match the offline v2_12 extractor convention.
+
+  Evidence is stored in `ros2_ws/diagnostics/perception_pipeline_live_v2_14_v1/`:
+    multimodal/multimodal_observation_log.csv (10 MB, 4804 rows)
+    inference/live_v2_14_inference_log.csv (8 MB, 4904 rows)
+    ablation/live_v2_14_ablation_summary.json
+    ablation/live_v2_14_confusion_matrix.png
+    ablation/live_v2_14_per_phase_target_mse.png

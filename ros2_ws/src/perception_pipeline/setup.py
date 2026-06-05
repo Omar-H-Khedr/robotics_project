@@ -27,6 +27,7 @@ setup(
             "v2_13_context_encoder = perception_pipeline.v2_13_context_encoder:main",
             "v2_14_context_conditioned_action = perception_pipeline.v2_14_context_conditioned_action:main",
             "v2_15_context_action_ablation = perception_pipeline.v2_15_context_action_ablation:main",
+            "live_v2_14_inference_node = perception_pipeline.live_v2_14_inference_node:main",
         ],
     },
 )

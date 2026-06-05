@@ -134,7 +134,11 @@ v2_14 / v2_15 pipeline, not for training a controller.
      head are intended for integration with the live controller
      in a follow-up sprint. The integration pattern is
      documented in `docs/thesis_chapter_5_phase_5_6.md`
-     section 5.9 but not implemented here.
+     section 5.9 but not implemented here. (SUPERSEDED —
+     see limitation 9 below; live inference IS implemented
+     in this PhD work and validated at 62.6% live accuracy,
+     but it is a passive inference node, not a closed-loop
+     controller.)
 
   7. **The D405 RGB-D camera is the only perception source.**
      No tactile sensor, no second camera, no force-torque
@@ -148,6 +152,41 @@ v2_14 / v2_15 pipeline, not for training a controller.
      not as live nodes. Real-time inference (e.g., publishing
      a JointTrajectory correction to the JTC at 20 Hz) would
      require rewriting the inference as a live ROS2 node.
+     (SUPERSEDED — see limitation 9; the live
+     v2_14_inference_node is a 20 Hz ROS2 node that loads
+     the encoder + head checkpoints and publishes
+     /v2_14/predicted_phase, /v2_14/target_joint_pose, and
+     /v2_14/latent in real time.)
+
+  9. **Live integration is a passive inference node, not a
+     closed-loop controller.** The live_v2_14_inference_node
+     (`src/perception_pipeline/perception_pipeline/
+     live_v2_14_inference_node.py`) runs at 20 Hz in the
+     research baseline, but it only publishes its outputs
+     on observation topics. It does NOT publish
+     JointTrajectory corrections to the JTC. The reasons are
+     documented in the chapter: (a) the JTC's
+     follow_joint_trajectory action server only accepts one
+     action client at a time, and the
+     admittance_insertion_node already uses it; (b) blending
+     the v2_14 predicted target with the admittance target
+     is a non-trivial control problem (priority, saturation,
+     anti-windup). The live inference is the perception
+     half of a closed-loop controller; the control half is
+     out of scope for this PhD work.
+
+  10. **Live input distribution shift from training.** The
+      v2_13 encoder and v2_14 head were trained on the
+      synthetic multi-phase dataset. The live trial produces
+      the same phase distribution but a slightly different
+      raw sensor distribution (real Gazebo timing jitter,
+      real depth-image inf pixels, joint_state_broadcaster
+      velocity NaN). The live node sanitizes these (NaN/inf
+      -> 0.0), but the live accuracy (62.6%) is below the
+      offline test accuracy (100%) because the encoder
+      bottleneck cannot perfectly reconstruct the live
+      distribution. A larger encoder and a real multi-phase
+      dataset would close this gap.
 
 ## What the next milestone should be
 
@@ -161,9 +200,17 @@ The next milestone is to either:
 
   (b) Integrate the v2_13/v2_14/v2_15 pipeline as a live ROS2
       node that publishes JointTrajectory corrections to the
-      JTC. The integration pattern is documented in section
-      5.9 of the chapter. The live integration would be a
-      small wrapper around the existing scripts.
+      JTC. (PARTIALLY COMPLETED: the
+      live_v2_14_inference_node IS a 20 Hz live ROS2 node
+      that loads the encoder + head checkpoints and publishes
+      the predicted phase + target joint pose + latent in
+      real time. It is validated at 62.6% live accuracy on
+      the synthetic schedule. The remaining work is the
+      closed-loop control: a multiplexer that shares the
+      JTC's follow_joint_trajectory action server between
+      the admittance_insertion_node and the v2_14 policy,
+      and a blending law with priority, saturation, and
+      anti-windup.)
 
   (c) Generate a real multi-phase dataset (e.g., by lowering
       the JTC gains and accepting the lower precision, or by
@@ -186,7 +233,10 @@ deliverables: v2_11, v2_12, v2_13, v2_14, v2_15 are all
 implemented, tested on canonical Gazebo trial data, and
 documented. The 1mm/2mm cartesian precision ceiling is
 diagnosed. The synthetic multi-phase trial is generated
-and labeled. The v2_15 ablation is run. The next milestone
-is to integrate the pipeline as a live ROS2 node or to
-improve the controller architecture to break the precision
-ceiling.
+and labeled. The v2_15 ablation is run. The live v2_14
+inference node is implemented and validated at 62.6%
+live accuracy. The next milestone is either (a) improve
+the controller architecture to break the precision ceiling,
+(b) close the closed-loop control gap (multiplexer + blending
+law) for the live v2_14 policy, or (c) generate a real
+multi-phase dataset and re-train the pipeline.

@@ -553,6 +553,29 @@ def launch_setup(context, *args, **kwargs):
         condition=IfCondition(LaunchConfiguration("enable_synthetic_phases")),
     )
 
+    live_v2_14_inference_node = Node(
+        package="perception_pipeline",
+        executable="live_v2_14_inference_node",
+        parameters=[
+            {
+                "use_sim_time": simulation["use_sim_time"],
+                "encoder_pt": LaunchConfiguration("v2_14_encoder_pt"),
+                "scaler_json": LaunchConfiguration("v2_14_scaler_json"),
+                "action_classifier_pt": LaunchConfiguration("v2_14_action_classifier_pt"),
+                "output_dir": LaunchConfiguration("v2_14_live_inference_dir"),
+                "rate_hz": 20.0,
+                "rgb_topic": "/d405/color/image_raw",
+                "depth_topic": "/d405/depth/image_rect_raw",
+                "joint_state_topic": "/joint_states",
+                "ft_topic": "/ft_sensor_wrench",
+                "task_phase_topic": "/task_phase",
+                "safety_status_topic": "/safety_status",
+            }
+        ],
+        output="screen",
+        condition=IfCondition(LaunchConfiguration("enable_v2_14_live_inference")),
+    )
+
     admittance_insertion = Node(
         package="kuka_task_control",
         executable="admittance_insertion_node",
@@ -666,6 +689,7 @@ def launch_setup(context, *args, **kwargs):
         contact_state_observer,
         perception_observation_logger,
         synthetic_phase_publisher_node,
+        live_v2_14_inference_node,
     ])
     return actions
 
@@ -865,6 +889,43 @@ def generate_launch_description():
                     "{phase, duration_s} entries to override the builtin "
                     "default schedule of synthetic_phase_publisher."
                 ),
+            ),
+            DeclareLaunchArgument(
+                "enable_v2_14_live_inference",
+                default_value="false",
+                description=(
+                    "If true, spawn live_v2_14_inference_node from "
+                    "perception_pipeline. Subscribes to /d405/*, /joint_states, "
+                    "/ft_sensor_wrench, /task_phase, /safety_status; loads the "
+                    "v2_13_v2 frozen encoder and v2_14 PhaseHead; publishes "
+                    "/v2_14/predicted_phase (String), /v2_14/target_joint_pose "
+                    "(Float64MultiArray, 6 floats), and /v2_14/latent "
+                    "(Float64MultiArray, 32 floats); logs a CSV with "
+                    "ground-truth and predicted phase per tick. This is a "
+                    "passive inference node: it does not publish "
+                    "JointTrajectory corrections. The integration with the "
+                    "JTC is a follow-up milestone."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "v2_14_live_inference_dir",
+                default_value="diagnostics/perception_pipeline_live_v2_14_v1",
+                description=(
+                    "Output directory for the live_v2_14_inference_log.csv "
+                    "when enable_v2_14_live_inference is true."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "v2_14_encoder_pt",
+                default_value="diagnostics/perception_pipeline_v2_13_encoder_v2/encoder.pt",
+            ),
+            DeclareLaunchArgument(
+                "v2_14_scaler_json",
+                default_value="diagnostics/perception_pipeline_v2_13_encoder_v2/scaler.json",
+            ),
+            DeclareLaunchArgument(
+                "v2_14_action_classifier_pt",
+                default_value="diagnostics/perception_pipeline_v2_14_action/action_classifier.pt",
             ),
             OpaqueFunction(function=launch_setup),
         ]

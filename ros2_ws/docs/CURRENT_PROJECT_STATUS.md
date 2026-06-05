@@ -1539,3 +1539,89 @@ blocks real SEARCH/INSERT/ABORT labeled trials.
   diagnostics/perception_pipeline_v2_13_encoder_v2/ v2 multi-phase baseline
   diagnostics/perception_pipeline_v2_14_action/      v2_14 phase classifier
   diagnostics/perception_pipeline_v2_15_ablation/    v2_15 A vs B
+
+## 2026-06-05 Live v2_14 Inference and Integration
+
+The v2_13 encoder and v2_14 head are validated as a live
+ROS2 node. The integration is implemented and tested in
+the research baseline. The live node is a passive
+inference component: it subscribes to the same topics
+as the multimodal_observation_logger, computes the
+74-dim context vector on the fly, loads the v2_13_v2
+encoder and the v2_14 action classifier, and publishes
+the predicted phase + target joint pose + latent at 20
+Hz. It does NOT publish JointTrajectory corrections
+to the JTC (closed-loop control is a follow-up).
+
+### Files added
+
+  src/perception_pipeline/perception_pipeline/context_vector.py
+    Shared 74-dim utilities used by both v2_12 offline
+    and the live node. CONTEXT_DIM=74, PHASE_ENUM,
+    SAFETY_ENUM, DEPTH_VALUE_INDICES, DEPTH_CLIP_VALUE,
+    NUM_PHASE_CLASSES, encode_rgb_to_48,
+    summarize_depth_msg, phase_to_int, safety_to_int,
+    decode_rgb_b64_png, summarize_depth_csv_row.
+
+  src/perception_pipeline/perception_pipeline/live_v2_14_inference_node.py
+    ROS2 node at 20 Hz. Subscribes to D405 + joint_states
+    + ft_sensor_wrench + /task_phase + /safety_status.
+    Loads encoder.pt + scaler.json + action_classifier.pt.
+    Publishes /v2_14/predicted_phase (String),
+    /v2_14/target_joint_pose (Float64MultiArray, 6 floats),
+    /v2_14/latent (Float64MultiArray, 32 floats). Logs to
+    <live_inference_dir>/live_v2_14_inference_log.csv
+    with columns: stamp_s, tick_index, ground_truth_phase,
+    ground_truth_safety (level string), predicted_phase_int,
+    predicted_phase_name, target_joint_1..6.
+
+  src/thesis_bringup/launch/run_live_v2_14_trial.launch.py
+    Convenience launch wrapper (research_baseline +
+    perception_logging + synthetic_phases +
+    live_v2_14_inference, all enabled).
+
+  src/thesis_bringup/thesis_bringup/live_v2_14_ablation_analyzer.py
+    Offline analyzer. Reads the inference log CSV, reports
+    confusion matrix, per-class metrics, per-phase target
+    stats, JSON summary + 2 PNGs (confusion, per-phase MSE).
+
+### Live trial result
+
+  170s synthetic multi-phase trial (same schedule as
+  training data), arm frozen, 4904 valid ticks.
+
+  overall_accuracy = 0.626
+  per_class (precision, recall, support):
+    MOVE_TO_START:    1.00, 0.03, 600  (cold-start artifact)
+    APPROACH:         0.33, 0.50, 400
+    SEARCH:           0.54, 0.57, 800
+    HOVER_ABOVE_HOLE: 0.27, 0.50, 300
+    INSERT:           0.50, 0.49, 600
+    INSERTED:         0.43, 0.48, 400
+    ABORT:            0.96, 0.98, 1804
+
+  Confusion is concentrated on adjacent phase boundaries
+  (SEARCH <-> HOVER_ABOVE_HOLE, INSERT <-> INSERTED,
+  MOVE_TO_START -> APPROACH at cold start). Diagonal is
+  dominant in every row except MOVE_TO_START.
+
+  62.6% live accuracy is well below 100% offline test
+  accuracy because the live input distribution differs
+  in 3 known ways: joint velocities are NaN (Gazebo's
+  default joint_state_broadcaster), depth has inf values
+  for invalid pixels, and the encoder bottleneck forces
+  a lossy representation. The live node now sanitizes
+  NaN/inf to 0.0 to match the offline v2_12 extractor
+  convention.
+
+### Artifacts
+
+  diagnostics/perception_pipeline_live_v2_14_v1/
+    multimodal/
+      multimodal_observation_log.csv (10 MB, 4804 rows)
+    inference/
+      live_v2_14_inference_log.csv (8 MB, 4904 rows)
+    ablation/
+      live_v2_14_ablation_summary.json
+      live_v2_14_confusion_matrix.png
+      live_v2_14_per_phase_target_mse.png
