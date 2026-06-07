@@ -119,6 +119,17 @@ gain retest:
   online gate;
 - the current-joint handoff source edit was reverted, so the diagnostic is
   retained only as SEARCH instability evidence.
+- the task node now writes online SEARCH gate counter/decision rows to
+  `search_gate_trace.csv` in `tracking_log_dir`, and the launch passes that
+  directory into `admittance_insertion_node`;
+- validation of this trace hook bypassed SEARCH because APPROACH reached
+  pre-insertion XY `0.0009 m`, so the trace file contained only its header;
+- the same run reached INSERT and failed safely before descent because handoff
+  XY `0.0016 m` did not remain within physical clearance for `8` ticks;
+- INSERT best estimated `0.0010 m` stability was `4` ticks and hold-like best
+  feedback was `5` ticks;
+- the trace hook is retained for the next SEARCH-entering run, but no insertion
+  success is claimed.
 
 Decision: the duplicate-controller startup/configuration fault and the
 non-default-cadence SEARCH hold-shortening bug are fixed. The INSERT handoff

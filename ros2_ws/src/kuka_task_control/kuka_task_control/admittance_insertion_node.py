@@ -41,10 +41,12 @@ DEPENDENCY-ORDERED FIXES (applied together because they are interdependent):
 
 from __future__ import annotations
 
+import csv
 import json
 import math
 import time
 from collections import deque
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -186,6 +188,7 @@ class AdmittanceInsertionNode(Node):
             'insert_handoff_timeout_s',
             self.INSERT_HANDOFF_TIMEOUT_S,
         )
+        self.declare_parameter('tracking_log_dir', '')
 
         self._contact_threshold: float = (
             self.get_parameter('contact_threshold').value
@@ -231,6 +234,9 @@ class AdmittanceInsertionNode(Node):
         self._insert_handoff_timeout_s: float = max(
             self._insert_handoff_hold_duration_s,
             float(self.get_parameter('insert_handoff_timeout_s').value),
+        )
+        self._tracking_log_dir: str = str(
+            self.get_parameter('tracking_log_dir').value or ''
         )
 
         self._state: str = self.IDLE
@@ -316,6 +322,9 @@ class AdmittanceInsertionNode(Node):
         self._search_convergence_ticks: int = 0
         self._search_recenter_attempts: int = 0
         self._search_stability_ready_s: float = 0.0
+        self._search_trace_writer: csv.DictWriter | None = None
+        self._search_trace_file = None
+        self._setup_search_gate_trace()
 
         period = 1.0 / self._control_rate
         self._timer = self.create_timer(period, self._control_loop)
@@ -334,8 +343,98 @@ class AdmittanceInsertionNode(Node):
             f'search_settle_duration_s={self._search_settle_duration_s:.1f}, '
             f'insert_handoff_hold_duration_s='
             f'{self._insert_handoff_hold_duration_s:.1f}, '
-            f'insert_handoff_timeout_s={self._insert_handoff_timeout_s:.1f}'
+            f'insert_handoff_timeout_s={self._insert_handoff_timeout_s:.1f}, '
+            f'tracking_log_dir={self._tracking_log_dir or "disabled"}'
         )
+
+    def _setup_search_gate_trace(self) -> None:
+        if not self._tracking_log_dir:
+            return
+        output_dir = Path(self._tracking_log_dir).expanduser()
+        try:
+            output_dir.mkdir(parents=True, exist_ok=True)
+            path = output_dir / 'search_gate_trace.csv'
+            self._search_trace_file = path.open(
+                'w',
+                encoding='utf-8',
+                newline='',
+            )
+            fields = [
+                'stamp_s',
+                'search_tick',
+                'state_entry_ticks',
+                'elapsed_s',
+                'settle_elapsed_s',
+                'ready_to_count',
+                'settling_window_active',
+                'command_still_running',
+                'search_step',
+                'recenter_attempts',
+                'convergence_ticks_before',
+                'convergence_ticks_after',
+                'xy_error_m',
+                'peg_z_m',
+                'stability_ready_s',
+                'decision',
+            ]
+            self._search_trace_writer = csv.DictWriter(
+                self._search_trace_file,
+                fieldnames=fields,
+                lineterminator='\n',
+            )
+            self._search_trace_writer.writeheader()
+            self._search_trace_file.flush()
+            self.get_logger().info(
+                f'SEARCH gate trace enabled: {path}'
+            )
+        except OSError as exc:
+            self._search_trace_writer = None
+            self._search_trace_file = None
+            self.get_logger().warn(
+                f'Could not open SEARCH gate trace in {output_dir}: {exc}'
+            )
+
+    def _write_search_gate_trace(
+        self,
+        *,
+        elapsed_s: float,
+        settle_elapsed_s: float,
+        ready_to_count: bool,
+        settling_window_active: bool,
+        command_still_running: bool,
+        convergence_before: int,
+        xy_error: float,
+        peg_z: float,
+        decision: str,
+    ) -> None:
+        if self._search_trace_writer is None or self._search_trace_file is None:
+            return
+        try:
+            self._search_trace_writer.writerow({
+                'stamp_s': f'{self._now_s():.9f}',
+                'search_tick': self._search_total_ticks,
+                'state_entry_ticks': self._state_entry_ticks,
+                'elapsed_s': f'{elapsed_s:.9f}',
+                'settle_elapsed_s': f'{settle_elapsed_s:.9f}',
+                'ready_to_count': int(ready_to_count),
+                'settling_window_active': int(settling_window_active),
+                'command_still_running': int(command_still_running),
+                'search_step': self._search_step,
+                'recenter_attempts': self._search_recenter_attempts,
+                'convergence_ticks_before': convergence_before,
+                'convergence_ticks_after': self._search_convergence_ticks,
+                'xy_error_m': f'{xy_error:.9f}',
+                'peg_z_m': f'{peg_z:.9f}',
+                'stability_ready_s': f'{self._search_stability_ready_s:.9f}',
+                'decision': decision,
+            })
+            self._search_trace_file.flush()
+        except OSError as exc:
+            self.get_logger().warn(
+                f'Disabling SEARCH gate trace after write failure: {exc}'
+            )
+            self._search_trace_writer = None
+            self._search_trace_file = None
 
     def _joint_states_cb(self, msg: JointState) -> None:
         positions_by_name = {
@@ -1015,6 +1114,7 @@ class AdmittanceInsertionNode(Node):
         if elapsed >= self.SEARCH_TIMEOUT_S:
             peg, _ = self._kinematics.pose(self.current_joints)
             xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
+            convergence_before = self._search_convergence_ticks
             if xy_err <= self.INSERT_FINAL_XY_TOLERANCE:
                 self._abort_reason = (
                     f'SEARCH timeout ({self.SEARCH_TIMEOUT_S:.0f}s). '
@@ -1030,6 +1130,17 @@ class AdmittanceInsertionNode(Node):
                     f'clearance {self.INSERT_FINAL_XY_TOLERANCE:.4f}m.'
                 )
             self.get_logger().error(self._abort_reason)
+            self._write_search_gate_trace(
+                elapsed_s=elapsed,
+                settle_elapsed_s=0.0,
+                ready_to_count=False,
+                settling_window_active=False,
+                command_still_running=False,
+                convergence_before=convergence_before,
+                xy_error=xy_err,
+                peg_z=float(peg[2]),
+                decision='timeout_abort',
+            )
             self._end_phase(False, xy_err, 0.0, True, self._abort_reason)
             self._set_state(self.ABORT)
             return
@@ -1058,9 +1169,23 @@ class AdmittanceInsertionNode(Node):
             self._state_entry_ticks += 1
             peg, _ = self._kinematics.pose(self.current_joints)
             xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
+            convergence_before = self._search_convergence_ticks
+            decision = 'settling_reset'
             if ready_to_count and xy_err <= self.INSERT_FINAL_XY_TOLERANCE:
                 self._search_convergence_ticks += 1
+                decision = 'settling_count'
                 if self._search_convergence_ticks >= self.SEARCH_CONVERGENCE_TICKS:
+                    self._write_search_gate_trace(
+                        elapsed_s=elapsed,
+                        settle_elapsed_s=search_settle_elapsed_s,
+                        ready_to_count=ready_to_count,
+                        settling_window_active=settling_window_active,
+                        command_still_running=command_still_running,
+                        convergence_before=convergence_before,
+                        xy_error=xy_err,
+                        peg_z=float(peg[2]),
+                        decision='settling_converged',
+                    )
                     self.get_logger().info(
                         f'SEARCH converged. XY error {xy_err:.4f}m within '
                         f'physical clearance for '
@@ -1084,6 +1209,17 @@ class AdmittanceInsertionNode(Node):
                     return
             else:
                 self._search_convergence_ticks = 0
+            self._write_search_gate_trace(
+                elapsed_s=elapsed,
+                settle_elapsed_s=search_settle_elapsed_s,
+                ready_to_count=ready_to_count,
+                settling_window_active=settling_window_active,
+                command_still_running=command_still_running,
+                convergence_before=convergence_before,
+                xy_error=xy_err,
+                peg_z=float(peg[2]),
+                decision=decision,
+            )
             if self._state_entry_ticks % 10 == 0:
                 self.get_logger().info(
                     f'SEARCH settling: xy_error={xy_err:.4f}m, stable='
@@ -1117,10 +1253,22 @@ class AdmittanceInsertionNode(Node):
 
         peg, _ = self._kinematics.pose(self.current_joints)
         xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
+        convergence_before = self._search_convergence_ticks
         if ready_to_count and xy_err <= self.INSERT_FINAL_XY_TOLERANCE:
             self._search_convergence_ticks += 1
             self._state_entry_ticks += 1
             if self._search_convergence_ticks >= self.SEARCH_CONVERGENCE_TICKS:
+                self._write_search_gate_trace(
+                    elapsed_s=elapsed,
+                    settle_elapsed_s=search_settle_elapsed_s,
+                    ready_to_count=ready_to_count,
+                    settling_window_active=settling_window_active,
+                    command_still_running=command_still_running,
+                    convergence_before=convergence_before,
+                    xy_error=xy_err,
+                    peg_z=float(peg[2]),
+                    decision='post_settle_converged',
+                )
                 self.get_logger().info(
                     f'SEARCH converged. XY error {xy_err:.4f}m within '
                     f'physical clearance for '
@@ -1142,6 +1290,17 @@ class AdmittanceInsertionNode(Node):
                 self._begin_phase(self.INSERT)
                 self._set_state(self.INSERT)
                 return
+            self._write_search_gate_trace(
+                elapsed_s=elapsed,
+                settle_elapsed_s=search_settle_elapsed_s,
+                ready_to_count=ready_to_count,
+                settling_window_active=settling_window_active,
+                command_still_running=command_still_running,
+                convergence_before=convergence_before,
+                xy_error=xy_err,
+                peg_z=float(peg[2]),
+                decision='post_settle_count',
+            )
             self.get_logger().info(
                 f'SEARCH post-settle hold: xy_error={xy_err:.4f}m, '
                 f'stable={self._search_convergence_ticks}/'
@@ -1174,6 +1333,17 @@ class AdmittanceInsertionNode(Node):
                 )
                 self._state_entry_ticks = 0
                 self._search_convergence_ticks = 0
+                self._write_search_gate_trace(
+                    elapsed_s=elapsed,
+                    settle_elapsed_s=search_settle_elapsed_s,
+                    ready_to_count=ready_to_count,
+                    settling_window_active=settling_window_active,
+                    command_still_running=command_still_running,
+                    convergence_before=convergence_before,
+                    xy_error=xy_err,
+                    peg_z=float(peg[2]),
+                    decision='recenter_command',
+                )
                 return
 
         offset_x = self._search_radius * math.cos(self._search_angle)
@@ -1193,6 +1363,17 @@ class AdmittanceInsertionNode(Node):
                 duration_s = 5.0
                 self._send_trajectory_goal(q, duration_s=duration_s)
                 self._search_stability_ready_s = self._now_s() + duration_s
+                self._write_search_gate_trace(
+                    elapsed_s=elapsed,
+                    settle_elapsed_s=search_settle_elapsed_s,
+                    ready_to_count=ready_to_count,
+                    settling_window_active=settling_window_active,
+                    command_still_running=command_still_running,
+                    convergence_before=convergence_before,
+                    xy_error=xy_err,
+                    peg_z=float(peg[2]),
+                    decision='spiral_command',
+                )
                 self.get_logger().info(
                     f'SEARCH step {self._search_step + 1}/{n_steps} '
                     f'radius={self._search_radius:.3f}m '
@@ -1201,6 +1382,17 @@ class AdmittanceInsertionNode(Node):
                 )
             else:
                 self._search_stability_ready_s = 0.0
+                self._write_search_gate_trace(
+                    elapsed_s=elapsed,
+                    settle_elapsed_s=search_settle_elapsed_s,
+                    ready_to_count=ready_to_count,
+                    settling_window_active=settling_window_active,
+                    command_still_running=command_still_running,
+                    convergence_before=convergence_before,
+                    xy_error=xy_err,
+                    peg_z=float(peg[2]),
+                    decision='spiral_ik_too_close',
+                )
                 self.get_logger().warn(
                     f'SEARCH step {self._search_step + 1}/{n_steps} '
                     f'radius={self._search_radius:.3f}m '

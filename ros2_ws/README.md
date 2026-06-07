@@ -26,6 +26,13 @@ before INSERT and no handoff command was published. The candidate source edit
 was reverted; the retained evidence is a SEARCH instability diagnostic, not an
 insertion milestone.
 
+The latest source milestone,
+`research_baseline_search_gate_trace_recenter8_gain3000_damping10_25hz_v1`,
+adds task-side SEARCH gate tracing to the existing `tracking_log_dir`. Its
+validation bypassed SEARCH and therefore produced only a trace header, then
+failed safely in INSERT handoff at `0.0016 m` XY against the `0.0010 m` gate.
+No insertion success is claimed.
+
 Operational note: after restoring tracked generated directories, clean and
 rebuild selected package build/install trees before runtime. A stale tracked
 `install/thesis_bringup` launch file was observed to launch the older iisy3
@@ -151,6 +158,36 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_done_shutdown_hook_v1 | Implemented operational hook: task node can exit after writing DONE and launch can shut down on task exit. Direct node smoke test passed; full launch repeat timed out in SEARCH with best 1 mm window 7 ticks, so launch shutdown-on-DONE still needed a DONE-reaching runtime repeat. |
 | research_baseline_search_post_settle_count_recenter8_gain3000_damping10_25hz_v1 | Completed sequencing fix, failed safely: SEARCH now preserves post-settle inside-clearance samples before issuing another command. The validation reached INSERT and launch exited with code 0 after final DONE status, but aborted before descent because INSERT handoff XY reached 0.0023 m and did not remain within the 0.0010 m clearance for 8 ticks. No insertion success claimed. |
 | research_baseline_current_joint_handoff_recenter8_gain3000_damping10_25hz_v1 | Rejected/unvalidated candidate: a current-joint INSERT handoff hold edit was built, but the validation failed closed in SEARCH before INSERT and no handoff command was published. Source reverted; diagnostic retained for SEARCH instability evidence. |
+| research_baseline_search_gate_trace_recenter8_gain3000_damping10_25hz_v1 | Completed diagnostic hook: the task node writes online SEARCH gate decisions to `search_gate_trace.csv` in `tracking_log_dir`. Validation bypassed SEARCH, so the trace had no rows; the run reached INSERT and failed safely at handoff with 4/8 best INSERT 1 mm ticks. No insertion success claimed. |
+
+## 2026-06-07 SEARCH Gate Trace Hook
+
+Milestone: `research_baseline_search_gate_trace_recenter8_gain3000_damping10_25hz_v1`
+
+Evidence: `diagnostics/research_baseline_search_gate_trace_recenter8_gain3000_damping10_25hz_v1/summary.md`
+
+`admittance_insertion_node` now accepts `tracking_log_dir` and records
+task-side SEARCH gate decisions when SEARCH is entered. This fills the evidence
+gap between passive observer replay and the online state-machine counter.
+
+Validation built the selected packages cleanly and ran the same 25 Hz gain=3000
+/ D=10 / damping-scale-10 headless configuration. The launch exited with code
+`0` after DONE, but SEARCH was bypassed because APPROACH reached pre-insertion
+XY `0.0009 m`; the new trace therefore contained only its header. The task then
+failed safely in INSERT handoff:
+
+- final outcome: `ABORTED`;
+- reason: `INSERT handoff settle timeout: XY error 0.0016m did not remain within physical clearance 0.0010m for 8 ticks before descent.`;
+- insertion depth: `0.0000 m`;
+- INSERT best estimated 1 mm window: `4` task ticks;
+- hold-like best feedback 1 mm window: `5` ticks;
+- max centered-hold p95 actual XY drift: `0.002246 m`;
+- max raw `|Fz|`: `101.55 N`;
+- positive Gazebo contact-topic samples: `0`.
+
+Decision: keep the trace hook. It is non-interfering and will make the next
+SEARCH-entering run auditable at the task-node counter level. The physical
+blocker remains INSERT handoff feedback stability.
 
 ## 2026-06-07 Current-Joint Handoff Candidate Diagnostic
 

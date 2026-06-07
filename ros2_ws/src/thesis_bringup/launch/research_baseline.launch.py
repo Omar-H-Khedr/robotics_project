@@ -615,6 +615,7 @@ def launch_setup(context, *args, **kwargs):
                     LaunchConfiguration("done_exit_delay_s"),
                     value_type=float,
                 ),
+                "tracking_log_dir": LaunchConfiguration("tracking_log_dir"),
                 "use_sim_time": simulation["use_sim_time"],
             }
         ],
