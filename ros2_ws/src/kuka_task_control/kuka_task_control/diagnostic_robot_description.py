@@ -13,7 +13,7 @@ from ament_index_python.packages import (
 )
 
 
-RESEARCH_ROBOT_XACRO = "lbr_iisy3_r760_research_gripper.urdf.xacro"
+RESEARCH_ROBOT_XACRO = "lbr_iisy6_r1300_research_gripper.urdf.xacro"
 REQUIRED_JOINTS = ("joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6")
 
 
@@ -48,7 +48,7 @@ def robot_description_file_fallback() -> tuple[str, str | None]:
                 "prefix:=",
                 "x:=0.80",
                 "y:=-0.75",
-                "z:=0.75",
+                "z:=0.735",
                 "roll:=0",
                 "pitch:=0",
                 "yaw:=1.5708",

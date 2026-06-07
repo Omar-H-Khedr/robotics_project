@@ -1,13 +1,32 @@
 # Visuomotor Context-Based Meta-Reinforcement Learning for Safe Peg-in-Hole Assembly
 
 **Repository status:** active doctoral research prototype
-**Latest documented:** `research_baseline_approach_z_precondition_gate_v1`
-**README last updated:** 2026-06-03
+**Latest documented:** `live_v2_14_inference_node_validation` and `research_baseline_search_velocity_state_v1`
+**README last updated:** 2026-06-07
 **Execution scope:** simulation-first validation only; no real-robot claim is made in this repository state.
 
 ---
 
 ## Current Status Note
+
+Recovery after the sudden shutdown was performed on 2026-06-07. The dirty tree
+was classified before cleanup: intentional source/docs were limited to iisy6
+R1300 documentation, diagnostic source references, and the KUKA submodule's D405
+bridge / iisy6 mesh support; generated build/install/log/pycache changes were
+restored; uncurated diagnostics, `.deb` packages, frame graphs, Gazebo caches,
+and local proposal extraction copies are ignored. No raw diagnostics CSV batch
+was added.
+
+The latest verified perception milestone is `live_v2_14_inference_node_validation`
+from commit `ab2a747`: the live v2_14 node runs passively at 20 Hz and reports
+62.6% live accuracy, but it does not command the controller. The latest verified
+control diagnostic is `research_baseline_search_velocity_state_v1`: the
+velocity-state injection path works and fails closed in SEARCH; the 1 mm
+sustained clearance window remains the binding constraint. The next technically
+necessary step is not another bulk rebuild or raw-log commit; it is to stabilize
+near-centered SEARCH / pre-insert handoff while preserving the physical
+clearance gates, then rerun the same analyzers and repeat validation only after
+the safety gates pass.
 
 The active baseline targets the KUKA LBR iisy 6 R1300 and is controller-driven in Gazebo. It must not be described as robust autonomous peg-in-hole success: repeated validation has produced 0/3 physical successes, and the latest 2026-06-03 validation reached `INSERT` only under the diagnostic `joint_damping_scale:=5.0` setting, reported `physical_depth=0.0000 m`, and exposed high `RETREAT` contact.
 

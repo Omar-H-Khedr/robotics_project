@@ -3,41 +3,37 @@ ros2_ws/build/
 ros2_ws/install/
 ros2_ws/log/
 
-# Experiment outputs
+# Experiment and diagnostics outputs
 ros2_ws/results/
+ros2_ws/diagnostics/
 
-# Python cache
-__pycache__/
-*.pyc
+# Local proposal extraction/context copies
+ros2_ws/docs/agent_context/
+ros2_ws/docs/proposal/
+ros2_ws/docs/context/proposal_media/
+
+# Generated ROS/Gazebo/cache artifacts
+**/__pycache__/
+*.py[cod]
 *.pyo
 *.pyd
+*.deb
+frames_*.gv
+frames_*.pdf
+**/.pytest_cache/
+**/.cache/
+**/.gz/
+**/.sdformat/
 
-# Temporary/editor files
-*.swp
-*.swo
-*~
+# Local assistant/editor scratch
+.aider*
+.antigravitycli/
+ros2_fresh/
 README.md.save*
 0.
 tool_frame
-
-# OS/editor folders
-.vscode/
-.idea/
-.DS_Store
-
-# ROS 2 build artifacts
-ros2_ws/build/
-ros2_ws/install/
-ros2_ws/log/
-
-# Experiment outputs
-ros2_ws/results/
-
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
+/2 launch thesis_bringup research_baseline.launch.py use_gui:=true
+/al context for ROS simulation work"
 
 # Editor/system files
 .vscode/

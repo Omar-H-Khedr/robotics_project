@@ -345,7 +345,7 @@ class IkBackendAudit(Node):
                 path = (
                     Path(get_package_share_directory("kuka_lbr_iisy_support"))
                     / "config"
-                    / "lbr_iisy3_r760_joint_limits.yaml"
+                    / "lbr_iisy6_r1300_joint_limits.yaml"
                 )
             except PackageNotFoundError:
                 path = None

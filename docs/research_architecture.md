@@ -16,11 +16,11 @@ The framework is built around a modular ROS 2 graph:
 
 Existing demo packages are retained as legacy/demo references. They should not be treated as the primary research architecture, but they can remain useful for regression checks and historical context.
 
-The current canonical simulation entry point is `thesis_bringup`'s `research_baseline.launch.py`. It launches the configured peg-in-hole Gazebo world from `peg_in_hole_description`, exposes that package's `models` directory through `GZ_SIM_RESOURCE_PATH`, builds the robot description from the project-owned `peg_in_hole_description/urdf/lbr_iisy3_r760_research_gripper.urdf.xacro`, and starts the Gazebo entity spawn, bridge, `joint_state_broadcaster`, and `joint_trajectory_controller`.
+The current canonical simulation entry point is `thesis_bringup`'s `research_baseline.launch.py`. It launches the configured peg-in-hole Gazebo world from `peg_in_hole_description`, exposes that package's `models` directory through `GZ_SIM_RESOURCE_PATH`, builds the robot description from the project-owned `peg_in_hole_description/urdf/lbr_iisy6_r1300_research_gripper.urdf.xacro`, and starts the Gazebo entity spawn, bridge, `joint_state_broadcaster`, and `joint_trajectory_controller`.
 
 Research Baseline v0.1 adds the reproducible trial entry point `thesis_bringup/launch/run_research_trial.launch.py`. It composes the Gazebo baseline, `safety_layer/safety_monitor`, and `experiment_manager/baseline_trial_manager`. Robot motion remains a deliberate second command through `kuka_task_control/launch/run_task_sequence.launch.py`, which sends `FollowJointTrajectory` action goals and publishes `/task_phase`.
 
-The project-owned robot wrapper still reuses the upstream KUKA iisy meshes, kinematic macro, and ROS 2 control macro. It adds only the Phase 2 passive research gripper at the upstream `flange` attachment link, with a fixed `gripper_tcp` frame for peg-in-hole task programming. The upstream KUKA description remains unmodified.
+The project-owned robot wrapper uses the project-local KUKA iisy6 R1300 support files, which preserve the same-family R1300 geometry and upstream-compatible `flange` attachment link. It adds only the Phase 2 passive research gripper, a fixed `gripper_tcp` frame, and the grasped peg needed for peg-in-hole task programming.
 
 ## Why Gazebo Is the Main Simulator
 

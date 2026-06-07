@@ -1,6 +1,21 @@
 # ROS 2 Jazzy / Gazebo Peg-in-Hole Research Workspace
 
-Current status as of 2026-06-03: this is an active ROS 2 Jazzy workspace for a Gazebo-based KUKA LBR iisy 6 R1300 peg-in-hole research baseline. The project has a working robot spawn path, active ros2_control controllers, a fixed grasped peg model, a fixed hole fixture, force/torque bridge plumbing, contact observability, and an admittance-style insertion controller.
+Current status as of 2026-06-07: this is an active ROS 2 Jazzy workspace for a Gazebo-based KUKA LBR iisy 6 R1300 peg-in-hole research baseline. The project has a working robot spawn path, active ros2_control controllers, a fixed grasped peg model, a fixed hole fixture, force/torque bridge plumbing, contact observability, and an admittance-style insertion controller.
+
+Shutdown recovery on 2026-06-07 restored tracked `build/`, `install/`, `log/`,
+and `__pycache__` churn, ignored local diagnostics/cache/proposal extraction
+artifacts, and kept only intentional source/docs. The latest verified milestone
+from docs and git history is split by subsystem:
+
+- Perception: `live_v2_14_inference_node_validation` from `ab2a747`, a passive
+  20 Hz live node with 62.6% live accuracy and no controller output.
+- Control: `research_baseline_search_velocity_state_v1`, a fail-closed SEARCH
+  diagnostic confirming the velocity-state injection path works but does not
+  unblock the 1 mm sustained clearance gate.
+
+Next technical step: stabilize near-centered SEARCH and pre-insert handoff while
+preserving the physical clearance gates; do not bulk-add raw diagnostic CSVs or
+claim insertion success before repeat validation passes.
 
 The strongest historical iisy6 evidence is a controller-driven simulated insertion-depth event from `diagnostics/research_baseline_insert_sim_time_completion_v4`: final outcome `SUCCESS` under older depth/contact criteria, insertion depth `0.0191 m`, task F/T insert-contact evidence `60.1 N`, max raw `|Fz|=133.33 N`, and no safety abort or invalid timeout. That claim is now superseded by a stricter physical-clearance gate: `diagnostics/research_baseline_insert_physical_xy_gate_v1` reached depth `0.0177 m` and insert contact `55.4 N`, but correctly reported `DEGRADED` because final insertion XY error `0.0030 m` exceeds the 25 mm peg / 27 mm hole radial clearance of `0.0010 m`. Current status: no validated physical insertion success under the latest criteria.
 

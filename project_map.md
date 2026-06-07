@@ -1,6 +1,6 @@
 # Project Map: KUKA LBR iisy Peg-in-Hole Simulation Cell
 
-> **Changes made in this session (P0–P6 fixes applied):**
+> **Changes made in this session (P0–P7 fixes applied):**
 > - P0: Deprecated `proposal_lbr_iisy6_r1300_cell.urdf.xacro` (cylinder placeholder)
 > - P1: Fixed robot base z from 0.75→0.735 in `research_baseline.launch.py` (pedestal alignment)
 > - P2: Added D405 camera (world SDF model + URDF TF frames + bridge topics)
@@ -8,18 +8,19 @@
 > - P4: Fixed `peg_hole_cartesian_targets.yaml` hole_center z from 0.845→0.810
 > - P5: Verified table/robot alignment — correct, no change needed
 > - P6: Verified bridge configs correctly paired with worlds — correct, no change needed
+> - **P7: Switched research baseline from `lbr_iisy3_r760` (760mm reach) to exact `lbr_iisy6_r1300` support files derived from the same-family R1300 geometry. Created `ros2_ws/docs/ROBOT_DATASHEET_CHECK.md`.**
 
 ## 1. ROS 2 Packages and Their Roles
 
 | Package | Type | Role |
 |---------|------|------|
 | **thesis_bringup** | Python (ament) | Top-level launch + config orchestrator. 36+ launch files, 20+ YAML configs. Contains all proposal-simulation-cell validation nodes (v1.0–v2.16). |
-| **peg_in_hole_description** | Python (ament) | Gazebo world SDF files, URDF cell descriptions (canonical: `lbr_iisy3_r760_research_gripper.urdf.xacro`), static model SDF files (table, pedestal, peg, hole_fixture, target_plate, contact_validation_pad). |
+| **peg_in_hole_description** | Python (ament) | Gazebo world SDF files, URDF cell descriptions (canonical: `lbr_iisy6_r1300_research_gripper.urdf.xacro`), static model SDF files (table, pedestal, peg, hole_fixture, target_plate, contact_validation_pad). |
 | **kuka_task_control** | Python (ament) | Task-level control nodes: `task_trajectory_executor`, `baseline_joint_sequence_executor`, IK diagnostics, Cartesian insertion planner, segmented contact executors, MoveIt config overlay for `lbr_iisy6_r1300`. |
 | **safety_layer** | Python (ament) | `safety_monitor` node: joint-state validity, soft-limit checking, phase timeout, publishes `/safety_status`. Config in `safety_limits.yaml`. |
 | **experiment_manager** | Python (ament) | `baseline_trial_manager` (structured CSV/JSON logger), `research_baseline_v2_4_experiment_runner` (dry-run experiment generator). |
 | **peg_in_hole_metrics** | Python (ament) | `contact_metrics_node`: subscribes to `/gazebo/contacts/*`, extracts force vectors, publishes `/insertion_metrics`. |
-| **perception_pipeline** | Python (ament) | RGB-D perception interface stub: subscribes `/camera/color/image_raw`, `/camera/depth/image_raw`. Config `rgbd_pipeline.yaml`. |
+| **perception_pipeline** | Python (ament) | RGB-D perception interface stub: subscribes D405 topics `/d405/color/image_raw`, `/d405/depth/image_rect_raw`. Config `rgbd_pipeline.yaml`. |
 | **learning_interface** | Python (ament) | RL interface package (stub, `__init__.py` only). |
 | **first_robot_demo** | Python (ament) | Demo/starter package (placeholder). |
 | **external/kuka_robot_descriptions/** | Mixed (ament/cmake) | Upstream KUKA descriptions (forked from `kuka_robot_descriptions`). Contains `kuka_lbr_iisy_support`, `kuka_gazebo`, `kuka_resources`, `kuka_lbr_iisy_moveit_config`, plus support for KR/Agilus/Fortec/Iontec/Cybertech/KL series. |
@@ -32,7 +33,7 @@
 ```bash
 # Full Gazebo GUI launch with KUKA + peg-in-hole world
 ros2 launch thesis_bringup research_baseline.launch.py \
-  robot_model:=lbr_iisy3_r760 \
+  robot_model:=lbr_iisy6_r1300 \
   robot_family:=lbr_iisy \
   use_gui:=true \
   world_file:=peg_in_hole_world.sdf
@@ -98,13 +99,17 @@ ros2 launch kuka_gazebo gazebo_startup.launch.py \
 ## 3. KUKA Robot Description Files
 
 ### Primary Research Cell URDF (USED by research_baseline)
-- **`peg_in_hole_description/urdf/lbr_iisy3_r760_research_gripper.urdf.xacro`**
-  - Includes `kuka_lbr_iisy_support/urdf/lbr_iisy3_r760_macro.xacro` (mesh-based real robot)
-  - Includes `research_parallel_gripper.xacro` (custom gripper with palm + 2 fingers + TCP)
+- **`peg_in_hole_description/urdf/lbr_iisy6_r1300_research_gripper.urdf.xacro`** (canonical)
+  - Includes `kuka_lbr_iisy_support/urdf/lbr_iisy6_r1300_macro.xacro` (project-local exact iisy6 R1300 support derived from same-family R1300 geometry)
+  - Includes `research_parallel_gripper.xacro` (custom gripper with palm + 2 fingers + TCP + grasped peg)
   - Includes `kuka_lbr_iisy_support/urdf/lbr_iisy_ros2_control_macro.xacro`
+  - Includes D405 camera TF frames (world-fixed, behind `include_camera` arg)
   - Places base_link via `world-base_link` joint at launch-arg x/y/z/rpy
   - Used by `research_baseline.launch.py`
-  - **Contains NO camera link**
+  - Datasheet comparison: `ros2_ws/docs/ROBOT_DATASHEET_CHECK.md`
+
+- **`peg_in_hole_description/urdf/lbr_iisy3_r760_research_gripper.urdf.xacro`** (LEGACY — kept for reproducibility)
+  - Previous canonical URDF using iisy3 R760 (760mm reach). Superseded by exact iisy6 R1300 variant.
 
 ### Old Prototype Cell URDF (NOT used by research_baseline)
 - **`peg_in_hole_description/urdf/proposal_lbr_iisy6_r1300_cell.urdf.xacro`**
@@ -118,9 +123,17 @@ ros2 launch kuka_gazebo gazebo_startup.launch.py \
   - Pure upstream-style: no gripper, no camera
   - Used by `proposal_simulation_cell_v2_*.launch.py` launches
 - **`external/kuka_robot_descriptions/kuka_lbr_iisy_support/urdf/lbr_iisy3_r760_macro.xacro`**
-  - Real mesh-based KUKA LBR iisy 3 R760 links/joints
+  - Real mesh-based KUKA LBR iisy 3 R760 links/joints (760mm reach, 3kg payload)
+- **`external/kuka_robot_descriptions/kuka_lbr_iisy_support/urdf/lbr_iisy11_r1300_macro.xacro`** (PROXY for iisy6 R1300)
+  - Real mesh-based KUKA LBR iisy 11 R1300 links/joints (1300mm reach, 11kg payload)
+  - Shares same 1300mm reach and kinematic chain as target iisy6 R1300 (6kg)
   - Standard ROS-Industrial frames: `base`, `flange`, `tool0`
   - 6 revolute joints with correct limits, meshes from STL files
+- **`external/kuka_robot_descriptions/kuka_lbr_iisy_support/urdf/lbr_iisy6_r1300_macro.xacro`**
+  - Project-local exact iisy6 R1300 macro derived from the iisy11 R1300 chain with iisy6 payload/mass/torque scaling.
+  - Uses `meshes/lbr_iisy6_r1300` symlinks to the same-family R1300 geometry.
+  - Standard ROS-Industrial frames: `base`, `flange`, `tool0`.
+  - Joint limits config: `config/lbr_iisy6_r1300_joint_limits.yaml`.
 
 ### Gripper Description
 - **`peg_in_hole_description/urdf/research_parallel_gripper.xacro`**
@@ -163,28 +176,30 @@ World +Z: up
 
 Table center:    [0.80,  0.00, 0.00] (model origin, surface at z=0.75)
 Robot pedestal:  [0.80, -0.75, 0.00] (base, top at z=0.75)
-Robot base_link: [0.80, -0.75, 0.75] yaw=1.5708 (faces toward table)
+Robot base_link: [0.80, -0.75, 0.735] yaw=1.5708 (faces toward table)
 Hole fixture:    [0.52, -0.20, 0.75] (bottom)
 Target plate:    [0.52, -0.20, 0.79] (hole opening at z=0.81)
-Peg (world):     [0.72, -0.05, 0.75] (separate model, not on robot)
+Peg (world):     [0.72, -0.05, 0.75] (legacy scene reference; robot also has grasped peg)
 ```
 
 ## 5. Camera Configuration
 
-**D405 Camera** is defined only in `proposal_lbr_iisy6_r1300_cell.urdf.xacro` (the old prototype):
-- Link: `d405_camera_link` at `[0.42, -0.65, 1.18]` (world frame)
+**D405 Camera** is defined in the current research baseline:
+- Gazebo RGB-D sensors are defined in `peg_in_hole_world.sdf` as a static workcell camera.
+- TF frames are defined in `lbr_iisy6_r1300_research_gripper.urdf.xacro` behind `include_camera`.
+- Link: `d405_camera_link` at `[0.42, -0.55, 1.18]` (world frame)
 - Orientation: rpy `[0.95, 0, 0.35]` rad (~54° downward tilt)
 - Optical frame: `d405_camera_optical_frame` (ROS standard: z-forward, x-right, y-down)
 - Camera points approximately toward the table center / workspace
 
-**CRITICAL ISSUE**: The research baseline uses `lbr_iisy3_r760_research_gripper.urdf.xacro` which does NOT include the camera. There is **no camera** in the current research baseline cell.
+The current bridge config (`kuka_gazebo/config/bridge_config.yaml`) bridges:
+- `/d405/color/image_raw`
+- `/d405/depth/image_rect_raw`
+- `/d405/color/camera_info`
+- `/d405/depth/camera_info`
 
-The `perception_pipeline/config/rgbd_pipeline.yaml` expects topics:
-- `/camera/color/image_raw`
-- `/camera/depth/image_raw`
-- `/camera/color/camera_info`
-
-These topics are not bridged in the current bridge config (`kuka_gazebo/config/bridge_config.yaml`), which only bridges `/clock`, `/joint_states`, and `/cmd_vel`.
+The `perception_pipeline/config/rgbd_pipeline.yaml` should be checked against
+these D405 topic names before perception experiments.
 
 ## 6. Controller Configuration
 
@@ -334,14 +349,16 @@ ros2 control list_hardware_interfaces
 ## 9. Current Known Problems
 
 ### A. Robot Model Correctness
-1. **Two conflicting robot descriptions exist**:
-   - `proposal_lbr_iisy6_r1300_cell.urdf.xacro`: **FAKE cylinder robot** (not the real KUKA) — 6 cylindrical links with incorrect dimensions, inertias, joint limits. This is a v1 placeholder and should NOT be used.
-   - `lbr_iisy3_r760_research_gripper.urdf.xacro`: Correct mesh-based robot from upstream. Used by research_baseline. **BUT** it uses `lbr_iisy3_r760` model (R760 = 760mm reach) while some references say `iisy6_r1300` (R1300 = 1300mm reach). **Naming/model mismatch.**
+1. **Research baseline uses exact iisy6_R1300 project-local support**:
+   - The project-local `kuka_lbr_iisy_support` now includes `lbr_iisy6_r1300` URDF, macro, joint limits, and mesh-path assets.
+   - The macro keeps the R1300 kinematic chain and documents iisy6-specific mass/payload/torque scaling.
+   - See `ros2_ws/docs/ROBOT_DATASHEET_CHECK.md` for full comparison.
+   - LEGACY: `lbr_iisy3_r760_research_gripper.urdf.xacro` kept for reproducibility.
 
-2. **The research baseline uses the iisy3 R760**, but the project name includes "iisy6 R1300". Verify which physical robot is intended.
+2. **`proposal_lbr_iisy6_r1300_cell.urdf.xacro` remains deprecated** — fake cylinder placeholder from v1 sprints.
 
 ### B. Robot Base Position
-3. **Double coordinate system risk**: The world SDF places robot_pedestal at `[0.80, -0.75, 0.0]`, and the URDF world-base_link joint places base_link at `[0.80, -0.75, 0.75]`. The Gazebo spawn also has `[0,0,0]` offset. This double-positioning (SDF model + URDF joint) could cause the robot to appear at the wrong location if one is not properly aligned. Currently both match.
+3. **Double coordinate system risk**: The world SDF places robot_pedestal at `[0.80, -0.75, 0.0]`, and the URDF world-base_link joint places base_link at `[0.80, -0.75, 0.735]`. The Gazebo spawn also has `[0,0,0]` offset. This double-positioning can cause the robot to appear at the wrong location if the URDF transform and SDF pedestal are not kept aligned. Currently both match.
 
 4. **The `proposal_lbr_iisy6_r1300_cell.urdf.xacro` has a different base position**: `[0.80, -0.75, 0.75]` with yaw `1.5708`. This matches the research baseline base position, but the old cell xacro also has a `base_link` with a visual cylinder (0.12m radius, 0.10m tall) that overlaps with the pedestal top.
 
@@ -349,23 +366,23 @@ ros2 control list_hardware_interfaces
 5. **Table positioning appears correct** for the research baseline: centered at `[0.80, 0.0, 0.0]`, surface at z=0.75. Robot at y=-0.75 gives 0.45m clearance from table edge at y=-0.30.
 
 ### D. Camera Direction
-6. **NO camera in the research baseline**: The D405 camera is only in the old `proposal_lbr_iisy6_r1300_cell.urdf.xacro`. The research baseline URDF (`lbr_iisy3_r760_research_gripper.urdf.xacro`) has no camera at all.
+6. **Camera is present in the research baseline**: `lbr_iisy6_r1300_research_gripper.urdf.xacro` provides D405 TF frames, and `peg_in_hole_world.sdf` provides the static D405 Gazebo sensors.
 
-7. **No RGB-D bridge configured**: The `kuka_gazebo/config/bridge_config.yaml` does not bridge camera topics. The `ros_gz_bridge` only bridges `/clock`, `/joint_states`, `/cmd_vel`.
+7. **RGB-D bridge configured**: `kuka_gazebo/config/bridge_config.yaml` bridges D405 color/depth image and camera-info topics.
 
-8. **Perception pipeline expects topics** `/camera/color/image_raw` and `/camera/depth/image_raw` that don't exist.
+8. **Perception topic names are aligned**: `perception_pipeline/config/rgbd_pipeline.yaml` now uses the bridged D405 color/depth topic names.
 
 ### E. Peg and Hole Placement
-9. **Peg is a separate world model**, not attached to the robot end-effector. The cylindrical_peg floats at `[0.72, -0.05, 0.75]` in the world. The robot's tool0 has no physical peg attached.
+9. **Research gripper has a grasped peg**: `research_parallel_gripper.xacro` can attach a physical peg to the gripper, and the canonical iisy6 wrapper enables it with `has_peg="true"`.
 
-10. **Peg_tip frame exists in URDF** (`tool0_to_peg_tip` with z-offset 0.11m) but there is no physical collision model — it's just a TF frame.
+10. **World peg remains as a scene reference**: `cylindrical_peg` still exists in the world at `[0.72, -0.05, 0.75]`; remove or disable it later if duplicate peg geometry interferes with trials.
 
-11. **Hole center** is at `[0.52, -0.20, 0.81]` in `peg_in_hole_task.urdf.xacro`. This matches `peg_in_hole_world.sdf` (fixture at z=0.75 + 0.04m fixture + 0.02m plate = 0.81m top). The Cartesian targets file has hole_center at `[0.520, -0.200, 0.845]` — this is 0.035m above the actual hole surface, likely as the tool0 target z to align the peg above the hole.
+11. **Hole center** is at `[0.52, -0.20, 0.81]` in `peg_in_hole_task.urdf.xacro`. This matches `peg_in_hole_world.sdf` (fixture at z=0.75 + 0.04m fixture + 0.02m plate = 0.81m top). The Cartesian targets file now uses hole_center `[0.520, -0.200, 0.810]`, so the task frame and Cartesian target agree.
 
 12. **Peg-in-hole clearance**: Peg radius 0.0125m (25mm dia), hole radius 0.0135m (27mm dia), clearance = 0.001m (1mm). This is very tight for simulation.
 
 ### F. Missing End-Effector / Tool
-13. **No physical peg model on the robot**: The research_gripper attaches to flange, but there is no peg held in the gripper fingers. The peg is a separate world model.
+13. **Physical peg model exists on the robot**: the grasped peg is attached through the research gripper; the remaining risk is duplicate world peg cleanup.
 
 14. **Gripper fingers are fixed** (no prismatic joint), so the gripper cannot actually grasp anything.
 
@@ -409,7 +426,7 @@ ros2 topic echo /robot_description --once | head -c 2000
 ros2 topic echo /joint_states --once
 
 # Check URDF geometry (after xacro expansion)
-ros2 run xacro xacro src/peg_in_hole_description/urdf/lbr_iisy3_r760_research_gripper.urdf.xacro mode:=gazebo
+ros2 run xacro xacro src/peg_in_hole_description/urdf/lbr_iisy6_r1300_research_gripper.urdf.xacro mode:=gazebo
 ```
 
 ### Controller Verification
@@ -548,7 +565,7 @@ Deliver a visuomotor, context-based meta-RL framework for adaptable peg-in-hole 
 | Aspect | Proposal Specifies | Workspace Current State | Action Needed |
 |--------|-------------------|------------------------|---------------|
 | **Simulation engine** | NVIDIA Isaac Sim | Gazebo (GazeboSim + `gz_ros2_control`) | Clarify: Gazebo stand-in or migration path? |
-| **Robot model** | KUKA LBR iisy 6 R1300 (1300mm reach) | `lbr_iisy3_r760` (760mm reach) | Confirm correct physical model |
+| **Robot model** | KUKA LBR iisy 6 R1300 (1300mm reach) | Exact `lbr_iisy6_r1300` project-local support | ✅ Resolved — documented in `ros2_ws/docs/ROBOT_DATASHEET_CHECK.md` |
 | **Learning framework** | PyTorch + context-conditioned SAC | Not implemented (stub `learning_interface`) | Deferred to proposal months 10–22 |
 | **Sim-to-real transfer** | Staged protocol with transfer gates | Not started | Deferred to proposal months 18–33 |
 | **Safety filter** | Runtime constraint enforcement | `safety_monitor` node (soft limits only) | Deferred — current is pre-contact validation only |
@@ -556,7 +573,7 @@ Deliver a visuomotor, context-based meta-RL framework for adaptable peg-in-hole 
 ### What the Workspace Already Provides (ahead of proposal timeline)
 
 The v2.0–v2.16 sprint validation has produced a working Gazebo simulation cell with:
-- Mesh-based KUKA LBR iisy 3 R760 + parallel gripper + D405 camera + grasped peg
+- Mesh-based KUKA LBR iisy 6 R1300 + parallel gripper + D405 camera + grasped peg
 - Joint trajectory control via `joint_trajectory_controller`
 - Contact sensing via Gazebo contact sensors
 - Guarded approach/retreat sequences with phase-based execution
@@ -569,7 +586,7 @@ This places the workspace ahead of the proposal's **Month 6 (Foundations)** mile
 
 ### Next Workspace Priorities (aligned with proposal Months 4–12)
 
-1. Confirm robot model (iisy6 R1300 vs. iisy3 R760) and switch if needed
+1. Validate exact iisy6 R1300 support through repeatable launch and controller tests
 2. Clarify simulation engine choice (Gazebo vs. Isaac Sim)
 3. Implement domain randomization infrastructure
 4. Build multi-modal observation logging pipeline (RGB-D + F/T + joint states synchronized)
@@ -588,7 +605,8 @@ These steps lay the groundwork before the learning-intensive core phase (proposa
 #### P0: Robot Model Correctness (DONE)
 **Status**: FIXED
 - `proposal_lbr_iisy6_r1300_cell.urdf.xacro` marked as deprecated with header comment — kept for historical reproducibility.
-- Canonical description: `lbr_iisy3_r760_research_gripper.urdf.xacro` (mesh-based KUKA + gripper + camera + peg).
+- Canonical description: `lbr_iisy6_r1300_research_gripper.urdf.xacro` (mesh-based KUKA iisy6_R1300 + gripper + camera + peg).
+- `lbr_iisy3_r760_research_gripper.urdf.xacro` kept as legacy fallback.
 
 #### P1: Robot Base Position (DONE)
 **Status**: FIXED
@@ -598,7 +616,7 @@ These steps lay the groundwork before the learning-intensive core phase (proposa
 #### P2: Add Camera to Research Baseline (DONE)
 **Status**: FIXED
 - Added D405 camera as static model in `peg_in_hole_world.sdf` (color + depth sensors, 848×480, 30 Hz, ogre2 renderer).
-- Added camera TF frames (`d405_camera_link`, `d405_camera_optical_frame`) to `lbr_iisy3_r760_research_gripper.urdf.xacro` behind `include_camera` arg (default: true). World-fixed at `[0.42, -0.65, 1.18]` with rpy `[0.95, 0, 0.35]`.
+- Added camera TF frames (`d405_camera_link`, `d405_camera_optical_frame`) to `lbr_iisy6_r1300_research_gripper.urdf.xacro` behind `include_camera` arg (default: true). World-fixed at `[0.42, -0.55, 1.18]` with rpy `[0.95, 0, 0.35]`.
 - Added `gz::sim::systems::Sensors` plugin to `peg_in_hole_world.sdf`.
 - Added 4 bridge topics to `kuka_gazebo/config/bridge_config.yaml` (color, depth, 2× camera_info).
 
@@ -606,7 +624,7 @@ These steps lay the groundwork before the learning-intensive core phase (proposa
 **Status**: FIXED
 - Added optional `grasped_peg` link (0.11m × 0.0125m radius cylinder) with collision + inertial properties to `research_parallel_gripper.xacro`, behind `has_peg` macro param (default: false).
 - Peg sits at TCP, extends 0.11m below; `peg_tip` frame at bottom of peg.
-- Enabled in `lbr_iisy3_r760_research_gripper.urdf.xacro` via `has_peg="true"`.
+- Enabled in `lbr_iisy6_r1300_research_gripper.urdf.xacro` via `has_peg="true"`.
 - World peg model at `[0.72, -0.05, 0.75]` kept for reference — remove later if no longer needed.
 
 #### P4: Peg and Hole Placement Alignment (DONE)
@@ -626,6 +644,21 @@ These steps lay the groundwork before the learning-intensive core phase (proposa
 - Robot at `[0.80, -0.75, 0.735]` (fixed) faces the table.
 - Robot table-edge clearance: 0.45m (from y=-0.75 to y=-0.30).
 
+#### P7: Robot Datasheet Compliance (DONE)
+**Status**: DONE
+**Files changed:**
+- **New/updated**: `peg_in_hole_description/urdf/lbr_iisy6_r1300_research_gripper.urdf.xacro`
+  - Uses project-local `lbr_iisy6_r1300_macro.xacro` (1300mm reach, mesh-based real KUKA geometry)
+  - Same structure as former iisy3 variant: ros2_control + robot macro + gripper + peg + camera
+- **Updated**: `research_baseline.launch.py` — XACRO ref and robot_model default changed to iisy6
+- **Updated**: `diagnostic_robot_description.py` — XACRO ref and z default 0.75→0.735
+- **Updated**: `run_move_group_ik_diagnostic.launch.py` — XACRO ref and z default 0.75→0.735
+- **Updated**: `ik_backend_audit.py` — joint limits -> `lbr_iisy6_r1300_joint_limits.yaml`
+- **Updated**: `ik_feasibility_diagnostics.py` — joint limits -> `lbr_iisy6_r1300_joint_limits.yaml`
+- **New**: `ros2_ws/docs/ROBOT_DATASHEET_CHECK.md` — full comparison + exact-support justification
+
+**Unchanged**: All v2 proposal cells (v2.0–v2.16) still reference `lbr_iisy3_r760` — migrate when re-validating those experiments.
+
 #### P6: Controller-Driven Robot Motion (No Change Needed)
 **Impact**: LOW — controller stack works
 - `joint_trajectory_controller` validated and functional.
@@ -636,4 +669,4 @@ These steps lay the groundwork before the learning-intensive core phase (proposa
 ### Cross-Cutting Issues
 - **World file switching**: `contact_validation_bridge.yaml` references `peg_in_hole_contact_validation_world` (exists). `contact_bridge.yaml` references simple topic names matching `peg_in_hole_world` sensor topics.
 - **Task geometry duplication**: `task_geometry.yaml` vs `peg_hole_cartesian_targets.yaml` vs `peg_in_hole_task.urdf.xacro` all define overlapping geometry. Define in ONE place and reference.
-- **Diverging URDF paths**: v2.16 historical launch uses `kuka_lbr_iisy_support` URDF directly (no gripper). Research baseline uses `peg_in_hole_description` URDF with gripper. Not changed — v2.16 kept for reproducibility. All new launches should use `lbr_iisy3_r760_research_gripper.urdf.xacro`.
+- **Diverging URDF paths**: v2.16 historical launch uses `kuka_lbr_iisy_support` URDF directly (no gripper). Research baseline uses `peg_in_hole_description` URDF with gripper. Not changed — v2.16 kept for reproducibility. All new launches should use `lbr_iisy6_r1300_research_gripper.urdf.xacro`.

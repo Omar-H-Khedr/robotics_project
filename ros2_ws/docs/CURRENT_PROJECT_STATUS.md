@@ -1,12 +1,41 @@
 # Current Project Status
 
-Date: 2026-06-03
+Date: 2026-06-07
 
 ## Review Summary
 
 The repository is an active ROS 2 Jazzy / Gazebo research workspace, not a blank future workspace. The current implementation has moved beyond proposal-only diagnostics into a controller-driven KUKA LBR iisy 6 R1300 Gazebo baseline. Controllers can activate and the task controller can command simulated motion.
 
 The project must not claim final autonomous peg-in-hole success yet. The defensible claim is a historical simulated insertion-depth/contact event, followed by a stricter current baseline that correctly rejects side-loaded insertion as `DEGRADED`.
+
+## Shutdown Recovery Summary
+
+Recovery after the sudden shutdown was completed on 2026-06-07.
+
+Classification:
+
+- Keep: iisy6 R1300 source/docs updates, diagnostic source references, KUKA
+  submodule D405 bridge support, and iisy6 mesh symlink support.
+- Restore/ignore: tracked `build/`, `install/`, `log/`, and `__pycache__`
+  rebuild churn.
+- Document, not bulk commit: newly generated diagnostics directories and CSVs.
+- Ignore/remove as junk: local `.deb` packages, frame graph outputs, Gazebo/ROS
+  cache trees, and proposal extraction/context copies.
+
+Verification after cleanup:
+
+- `colcon build --packages-select kuka_lbr_iisy_support thesis_bringup kuka_task_control` passed.
+- `colcon test --packages-select thesis_bringup kuka_task_control` passed with zero collected pytest tests in both packages.
+- Canonical iisy6 xacro expansion passed.
+- The supported velocity-state injection path added six `velocity`
+  `state_interface` entries to the expanded URDF.
+
+The latest verified milestone from README/docs/git history is
+`live_v2_14_inference_node_validation` for perception and
+`research_baseline_search_velocity_state_v1` for control. The next technical
+step remains near-centered SEARCH / pre-insert handoff stabilization while
+preserving physical clearance gates; repeated validation should follow only
+after those gates pass.
 
 ## Evidence Reviewed
 
