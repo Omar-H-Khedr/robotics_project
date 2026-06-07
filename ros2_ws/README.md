@@ -11,14 +11,15 @@ from docs and git history is split by subsystem:
   20 Hz live node with 62.6% live accuracy and no controller output.
 - Control: `research_baseline_search_damping10_gain3000_25hz_v1`, a rejected
   damping diagnostic plus
-  `research_baseline_handoff_timeout12_gain3000_damping10_25hz_v1`, a failed
-  extended-handoff-timeout SEARCH diagnostic. The state-machine fix is retained:
+  `research_baseline_search_recenter8_settle9_gain3000_damping10_25hz_v1`, an
+  extended SEARCH timing diagnostic. The state-machine fix is retained:
   no-contact pre-depth INSERT clearance abort applies only after the final
-  descent command has started, while side-load/force aborts remain active. The
-  latest run adds launch-level handoff timing diagnostics without exposing the
-  1 mm clearance or 8-tick gate. It did not reach INSERT: SEARCH reached only
-  5 of 8 required stable 25 Hz ticks inside the 1 mm clearance. No insertion
-  success is claimed.
+  descent command has started, while side-load/force aborts remain active.
+  Launch-level SEARCH and INSERT handoff timing diagnostics are now available
+  without exposing the 1 mm clearance or 8-tick gate. The latest run reached
+  INSERT but aborted before descent: handoff feedback reached only 5 of 8
+  required stable 25 Hz ticks inside the 1 mm clearance. No insertion success is
+  claimed.
 
 Next technical step: stabilize near-centered SEARCH and pre-insert handoff while
 preserving the physical clearance gates; do not bulk-add raw diagnostic CSVs or
@@ -135,6 +136,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_insert_handoff_gate_order_v1 | Completed sequencing fix with partial runtime validation: no-contact pre-depth INSERT clearance abort now applies after descent command start, allowing the existing handoff settle window to run as designed. The retained validation timed out in SEARCH and did not exercise INSERT handoff; SEARCH best 1 mm window remained 3 ticks. |
 | research_baseline_search_damping10_gain3000_25hz_v1 | Rejected diagnostic: gain=3000, D=10, damping scale 10 reached INSERT and exercised the reordered handoff path, but aborted safely before descent because INSERT handoff feedback reached only 4 of 8 required 25 Hz ticks inside the 0.0010 m clearance. No insertion success claimed. |
 | research_baseline_handoff_timeout12_gain3000_damping10_25hz_v1 | Completed diagnostic hook, failed runtime: handoff hold duration/timeout are now launch parameters with canonical defaults, but the fixed 8-tick/1 mm gate is not configurable. A 12 s handoff-timeout run did not reach INSERT; SEARCH failed closed with best 1 mm stability 5 ticks and best hold-like feedback 6 ticks. No insertion success claimed. |
+| research_baseline_search_recenter8_settle9_gain3000_damping10_25hz_v1 | Improved but failed safely: SEARCH recenter/settle durations are now launch parameters. An 8 s / 9 s diagnostic reached INSERT, but aborted before descent because INSERT handoff reached only 5 of 8 required 1 mm stability ticks. No insertion success claimed. |
 
 ## 2026-06-07 INSERT Handoff Gate Ordering
 

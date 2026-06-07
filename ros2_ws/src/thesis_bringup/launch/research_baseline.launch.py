@@ -589,6 +589,14 @@ def launch_setup(context, *args, **kwargs):
                     value_type=float,
                 ),
                 "approach_speed": 0.01,
+                "search_recenter_duration_s": ParameterValue(
+                    LaunchConfiguration("search_recenter_duration_s"),
+                    value_type=float,
+                ),
+                "search_settle_duration_s": ParameterValue(
+                    LaunchConfiguration("search_settle_duration_s"),
+                    value_type=float,
+                ),
                 "insert_handoff_hold_duration_s": ParameterValue(
                     LaunchConfiguration("insert_handoff_hold_duration_s"),
                     value_type=float,
@@ -760,6 +768,24 @@ def generate_launch_description():
                     "No-descent INSERT handoff hold command duration. "
                     "Default 2.0 s preserves canonical behavior; this does "
                     "not change the 1 mm clearance or 8-tick stability gate."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "search_recenter_duration_s",
+                default_value="5.0",
+                description=(
+                    "Centered SEARCH recenter command duration. Default "
+                    "5.0 s preserves canonical behavior; this does not "
+                    "change the 1 mm clearance or 8-tick SEARCH gate."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "search_settle_duration_s",
+                default_value="6.0",
+                description=(
+                    "SEARCH post-command wait before another recenter/spiral "
+                    "command is allowed. Default 6.0 s preserves canonical "
+                    "behavior and must be at least the recenter duration."
                 ),
             ),
             DeclareLaunchArgument(

@@ -168,6 +168,14 @@ class AdmittanceInsertionNode(Node):
         self.declare_parameter('trajectory_discovery_wait_s', 2.0)
         self.declare_parameter('expected_trajectory_subscribers', 2)
         self.declare_parameter(
+            'search_recenter_duration_s',
+            self.SEARCH_RECENTER_DURATION_S,
+        )
+        self.declare_parameter(
+            'search_settle_duration_s',
+            self.SEARCH_SETTLE_DURATION_S,
+        )
+        self.declare_parameter(
             'insert_handoff_hold_duration_s',
             self.INSERT_HANDOFF_HOLD_DURATION_S,
         )
@@ -196,6 +204,14 @@ class AdmittanceInsertionNode(Node):
         )
         self._expected_trajectory_subscribers: int = int(
             self.get_parameter('expected_trajectory_subscribers').value
+        )
+        self._search_recenter_duration_s: float = max(
+            0.1,
+            float(self.get_parameter('search_recenter_duration_s').value),
+        )
+        self._search_settle_duration_s: float = max(
+            self._search_recenter_duration_s,
+            float(self.get_parameter('search_settle_duration_s').value),
         )
         self._insert_handoff_hold_duration_s: float = max(
             0.1,
@@ -301,6 +317,8 @@ class AdmittanceInsertionNode(Node):
             f'approach_speed={self._approach_speed:.3f}, '
             f'trajectory_discovery_wait_s={self._trajectory_discovery_wait_s:.1f}, '
             f'expected_trajectory_subscribers={self._expected_trajectory_subscribers}, '
+            f'search_recenter_duration_s={self._search_recenter_duration_s:.1f}, '
+            f'search_settle_duration_s={self._search_settle_duration_s:.1f}, '
             f'insert_handoff_hold_duration_s='
             f'{self._insert_handoff_hold_duration_s:.1f}, '
             f'insert_handoff_timeout_s={self._insert_handoff_timeout_s:.1f}'
@@ -1011,7 +1029,7 @@ class AdmittanceInsertionNode(Node):
         # shorten the hold below the recenter command duration.
         search_settle_elapsed_s = self._state_entry_ticks / self._control_rate
         ready_to_count = self._now_s() >= self._search_stability_ready_s
-        settling_window_active = search_settle_elapsed_s < self.SEARCH_SETTLE_DURATION_S
+        settling_window_active = search_settle_elapsed_s < self._search_settle_duration_s
         command_still_running = (
             self._search_stability_ready_s > 0.0
             and not ready_to_count
@@ -1094,9 +1112,9 @@ class AdmittanceInsertionNode(Node):
             ])
             q = self._solve_ik(recenter_target, seed=self.current_joints)
             if q is not None:
-                self._send_trajectory_goal(q, self.SEARCH_RECENTER_DURATION_S)
+                self._send_trajectory_goal(q, self._search_recenter_duration_s)
                 self._search_stability_ready_s = (
-                    self._now_s() + self.SEARCH_RECENTER_DURATION_S
+                    self._now_s() + self._search_recenter_duration_s
                 )
                 self._search_recenter_attempts += 1
                 self.get_logger().info(
@@ -1106,7 +1124,7 @@ class AdmittanceInsertionNode(Node):
                     f'sustained physical clearance '
                     f'{self.INSERT_FINAL_XY_TOLERANCE:.4f}m; '
                     f'holding centered target for '
-                    f'{self.SEARCH_RECENTER_DURATION_S:.1f}s.'
+                    f'{self._search_recenter_duration_s:.1f}s.'
                 )
                 self._state_entry_ticks = 0
                 self._search_convergence_ticks = 0
@@ -1607,7 +1625,14 @@ class AdmittanceInsertionNode(Node):
                     self.SEARCH_CONVERGENCE_TICKS / self._control_rate,
                     3,
                 ),
-                'search_settle_duration_s': round(self.SEARCH_SETTLE_DURATION_S, 3),
+                'search_recenter_duration_s': round(
+                    self._search_recenter_duration_s,
+                    3,
+                ),
+                'search_settle_duration_s': round(
+                    self._search_settle_duration_s,
+                    3,
+                ),
                 'insert_handoff_hold_duration_s': round(
                     self._insert_handoff_hold_duration_s,
                     3,
