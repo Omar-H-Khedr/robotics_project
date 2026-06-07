@@ -19,7 +19,9 @@ from docs and git history is split by subsystem:
   without exposing the 1 mm clearance or 8-tick gate. The latest run reached
   INSERT but aborted before descent: handoff feedback reached only 5 of 8
   required stable 25 Hz ticks inside the 1 mm clearance. No insertion success is
-  claimed.
+  claimed. A follow-up run added `exit_on_done` launch support; the node-level
+  exit hook passed a direct smoke test, but the full launch repeat timed out in
+  SEARCH before DONE and therefore did not exercise launch shutdown.
 
 Next technical step: stabilize near-centered SEARCH and pre-insert handoff while
 preserving the physical clearance gates; do not bulk-add raw diagnostic CSVs or
@@ -137,6 +139,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_damping10_gain3000_25hz_v1 | Rejected diagnostic: gain=3000, D=10, damping scale 10 reached INSERT and exercised the reordered handoff path, but aborted safely before descent because INSERT handoff feedback reached only 4 of 8 required 25 Hz ticks inside the 0.0010 m clearance. No insertion success claimed. |
 | research_baseline_handoff_timeout12_gain3000_damping10_25hz_v1 | Completed diagnostic hook, failed runtime: handoff hold duration/timeout are now launch parameters with canonical defaults, but the fixed 8-tick/1 mm gate is not configurable. A 12 s handoff-timeout run did not reach INSERT; SEARCH failed closed with best 1 mm stability 5 ticks and best hold-like feedback 6 ticks. No insertion success claimed. |
 | research_baseline_search_recenter8_settle9_gain3000_damping10_25hz_v1 | Improved but failed safely: SEARCH recenter/settle durations are now launch parameters. An 8 s / 9 s diagnostic reached INSERT, but aborted before descent because INSERT handoff reached only 5 of 8 required 1 mm stability ticks. No insertion success claimed. |
+| research_baseline_done_shutdown_hook_v1 | Implemented operational hook: task node can exit after writing DONE and launch can shut down on task exit. Direct node smoke test passed; full launch repeat timed out in SEARCH with best 1 mm window 7 ticks, so launch shutdown-on-DONE still needs a DONE-reaching runtime repeat. |
 
 ## 2026-06-07 INSERT Handoff Gate Ordering
 

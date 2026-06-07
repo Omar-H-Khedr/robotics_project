@@ -50,6 +50,7 @@ from typing import Any
 import numpy as np
 
 import rclpy
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 
 from builtin_interfaces.msg import Duration
@@ -167,6 +168,8 @@ class AdmittanceInsertionNode(Node):
         self.declare_parameter('action_timeout', 15.0)
         self.declare_parameter('trajectory_discovery_wait_s', 2.0)
         self.declare_parameter('expected_trajectory_subscribers', 2)
+        self.declare_parameter('exit_on_done', False)
+        self.declare_parameter('done_exit_delay_s', 0.5)
         self.declare_parameter(
             'search_recenter_duration_s',
             self.SEARCH_RECENTER_DURATION_S,
@@ -205,6 +208,14 @@ class AdmittanceInsertionNode(Node):
         self._expected_trajectory_subscribers: int = int(
             self.get_parameter('expected_trajectory_subscribers').value
         )
+        self._exit_on_done: bool = bool(
+            self.get_parameter('exit_on_done').value
+        )
+        self._done_exit_delay_s: float = max(
+            0.0,
+            float(self.get_parameter('done_exit_delay_s').value),
+        )
+        self._done_exit_timer = None
         self._search_recenter_duration_s: float = max(
             0.1,
             float(self.get_parameter('search_recenter_duration_s').value),
@@ -317,6 +328,8 @@ class AdmittanceInsertionNode(Node):
             f'approach_speed={self._approach_speed:.3f}, '
             f'trajectory_discovery_wait_s={self._trajectory_discovery_wait_s:.1f}, '
             f'expected_trajectory_subscribers={self._expected_trajectory_subscribers}, '
+            f'exit_on_done={self._exit_on_done}, '
+            f'done_exit_delay_s={self._done_exit_delay_s:.1f}, '
             f'search_recenter_duration_s={self._search_recenter_duration_s:.1f}, '
             f'search_settle_duration_s={self._search_settle_duration_s:.1f}, '
             f'insert_handoff_hold_duration_s='
@@ -1677,6 +1690,24 @@ class AdmittanceInsertionNode(Node):
         with open('/tmp/insertion_trial_outcome.json', 'w') as f:
             json.dump(outcome, f, indent=2)
 
+        if self._exit_on_done:
+            self._schedule_done_exit()
+
+    def _schedule_done_exit(self) -> None:
+        if self._done_exit_timer is not None:
+            return
+        delay_s = max(0.01, self._done_exit_delay_s)
+        self.get_logger().info(
+            f'exit_on_done enabled; shutting down node in {delay_s:.2f}s.'
+        )
+        self._done_exit_timer = self.create_timer(delay_s, self._exit_after_done)
+
+    def _exit_after_done(self) -> None:
+        if self._done_exit_timer is not None:
+            self._done_exit_timer.cancel()
+        self.get_logger().info('DONE outcome written; exiting task node.')
+        rclpy.shutdown()
+
 
 def main(args=None) -> None:
     rclpy.init(args=args)
@@ -1685,6 +1716,8 @@ def main(args=None) -> None:
         rclpy.spin(node)
     except KeyboardInterrupt:
         node.get_logger().info('Keyboard interrupt - shutting down.')
+    except ExternalShutdownException:
+        pass
     finally:
         node.destroy_node()
         if rclpy.ok():

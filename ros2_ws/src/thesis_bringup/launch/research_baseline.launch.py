@@ -7,6 +7,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
+    EmitEvent,
     IncludeLaunchDescription,
     LogInfo,
     OpaqueFunction,
@@ -15,6 +16,7 @@ from launch.actions import (
 )
 from launch.conditions import IfCondition, UnlessCondition
 from launch.event_handlers import OnProcessExit
+from launch.events import Shutdown
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (
     Command,
@@ -605,6 +607,14 @@ def launch_setup(context, *args, **kwargs):
                     LaunchConfiguration("insert_handoff_timeout_s"),
                     value_type=float,
                 ),
+                "exit_on_done": ParameterValue(
+                    LaunchConfiguration("exit_on_done"),
+                    value_type=bool,
+                ),
+                "done_exit_delay_s": ParameterValue(
+                    LaunchConfiguration("done_exit_delay_s"),
+                    value_type=float,
+                ),
                 "use_sim_time": simulation["use_sim_time"],
             }
         ],
@@ -710,6 +720,19 @@ def launch_setup(context, *args, **kwargs):
         perception_observation_logger,
         synthetic_phase_publisher_node,
         live_v2_14_inference_node,
+        RegisterEventHandler(
+            OnProcessExit(
+                target_action=admittance_insertion,
+                on_exit=[
+                    EmitEvent(
+                        event=Shutdown(
+                            reason="admittance insertion task completed"
+                        )
+                    )
+                ],
+            ),
+            condition=IfCondition(LaunchConfiguration("shutdown_on_task_exit")),
+        ),
     ])
     return actions
 
@@ -795,6 +818,27 @@ def generate_launch_description():
                     "Maximum wait for INSERT handoff feedback to satisfy the "
                     "fixed physical-clearance stability gate before aborting. "
                     "Default 6.0 s preserves canonical behavior."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "exit_on_done",
+                default_value="true",
+                description=(
+                    "If true, the admittance task node exits shortly after "
+                    "writing the final DONE outcome."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "done_exit_delay_s",
+                default_value="0.5",
+                description="Delay between final outcome logging and task-node exit.",
+            ),
+            DeclareLaunchArgument(
+                "shutdown_on_task_exit",
+                default_value="true",
+                description=(
+                    "If true, stop the launch system when the admittance task "
+                    "node exits after DONE. Set false for manual GUI inspection."
                 ),
             ),
             DeclareLaunchArgument(

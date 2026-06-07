@@ -87,7 +87,15 @@ gain retest:
   was `101.68 N`, max force norm was `169.48 N`, and positive Gazebo
   contact-topic samples were `0`;
 - max centered-hold p95 actual XY drift was `0.002232 m`, with max
-  centered-hold p95 JTC joint-position error `0.007669 rad`.
+  centered-hold p95 JTC joint-position error `0.007669 rad`;
+- the task node now supports `exit_on_done` and `done_exit_delay_s`, and the
+  launch file supports `shutdown_on_task_exit`, so DONE-reaching validations
+  can stop the launch instead of relying on an outer timeout;
+- a direct node-level smoke test validated `exit_on_done` with process exit
+  code `0` before an 8 s wrapper;
+- the full launch repeat intended to validate shutdown-on-DONE did not reach
+  DONE: it timed out externally in SEARCH, with best SEARCH `0.0010 m`
+  stability `7` of `8` ticks and best `0.0020 m` stability `54` ticks.
 
 Decision: the duplicate-controller startup/configuration fault and the
 non-default-cadence SEARCH hold-shortening bug are fixed. The INSERT handoff
@@ -97,8 +105,10 @@ the strict handoff stability gate and slows startup motion. Longer handoff
 waiting and SEARCH recenter/settle timing are now configurable for diagnostics,
 but the latest run shows the physical blocker has moved back to INSERT handoff
 feedback stability after SEARCH convergence. No new insertion success is
-claimed. Sustained no-contact SEARCH/hold/handoff feedback centering remains
-the blocker under the `0.0010 m` physical radial clearance gate.
+claimed. The shutdown hook is implemented for DONE-reaching trials, but the
+latest full launch repeat reinforces that sustained no-contact
+SEARCH/hold/handoff feedback centering remains the blocker under the
+`0.0010 m` physical radial clearance gate.
 
 The strongest historical single-run iisy6 insertion-depth evidence is
 `diagnostics/research_baseline_insert_sim_time_completion_v4`, which passed the
