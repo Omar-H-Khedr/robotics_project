@@ -156,6 +156,10 @@ class AdmittanceInsertionNode(Node):
     INSERT_PRECONTACT_CLEARANCE_TICKS = 3
     INSERT_SIDELOAD_DEPTH_GATE_M = 0.001
     INSERT_SIDELOAD_SETTLE_TICKS = 3
+    INSERT_SHALLOW_SIDELOAD_RECOVERY_DEPTH_M = 0.005
+    INSERT_SHALLOW_SIDELOAD_RECOVERY_MAX_ATTEMPTS = 2
+    INSERT_SIDELOAD_WITHDRAW_CLEARANCE_M = 0.015
+    INSERT_SIDELOAD_WITHDRAW_DURATION_S = 3.0
     INSERT_HANDOFF_HOLD_DURATION_S = 2.0
     INSERT_HANDOFF_SETTLE_TICKS = 8
     INSERT_HANDOFF_TIMEOUT_S = 6.0
@@ -269,6 +273,9 @@ class AdmittanceInsertionNode(Node):
         self._insert_precontact_clearance_ticks: int = 0
         self._insert_sideload_ticks: int = 0
         self._insert_predepth_recenter_attempts: int = 0
+        self._insert_shallow_sideload_recovery_attempts: int = 0
+        self._insert_sideload_withdraw_active: bool = False
+        self._insert_sideload_withdraw_start_s: float = 0.0
 
         self.current_joints: np.ndarray = np.zeros(6)
         self.current_wrench: Wrench = Wrench()
@@ -650,6 +657,9 @@ class AdmittanceInsertionNode(Node):
             self._insert_precontact_clearance_ticks = 0
             self._insert_sideload_ticks = 0
             self._insert_predepth_recenter_attempts = 0
+            self._insert_shallow_sideload_recovery_attempts = 0
+            self._insert_sideload_withdraw_active = False
+            self._insert_sideload_withdraw_start_s = 0.0
         if new_state == self.SEARCH:
             self._search_total_ticks = 0
             self._search_convergence_ticks = 0
@@ -765,6 +775,9 @@ class AdmittanceInsertionNode(Node):
             self._insert_precontact_clearance_ticks = 0
             self._insert_sideload_ticks = 0
             self._insert_predepth_recenter_attempts = 0
+            self._insert_shallow_sideload_recovery_attempts = 0
+            self._insert_sideload_withdraw_active = False
+            self._insert_sideload_withdraw_start_s = 0.0
             self._begin_phase(self.MOVING_TO_START)
             self._set_state(self.MOVING_TO_START)
 
@@ -1527,6 +1540,118 @@ class AdmittanceInsertionNode(Node):
         self._insert_precontact_clearance_ticks = 0
         return False
 
+    def _abort_insert_sideload(self, xy_error: float, current_depth: float) -> None:
+        self._abort_reason = (
+            f'INSERT aborted: side-loaded peg at depth '
+            f'{current_depth:.4f}m with XY error {xy_error:.4f}m, '
+            f'exceeding physical clearance '
+            f'{self.INSERT_FINAL_XY_TOLERANCE:.4f}m for '
+            f'{self._insert_sideload_ticks} ticks.'
+        )
+        self.get_logger().warn(self._abort_reason)
+        self._final_insertion_xy_error_m = xy_error
+        self._end_phase(False, xy_error, 0.0, False, self._abort_reason)
+        self._set_state(self.ABORT)
+
+    def _start_shallow_sideload_withdraw(
+        self,
+        peg: np.ndarray,
+        xy_error: float,
+        current_depth: float,
+    ) -> bool:
+        if (
+            current_depth > self.INSERT_SHALLOW_SIDELOAD_RECOVERY_DEPTH_M
+            or self._insert_shallow_sideload_recovery_attempts
+            >= self.INSERT_SHALLOW_SIDELOAD_RECOVERY_MAX_ATTEMPTS
+        ):
+            return False
+
+        target_z = min(
+            self._insert_start_z,
+            max(
+                self.HOLE_TOP_Z + self.INSERT_SIDELOAD_WITHDRAW_CLEARANCE_M,
+                float(peg[2]) + self.INSERT_SIDELOAD_WITHDRAW_CLEARANCE_M,
+            ),
+        )
+        withdraw_target = np.array([peg[0], peg[1], target_z])
+        q = self._solve_ik(withdraw_target, self.current_joints, max_iter=100)
+        if q is None:
+            self.get_logger().warn(
+                'INSERT shallow side-load withdrawal IK failed; aborting '
+                'instead of continuing side-loaded insertion.'
+            )
+            return False
+
+        self._insert_shallow_sideload_recovery_attempts += 1
+        self._send_trajectory_goal(q, self.INSERT_SIDELOAD_WITHDRAW_DURATION_S)
+        self._insert_sideload_withdraw_active = True
+        self._insert_sideload_withdraw_start_s = self._now_s()
+        self._insert_command_sent = False
+        self._insert_command_start_s = 0.0
+        self._insert_handoff_hold_sent = False
+        self._insert_handoff_hold_start_s = 0.0
+        self._insert_handoff_stable_ticks = 0
+        self._insert_precontact_clearance_ticks = 0
+        self._insert_sideload_ticks = 0
+
+        self.get_logger().warn(
+            f'INSERT shallow side-load at depth {current_depth:.4f}m with '
+            f'XY error {xy_error:.4f}m; withdrawing to z={target_z:.4f}m '
+            f'and retrying handoff '
+            f'{self._insert_shallow_sideload_recovery_attempts}/'
+            f'{self.INSERT_SHALLOW_SIDELOAD_RECOVERY_MAX_ATTEMPTS}.'
+        )
+        return True
+
+    def _handle_shallow_sideload_withdraw(
+        self,
+        xy_error: float,
+        current_depth: float,
+    ) -> bool:
+        if not self._insert_sideload_withdraw_active:
+            return False
+
+        elapsed = self._now_s() - self._insert_sideload_withdraw_start_s
+        settled = (
+            elapsed >= self.INSERT_SIDELOAD_WITHDRAW_DURATION_S
+            and current_depth < self.INSERT_SIDELOAD_DEPTH_GATE_M
+            and xy_error <= self.INSERT_PRECONDITION_XY_TOLERANCE
+        )
+        timed_out = elapsed >= self.INSERT_SIDELOAD_WITHDRAW_DURATION_S + 3.0
+
+        if settled:
+            self.get_logger().info(
+                f'INSERT shallow side-load withdrawal complete: '
+                f'depth={current_depth:.4f}m, xy_error={xy_error:.4f}m. '
+                f'Restarting handoff gate.'
+            )
+            self._insert_sideload_withdraw_active = False
+            self._insert_handoff_hold_sent = False
+            self._insert_handoff_hold_start_s = 0.0
+            self._insert_handoff_stable_ticks = 0
+            self._insert_precontact_clearance_ticks = 0
+            self._insert_sideload_ticks = 0
+            return False
+
+        if timed_out:
+            self._abort_reason = (
+                f'INSERT aborted: shallow side-load withdrawal did not clear '
+                f'the hole after {elapsed:.1f}s; depth={current_depth:.4f}m, '
+                f'xy_error={xy_error:.4f}m.'
+            )
+            self.get_logger().warn(self._abort_reason)
+            self._final_insertion_xy_error_m = xy_error
+            self._end_phase(False, xy_error, 0.0, True, self._abort_reason)
+            self._set_state(self.ABORT)
+            return True
+
+        if self._state_entry_ticks % 10 == 0:
+            self.get_logger().info(
+                f'INSERT shallow side-load withdrawal t={elapsed:.1f}s  '
+                f'depth={current_depth:.4f}m  xy_error={xy_error:.4f}m'
+            )
+        return True
+
     def _handle_insert_handoff_settle(
         self,
         peg: np.ndarray,
@@ -1627,27 +1752,6 @@ class AdmittanceInsertionNode(Node):
             self._set_state(self.ABORT)
             return
 
-        side_loaded = (
-            current_depth >= self.INSERT_SIDELOAD_DEPTH_GATE_M
-            and xy_error > self.INSERT_FINAL_XY_TOLERANCE
-        )
-        self._insert_sideload_ticks = (
-            self._insert_sideload_ticks + 1 if side_loaded else 0
-        )
-        if self._insert_sideload_ticks >= self.INSERT_SIDELOAD_SETTLE_TICKS:
-            self._abort_reason = (
-                f'INSERT aborted: side-loaded peg at depth '
-                f'{current_depth:.4f}m with XY error {xy_error:.4f}m, '
-                f'exceeding physical clearance '
-                f'{self.INSERT_FINAL_XY_TOLERANCE:.4f}m for '
-                f'{self._insert_sideload_ticks} ticks.'
-            )
-            self.get_logger().warn(self._abort_reason)
-            self._final_insertion_xy_error_m = xy_error
-            self._end_phase(False, xy_error, 0.0, False, self._abort_reason)
-            self._set_state(self.ABORT)
-            return
-
         # --- SAFETY: abort on excessive force ---
         if force_active and self._check_abort(fz):
             self._abort_reason = (
@@ -1658,6 +1762,26 @@ class AdmittanceInsertionNode(Node):
             self.get_logger().warn(self._abort_reason)
             self._end_phase(False, 0.0, 0.0, False, self._abort_reason)
             self._set_state(self.ABORT)
+            return
+
+        if self._handle_shallow_sideload_withdraw(xy_error, current_depth):
+            return
+
+        side_loaded = (
+            current_depth >= self.INSERT_SIDELOAD_DEPTH_GATE_M
+            and xy_error > self.INSERT_FINAL_XY_TOLERANCE
+        )
+        self._insert_sideload_ticks = (
+            self._insert_sideload_ticks + 1 if side_loaded else 0
+        )
+        if self._insert_sideload_ticks >= self.INSERT_SIDELOAD_SETTLE_TICKS:
+            if self._start_shallow_sideload_withdraw(
+                peg,
+                xy_error,
+                current_depth,
+            ):
+                return
+            self._abort_insert_sideload(xy_error, current_depth)
             return
 
         if not self._insert_command_sent:
@@ -1926,6 +2050,9 @@ class AdmittanceInsertionNode(Node):
                 ),
                 'insert_predepth_recenter_attempts': (
                     self._insert_predepth_recenter_attempts
+                ),
+                'insert_shallow_sideload_recovery_attempts': (
+                    self._insert_shallow_sideload_recovery_attempts
                 ),
                 'gravity_baseline_valid': self._baseline_valid,
                 'baseline_window_samples': len(self._fz_buffer),

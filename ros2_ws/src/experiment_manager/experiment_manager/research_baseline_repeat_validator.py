@@ -70,8 +70,13 @@ def _row_from_outcome(
             "success": False,
             "failed_phase": "launch_or_logging",
             "insertion_depth_m": 0.0,
+            "final_xy_error_m": 0.0,
             "peak_raw_fz_N": 0.0,
             "sustained_contact_force_N": 0.0,
+            "max_insert_contact_force_N": 0.0,
+            "insert_predepth_recenter_attempts": 0,
+            "insert_shallow_sideload_recovery_attempts": 0,
+            "side_load_abort": False,
             "max_cartesian_error_m": 0.0,
             "timeout": timed_out,
             "safety_abort": False,
@@ -85,12 +90,17 @@ def _row_from_outcome(
     reason = str(outcome.get("reason", ""))
     insert = _phase_lookup(outcome, "INSERT")
     failed_phase = _failed_phase(outcome)
+    reason_lower = reason.lower()
     timeout = bool(timed_out or any(
         bool(phase.get("timed_out", False))
         for phase in outcome.get("phases", [])
         if isinstance(phase, dict)
     ))
-    safety_abort = "safety threshold" in reason.lower() or "exceeded" in reason.lower()
+    safety_abort = (
+        "safety threshold" in reason_lower
+        or "hard-force" in reason_lower
+        or "hard force" in reason_lower
+    )
     physical_success = (
         trial_outcome == "SUCCESS"
         and float(metrics.get("insertion_depth_m", 0.0)) >= 0.010
@@ -107,9 +117,25 @@ def _row_from_outcome(
         "success": physical_success,
         "failed_phase": failed_phase,
         "insertion_depth_m": float(metrics.get("insertion_depth_m", 0.0)),
+        "final_xy_error_m": float(
+            metrics.get("final_insertion_xy_error_m", 0.0)
+        ),
         "peak_raw_fz_N": float(metrics.get("max_fz_N", 0.0)),
         "sustained_contact_force_N": float(
             metrics.get("max_contact_force_N", insert.get("contact_force_N", 0.0))
+        ),
+        "max_insert_contact_force_N": float(
+            metrics.get("max_insert_contact_force_N", 0.0)
+        ),
+        "insert_predepth_recenter_attempts": int(
+            metrics.get("insert_predepth_recenter_attempts", 0)
+        ),
+        "insert_shallow_sideload_recovery_attempts": int(
+            metrics.get("insert_shallow_sideload_recovery_attempts", 0)
+        ),
+        "side_load_abort": (
+            trial_outcome == "ABORTED"
+            and ("side-loaded" in reason_lower or "side-load" in reason_lower)
         ),
         "max_cartesian_error_m": _max_cartesian_error(outcome),
         "timeout": timeout,
@@ -217,8 +243,13 @@ def _write_outputs(rows: list[dict[str, Any]], output_dir: Path, args: argparse.
         "success",
         "failed_phase",
         "insertion_depth_m",
+        "final_xy_error_m",
         "peak_raw_fz_N",
         "sustained_contact_force_N",
+        "max_insert_contact_force_N",
+        "insert_predepth_recenter_attempts",
+        "insert_shallow_sideload_recovery_attempts",
+        "side_load_abort",
         "max_cartesian_error_m",
         "timeout",
         "safety_abort",
@@ -237,6 +268,7 @@ def _write_outputs(rows: list[dict[str, Any]], output_dir: Path, args: argparse.
     successes = sum(1 for row in rows if row["success"])
     timeouts = sum(1 for row in rows if row["timeout"])
     safety_aborts = sum(1 for row in rows if row["safety_abort"])
+    side_load_aborts = sum(1 for row in rows if row["side_load_abort"])
     summary = {
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "command": "ros2 launch thesis_bringup research_baseline.launch.py use_gui:=false",
@@ -249,6 +281,7 @@ def _write_outputs(rows: list[dict[str, Any]], output_dir: Path, args: argparse.
         "success_rate": round(successes / total, 4) if total else 0.0,
         "timeout_count": timeouts,
         "safety_abort_count": safety_aborts,
+        "side_load_abort_count": side_load_aborts,
         "criteria": {
             "physical_success": (
                 "trial_outcome == SUCCESS, insertion_depth_m >= 0.010, "
@@ -274,11 +307,33 @@ def _write_outputs(rows: list[dict[str, Any]], output_dir: Path, args: argparse.
                 f"- Success rate: {summary['success_rate']}",
                 f"- Timeouts: {timeouts}",
                 f"- Safety aborts: {safety_aborts}",
+                f"- Side-load aborts: {side_load_aborts}",
                 f"- CSV: `{csv_path}`",
                 "",
                 "Physical success requires measured insertion depth, contact evidence, "
                 "and no safety abort. This report does not convert a single run into a "
                 "robustness claim.",
+                "",
+                "| Trial | Outcome | Success | Failed phase | Depth m | Final XY m | "
+                "Peak raw Fz N | Contact N | Insert contact N | Pre-depth recenters | "
+                "Shallow side-load recoveries | Timeout | Safety abort | Side-load abort |",
+                "| ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- |",
+                *[
+                    (
+                        f"| {row['trial']} | `{row['trial_outcome']}` | "
+                        f"`{row['success']}` | `{row['failed_phase']}` | "
+                        f"{float(row['insertion_depth_m']):.4f} | "
+                        f"{float(row['final_xy_error_m']):.4f} | "
+                        f"{float(row['peak_raw_fz_N']):.2f} | "
+                        f"{float(row['sustained_contact_force_N']):.2f} | "
+                        f"{float(row['max_insert_contact_force_N']):.2f} | "
+                        f"{row['insert_predepth_recenter_attempts']} | "
+                        f"{row['insert_shallow_sideload_recovery_attempts']} | "
+                        f"`{row['timeout']}` | `{row['safety_abort']}` | "
+                        f"`{row['side_load_abort']}` |"
+                    )
+                    for row in rows
+                ],
                 "",
             ]
         ),

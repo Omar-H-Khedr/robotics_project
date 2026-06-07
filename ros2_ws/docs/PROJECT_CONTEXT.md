@@ -222,6 +222,22 @@ gain retest:
   `0.0006 m`;
 - Trial 3 aborted after two recenter attempts at depth `0.0040 m`, final XY
   `0.0013 m`.
+- shallow inserted side-load now has a bounded vertical withdrawal/retry path
+  at or below `0.005 m` inserted depth; this keeps the fixed `0.0010 m`
+  physical clearance and force gates unchanged;
+- repeat validation in
+  `diagnostics/research_baseline_shallow_sideload_withdraw_500hz_repeat_v1`
+  completed 5 fresh headless trials with per-trial tracking logs;
+- repeat result: `4/5` physical successes, `0` timeouts, `0` safety aborts,
+  and `0` side-load aborts;
+- Trial 2 exercised one shallow side-load withdrawal and recovered to depth
+  `0.0201 m`;
+- Trials 1, 3, and 5 reached depths `0.0202 m`, `0.0205 m`, and `0.0207 m`;
+- Trial 4 failed closed before meaningful insertion depth after two bounded
+  pre-depth recenters, with no-contact XY drift `0.0021 m` against the fixed
+  `0.0010 m` clearance;
+- SEARCH was bypassed in this repeat set, so SEARCH-entering robustness is
+  still unresolved.
 
 Decision: the duplicate-controller startup/configuration fault and the
 non-default-cadence SEARCH hold-shortening bug are fixed. The INSERT handoff
@@ -232,13 +248,13 @@ waiting and SEARCH recenter/settle timing are now configurable for diagnostics,
 but SEARCH-entering runs still show that post-command feedback stability can be
 the physical blocker before INSERT. The shutdown hook and Python-node teardown
 have now been exercised in full DONE-reaching launches. The 500 Hz variant is
-useful diagnostic evidence but failed robustness validation at `1/3` successes.
-Bounded pre-depth recentering and immediate ABORT outcome logging are the
-latest retained INSERT-runtime changes. Repeat validation still failed at
-`1/3` successes, so the next control blocker is shallow inserted-depth
-side-load drift after recenter, while sustained no-contact SEARCH/hold/handoff
-feedback centering remains an unresolved robustness risk in SEARCH-entering
-runs under the `0.0010 m` physical radial clearance gate.
+useful diagnostic evidence and, after bounded pre-depth recentering plus
+shallow side-load withdrawal/retry, now has `4/5` physical successes in the
+latest repeat set. This is not final robust autonomous success. The next
+control blocker is no-contact pre-depth XY drift after repeated handoff
+recenters, while sustained no-contact SEARCH/hold/handoff feedback centering
+remains an unresolved robustness risk in SEARCH-entering runs under the
+`0.0010 m` physical radial clearance gate.
 
 Operational note: after generated tracked `build/`, `install/`, and `log`
 trees are restored, selected package build/install trees must be cleaned and

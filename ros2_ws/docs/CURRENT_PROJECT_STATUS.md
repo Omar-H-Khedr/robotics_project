@@ -153,6 +153,21 @@ rows. The current blocker is shallow inserted-depth side-load drift after
 bounded recenter, while SEARCH robustness is still unresolved in
 SEARCH-entering runs.
 
+The latest retained INSERT recovery milestone is
+`research_baseline_shallow_sideload_withdraw_500hz_repeat_v1`. It adds a
+bounded vertical withdrawal/retry path only for shallow inserted side-load
+events at or below `0.005 m` depth. The fixed `0.0010 m` physical clearance,
+`8`-tick handoff stability gate, and force safety thresholds were not relaxed.
+Five fresh headless repeats completed with per-trial tracking logs: `4/5`
+physical successes, `0` timeouts, `0` safety aborts, and `0` side-load aborts.
+Trial 2 exercised one shallow side-load withdrawal and then reached depth
+`0.0201 m`; Trials 1, 3, and 5 reached depths `0.0202 m`, `0.0205 m`, and
+`0.0207 m`. Trial 4 failed closed in INSERT before meaningful insertion depth
+after two bounded pre-depth recenters: no-contact XY drift reached `0.0021 m`
+against the fixed `0.0010 m` clearance. This improves repeat evidence beyond
+the previous `1/3`, but it is not final robust autonomous success. SEARCH was
+bypassed in this repeat set, so SEARCH-entering robustness remains unresolved.
+
 ## Evidence Reviewed
 
 - `README.md`
@@ -248,6 +263,13 @@ SEARCH-entering runs.
 - `diagnostics/research_baseline_insert_predepth_recenter_500hz_repeat_v3/trial_01_outcome.json`
 - `diagnostics/research_baseline_insert_predepth_recenter_500hz_repeat_v3/trial_02_outcome.json`
 - `diagnostics/research_baseline_insert_predepth_recenter_500hz_repeat_v3/trial_03_outcome.json`
+- `diagnostics/research_baseline_shallow_sideload_withdraw_500hz_repeat_v1/summary.md`
+- `diagnostics/research_baseline_shallow_sideload_withdraw_500hz_repeat_v1/repeat_trials.csv`
+- `diagnostics/research_baseline_shallow_sideload_withdraw_500hz_repeat_v1/trial_01_outcome.json`
+- `diagnostics/research_baseline_shallow_sideload_withdraw_500hz_repeat_v1/trial_02_outcome.json`
+- `diagnostics/research_baseline_shallow_sideload_withdraw_500hz_repeat_v1/trial_03_outcome.json`
+- `diagnostics/research_baseline_shallow_sideload_withdraw_500hz_repeat_v1/trial_04_outcome.json`
+- `diagnostics/research_baseline_shallow_sideload_withdraw_500hz_repeat_v1/trial_05_outcome.json`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -317,6 +339,7 @@ until repeated validation demonstrates robust success.
 - `research_baseline_insert_predepth_recenter_500hz_v1`: bounded INSERT pre-depth recentering now restarts handoff instead of immediately aborting after the first no-contact XY drift event before meaningful depth. The fixed `0.0010 m` clearance and `8`-tick handoff gate are unchanged, and recovery is capped at `2` attempts. A valid 500 Hz iisy6 diagnostic exercised one recenter attempt and reached final outcome `SUCCESS` with depth `0.0197 m`, final INSERT XY `0.0003 m`, max task INSERT contact `49.74 N`, max raw `|Fz|` `98.87 N`, max force norm `171.07 N`, and `0` positive contact-topic samples. Passive analysis reported INSERT p95 XY `0.001138 m`, best INSERT 1 mm window `62` estimated task ticks, and second-descent hold feedback `46` ticks inside `0.0010 m`.
 - `research_baseline_abort_outcome_logging_v1`: entering ABORT now writes final outcome JSON once and schedules the existing `exit_on_done` shutdown path. This fixes repeat-harness `NO_OUTCOME` rows for task-level aborts that previously remained in ABORT/retreat until the harness killed the launch.
 - `research_baseline_insert_predepth_recenter_500hz_repeat_v3`: repeated validation of bounded pre-depth recentering completed 3 fresh launches with a 300 s per-trial timeout. Result: `1/3` physical successes, `0` timeouts, `0` safety aborts. The success used two recenter attempts and reached depth `0.0206 m`; the two failures were explicit INSERT side-load aborts at shallow depths `0.0021 m` and `0.0040 m`. This is not robust success.
+- `research_baseline_shallow_sideload_withdraw_500hz_repeat_v1`: bounded shallow side-load withdrawal/retry was validated in 5 fresh headless repeats. Result: `4/5` physical successes, `0` timeouts, `0` safety aborts, `0` side-load aborts. Trial 2 used one shallow withdrawal and recovered to depth; Trial 4 failed closed before meaningful depth on no-contact XY drift after two bounded recenters. This is improved repeated simulation evidence, not final robust success.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.

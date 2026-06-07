@@ -97,6 +97,19 @@ recenter attempts at depth `0.0038 m` / XY `0.0013 m`. The task node now writes
 final outcome JSON immediately on ABORT, so these failures are explicit task
 outcomes rather than harness `NO_OUTCOME` rows.
 
+The latest retained INSERT recovery milestone,
+`research_baseline_shallow_sideload_withdraw_500hz_repeat_v1`, adds a bounded
+vertical withdrawal/retry only when the peg is already side-loaded at shallow
+inserted depth (`<= 0.005 m`). It does not relax the fixed `0.0010 m`
+physical clearance or force gates. Five fresh headless repeats produced `4/5`
+physical successes, `0` timeouts, and `0` safety aborts. Trial 2 exercised the
+new withdrawal once at shallow depth and recovered to `0.0201 m` insertion.
+The remaining failure, Trial 4, aborted before meaningful insertion depth after
+two bounded pre-depth recenters when no-contact XY drift reached `0.0021 m`.
+This is an improvement over `1/3`, but not final robust success. SEARCH was
+still bypassed in these repeats, so SEARCH-entering robustness remains
+unresolved.
+
 Operational note: after restoring tracked generated directories, clean and
 rebuild selected package build/install trees before runtime. A stale tracked
 `install/thesis_bringup` launch file was observed to launch the older iisy3
@@ -105,12 +118,12 @@ path until `build/kuka_task_control`, `install/kuka_task_control`,
 
 Remaining shutdown limitation: the Python-side cleanup does not fix
 `ros_gz_bridge` exit `-11` or `gzserver` forced-kill behavior during launch
-teardown. Next technical step: reduce shallow inserted-depth side-load drift
-after bounded recenter, while continuing to treat SEARCH-entering robustness as
-unresolved; do not bulk-add raw diagnostic CSVs or claim robust insertion
-success before repeated validation passes.
+teardown. Next technical step: reduce or prevent no-contact pre-depth XY drift
+after repeated handoff recenters, while continuing to treat SEARCH-entering
+robustness as unresolved; do not bulk-add raw diagnostic CSVs or claim final
+autonomous peg-in-hole success before broader repeated validation passes.
 
-The strongest historical iisy6 evidence is a controller-driven simulated insertion-depth event from `diagnostics/research_baseline_insert_sim_time_completion_v4`: final outcome `SUCCESS` under older depth/contact criteria, insertion depth `0.0191 m`, task F/T insert-contact evidence `60.1 N`, max raw `|Fz|=133.33 N`, and no safety abort or invalid timeout. That claim is now superseded by a stricter physical-clearance gate: `diagnostics/research_baseline_insert_physical_xy_gate_v1` reached depth `0.0177 m` and insert contact `55.4 N`, but correctly reported `DEGRADED` because final insertion XY error `0.0030 m` exceeds the 25 mm peg / 27 mm hole radial clearance of `0.0010 m`. Current status: bounded pre-depth recentering has produced one single-run insertion-depth event and only `1/3` repeat successes in `research_baseline_insert_predepth_recenter_500hz_repeat_v3`, so there is still no repeated validated physical insertion success under the latest criteria.
+The strongest historical iisy6 evidence is a controller-driven simulated insertion-depth event from `diagnostics/research_baseline_insert_sim_time_completion_v4`: final outcome `SUCCESS` under older depth/contact criteria, insertion depth `0.0191 m`, task F/T insert-contact evidence `60.1 N`, max raw `|Fz|=133.33 N`, and no safety abort or invalid timeout. That claim is now superseded by a stricter physical-clearance gate: `diagnostics/research_baseline_insert_physical_xy_gate_v1` reached depth `0.0177 m` and insert contact `55.4 N`, but correctly reported `DEGRADED` because final insertion XY error `0.0030 m` exceeds the 25 mm peg / 27 mm hole radial clearance of `0.0010 m`. Current status: shallow side-load withdrawal recovery improved repeat validation to `4/5` physical successes in `research_baseline_shallow_sideload_withdraw_500hz_repeat_v1`, with one explicit fail-closed pre-depth drift abort. This is promising repeated simulation evidence, not final robust autonomous peg-in-hole success.
 
 Latest timing evidence shows the prior failed insert was partly a clock-domain bug: the task advanced to RETREAT after about `10.6 s` of controller-state INSERT time despite commanding a `20 s` trajectory. The current task node uses ROS/Gazebo time for INSERT completion and now checks final insertion XY against physical hole clearance. The latest runtime gate aborts INSERT before meaningful depth when no-contact XY feedback exceeds the `0.001 m` physical radial clearance, so future work should reduce or constrain single-point INSERT path drift; do not treat depth/contact alone as robust autonomous peg-in-hole performance.
 
@@ -234,6 +247,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_insert_predepth_recenter_500hz_v1 | Promising single-run diagnostic: bounded INSERT pre-depth recenter fired once, restarted handoff, and reached one measured insertion-depth event at depth 0.0197 m with final INSERT XY 0.0003 m. |
 | research_baseline_abort_outcome_logging_v1 | Completed: ABORT now writes final outcome JSON immediately, so repeat validation records explicit task failures instead of harness NO_OUTCOME rows. |
 | research_baseline_insert_predepth_recenter_500hz_repeat_v3 | Failed robustness validation: 1/3 physical successes, 0 timeouts, 0 safety aborts; failures are shallow INSERT side-load aborts after bounded recenter attempts. |
+| research_baseline_shallow_sideload_withdraw_500hz_repeat_v1 | Improved repeat validation: bounded shallow side-load withdrawal/retry reached 4/5 physical successes, 0 timeouts, 0 safety aborts; one remaining failure is no-contact pre-depth XY drift after two bounded recenters. |
 
 ## 2026-06-07 INSERT Pre-Depth Recenter Repeat Validation
 
