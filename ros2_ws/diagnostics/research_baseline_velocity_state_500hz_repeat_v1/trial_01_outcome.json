@@ -1,0 +1,66 @@
+{
+  "trial_outcome": "SUCCESS",
+  "reason": "Full cycle completed. Insertion depth 0.020m, contact 49.9N during INSERT.",
+  "phases": [
+    {
+      "phase": "MOVING_TO_START",
+      "success": true,
+      "cart_error_m": 0.000755,
+      "joint_error_rad": 0.002562,
+      "timed_out": false,
+      "duration_s": 40.04,
+      "message": ""
+    },
+    {
+      "phase": "APPROACH",
+      "success": true,
+      "cart_error_m": 0.014003,
+      "joint_error_rad": 0.024826,
+      "timed_out": false,
+      "duration_s": 11.64,
+      "message": ""
+    },
+    {
+      "phase": "INSERT",
+      "success": true,
+      "cart_error_m": 0.0,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 25.36,
+      "message": "Insertion depth 0.020m with insert contact evidence 49.9N and final XY error 0.0006m"
+    },
+    {
+      "phase": "RETREAT",
+      "success": true,
+      "cart_error_m": 0.0,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 24.64,
+      "message": ""
+    }
+  ],
+  "metrics": {
+    "initial_xy_error_m": 0.0006,
+    "pre_insertion_xy_error_m": 0.0004,
+    "final_insertion_xy_error_m": 0.0006,
+    "insert_final_xy_tolerance_m": 0.001,
+    "insertion_depth_m": 0.0202,
+    "max_fz_N": 99.99,
+    "max_abs_fz_N": 99.99,
+    "max_force_norm_N": 172.72,
+    "baseline_fz_N": 41.62,
+    "max_contact_force_N": 72.47,
+    "max_insert_contact_force_N": 49.89,
+    "contact_threshold_N": 5.0,
+    "control_rate_hz": 25.0,
+    "search_convergence_required_ticks": 8,
+    "search_convergence_required_duration_s": 0.32,
+    "search_recenter_duration_s": 8.0,
+    "search_settle_duration_s": 9.0,
+    "insert_handoff_hold_duration_s": 2.0,
+    "insert_handoff_timeout_s": 12.0,
+    "gravity_baseline_valid": true,
+    "baseline_window_samples": 50
+  },
+  "status": "DONE"
+}

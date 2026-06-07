@@ -186,6 +186,16 @@ gain retest:
   wrench-derived contact, not contact-topic confirmation;
 - this is one simulated insertion-depth event under the strict gate, not
   repeated validation or final autonomous peg-in-hole success.
+- repeat validation of the same 500 Hz configuration in
+  `diagnostics/research_baseline_velocity_state_500hz_repeat_v1` completed
+  three fresh headless launches with per-trial tracking logs;
+- repeat result: `1/3` physical successes, `0` timeouts, `0` safety aborts;
+- trial 1 reached `SUCCESS` with insertion depth `0.0202 m`;
+- trials 2 and 3 aborted safely in INSERT before meaningful depth because
+  no-contact XY drift crossed the fixed `0.0010 m` physical clearance gate
+  after descent command start (`0.0012 m` and `0.0010 m`);
+- SEARCH was bypassed in all three repeats, and the Gazebo contact-topic
+  observer still recorded `0` positive samples in every trial.
 
 Decision: the duplicate-controller startup/configuration fault and the
 non-default-cadence SEARCH hold-shortening bug are fixed. The INSERT handoff
@@ -195,11 +205,12 @@ the strict handoff stability gate and slows startup motion. Longer handoff
 waiting and SEARCH recenter/settle timing are now configurable for diagnostics,
 but SEARCH-entering runs still show that post-command feedback stability can be
 the physical blocker before INSERT. The shutdown hook and Python-node teardown
-have now been exercised in full DONE-reaching launches. The latest 500 Hz run
-is a promising single simulated insertion-depth event, but it bypassed SEARCH
-and has not been repeated. Sustained no-contact SEARCH/hold/handoff feedback
-centering remains an unresolved robustness risk under the `0.0010 m` physical
-radial clearance gate.
+have now been exercised in full DONE-reaching launches. The 500 Hz variant is
+useful diagnostic evidence but failed robustness validation at `1/3` successes.
+The next control blocker is deterministic INSERT handoff/descent centering
+after APPROACH bypasses SEARCH, while sustained no-contact SEARCH/hold/handoff
+feedback centering remains an unresolved robustness risk in SEARCH-entering
+runs under the `0.0010 m` physical radial clearance gate.
 
 Operational note: after generated tracked `build/`, `install/`, and `log`
 trees are restored, selected package build/install trees must be cleaned and

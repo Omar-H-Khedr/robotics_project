@@ -1,0 +1,27 @@
+{
+  "created_at_utc": "2026-06-07T17:08:01.477112+00:00",
+  "command": "ros2 launch thesis_bringup research_baseline.launch.py use_gui:=false",
+  "extra_launch_args": [
+    "control_rate:=25.0",
+    "position_gain:=3000.0",
+    "position_derivative_gain:=10.0",
+    "joint_damping_scale:=10.0",
+    "inject_velocity_state:=true",
+    "velocity_state_controller_config_path:=config/research_baseline_velocity_state_500hz.yaml",
+    "search_recenter_duration_s:=8.0",
+    "search_settle_duration_s:=9.0",
+    "insert_handoff_timeout_s:=12.0"
+  ],
+  "per_trial_tracking_logs": true,
+  "trials_requested": 3,
+  "timeout_s": 260.0,
+  "trials_completed": 3,
+  "success_count": 1,
+  "success_rate": 0.3333,
+  "timeout_count": 0,
+  "safety_abort_count": 0,
+  "criteria": {
+    "physical_success": "trial_outcome == SUCCESS, insertion_depth_m >= 0.010, max_contact_force_N >= contact_threshold_N, and no safety abort",
+    "robust_success_claim": "requires repeated evidence; one successful insertion-depth event is not treated as final autonomous peg-in-hole success"
+  }
+}

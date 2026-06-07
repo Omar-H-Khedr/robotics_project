@@ -62,6 +62,16 @@ trace therefore had `0` rows, and the Gazebo contact-topic observer still
 recorded `0` positive contact samples. Repeat validation is required before
 claiming robust physical success.
 
+The follow-up repeat validation,
+`research_baseline_velocity_state_500hz_repeat_v1`, ran three fresh headless
+Gazebo trials of the same 500 Hz configuration with per-trial tracking logs.
+It failed robustness validation: `1/3` physical successes, `0` timeouts, and
+`0` safety aborts. Trial 1 repeated the insertion-depth event (`0.0202 m`),
+but trials 2 and 3 aborted safely in INSERT before meaningful depth when
+no-contact XY drift reached `0.0012 m` and `0.0010 m` against the fixed
+`0.0010 m` physical clearance gate. SEARCH was bypassed in all three trials,
+and Gazebo contact-topic samples remained zero.
+
 Operational note: after restoring tracked generated directories, clean and
 rebuild selected package build/install trees before runtime. A stale tracked
 `install/thesis_bringup` launch file was observed to launch the older iisy3
@@ -70,12 +80,13 @@ path until `build/kuka_task_control`, `install/kuka_task_control`,
 
 Remaining shutdown limitation: the Python-side cleanup does not fix
 `ros_gz_bridge` exit `-11` or `gzserver` forced-kill behavior during launch
-teardown. Next technical step: repeat-validate the 500 Hz diagnostic while
-preserving the physical clearance gates and continuing to track SEARCH
-non-determinism; do not bulk-add raw diagnostic CSVs or claim robust insertion
-success before repeated validation passes.
+teardown. Next technical step: stabilize deterministic INSERT handoff/descent
+centering after APPROACH bypasses SEARCH, while preserving the physical
+clearance gates and continuing to track SEARCH non-determinism; do not bulk-add
+raw diagnostic CSVs or claim robust insertion success before repeated
+validation passes.
 
-The strongest historical iisy6 evidence is a controller-driven simulated insertion-depth event from `diagnostics/research_baseline_insert_sim_time_completion_v4`: final outcome `SUCCESS` under older depth/contact criteria, insertion depth `0.0191 m`, task F/T insert-contact evidence `60.1 N`, max raw `|Fz|=133.33 N`, and no safety abort or invalid timeout. That claim is now superseded by a stricter physical-clearance gate: `diagnostics/research_baseline_insert_physical_xy_gate_v1` reached depth `0.0177 m` and insert contact `55.4 N`, but correctly reported `DEGRADED` because final insertion XY error `0.0030 m` exceeds the 25 mm peg / 27 mm hole radial clearance of `0.0010 m`. Current status: one 500 Hz diagnostic has now produced a strict-gate single-run insertion-depth event, but there is still no repeated validated physical insertion success under the latest criteria.
+The strongest historical iisy6 evidence is a controller-driven simulated insertion-depth event from `diagnostics/research_baseline_insert_sim_time_completion_v4`: final outcome `SUCCESS` under older depth/contact criteria, insertion depth `0.0191 m`, task F/T insert-contact evidence `60.1 N`, max raw `|Fz|=133.33 N`, and no safety abort or invalid timeout. That claim is now superseded by a stricter physical-clearance gate: `diagnostics/research_baseline_insert_physical_xy_gate_v1` reached depth `0.0177 m` and insert contact `55.4 N`, but correctly reported `DEGRADED` because final insertion XY error `0.0030 m` exceeds the 25 mm peg / 27 mm hole radial clearance of `0.0010 m`. Current status: the 500 Hz diagnostic produced one strict-gate single-run insertion-depth event and then only `1/3` repeat successes, so there is still no repeated validated physical insertion success under the latest criteria.
 
 Latest timing evidence shows the prior failed insert was partly a clock-domain bug: the task advanced to RETREAT after about `10.6 s` of controller-state INSERT time despite commanding a `20 s` trajectory. The current task node uses ROS/Gazebo time for INSERT completion and now checks final insertion XY against physical hole clearance. The latest runtime gate aborts INSERT before meaningful depth when no-contact XY feedback exceeds the `0.001 m` physical radial clearance, so future work should reduce or constrain single-point INSERT path drift; do not treat depth/contact alone as robust autonomous peg-in-hole performance.
 
@@ -195,6 +206,32 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_gate_trace_analyzer_v1 | Completed diagnostic: reusable analyzer now reports the online SEARCH gate counter directly from `search_gate_trace.csv`, avoiding passive replay overstatement. |
 | research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1 | Rejected diagnostic: D=20 improves some passive SEARCH indicators but the online gate still reaches only 4/8 required 1 mm ticks; no INSERT and no insertion success. |
 | research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1 | Promising single-run diagnostic: 500 Hz velocity-state controller reached task `SUCCESS` once with depth 0.0202 m, final INSERT XY 0.000848 m, and insert contact 60.2 N; SEARCH was bypassed and Gazebo contact-topic samples remained zero, so repeat validation is still required. |
+| research_baseline_velocity_state_500hz_repeat_v1 | Failed robustness validation: 1/3 physical successes, 0 timeouts, 0 safety aborts; two repeats aborted safely in INSERT before meaningful depth when no-contact XY drift crossed the 1 mm clearance gate. |
+
+## 2026-06-07 500 Hz Repeat Validation
+
+Milestone: `research_baseline_velocity_state_500hz_repeat_v1`
+
+Evidence: `diagnostics/research_baseline_velocity_state_500hz_repeat_v1/summary.md`
+
+Three fresh headless Gazebo trials were run through
+`research_baseline_repeat_validator` with the same 500 Hz velocity-state
+controller configuration and per-trial tracking logs.
+
+Result:
+
+- physical successes: `1/3`;
+- timeouts: `0`;
+- safety aborts: `0`;
+- Trial 1: `SUCCESS`, insertion depth `0.0202 m`;
+- Trial 2: `ABORTED` in INSERT at no-contact XY `0.0012 m`, depth `0.0000 m`;
+- Trial 3: `ABORTED` in INSERT at no-contact XY `0.0010 m`, depth `0.0000 m`;
+- SEARCH gate trace rows: `0` in all three trials because SEARCH was bypassed;
+- positive Gazebo contact-topic samples: `0` in all three trials.
+
+Decision: the 500 Hz variant is useful but not robust enough to become the
+validated baseline. The next control milestone is deterministic INSERT
+handoff/descent centering under the fixed `0.0010 m` physical clearance gate.
 
 ## 2026-06-07 500 Hz Velocity-State Insertion Diagnostic
 

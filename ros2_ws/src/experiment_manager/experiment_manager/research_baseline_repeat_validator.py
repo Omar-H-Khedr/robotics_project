@@ -40,6 +40,8 @@ def _max_cartesian_error(outcome: dict[str, Any]) -> float:
 
 
 def _failed_phase(outcome: dict[str, Any]) -> str:
+    if str(outcome.get("trial_outcome", "")) == "SUCCESS":
+        return ""
     for phase in outcome.get("phases", []):
         if isinstance(phase, dict) and not bool(phase.get("success", False)):
             return str(phase.get("phase", "unknown"))
@@ -155,6 +157,14 @@ def _run_trial(trial: int, args: argparse.Namespace, output_dir: Path) -> dict[s
     ]
     if args.extra_launch_arg:
         cmd.extend(args.extra_launch_arg)
+    tracking_log_dir = ""
+    if args.per_trial_tracking_logs and not any(
+        arg.startswith("tracking_log_dir:=") for arg in args.extra_launch_arg
+    ):
+        tracking_path = output_dir / f"trial_{trial:02d}_tracking"
+        tracking_path.mkdir(parents=True, exist_ok=True)
+        tracking_log_dir = str(tracking_path)
+        cmd.append(f"tracking_log_dir:={tracking_log_dir}")
 
     start = time.monotonic()
     timed_out = False
@@ -189,6 +199,7 @@ def _run_trial(trial: int, args: argparse.Namespace, output_dir: Path) -> dict[s
     elapsed_s = time.monotonic() - start
     row = _row_from_outcome(trial, return_code, elapsed_s, timed_out, outcome)
     row["log_path"] = str(log_path)
+    row["tracking_log_dir"] = tracking_log_dir
     if outcome is not None:
         (output_dir / f"trial_{trial:02d}_outcome.json").write_text(
             json.dumps(outcome, indent=2),
@@ -215,6 +226,7 @@ def _write_outputs(rows: list[dict[str, Any]], output_dir: Path, args: argparse.
         "elapsed_s",
         "reason",
         "log_path",
+        "tracking_log_dir",
     ]
     with csv_path.open("w", encoding="utf-8", newline="") as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
@@ -228,6 +240,8 @@ def _write_outputs(rows: list[dict[str, Any]], output_dir: Path, args: argparse.
     summary = {
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "command": "ros2 launch thesis_bringup research_baseline.launch.py use_gui:=false",
+        "extra_launch_args": list(args.extra_launch_arg),
+        "per_trial_tracking_logs": bool(args.per_trial_tracking_logs),
         "trials_requested": args.trials,
         "timeout_s": args.timeout_s,
         "trials_completed": total,
@@ -285,6 +299,14 @@ def main() -> None:
         action="append",
         default=[],
         help="Additional launch argument, e.g. robot_model:=lbr_iisy6_r1300",
+    )
+    parser.add_argument(
+        "--per-trial-tracking-logs",
+        action="store_true",
+        help=(
+            "Append tracking_log_dir:=<output-dir>/trial_XX_tracking to each "
+            "launch unless tracking_log_dir is already supplied."
+        ),
     )
     args = parser.parse_args()
 

@@ -115,6 +115,18 @@ inside the `0.0010 m` clearance gate; the SEARCH trace therefore contained
 samples, so the contact evidence remains wrench-derived/task-side. Repeat
 validation is the next control milestone before any robust success claim.
 
+Repeat validation of the same 500 Hz configuration has now been run in
+`research_baseline_velocity_state_500hz_repeat_v1`. It failed robustness
+validation: `1/3` physical successes, `0` timeouts, and `0` safety aborts.
+Trial 1 reached `SUCCESS` with insertion depth `0.0202 m`; trials 2 and 3
+aborted safely in INSERT before meaningful depth when no-contact XY drift
+crossed the fixed `0.0010 m` physical clearance gate (`0.0012 m` and
+`0.0010 m`, respectively). SEARCH was bypassed in all three trials, and
+positive Gazebo contact-topic samples remained `0`. The current control
+blocker is deterministic INSERT handoff/descent centering under the fixed
+physical clearance gate, with SEARCH robustness still unresolved in
+SEARCH-entering runs.
+
 ## Evidence Reviewed
 
 - `README.md`
@@ -194,6 +206,11 @@ validation is the next control milestone before any robust success claim.
 - `diagnostics/research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1/xy_stability_analysis.md`
 - `diagnostics/research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1/hold_window_reference_analysis.md`
 - `diagnostics/research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1/search_tracking_sensitivity_analysis.md`
+- `diagnostics/research_baseline_velocity_state_500hz_repeat_v1/summary.md`
+- `diagnostics/research_baseline_velocity_state_500hz_repeat_v1/repeat_trials.csv`
+- `diagnostics/research_baseline_velocity_state_500hz_repeat_v1/trial_01_outcome.json`
+- `diagnostics/research_baseline_velocity_state_500hz_repeat_v1/trial_02_outcome.json`
+- `diagnostics/research_baseline_velocity_state_500hz_repeat_v1/trial_03_outcome.json`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -259,6 +276,7 @@ until repeated validation demonstrates robust success.
 - `research_baseline_search_gate_trace_analyzer_v1`: `search_gate_trace_analyzer` now reads `search_gate_trace.csv` and reports the task node's online `convergence_ticks_after` counter, ready-to-count streaks, all-trace streaks, decision counts, final decision, and pass/fail status. Re-analysis corrected the D=20 diagnostic from an ad hoc post-settle-only count to the authoritative online max convergence count: D=20 reached `4/8` ticks, while the previous D=10 clean-shutdown trace reached `6/8`.
 - `research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1`: D=20 was tested as a launch-parameter diagnostic after the clean Python shutdown milestone. The launch reached DONE and exited with code `0`, but failed safely in SEARCH: final outcome `ABORTED`, reason `SEARCH timeout (45s). Instantaneous XY error 0.0006m is within physical clearance 0.0010m but was not sustained for 8 post-command ticks.`, insertion depth `0.0000 m`, max raw `|Fz|` `100.51 N`, max force norm `170.49 N`, and `0` positive contact-topic samples. The online trace recorded `1125` rows, only `2` `post_settle_count` rows, and max online convergence count `4/8` ticks. Passive SEARCH best 1 mm window was `6` estimated ticks and hold-like best feedback 1 mm window was `9` ticks. D=20 is rejected as a baseline change because the online state-machine gate still blocks INSERT correctly.
 - `research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1`: a 500 Hz velocity-state controller-manager diagnostic was run after a clean selected package rebuild. It reached one task `SUCCESS` with insertion depth `0.0202 m`, final INSERT XY `0.000848 m`, task INSERT contact `60.2 N`, max raw `|Fz|` `96.97 N`, and no task safety abort. SEARCH was bypassed, `search_gate_trace.csv` had `0` rows, and the Gazebo contact-topic observer recorded `0` positive samples. This is a single simulated insertion-depth event that must be repeat-validated before any robust physical success claim.
+- `research_baseline_velocity_state_500hz_repeat_v1`: repeated validation of the same 500 Hz configuration completed 3 fresh launches with per-trial tracking logs. Result: `1/3` physical successes, `0` timeouts, `0` safety aborts. Trial 1 reached depth `0.0202 m`; trials 2 and 3 aborted safely in INSERT before meaningful depth on no-contact XY drift at the `0.0010 m` physical clearance boundary. SEARCH was bypassed in all repeats, and contact-topic positives remained `0`. The 500 Hz variant is not a robust validated baseline.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
