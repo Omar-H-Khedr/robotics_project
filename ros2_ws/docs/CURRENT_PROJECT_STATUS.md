@@ -100,6 +100,21 @@ Passive replay
 reported SEARCH best 1 mm stability `6` estimated task ticks and hold-like best
 feedback 1 mm stability `9` ticks. D=20 is rejected as a baseline change.
 
+The latest retained runtime diagnostic is
+`research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1`. It adds a
+500 Hz velocity-state controller-manager configuration and reruns the 25 Hz
+gain=3000 / D=10 / damping-scale-10 task configuration after a clean selected
+package rebuild. The launch exited with code `0` and the task reported one
+`SUCCESS` outcome: insertion depth `0.0202 m`, final INSERT XY `0.000848 m`,
+max task INSERT contact `60.2 N`, max raw `|Fz|` `96.97 N`, max force norm
+`170.02 N`, and no task safety abort. This is a single simulated
+insertion-depth event under the strict physical-clearance gate, not final
+validated peg-in-hole success. SEARCH was bypassed because APPROACH completed
+inside the `0.0010 m` clearance gate; the SEARCH trace therefore contained
+`0` rows. The Gazebo contact-topic observer recorded `0` positive contact
+samples, so the contact evidence remains wrench-derived/task-side. Repeat
+validation is the next control milestone before any robust success claim.
+
 ## Evidence Reviewed
 
 - `README.md`
@@ -175,13 +190,17 @@ feedback 1 mm stability `9` ticks. D=20 is rejected as a baseline change.
 - `diagnostics/research_baseline_clean_python_shutdown_recenter8_gain3000_damping10_25hz_v3/search_gate_trace_analysis.md`
 - `diagnostics/research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1/summary.md`
 - `diagnostics/research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1/search_gate_trace_analysis.md`
+- `diagnostics/research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1/summary.md`
+- `diagnostics/research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1/xy_stability_analysis.md`
+- `diagnostics/research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1/hold_window_reference_analysis.md`
+- `diagnostics/research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1/search_tracking_sensitivity_analysis.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
 
 Do not use wording such as "first successful autonomous peg-in-hole" for the current state. Use:
 
-**first simulated insertion-depth/contact event, not validated physical success**
+**single simulated insertion-depth/contact event, not validated physical success**
 
 until repeated validation demonstrates robust success.
 
@@ -239,6 +258,7 @@ until repeated validation demonstrates robust success.
 - `research_baseline_clean_python_shutdown_recenter8_gain3000_damping10_25hz_v3`: Python passive observers, `safety_monitor`, and `data_logger_node` now shut down cleanly on task-node-driven DONE launch teardown. The validation exited the launch wrapper with code `0`; those Python processes finished cleanly and the data logger closed its CSV without rosout context errors. The task result was still `ABORTED` in SEARCH with reason `SEARCH timeout (45s). XY error 0.0013m remains above physical clearance 0.0010m.`, insertion depth `0.0000 m`, `1125` online SEARCH trace rows ending in `timeout_abort`, SEARCH best passive 1 mm window `9` estimated ticks, hold-like best feedback 1 mm window `6` ticks, max centered-hold p95 XY drift `0.002290 m`, max raw `|Fz|` `102.83 N`, and `0` positive contact-topic samples. Bridge nodes still exit with `-11` and `gzserver` still requires forced teardown.
 - `research_baseline_search_gate_trace_analyzer_v1`: `search_gate_trace_analyzer` now reads `search_gate_trace.csv` and reports the task node's online `convergence_ticks_after` counter, ready-to-count streaks, all-trace streaks, decision counts, final decision, and pass/fail status. Re-analysis corrected the D=20 diagnostic from an ad hoc post-settle-only count to the authoritative online max convergence count: D=20 reached `4/8` ticks, while the previous D=10 clean-shutdown trace reached `6/8`.
 - `research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1`: D=20 was tested as a launch-parameter diagnostic after the clean Python shutdown milestone. The launch reached DONE and exited with code `0`, but failed safely in SEARCH: final outcome `ABORTED`, reason `SEARCH timeout (45s). Instantaneous XY error 0.0006m is within physical clearance 0.0010m but was not sustained for 8 post-command ticks.`, insertion depth `0.0000 m`, max raw `|Fz|` `100.51 N`, max force norm `170.49 N`, and `0` positive contact-topic samples. The online trace recorded `1125` rows, only `2` `post_settle_count` rows, and max online convergence count `4/8` ticks. Passive SEARCH best 1 mm window was `6` estimated ticks and hold-like best feedback 1 mm window was `9` ticks. D=20 is rejected as a baseline change because the online state-machine gate still blocks INSERT correctly.
+- `research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1`: a 500 Hz velocity-state controller-manager diagnostic was run after a clean selected package rebuild. It reached one task `SUCCESS` with insertion depth `0.0202 m`, final INSERT XY `0.000848 m`, task INSERT contact `60.2 N`, max raw `|Fz|` `96.97 N`, and no task safety abort. SEARCH was bypassed, `search_gate_trace.csv` had `0` rows, and the Gazebo contact-topic observer recorded `0` positive samples. This is a single simulated insertion-depth event that must be repeat-validated before any robust physical success claim.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.

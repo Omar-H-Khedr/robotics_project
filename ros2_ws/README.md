@@ -37,7 +37,7 @@ and reason `SEARCH timeout (45s). XY error 0.0013m remains above physical
 clearance 0.0010m.` The SEARCH gate trace recorded `1125` online decision rows
 and ended in `timeout_abort`. No insertion success is claimed.
 
-The latest control diagnostic,
+The latest rejected control diagnostic,
 `research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1`,
 tested gain=3000, D=20, damping-scale=10, velocity-state injection, and the
 same 8 s / 9 s SEARCH timing. It also reached DONE with launch exit code `0`,
@@ -48,6 +48,20 @@ ticks.` The online SEARCH trace recorded `1125` rows, only `2`
 `post_settle_count` rows, and a max online 1 mm convergence count of `4`
 ticks against the required `8`. D=20 is rejected as a baseline change.
 
+The latest retained runtime diagnostic,
+`research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1`, adds a
+500 Hz velocity-state controller-manager configuration and reruns the 25 Hz
+gain=3000 / D=10 / damping-scale-10 task configuration after a clean selected
+package rebuild. The launch exited with code `0` and the task reported
+`SUCCESS` once: insertion depth `0.0202 m`, final INSERT XY `0.000848 m`, max
+INSERT contact `60.2 N`, max raw `|Fz|` `96.97 N`, and no task safety abort.
+This is a first retained strict-gate simulated insertion-depth event in the
+current line of work, not a final validated system result. SEARCH was bypassed
+because APPROACH completed inside the `0.0010 m` clearance gate, the SEARCH
+trace therefore had `0` rows, and the Gazebo contact-topic observer still
+recorded `0` positive contact samples. Repeat validation is required before
+claiming robust physical success.
+
 Operational note: after restoring tracked generated directories, clean and
 rebuild selected package build/install trees before runtime. A stale tracked
 `install/thesis_bringup` launch file was observed to launch the older iisy3
@@ -56,11 +70,12 @@ path until `build/kuka_task_control`, `install/kuka_task_control`,
 
 Remaining shutdown limitation: the Python-side cleanup does not fix
 `ros_gz_bridge` exit `-11` or `gzserver` forced-kill behavior during launch
-teardown. Next technical step: stabilize near-centered SEARCH and pre-insert
-handoff while preserving the physical clearance gates; do not bulk-add raw
-diagnostic CSVs or claim insertion success before repeat validation passes.
+teardown. Next technical step: repeat-validate the 500 Hz diagnostic while
+preserving the physical clearance gates and continuing to track SEARCH
+non-determinism; do not bulk-add raw diagnostic CSVs or claim robust insertion
+success before repeated validation passes.
 
-The strongest historical iisy6 evidence is a controller-driven simulated insertion-depth event from `diagnostics/research_baseline_insert_sim_time_completion_v4`: final outcome `SUCCESS` under older depth/contact criteria, insertion depth `0.0191 m`, task F/T insert-contact evidence `60.1 N`, max raw `|Fz|=133.33 N`, and no safety abort or invalid timeout. That claim is now superseded by a stricter physical-clearance gate: `diagnostics/research_baseline_insert_physical_xy_gate_v1` reached depth `0.0177 m` and insert contact `55.4 N`, but correctly reported `DEGRADED` because final insertion XY error `0.0030 m` exceeds the 25 mm peg / 27 mm hole radial clearance of `0.0010 m`. Current status: no validated physical insertion success under the latest criteria.
+The strongest historical iisy6 evidence is a controller-driven simulated insertion-depth event from `diagnostics/research_baseline_insert_sim_time_completion_v4`: final outcome `SUCCESS` under older depth/contact criteria, insertion depth `0.0191 m`, task F/T insert-contact evidence `60.1 N`, max raw `|Fz|=133.33 N`, and no safety abort or invalid timeout. That claim is now superseded by a stricter physical-clearance gate: `diagnostics/research_baseline_insert_physical_xy_gate_v1` reached depth `0.0177 m` and insert contact `55.4 N`, but correctly reported `DEGRADED` because final insertion XY error `0.0030 m` exceeds the 25 mm peg / 27 mm hole radial clearance of `0.0010 m`. Current status: one 500 Hz diagnostic has now produced a strict-gate single-run insertion-depth event, but there is still no repeated validated physical insertion success under the latest criteria.
 
 Latest timing evidence shows the prior failed insert was partly a clock-domain bug: the task advanced to RETREAT after about `10.6 s` of controller-state INSERT time despite commanding a `20 s` trajectory. The current task node uses ROS/Gazebo time for INSERT completion and now checks final insertion XY against physical hole clearance. The latest runtime gate aborts INSERT before meaningful depth when no-contact XY feedback exceeds the `0.001 m` physical radial clearance, so future work should reduce or constrain single-point INSERT path drift; do not treat depth/contact alone as robust autonomous peg-in-hole performance.
 
@@ -179,6 +194,38 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_clean_python_shutdown_recenter8_gain3000_damping10_25hz_v3 | Completed shutdown cleanup: Python observers, safety monitor, and data logger finish cleanly after DONE-reaching launch. Validation failed safely in SEARCH with 0 m insertion depth; bridge/gzserver shutdown faults remain external limitations. |
 | research_baseline_search_gate_trace_analyzer_v1 | Completed diagnostic: reusable analyzer now reports the online SEARCH gate counter directly from `search_gate_trace.csv`, avoiding passive replay overstatement. |
 | research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1 | Rejected diagnostic: D=20 improves some passive SEARCH indicators but the online gate still reaches only 4/8 required 1 mm ticks; no INSERT and no insertion success. |
+| research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1 | Promising single-run diagnostic: 500 Hz velocity-state controller reached task `SUCCESS` once with depth 0.0202 m, final INSERT XY 0.000848 m, and insert contact 60.2 N; SEARCH was bypassed and Gazebo contact-topic samples remained zero, so repeat validation is still required. |
+
+## 2026-06-07 500 Hz Velocity-State Insertion Diagnostic
+
+Milestone: `research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1`
+
+Evidence: `diagnostics/research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1/summary.md`
+
+The 500 Hz velocity-state controller-manager diagnostic was run after removing
+stale selected package build/install trees and rebuilding `kuka_task_control`,
+`safety_layer`, and `thesis_bringup`. The retained launch used the corrected
+iisy6 path, velocity state injection, gain=3000, D=10, damping scale 10,
+25 Hz task cadence, 8 s SEARCH recenter, 9 s SEARCH settle, and a 12 s INSERT
+handoff timeout.
+
+Task result:
+
+- final outcome: `SUCCESS`;
+- failed phase: none reported;
+- insertion depth: `0.0202 m`;
+- final INSERT XY error: `0.000848 m`;
+- max task INSERT contact: `60.2 N`;
+- max raw `|Fz|`: `96.97 N`;
+- max force norm: `170.02 N`;
+- positive Gazebo contact-topic samples: `0`;
+- SEARCH gate trace rows: `0`.
+
+Decision: keep `research_baseline_velocity_state_500hz.yaml` as a diagnostic
+variant and use it for repeated validation. This is one simulated insertion
+event with measured depth and wrench-derived task contact evidence. It is not
+robust autonomous peg-in-hole success because SEARCH was bypassed and the run
+has not been repeated.
 
 ## 2026-06-07 Clean Python Shutdown
 

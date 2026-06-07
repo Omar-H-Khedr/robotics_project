@@ -1,0 +1,32 @@
+controller_manager:
+  ros__parameters:
+    # Diagnostic velocity-state variant with a 500 Hz controller-manager update
+    # rate. Gazebo runs at 1 kHz in the research cell; this tests whether
+    # reducing the controller sample period from the canonical 250 Hz path
+    # improves the strict 1 mm SEARCH gate without changing task safety gates.
+    update_rate: 500  # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    joint_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+joint_trajectory_controller:
+  ros__parameters:
+    joints:
+      - joint_1
+      - joint_2
+      - joint_3
+      - joint_4
+      - joint_5
+      - joint_6
+
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    state_publish_rate: 100.0
+    action_monitor_rate: 50.0
+    allow_nonzero_velocity_at_trajectory_end: false

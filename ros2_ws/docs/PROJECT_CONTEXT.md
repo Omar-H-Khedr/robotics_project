@@ -38,7 +38,7 @@ The current workspace contains a Gazebo workcell with:
 - dry-run experiment/context scaffolds from earlier proposal milestones.
 
 The latest control-runtime diagnostic is
-`diagnostics/research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1`,
+`diagnostics/research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1`,
 following the retained
 `diagnostics/research_baseline_insert_handoff_gate_order_v1` sequencing fix and
 the rejected `diagnostics/research_baseline_search_gain3000_settle_seconds_25hz_v1`
@@ -171,6 +171,21 @@ gain retest:
   trace interpretation from a post-settle-only ad hoc count to the actual
   state-machine max: D=20 reached `4/8` ticks, while the previous D=10
   clean-shutdown trace reached `6/8`.
+- the latest 500 Hz velocity-state diagnostic uses
+  `research_baseline_velocity_state_500hz.yaml`, which raises the controller
+  manager update rate to `500 Hz` while retaining position commands and
+  `position, velocity` state interfaces;
+- after a clean selected package rebuild, that run reached final task outcome
+  `SUCCESS` once with insertion depth `0.0202 m`, final INSERT XY
+  `0.000848 m`, max task INSERT contact `60.2 N`, max raw `|Fz|`
+  `96.97 N`, and max force norm `170.02 N`;
+- SEARCH was bypassed because APPROACH ended inside the fixed `0.0010 m`
+  clearance gate, so `search_gate_trace.csv` had `0` rows;
+- the Gazebo contact-topic observer still reported `0` positive contact
+  samples, so the retained contact evidence for this event is task-side
+  wrench-derived contact, not contact-topic confirmation;
+- this is one simulated insertion-depth event under the strict gate, not
+  repeated validation or final autonomous peg-in-hole success.
 
 Decision: the duplicate-controller startup/configuration fault and the
 non-default-cadence SEARCH hold-shortening bug are fixed. The INSERT handoff
@@ -178,13 +193,13 @@ gate ordering now matches the intended safety design and has been exercised in
 runtime. Damping scale 10 is rejected as a default because it does not satisfy
 the strict handoff stability gate and slows startup motion. Longer handoff
 waiting and SEARCH recenter/settle timing are now configurable for diagnostics,
-but the latest run shows the physical blocker remains SEARCH/post-command
-feedback stability before INSERT. No new insertion success is claimed. The
-shutdown hook and Python-node teardown have now been exercised in full
-DONE-reaching launches, but the latest D=20 run was still a safe SEARCH abort,
-not a physical insertion success. Sustained no-contact SEARCH/hold/handoff
-feedback centering remains the blocker under the `0.0010 m` physical radial
-clearance gate.
+but SEARCH-entering runs still show that post-command feedback stability can be
+the physical blocker before INSERT. The shutdown hook and Python-node teardown
+have now been exercised in full DONE-reaching launches. The latest 500 Hz run
+is a promising single simulated insertion-depth event, but it bypassed SEARCH
+and has not been repeated. Sustained no-contact SEARCH/hold/handoff feedback
+centering remains an unresolved robustness risk under the `0.0010 m` physical
+radial clearance gate.
 
 Operational note: after generated tracked `build/`, `install/`, and `log`
 trees are restored, selected package build/install trees must be cleaned and
