@@ -32,18 +32,19 @@ Verification after cleanup:
 
 The latest verified milestone from README/docs/git history is
 `live_v2_14_inference_node_validation` for perception and
-`research_baseline_insert_handoff_gate_order_v1` for control. The latest
-control line keeps the duplicate-controller startup fix, the seconds-based
-SEARCH settling fix for 25 Hz runs, and a focused INSERT sequencing correction:
-the no-contact pre-depth clearance abort now applies after the final descent
-command starts, allowing the existing handoff settle window to prove stability.
-A gain=3000, D=10 diagnostic reached INSERT once but aborted before meaningful
-depth on `0.0012 m` no-contact XY drift, so it is rejected as a default. The
-retained validation of the sequencing fix timed out in SEARCH and did not
-exercise INSERT handoff; best SEARCH 1 mm stability remained `3` ticks and
-hold-like feedback remained `4` ticks. The next technical step remains
-near-centered SEARCH/pre-insert feedback stabilization while preserving physical
-clearance gates; repeated validation should follow only after those gates pass.
+`research_baseline_search_damping10_gain3000_25hz_v1` for the latest control
+diagnostic. The latest control line keeps the duplicate-controller startup fix,
+the seconds-based SEARCH settling fix for 25 Hz runs, and a focused INSERT
+sequencing correction: the no-contact pre-depth clearance abort now applies
+after the final descent command starts, allowing the existing handoff settle
+window to prove stability. A gain=3000, D=10 diagnostic first reached INSERT
+once but aborted before meaningful depth on `0.0012 m` no-contact XY drift, so
+it is rejected as a default. A follow-up damping-scale-10 diagnostic reached
+INSERT and exercised the reordered handoff path, but still aborted safely before
+descent because INSERT handoff feedback held inside `0.0010 m` for only `4` of
+the required `8` ticks. The next technical step remains near-centered
+SEARCH/pre-insert feedback stabilization while preserving physical clearance
+gates; repeated validation should follow only after those gates pass.
 
 ## Evidence Reviewed
 
@@ -109,6 +110,7 @@ clearance gates; repeated validation should follow only after those gates pass.
 - `diagnostics/research_baseline_search_settle_seconds_25hz_v1/summary.md`
 - `diagnostics/research_baseline_search_gain3000_settle_seconds_25hz_v1/summary.md`
 - `diagnostics/research_baseline_insert_handoff_gate_order_v1/summary.md`
+- `diagnostics/research_baseline_search_damping10_gain3000_25hz_v1/summary.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -163,6 +165,7 @@ until repeated validation demonstrates robust success.
 - `research_baseline_search_settle_seconds_25hz_v1`: SEARCH settling is now seconds-based (`6.0 s`) instead of hardcoded `60` state ticks, preserving the intended hold duration when `control_rate:=25.0`. A retained run confirmed correct iisy6 launch, single research `gz_ros2_control` startup, active controllers, and SEARCH logs reaching `settle_elapsed=6.0s` before another recenter command. The run was externally timed out in SEARCH before INSERT; best SEARCH 1 mm window improved to `4` ticks (`0.16 s`) and hold-like best feedback 1 mm window improved to `4` ticks, still below the required `8`. Contact-topic samples remained `0`; no insertion success is claimed.
 - `research_baseline_search_gain3000_settle_seconds_25hz_v1`: gain=3000, D=10 reached INSERT once after APPROACH finished at pre-insertion XY `0.0002 m`, but correctly aborted before meaningful depth when no-contact XY reached `0.0012 m` for 3 ticks, exceeding the `0.0010 m` physical clearance. This is not insertion success and is rejected as a default tuning.
 - `research_baseline_insert_handoff_gate_order_v1`: the INSERT state machine now allows the handoff settle window to run before the no-contact pre-depth descent gate; broad XY precondition, side-load-at-depth, and force aborts still run before descent. Retained validation timed out during SEARCH before INSERT and did not exercise the handoff path. SEARCH best 1 mm window was `3` ticks, best 2 mm window was `7` ticks, and hold-like best feedback 1 mm window was `4` ticks. No insertion success is claimed.
+- `research_baseline_search_damping10_gain3000_25hz_v1`: gain=3000, D=10, damping scale 10 reached INSERT and exercised the reordered handoff path. It still aborted safely before descent because INSERT handoff feedback reached only `4` of `8` required 25 Hz ticks inside `0.0010 m`; INSERT final XY was `0.002123 m`, max raw `|Fz|` was `102.21 N`, max force norm was `171.00 N`, and positive contact-topic samples were `0`. `MOVING_TO_START` slowed to about `40.08 s`, so damping scale 10 is rejected as a default. No insertion success is claimed.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.

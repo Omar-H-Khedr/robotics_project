@@ -9,12 +9,16 @@ from docs and git history is split by subsystem:
 
 - Perception: `live_v2_14_inference_node_validation` from `ab2a747`, a passive
   20 Hz live node with 62.6% live accuracy and no controller output.
-- Control: `research_baseline_insert_handoff_gate_order_v1`, a focused
+- Control: `research_baseline_search_damping10_gain3000_25hz_v1`, a rejected
+  damping diagnostic following `research_baseline_insert_handoff_gate_order_v1`.
+  The state-machine fix is retained: a focused
   state-machine sequencing fix after a rejected gain=3000 diagnostic reached
   INSERT once but aborted before meaningful depth on the strict 1 mm physical
   clearance gate. The handoff fix preserves side-load/force aborts and moves
   the no-contact pre-depth clearance abort until after the final descent command
-  has started. Its retained runtime validation timed out during SEARCH, so no
+  has started. The latest damping-scale-10 runtime reached INSERT and exercised
+  this handoff path, but aborted safely before descent because feedback reached
+  only 4 of the required 8 stable 25 Hz ticks inside the 1 mm clearance. No
   insertion success is claimed.
 
 Next technical step: stabilize near-centered SEARCH and pre-insert handoff while
@@ -130,6 +134,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_settle_seconds_25hz_v1 | Completed timing fix and fail-closed diagnostic: SEARCH post-command settling is now seconds-based (`6.0 s`) so 25 Hz diagnostics no longer interrupt 5 s recenter holds after 2.4 s. A retained 25 Hz run reached SEARCH and timed out externally before INSERT; SEARCH best 1 mm window improved to 4 ticks but still remained below the required 8. No insertion success claimed. |
 | research_baseline_search_gain3000_settle_seconds_25hz_v1 | Rejected: gain=3000, D=10 reached INSERT once after APPROACH finished inside clearance, but aborted before meaningful depth because no-contact XY reached 0.0012 m, exceeding the 0.0010 m physical clearance for 3 ticks. No insertion success claimed. |
 | research_baseline_insert_handoff_gate_order_v1 | Completed sequencing fix with partial runtime validation: no-contact pre-depth INSERT clearance abort now applies after descent command start, allowing the existing handoff settle window to run as designed. The retained validation timed out in SEARCH and did not exercise INSERT handoff; SEARCH best 1 mm window remained 3 ticks. |
+| research_baseline_search_damping10_gain3000_25hz_v1 | Rejected diagnostic: gain=3000, D=10, damping scale 10 reached INSERT and exercised the reordered handoff path, but aborted safely before descent because INSERT handoff feedback reached only 4 of 8 required 25 Hz ticks inside the 0.0010 m clearance. No insertion success claimed. |
 
 ## 2026-06-07 INSERT Handoff Gate Ordering
 
@@ -139,6 +144,7 @@ Evidence:
 
 - `diagnostics/research_baseline_search_gain3000_settle_seconds_25hz_v1/summary.md`
 - `diagnostics/research_baseline_insert_handoff_gate_order_v1/summary.md`
+- `diagnostics/research_baseline_search_damping10_gain3000_25hz_v1/summary.md`
 
 The gain=3000, D=10 diagnostic reached INSERT once after APPROACH finished with
 pre-insertion XY `0.0002 m`, but then aborted before meaningful depth when
@@ -161,7 +167,13 @@ still show the binding issue is feedback centering:
 
 Decision: keep the state-machine fix, reject gain=3000 as a default, and
 continue treating sustained no-contact SEARCH/hold feedback stability as the
-next blocker. No physical peg-in-hole success is claimed.
+next blocker. A follow-up damping-scale-10 diagnostic with gain=3000, D=10 did
+exercise the reordered INSERT handoff path, but it still failed the strict gate:
+INSERT lasted `6.03 s`, final XY was `0.002123 m`, and the best estimated
+`0.0010 m` window was only `4` ticks at 25 Hz. No final descent command was
+sent, Gazebo contact-topic samples were `0`, max raw `|Fz|` was `102.21 N`, and
+`MOVING_TO_START` slowed to about `40.08 s`. Damping scale 10 is therefore
+rejected as a default. No physical peg-in-hole success is claimed.
 
 ## 2026-06-07 SEARCH Settling Cadence Fix
 

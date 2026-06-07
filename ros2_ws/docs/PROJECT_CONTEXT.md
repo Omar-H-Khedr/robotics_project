@@ -38,9 +38,11 @@ The current workspace contains a Gazebo workcell with:
 - dry-run experiment/context scaffolds from earlier proposal milestones.
 
 The latest control-runtime diagnostic is
-`diagnostics/research_baseline_insert_handoff_gate_order_v1`, following the
-rejected `diagnostics/research_baseline_search_gain3000_settle_seconds_25hz_v1`
-gain retest:
+`diagnostics/research_baseline_search_damping10_gain3000_25hz_v1`, following
+the retained `diagnostics/research_baseline_insert_handoff_gate_order_v1`
+sequencing fix and the rejected
+`diagnostics/research_baseline_search_gain3000_settle_seconds_25hz_v1` gain
+retest:
 
 - startup fix: the converted upstream plugin pointing at
   `fake_hardware_config_6_axis.yaml` is removed before SDF spawn;
@@ -59,14 +61,20 @@ gain retest:
   side-load-at-depth, and force aborts remain active;
 - retained validation of that ordering fix timed out externally during SEARCH
   before INSERT and did not exercise the handoff path;
-- SEARCH best estimated 1 mm window in that retained run: `3` ticks at 25 Hz;
-- SEARCH best estimated 2 mm window: `7` ticks at 25 Hz;
-- hold-like best feedback 1 mm window: `4` ticks;
-- max centered-hold p95 actual XY drift: `0.003940 m`.
+- a follow-up gain=3000, D=10, damping-scale-10 diagnostic reached INSERT and
+  exercised the reordered handoff path;
+- that run still aborted safely before descent because INSERT handoff feedback
+  reached only `4` of `8` required 25 Hz ticks inside `0.0010 m`;
+- INSERT final XY in the passive log was `0.002123 m`;
+- max raw `|Fz|` was `102.21 N`, max force norm was `171.00 N`, and positive
+  Gazebo contact-topic samples were `0`;
+- `MOVING_TO_START` slowed to about `40.08 s`.
 
 Decision: the duplicate-controller startup/configuration fault and the
 non-default-cadence SEARCH hold-shortening bug are fixed. The INSERT handoff
-gate ordering now matches the intended safety design, but no new insertion
+gate ordering now matches the intended safety design and has been exercised in
+runtime. Damping scale 10 is rejected as a default because it does not satisfy
+the strict handoff stability gate and slows startup motion. No new insertion
 success is claimed. Sustained no-contact SEARCH/hold feedback centering remains
 the blocker under the `0.0010 m` physical radial clearance gate.
 
