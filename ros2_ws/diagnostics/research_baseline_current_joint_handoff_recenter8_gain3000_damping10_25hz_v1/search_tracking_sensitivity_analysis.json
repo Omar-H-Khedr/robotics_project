@@ -1,0 +1,537 @@
+{
+  "centered_hold_like_command_count": 4,
+  "command_source": "trajectory_commands.csv",
+  "commands": [
+    {
+      "command_index": 0,
+      "dominant_joints_by_p95_xy_contribution": [
+        {
+          "joint": "joint_5",
+          "max_abs_xy_contribution_m": 0.002722268518712953,
+          "mean_abs_xy_contribution_m": 0.0007239605674544371,
+          "p95_abs_xy_contribution_m": 0.0017846551521076477
+        },
+        {
+          "joint": "joint_1",
+          "max_abs_xy_contribution_m": 0.002823806316938732,
+          "mean_abs_xy_contribution_m": 0.0008174292117027169,
+          "p95_abs_xy_contribution_m": 0.0017672615695684213
+        },
+        {
+          "joint": "joint_6",
+          "max_abs_xy_contribution_m": 0.002198417529803155,
+          "mean_abs_xy_contribution_m": 0.0006742139390058506,
+          "p95_abs_xy_contribution_m": 0.0016286294006543094
+        },
+        {
+          "joint": "joint_3",
+          "max_abs_xy_contribution_m": 0.0030988349368440485,
+          "mean_abs_xy_contribution_m": 0.0006395144776824399,
+          "p95_abs_xy_contribution_m": 0.0015349535080938221
+        },
+        {
+          "joint": "joint_4",
+          "max_abs_xy_contribution_m": 0.0016981645555218536,
+          "mean_abs_xy_contribution_m": 0.00034621002026283547,
+          "p95_abs_xy_contribution_m": 0.0010260404696716986
+        },
+        {
+          "joint": "joint_2",
+          "max_abs_xy_contribution_m": 0.0006608910704404372,
+          "mean_abs_xy_contribution_m": 9.852735073757775e-05,
+          "p95_abs_xy_contribution_m": 0.000313421281241853
+        }
+      ],
+      "duration_s": 40.0,
+      "final_actual_reference_to_feedback_xy_drift_m": 0.0022488932426330045,
+      "final_feedback_xy_error_m": 0.0022492696866996636,
+      "final_linearized_xy_drift_m": 0.0022464896632725753,
+      "final_reference_xy_error_m": 4.707128863717415e-07,
+      "hold_like": false,
+      "max_abs_joint_error_rad": 0.017593085,
+      "max_actual_reference_to_feedback_xy_drift_m": 0.0046548900640849275,
+      "max_linearization_residual_m": 2.524267264151738e-05,
+      "max_linearized_xy_drift_m": 0.00464418199651085,
+      "mean_actual_reference_to_feedback_xy_drift_m": 0.0014490586912571026,
+      "mean_feedback_xy_error_m": 0.22673191613048851,
+      "mean_linearized_xy_drift_m": 0.001448773172667206,
+      "mean_max_xy_sensitivity_m_per_rad": 0.7718523949536407,
+      "mean_reference_xy_error_m": 0.22710012002226931,
+      "mean_rms_joint_error_rad": 0.0033549635830505092,
+      "mean_xy_jacobian_condition_number": 1.3110839146076523,
+      "next_command_stamp_s": 43.057,
+      "p95_actual_reference_to_feedback_xy_drift_m": 0.0027546935353547916,
+      "p95_linearization_residual_m": 1.0106190799588117e-05,
+      "p95_linearized_xy_drift_m": 0.0027551634506051232,
+      "p95_max_abs_joint_error_rad": 0.013033959,
+      "p95_max_xy_sensitivity_m_per_rad": 0.8468707667507019,
+      "p95_xy_jacobian_condition_number": 1.8804293811059303,
+      "point_count": 20,
+      "receipt_stamp_s": 2.955,
+      "samples": 10018,
+      "target_within_physical_clearance": true,
+      "target_xy_error_m": 4.707128863717415e-07,
+      "target_xyz_m": [
+        0.5200003473316399,
+        -0.20000031769695203,
+        0.8850008831257807
+      ]
+    },
+    {
+      "command_index": 1,
+      "dominant_joints_by_p95_xy_contribution": [
+        {
+          "joint": "joint_1",
+          "max_abs_xy_contribution_m": 0.0021437050243392486,
+          "mean_abs_xy_contribution_m": 0.0006048254585568144,
+          "p95_abs_xy_contribution_m": 0.0013579213456969786
+        },
+        {
+          "joint": "joint_3",
+          "max_abs_xy_contribution_m": 0.0021035093141171498,
+          "mean_abs_xy_contribution_m": 0.00046885056601204055,
+          "p95_abs_xy_contribution_m": 0.0011566316934237943
+        },
+        {
+          "joint": "joint_6",
+          "max_abs_xy_contribution_m": 0.0011360817037034906,
+          "mean_abs_xy_contribution_m": 0.0004621082471075689,
+          "p95_abs_xy_contribution_m": 0.0009450446390494487
+        },
+        {
+          "joint": "joint_5",
+          "max_abs_xy_contribution_m": 0.0009365396805807911,
+          "mean_abs_xy_contribution_m": 0.00031027411870684197,
+          "p95_abs_xy_contribution_m": 0.0006710000601511865
+        },
+        {
+          "joint": "joint_4",
+          "max_abs_xy_contribution_m": 0.0008574796682672617,
+          "mean_abs_xy_contribution_m": 0.00027395521568932197,
+          "p95_abs_xy_contribution_m": 0.0006205469961970992
+        },
+        {
+          "joint": "joint_2",
+          "max_abs_xy_contribution_m": 0.0008233964096958657,
+          "mean_abs_xy_contribution_m": 0.0001937478582138535,
+          "p95_abs_xy_contribution_m": 0.0004915314711657256
+        }
+      ],
+      "duration_s": 15.0,
+      "final_actual_reference_to_feedback_xy_drift_m": 0.0017665929377818535,
+      "final_feedback_xy_error_m": 0.001766600766009158,
+      "final_linearized_xy_drift_m": 0.001766853370263797,
+      "final_reference_xy_error_m": 1.6564823820567958e-08,
+      "hold_like": false,
+      "max_abs_joint_error_rad": 0.009088855,
+      "max_actual_reference_to_feedback_xy_drift_m": 0.003545632888323765,
+      "max_linearization_residual_m": 1.618640517186213e-05,
+      "max_linearized_xy_drift_m": 0.003547322176745649,
+      "mean_actual_reference_to_feedback_xy_drift_m": 0.0011510928637495223,
+      "mean_feedback_xy_error_m": 0.0011797962791946133,
+      "mean_linearized_xy_drift_m": 0.001150543386056341,
+      "mean_max_xy_sensitivity_m_per_rad": 0.6566706799885096,
+      "mean_reference_xy_error_m": 0.00013087478464079316,
+      "mean_rms_joint_error_rad": 0.0023298721357519017,
+      "mean_xy_jacobian_condition_number": 1.0838375933946052,
+      "next_command_stamp_s": 63.567,
+      "p95_actual_reference_to_feedback_xy_drift_m": 0.002224846561541175,
+      "p95_linearization_residual_m": 7.211554302988285e-06,
+      "p95_linearized_xy_drift_m": 0.002224338519762251,
+      "p95_max_abs_joint_error_rad": 0.007560374,
+      "p95_max_xy_sensitivity_m_per_rad": 0.6651965297476891,
+      "p95_xy_jacobian_condition_number": 1.1054385753032994,
+      "point_count": 8,
+      "receipt_stamp_s": 43.057,
+      "samples": 5127,
+      "target_within_physical_clearance": true,
+      "target_xy_error_m": 1.6564823820567958e-08,
+      "target_xyz_m": [
+        0.5200000075955122,
+        -0.20000001472078743,
+        0.8300000097153778
+      ]
+    },
+    {
+      "command_index": 2,
+      "dominant_joints_by_p95_xy_contribution": [
+        {
+          "joint": "joint_1",
+          "max_abs_xy_contribution_m": 0.0019327520157150927,
+          "mean_abs_xy_contribution_m": 0.0006164255886512307,
+          "p95_abs_xy_contribution_m": 0.0014078003642087843
+        },
+        {
+          "joint": "joint_3",
+          "max_abs_xy_contribution_m": 0.0019911631599761333,
+          "mean_abs_xy_contribution_m": 0.0004834796533038109,
+          "p95_abs_xy_contribution_m": 0.0011409695423264346
+        },
+        {
+          "joint": "joint_6",
+          "max_abs_xy_contribution_m": 0.0011394212499562235,
+          "mean_abs_xy_contribution_m": 0.00046666761273871104,
+          "p95_abs_xy_contribution_m": 0.0009652737318823482
+        },
+        {
+          "joint": "joint_4",
+          "max_abs_xy_contribution_m": 0.0009121052005529981,
+          "mean_abs_xy_contribution_m": 0.0003015698888198719,
+          "p95_abs_xy_contribution_m": 0.0006586961563406562
+        },
+        {
+          "joint": "joint_5",
+          "max_abs_xy_contribution_m": 0.0009305509668376915,
+          "mean_abs_xy_contribution_m": 0.00029771984498672995,
+          "p95_abs_xy_contribution_m": 0.0006356262831599479
+        },
+        {
+          "joint": "joint_2",
+          "max_abs_xy_contribution_m": 0.000795818611729685,
+          "mean_abs_xy_contribution_m": 0.00021401660780083224,
+          "p95_abs_xy_contribution_m": 0.0005462664002728538
+        }
+      ],
+      "duration_s": 8.0,
+      "final_actual_reference_to_feedback_xy_drift_m": 0.001335675727197373,
+      "final_feedback_xy_error_m": 0.0013367403026185764,
+      "final_linearized_xy_drift_m": 0.0013348175726972857,
+      "final_reference_xy_error_m": 1.0768185013649773e-06,
+      "hold_like": true,
+      "max_abs_joint_error_rad": 0.00911537,
+      "max_actual_reference_to_feedback_xy_drift_m": 0.003467442011184195,
+      "max_linearization_residual_m": 1.7347593618874083e-05,
+      "max_linearized_xy_drift_m": 0.0034652899659715565,
+      "mean_actual_reference_to_feedback_xy_drift_m": 0.0012110406778055357,
+      "mean_feedback_xy_error_m": 0.001351731595462479,
+      "mean_linearized_xy_drift_m": 0.001210524199696407,
+      "mean_max_xy_sensitivity_m_per_rad": 0.6594467189352599,
+      "mean_reference_xy_error_m": 0.0004263458250293958,
+      "mean_rms_joint_error_rad": 0.0023267547202301905,
+      "mean_xy_jacobian_condition_number": 1.0931501442067164,
+      "next_command_stamp_s": 72.601,
+      "p95_actual_reference_to_feedback_xy_drift_m": 0.002290195932044596,
+      "p95_linearization_residual_m": 7.43290032981094e-06,
+      "p95_linearized_xy_drift_m": 0.002290058799281,
+      "p95_max_abs_joint_error_rad": 0.00772219,
+      "p95_max_xy_sensitivity_m_per_rad": 0.6652240097782929,
+      "p95_xy_jacobian_condition_number": 1.1072656521936999,
+      "point_count": 1,
+      "receipt_stamp_s": 63.567,
+      "samples": 2259,
+      "target_within_physical_clearance": true,
+      "target_xy_error_m": 1.0768185013649773e-06,
+      "target_xyz_m": [
+        0.5200006764632428,
+        -0.20000083781595002,
+        0.8286733565185099
+      ]
+    },
+    {
+      "command_index": 3,
+      "dominant_joints_by_p95_xy_contribution": [
+        {
+          "joint": "joint_1",
+          "max_abs_xy_contribution_m": 0.002003932320771126,
+          "mean_abs_xy_contribution_m": 0.0005874645787006393,
+          "p95_abs_xy_contribution_m": 0.001417789775386173
+        },
+        {
+          "joint": "joint_3",
+          "max_abs_xy_contribution_m": 0.0020684377679991337,
+          "mean_abs_xy_contribution_m": 0.00046970834894202767,
+          "p95_abs_xy_contribution_m": 0.0011441396994696313
+        },
+        {
+          "joint": "joint_6",
+          "max_abs_xy_contribution_m": 0.0011469760164193412,
+          "mean_abs_xy_contribution_m": 0.00046172454072880326,
+          "p95_abs_xy_contribution_m": 0.0009400632962759971
+        },
+        {
+          "joint": "joint_4",
+          "max_abs_xy_contribution_m": 0.000911641258125003,
+          "mean_abs_xy_contribution_m": 0.00031664906659062777,
+          "p95_abs_xy_contribution_m": 0.0006865833294928781
+        },
+        {
+          "joint": "joint_5",
+          "max_abs_xy_contribution_m": 0.0008163770519303069,
+          "mean_abs_xy_contribution_m": 0.0002784036858783724,
+          "p95_abs_xy_contribution_m": 0.0006023231405305119
+        },
+        {
+          "joint": "joint_2",
+          "max_abs_xy_contribution_m": 0.0008388928412058314,
+          "mean_abs_xy_contribution_m": 0.00021532706898890944,
+          "p95_abs_xy_contribution_m": 0.0005476702848373811
+        }
+      ],
+      "duration_s": 8.0,
+      "final_actual_reference_to_feedback_xy_drift_m": 0.0007114942951762179,
+      "final_feedback_xy_error_m": 0.0007148553555356004,
+      "final_linearized_xy_drift_m": 0.0007111301162878967,
+      "final_reference_xy_error_m": 3.3762441500499515e-06,
+      "hold_like": true,
+      "max_abs_joint_error_rad": 0.009175812,
+      "max_actual_reference_to_feedback_xy_drift_m": 0.0033806953583387306,
+      "max_linearization_residual_m": 1.3768170453088658e-05,
+      "max_linearized_xy_drift_m": 0.003376918707574284,
+      "mean_actual_reference_to_feedback_xy_drift_m": 0.001158817068794896,
+      "mean_feedback_xy_error_m": 0.0014918386910795177,
+      "mean_linearized_xy_drift_m": 0.0011583699968665292,
+      "mean_max_xy_sensitivity_m_per_rad": 0.6545830375606366,
+      "mean_reference_xy_error_m": 0.0007307975022268938,
+      "mean_rms_joint_error_rad": 0.002300606851754386,
+      "mean_xy_jacobian_condition_number": 1.0831830792109647,
+      "next_command_stamp_s": 81.721,
+      "p95_actual_reference_to_feedback_xy_drift_m": 0.0021862551653538294,
+      "p95_linearization_residual_m": 6.9685425016981e-06,
+      "p95_linearized_xy_drift_m": 0.002185434763519098,
+      "p95_max_abs_joint_error_rad": 0.00752052,
+      "p95_max_xy_sensitivity_m_per_rad": 0.6549740595131415,
+      "p95_xy_jacobian_condition_number": 1.0850906897164538,
+      "point_count": 1,
+      "receipt_stamp_s": 72.601,
+      "samples": 2280,
+      "target_within_physical_clearance": true,
+      "target_xy_error_m": 3.3762441500499515e-06,
+      "target_xyz_m": [
+        0.5200004005839447,
+        -0.2000033523957201,
+        0.8271256975538033
+      ]
+    },
+    {
+      "command_index": 4,
+      "dominant_joints_by_p95_xy_contribution": [
+        {
+          "joint": "joint_1",
+          "max_abs_xy_contribution_m": 0.00213915944759812,
+          "mean_abs_xy_contribution_m": 0.0006024334629994758,
+          "p95_abs_xy_contribution_m": 0.0013370049893932907
+        },
+        {
+          "joint": "joint_3",
+          "max_abs_xy_contribution_m": 0.0016935481616796974,
+          "mean_abs_xy_contribution_m": 0.00047761832308372163,
+          "p95_abs_xy_contribution_m": 0.0011405214474573956
+        },
+        {
+          "joint": "joint_6",
+          "max_abs_xy_contribution_m": 0.0011604097451396597,
+          "mean_abs_xy_contribution_m": 0.0004653929729746878,
+          "p95_abs_xy_contribution_m": 0.0009454511247087979
+        },
+        {
+          "joint": "joint_4",
+          "max_abs_xy_contribution_m": 0.000926897903867571,
+          "mean_abs_xy_contribution_m": 0.0003004279565236894,
+          "p95_abs_xy_contribution_m": 0.0006736508143150785
+        },
+        {
+          "joint": "joint_5",
+          "max_abs_xy_contribution_m": 0.0007748117492660662,
+          "mean_abs_xy_contribution_m": 0.00027600435730849296,
+          "p95_abs_xy_contribution_m": 0.0005875841450172757
+        },
+        {
+          "joint": "joint_2",
+          "max_abs_xy_contribution_m": 0.0008226115143192426,
+          "mean_abs_xy_contribution_m": 0.00023076025746761043,
+          "p95_abs_xy_contribution_m": 0.0005586662182260725
+        }
+      ],
+      "duration_s": 8.0,
+      "final_actual_reference_to_feedback_xy_drift_m": 0.0012851827286255255,
+      "final_feedback_xy_error_m": 0.0012852410685893064,
+      "final_linearized_xy_drift_m": 0.001281835410568359,
+      "final_reference_xy_error_m": 2.083091593010768e-06,
+      "hold_like": true,
+      "max_abs_joint_error_rad": 0.009283399,
+      "max_actual_reference_to_feedback_xy_drift_m": 0.003592266942450099,
+      "max_linearization_residual_m": 1.6025927248977202e-05,
+      "max_linearized_xy_drift_m": 0.0035920390755952796,
+      "mean_actual_reference_to_feedback_xy_drift_m": 0.0012021032492321975,
+      "mean_feedback_xy_error_m": 0.0011912910008549445,
+      "mean_linearized_xy_drift_m": 0.0012015684214523453,
+      "mean_max_xy_sensitivity_m_per_rad": 0.6541085695020386,
+      "mean_reference_xy_error_m": 0.0001852791576108779,
+      "mean_rms_joint_error_rad": 0.0022930963872807015,
+      "mean_xy_jacobian_condition_number": 1.0813574256469838,
+      "next_command_stamp_s": 90.843,
+      "p95_actual_reference_to_feedback_xy_drift_m": 0.0022582819463778394,
+      "p95_linearization_residual_m": 7.064413499883364e-06,
+      "p95_linearized_xy_drift_m": 0.0022598079091215987,
+      "p95_max_abs_joint_error_rad": 0.007563609,
+      "p95_max_xy_sensitivity_m_per_rad": 0.6542025189258289,
+      "p95_xy_jacobian_condition_number": 1.0817769263419508,
+      "point_count": 1,
+      "receipt_stamp_s": 81.721,
+      "samples": 2280,
+      "target_within_physical_clearance": true,
+      "target_xy_error_m": 2.083091593010768e-06,
+      "target_xyz_m": [
+        0.5199998450230371,
+        -0.2000020773186385,
+        0.8274691432234482
+      ]
+    },
+    {
+      "command_index": 5,
+      "dominant_joints_by_p95_xy_contribution": [
+        {
+          "joint": "joint_1",
+          "max_abs_xy_contribution_m": 0.002075443733573642,
+          "mean_abs_xy_contribution_m": 0.000624936310089918,
+          "p95_abs_xy_contribution_m": 0.0014141949427394051
+        },
+        {
+          "joint": "joint_3",
+          "max_abs_xy_contribution_m": 0.0017025478286409592,
+          "mean_abs_xy_contribution_m": 0.0004703187129915641,
+          "p95_abs_xy_contribution_m": 0.001130796674943722
+        },
+        {
+          "joint": "joint_6",
+          "max_abs_xy_contribution_m": 0.0011610388800087767,
+          "mean_abs_xy_contribution_m": 0.0004652043336335888,
+          "p95_abs_xy_contribution_m": 0.0009504068418501044
+        },
+        {
+          "joint": "joint_4",
+          "max_abs_xy_contribution_m": 0.0009144591191673054,
+          "mean_abs_xy_contribution_m": 0.0003163278049723992,
+          "p95_abs_xy_contribution_m": 0.000688990806321982
+        },
+        {
+          "joint": "joint_5",
+          "max_abs_xy_contribution_m": 0.0008134630798130985,
+          "mean_abs_xy_contribution_m": 0.0002794410565787609,
+          "p95_abs_xy_contribution_m": 0.0006112657343400795
+        },
+        {
+          "joint": "joint_2",
+          "max_abs_xy_contribution_m": 0.0008260830553667394,
+          "mean_abs_xy_contribution_m": 0.00021154774661340868,
+          "p95_abs_xy_contribution_m": 0.0005369100736385101
+        }
+      ],
+      "duration_s": 8.0,
+      "final_actual_reference_to_feedback_xy_drift_m": 0.0003849337925555978,
+      "final_feedback_xy_error_m": 0.0003864537399355934,
+      "final_linearized_xy_drift_m": 0.0003853248827408893,
+      "final_reference_xy_error_m": 2.221754207906883e-06,
+      "hold_like": true,
+      "max_abs_joint_error_rad": 0.009288312,
+      "max_actual_reference_to_feedback_xy_drift_m": 0.0035262005715972072,
+      "max_linearization_residual_m": 1.6059777299959028e-05,
+      "max_linearized_xy_drift_m": 0.0035257269099616293,
+      "mean_actual_reference_to_feedback_xy_drift_m": 0.0011974459694920685,
+      "mean_feedback_xy_error_m": 0.0014717808957038796,
+      "mean_linearized_xy_drift_m": 0.0011969916507819115,
+      "mean_max_xy_sensitivity_m_per_rad": 0.6545926206475883,
+      "mean_reference_xy_error_m": 0.0006707800342810086,
+      "mean_rms_joint_error_rad": 0.002313498083944954,
+      "mean_xy_jacobian_condition_number": 1.0837423359680987,
+      "next_command_stamp_s": 99.562,
+      "p95_actual_reference_to_feedback_xy_drift_m": 0.0022387031678371507,
+      "p95_linearization_residual_m": 7.278856045856444e-06,
+      "p95_linearized_xy_drift_m": 0.002236485966916221,
+      "p95_max_abs_joint_error_rad": 0.007603255,
+      "p95_max_xy_sensitivity_m_per_rad": 0.6548350063539609,
+      "p95_xy_jacobian_condition_number": 1.0843254875911892,
+      "point_count": 1,
+      "receipt_stamp_s": 90.843,
+      "samples": 2180,
+      "target_within_physical_clearance": true,
+      "target_xy_error_m": 2.221754207906883e-06,
+      "target_xyz_m": [
+        0.5199996898160699,
+        -0.20000219999492952,
+        0.8258720349265466
+      ]
+    },
+    {
+      "command_index": 6,
+      "dominant_joints_by_p95_xy_contribution": [
+        {
+          "joint": "joint_1",
+          "max_abs_xy_contribution_m": 0.0021322203038917865,
+          "mean_abs_xy_contribution_m": 0.0006571913539985345,
+          "p95_abs_xy_contribution_m": 0.0014718997959268093
+        },
+        {
+          "joint": "joint_3",
+          "max_abs_xy_contribution_m": 0.001868796224422906,
+          "mean_abs_xy_contribution_m": 0.0004705208431515014,
+          "p95_abs_xy_contribution_m": 0.0011468148676471166
+        },
+        {
+          "joint": "joint_6",
+          "max_abs_xy_contribution_m": 0.0011421801977315792,
+          "mean_abs_xy_contribution_m": 0.0004626003056230487,
+          "p95_abs_xy_contribution_m": 0.0009434460714885433
+        },
+        {
+          "joint": "joint_4",
+          "max_abs_xy_contribution_m": 0.0008837406665900958,
+          "mean_abs_xy_contribution_m": 0.00030429570519650064,
+          "p95_abs_xy_contribution_m": 0.0006616037755687917
+        },
+        {
+          "joint": "joint_5",
+          "max_abs_xy_contribution_m": 0.0008141952379061126,
+          "mean_abs_xy_contribution_m": 0.00027563442953909946,
+          "p95_abs_xy_contribution_m": 0.0005892698936528358
+        },
+        {
+          "joint": "joint_2",
+          "max_abs_xy_contribution_m": 0.0008028936925479167,
+          "mean_abs_xy_contribution_m": 0.0001966883845937972,
+          "p95_abs_xy_contribution_m": 0.0004650349731323701
+        }
+      ],
+      "duration_s": 25.0,
+      "final_actual_reference_to_feedback_xy_drift_m": 0.0014930081182748507,
+      "final_feedback_xy_error_m": 0.00118526640513431,
+      "final_linearized_xy_drift_m": 0.001492233736829247,
+      "final_reference_xy_error_m": 0.0017398851204299402,
+      "hold_like": false,
+      "max_abs_joint_error_rad": 0.009137454,
+      "max_actual_reference_to_feedback_xy_drift_m": 0.003260833303914545,
+      "max_linearization_residual_m": 1.4481496469282686e-05,
+      "max_linearized_xy_drift_m": 0.0032612403396420036,
+      "mean_actual_reference_to_feedback_xy_drift_m": 0.001192315787522701,
+      "mean_feedback_xy_error_m": 0.0018722384119763892,
+      "mean_linearized_xy_drift_m": 0.001191878784241682,
+      "mean_max_xy_sensitivity_m_per_rad": 0.6534819637103964,
+      "mean_reference_xy_error_m": 0.0015105059176810552,
+      "mean_rms_joint_error_rad": 0.002287666810051737,
+      "mean_xy_jacobian_condition_number": 1.0795407994938375,
+      "next_command_stamp_s": null,
+      "p95_actual_reference_to_feedback_xy_drift_m": 0.002222522757941481,
+      "p95_linearization_residual_m": 6.963468416496713e-06,
+      "p95_linearized_xy_drift_m": 0.0022203711109304745,
+      "p95_max_abs_joint_error_rad": 0.007547572,
+      "p95_max_xy_sensitivity_m_per_rad": 0.6549551095438719,
+      "p95_xy_jacobian_condition_number": 1.0843330707324808,
+      "point_count": 16,
+      "receipt_stamp_s": 99.562,
+      "samples": 1353,
+      "target_within_physical_clearance": false,
+      "target_xy_error_m": 0.40967622811201115,
+      "target_xyz_m": [
+        0.8000000000000002,
+        0.09905620187530717,
+        1.0398718589107658
+      ]
+    }
+  ],
+  "hold_like_command_count": 4,
+  "input_dir": "diagnostics/research_baseline_current_joint_handoff_recenter8_gain3000_damping10_25hz_v1",
+  "max_centered_hold_p95_actual_xy_drift_m": 0.002290195932044596,
+  "max_centered_hold_p95_joint_error_rad": 0.00772219,
+  "physical_clearance_m": 0.001,
+  "tracking_source": "trajectory_controller_state_samples.csv"
+}

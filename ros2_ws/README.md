@@ -19,6 +19,19 @@ from docs and git history is split by subsystem:
   XY error against the `0.0010 m` physical radial clearance. No insertion
   success is claimed.
 
+Follow-up diagnostic
+`research_baseline_current_joint_handoff_recenter8_gain3000_damping10_25hz_v1`
+tested a candidate current-joint INSERT handoff hold, but SEARCH failed closed
+before INSERT and no handoff command was published. The candidate source edit
+was reverted; the retained evidence is a SEARCH instability diagnostic, not an
+insertion milestone.
+
+Operational note: after restoring tracked generated directories, clean and
+rebuild selected package build/install trees before runtime. A stale tracked
+`install/thesis_bringup` launch file was observed to launch the older iisy3
+path until `build/kuka_task_control`, `install/kuka_task_control`,
+`build/thesis_bringup`, and `install/thesis_bringup` were removed and rebuilt.
+
 Next technical step: stabilize near-centered SEARCH and pre-insert handoff while
 preserving the physical clearance gates; do not bulk-add raw diagnostic CSVs or
 claim insertion success before repeat validation passes.
@@ -137,6 +150,35 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_recenter8_settle9_gain3000_damping10_25hz_v1 | Improved but failed safely: SEARCH recenter/settle durations are now launch parameters. An 8 s / 9 s diagnostic reached INSERT, but aborted before descent because INSERT handoff reached only 5 of 8 required 1 mm stability ticks. No insertion success claimed. |
 | research_baseline_done_shutdown_hook_v1 | Implemented operational hook: task node can exit after writing DONE and launch can shut down on task exit. Direct node smoke test passed; full launch repeat timed out in SEARCH with best 1 mm window 7 ticks, so launch shutdown-on-DONE still needed a DONE-reaching runtime repeat. |
 | research_baseline_search_post_settle_count_recenter8_gain3000_damping10_25hz_v1 | Completed sequencing fix, failed safely: SEARCH now preserves post-settle inside-clearance samples before issuing another command. The validation reached INSERT and launch exited with code 0 after final DONE status, but aborted before descent because INSERT handoff XY reached 0.0023 m and did not remain within the 0.0010 m clearance for 8 ticks. No insertion success claimed. |
+| research_baseline_current_joint_handoff_recenter8_gain3000_damping10_25hz_v1 | Rejected/unvalidated candidate: a current-joint INSERT handoff hold edit was built, but the validation failed closed in SEARCH before INSERT and no handoff command was published. Source reverted; diagnostic retained for SEARCH instability evidence. |
+
+## 2026-06-07 Current-Joint Handoff Candidate Diagnostic
+
+Milestone: `research_baseline_current_joint_handoff_recenter8_gain3000_damping10_25hz_v1`
+
+Evidence: `diagnostics/research_baseline_current_joint_handoff_recenter8_gain3000_damping10_25hz_v1/summary.md`
+
+A candidate edit changed INSERT handoff to hold the current measured joint
+state rather than solve another centered IK target. The validation did not
+reach INSERT, so the candidate did not receive runtime validation and was
+reverted.
+
+The run confirmed the corrected iisy6 launch path after a clean selected
+package rebuild, then failed closed in SEARCH:
+
+- final observed sequence: `UNKNOWN -> MOVING_TO_START -> APPROACH -> SEARCH -> ABORT`;
+- task log reason: `SEARCH timeout (45s). Instantaneous XY error 0.0005m is within physical clearance 0.0010m but was not sustained for 8 post-command ticks.`;
+- no INSERT state samples and no INSERT handoff command;
+- SEARCH best estimated 1 mm stability window in passive replay: `9` task ticks;
+- hold-like best feedback 1 mm window: `7` ticks;
+- max centered-hold p95 actual XY drift: `0.002290 m`;
+- max centered-hold p95 JTC joint-position error: `0.007722 rad`;
+- positive Gazebo contact-topic samples: `0`;
+- max raw `|Fz|`: `101.52 N`.
+
+Decision: keep the diagnostic summary and compact analyses, but do not keep the
+source edit. The binding blocker remains online task-node-visible sustained
+SEARCH stability under the fixed `0.0010 m` / `8`-tick physical gate.
 
 ## 2026-06-07 SEARCH Post-Settle Count Fix
 

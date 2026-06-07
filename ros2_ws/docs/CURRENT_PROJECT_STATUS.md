@@ -59,6 +59,16 @@ but the task still aborted before descent because INSERT handoff XY reached
 feedback stabilization while preserving physical clearance gates; repeated
 validation should follow only after those gates pass.
 
+Follow-up diagnostic
+`research_baseline_current_joint_handoff_recenter8_gain3000_damping10_25hz_v1`
+built a candidate current-joint INSERT handoff hold, but the run failed closed
+in SEARCH before INSERT. No INSERT state samples or handoff command were
+recorded. Passive replay reported SEARCH best estimated 1 mm stability `9`
+ticks and hold-like best feedback `7` ticks, but the online task node still
+timed out because clearance was not sustained in its post-command count. The
+candidate source edit was reverted; this is retained as SEARCH instability
+evidence only.
+
 ## Evidence Reviewed
 
 - `README.md`
@@ -128,6 +138,7 @@ validation should follow only after those gates pass.
 - `diagnostics/research_baseline_search_recenter8_settle9_gain3000_damping10_25hz_v1/summary.md`
 - `diagnostics/research_baseline_done_shutdown_recenter8_settle9_gain3000_damping10_25hz_v1/summary.md`
 - `diagnostics/research_baseline_search_post_settle_count_recenter8_gain3000_damping10_25hz_v1/summary.md`
+- `diagnostics/research_baseline_current_joint_handoff_recenter8_gain3000_damping10_25hz_v1/summary.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -187,6 +198,7 @@ until repeated validation demonstrates robust success.
 - `research_baseline_search_recenter8_settle9_gain3000_damping10_25hz_v1`: `search_recenter_duration_s` and `search_settle_duration_s` are now launch/node parameters with canonical defaults `5.0 s` and `6.0 s`; the fixed `8`-tick/`0.0010 m` SEARCH/INSERT stability gates are not exposed as launch arguments. An 8 s recenter / 9 s settle diagnostic reached INSERT, but aborted before descent with final outcome `ABORTED` because INSERT handoff XY `0.0011 m` did not remain within physical clearance for 8 ticks. Passive analysis reported INSERT best 1 mm window `5` ticks, hold-like best feedback 1 mm window `4` ticks, max centered-hold p95 XY drift `0.002232 m`, max raw `|Fz|` `101.68 N`, max force norm `169.48 N`, and `0` positive contact-topic samples. No insertion success is claimed.
 - `research_baseline_done_shutdown_hook_v1`: `exit_on_done`, `done_exit_delay_s`, and `shutdown_on_task_exit` now let the task node exit after writing a final DONE outcome and let the launch system stop on that process exit. A direct node-level smoke test exited with code `0` before an 8 s wrapper. The full headless launch repeat did not validate launch shutdown because it timed out externally in SEARCH before DONE; passive analysis reported SEARCH best 1 mm window `7` ticks, best 2 mm window `54` ticks, hold-like best feedback 1 mm window `6` ticks, max raw `|Fz|` `102.14 N`, max force norm `168.21 N`, and `0` positive contact-topic samples. No insertion success is claimed.
 - `research_baseline_search_post_settle_count_recenter8_gain3000_damping10_25hz_v1`: SEARCH now counts a valid post-settle feedback sample inside the fixed `0.0010 m` physical clearance before issuing another command. The validation reached INSERT and final DONE status, and launch exited with code `0`. It still failed safely before descent: final outcome `ABORTED`, reason `INSERT handoff settle timeout: XY error 0.0023m did not remain within physical clearance 0.0010m for 8 ticks before descent`, insertion depth `0.0000 m`, pre-insertion XY `0.0009 m`, max raw `|Fz|` `103.01 N`, max force norm `169.95 N`, hold-like best feedback 1 mm window `5` ticks, max centered-hold p95 actual XY drift `0.002226 m`, and `0` positive contact-topic samples. No insertion success is claimed.
+- `research_baseline_current_joint_handoff_recenter8_gain3000_damping10_25hz_v1`: a candidate source edit to hold current measured joints during INSERT handoff was built after cleaning stale selected package build/install trees. The run used the corrected iisy6 installed launch path, but failed closed in SEARCH before INSERT: no INSERT state samples and no handoff command were recorded. The task log reported instantaneous XY `0.0005 m` inside physical clearance, but not sustained for 8 post-command ticks. Passive replay reported SEARCH best 1 mm stability `9` ticks, hold-like best feedback 1 mm window `7` ticks, max centered-hold p95 XY drift `0.002290 m`, max raw `|Fz|` `101.52 N`, and `0` positive contact-topic samples. The candidate source edit was reverted; this is not insertion progress.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.

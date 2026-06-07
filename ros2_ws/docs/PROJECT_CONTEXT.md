@@ -109,6 +109,16 @@ gain retest:
 - hold-like best feedback 1 mm window was `5` task ticks;
 - max centered-hold p95 actual XY drift was `0.002226 m`, with max
   centered-hold p95 JTC joint-position error `0.007530 rad`.
+- a follow-up candidate current-joint INSERT handoff hold was built after
+  cleaning stale selected package build/install trees, but the run failed
+  closed in SEARCH before INSERT and published no INSERT handoff command;
+- that follow-up's task log reported instantaneous XY `0.0005 m` inside
+  physical clearance, but not sustained for `8` post-command ticks;
+- passive replay reported SEARCH best estimated `0.0010 m` stability `9`
+  ticks and hold-like best feedback `7` ticks, but this did not validate the
+  online gate;
+- the current-joint handoff source edit was reverted, so the diagnostic is
+  retained only as SEARCH instability evidence.
 
 Decision: the duplicate-controller startup/configuration fault and the
 non-default-cadence SEARCH hold-shortening bug are fixed. The INSERT handoff
@@ -122,6 +132,12 @@ shutdown hook has now been exercised in a full DONE-reaching launch, but the
 result was a safe abort, not a physical insertion success. Sustained no-contact
 SEARCH/hold/handoff feedback centering remains the blocker under the `0.0010 m`
 physical radial clearance gate.
+
+Operational note: after generated tracked `build/`, `install/`, and `log`
+trees are restored, selected package build/install trees must be cleaned and
+rebuilt before runtime validation. A stale tracked `install/thesis_bringup`
+launch file was observed to use the old iisy3 path until `kuka_task_control`
+and `thesis_bringup` build/install directories were rebuilt.
 
 The strongest historical single-run iisy6 insertion-depth evidence is
 `diagnostics/research_baseline_insert_sim_time_completion_v4`, which passed the
