@@ -9,11 +9,13 @@ from docs and git history is split by subsystem:
 
 - Perception: `live_v2_14_inference_node_validation` from `ab2a747`, a passive
   20 Hz live node with 62.6% live accuracy and no controller output.
-- Control: `research_baseline_search_settle_seconds_25hz_v1`, a fail-closed
-  SEARCH diagnostic confirming the non-default 25 Hz task cadence now preserves
-  a 6.0 s post-command hold instead of shortening the old hardcoded 60-tick
-  window to 2.4 s. It still fails the 1 mm sustained clearance gate and does
-  not claim insertion success.
+- Control: `research_baseline_insert_handoff_gate_order_v1`, a focused
+  state-machine sequencing fix after a rejected gain=3000 diagnostic reached
+  INSERT once but aborted before meaningful depth on the strict 1 mm physical
+  clearance gate. The handoff fix preserves side-load/force aborts and moves
+  the no-contact pre-depth clearance abort until after the final descent command
+  has started. Its retained runtime validation timed out during SEARCH, so no
+  insertion success is claimed.
 
 Next technical step: stabilize near-centered SEARCH and pre-insert handoff while
 preserving the physical clearance gates; do not bulk-add raw diagnostic CSVs or
@@ -126,6 +128,40 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_velocity_state_v1 | Validated safely: inject_velocity_state:=true adds a `velocity` state interface to every joint so the JTC's D-term uses real joint velocity from `gz_ros2_control/GazeboSimSystem` (not finite-difference of position). Centered-hold p95 actual XY drift 0.004015 m, SEARCH 1 mm window 2 ticks, SEARCH final XY 0.0018 m. The D-term's input source is not the binding constraint. |
 | research_baseline_single_gz_control_25hz_v1 | Completed startup fix and partial diagnostic: `spawn_robot_sdf.py` strips the upstream converted `gz_ros2_control` plugin that referenced `fake_hardware_config_6_axis.yaml`, leaving one research controller manager. A 25 Hz headless run reached SEARCH and timed out externally before INSERT; SEARCH best 1 mm window was 2 ticks and best hold-like feedback 1 mm window was 3 ticks. No insertion success claimed. |
 | research_baseline_search_settle_seconds_25hz_v1 | Completed timing fix and fail-closed diagnostic: SEARCH post-command settling is now seconds-based (`6.0 s`) so 25 Hz diagnostics no longer interrupt 5 s recenter holds after 2.4 s. A retained 25 Hz run reached SEARCH and timed out externally before INSERT; SEARCH best 1 mm window improved to 4 ticks but still remained below the required 8. No insertion success claimed. |
+| research_baseline_search_gain3000_settle_seconds_25hz_v1 | Rejected: gain=3000, D=10 reached INSERT once after APPROACH finished inside clearance, but aborted before meaningful depth because no-contact XY reached 0.0012 m, exceeding the 0.0010 m physical clearance for 3 ticks. No insertion success claimed. |
+| research_baseline_insert_handoff_gate_order_v1 | Completed sequencing fix with partial runtime validation: no-contact pre-depth INSERT clearance abort now applies after descent command start, allowing the existing handoff settle window to run as designed. The retained validation timed out in SEARCH and did not exercise INSERT handoff; SEARCH best 1 mm window remained 3 ticks. |
+
+## 2026-06-07 INSERT Handoff Gate Ordering
+
+Milestone: `research_baseline_insert_handoff_gate_order_v1`
+
+Evidence:
+
+- `diagnostics/research_baseline_search_gain3000_settle_seconds_25hz_v1/summary.md`
+- `diagnostics/research_baseline_insert_handoff_gate_order_v1/summary.md`
+
+The gain=3000, D=10 diagnostic reached INSERT once after APPROACH finished with
+pre-insertion XY `0.0002 m`, but then aborted before meaningful depth when
+no-contact XY drift reached `0.0012 m` for 3 ticks. That run exposed a
+sequencing issue: the no-contact pre-depth clearance gate was checked before the
+configured INSERT handoff hold could run for its 2.0 s duration and prove 8
+stable ticks.
+
+`AdmittanceInsertionNode` now lets the handoff settle handler run before the
+no-contact pre-depth descent gate. Broad XY precondition, side-load-at-depth,
+and force aborts remain active. A retained validation of the new ordering
+timed out during SEARCH, so it did not exercise INSERT handoff. Passive metrics
+still show the binding issue is feedback centering:
+
+- SEARCH best estimated 1 mm window: `3` ticks;
+- SEARCH best estimated 2 mm window: `7` ticks;
+- hold-like best feedback 1 mm window: `4` ticks;
+- max centered-hold p95 actual XY drift: `0.003940 m`;
+- controller-state p95 max joint-position error: `0.011439 rad`.
+
+Decision: keep the state-machine fix, reject gain=3000 as a default, and
+continue treating sustained no-contact SEARCH/hold feedback stability as the
+next blocker. No physical peg-in-hole success is claimed.
 
 ## 2026-06-07 SEARCH Settling Cadence Fix
 

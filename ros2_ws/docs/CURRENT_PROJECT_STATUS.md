@@ -32,15 +32,18 @@ Verification after cleanup:
 
 The latest verified milestone from README/docs/git history is
 `live_v2_14_inference_node_validation` for perception and
-`research_baseline_search_settle_seconds_25hz_v1` for control. The latest
-control update keeps the duplicate-controller startup fix and corrects a
-non-default-cadence SEARCH timing bug: the old hardcoded `60` state ticks meant
-6.0 s at 10 Hz but only 2.4 s at 25 Hz, shorter than the 5.0 s recenter
-command. The retained 25 Hz run reached SEARCH and held for the intended 6.0 s
-windows, but still did not sustain the 1 mm physical clearance gate before the
-external timeout. The next technical step remains near-centered SEARCH /
-pre-insert handoff stabilization while preserving physical clearance gates;
-repeated validation should follow only after those gates pass.
+`research_baseline_insert_handoff_gate_order_v1` for control. The latest
+control line keeps the duplicate-controller startup fix, the seconds-based
+SEARCH settling fix for 25 Hz runs, and a focused INSERT sequencing correction:
+the no-contact pre-depth clearance abort now applies after the final descent
+command starts, allowing the existing handoff settle window to prove stability.
+A gain=3000, D=10 diagnostic reached INSERT once but aborted before meaningful
+depth on `0.0012 m` no-contact XY drift, so it is rejected as a default. The
+retained validation of the sequencing fix timed out in SEARCH and did not
+exercise INSERT handoff; best SEARCH 1 mm stability remained `3` ticks and
+hold-like feedback remained `4` ticks. The next technical step remains
+near-centered SEARCH/pre-insert feedback stabilization while preserving physical
+clearance gates; repeated validation should follow only after those gates pass.
 
 ## Evidence Reviewed
 
@@ -104,6 +107,8 @@ repeated validation should follow only after those gates pass.
 - `diagnostics/research_baseline_joint_damping_scale_5p0_v1/approach_tracking_analysis.md`
 - `diagnostics/research_baseline_single_gz_control_25hz_v1/summary.md`
 - `diagnostics/research_baseline_search_settle_seconds_25hz_v1/summary.md`
+- `diagnostics/research_baseline_search_gain3000_settle_seconds_25hz_v1/summary.md`
+- `diagnostics/research_baseline_insert_handoff_gate_order_v1/summary.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -156,6 +161,8 @@ until repeated validation demonstrates robust success.
   - `research_baseline_search_velocity_state_v1` (inject_velocity_state:=true, position_derivative_gain=10.0, position_gain=2000.0): added a `velocity` state interface to every joint's URDF via `inject_velocity_state_urdf.py` and switched the JTC's `state_interfaces` to `[position, velocity]`. The D-term's input is now real joint velocity from `gz_ros2_control/GazeboSimSystem` (not finite-difference of position). SEARCH failed closed at final XY `0.0018 m`, max centered-hold p95 actual XY drift `0.004015 m`, controller-state p95 joint error `0.011460 rad`, best SEARCH 1 mm window `2` ticks. Linearization residual p95 `0.000016-0.000020 m` (consistent with Jacobian estimate). The 1 mm sustained window remains unblocked; the D-term's input source (finite-difference vs. real velocity) is not the binding constraint. This closes out the velocity-state lever.
 - `research_baseline_single_gz_control_25hz_v1`: `spawn_robot_sdf.py` now removes the upstream converted `gz_ros2_control` plugin that referenced `fake_hardware_config_6_axis.yaml` before injecting the research controller plugin. Runtime startup used one intended controller manager, with no duplicate controller activation errors. The 25 Hz diagnostic reached SEARCH and was externally timed out before INSERT; SEARCH best 1 mm window was `2` ticks (`0.08 s`), best 2 mm window was `8` ticks (`0.32 s`), hold-like best feedback 1 mm window was `3` ticks, and contact-topic samples were `0`. This fixes the duplicate-plugin startup fault but does not claim insertion success or unblock sustained physical centering.
 - `research_baseline_search_settle_seconds_25hz_v1`: SEARCH settling is now seconds-based (`6.0 s`) instead of hardcoded `60` state ticks, preserving the intended hold duration when `control_rate:=25.0`. A retained run confirmed correct iisy6 launch, single research `gz_ros2_control` startup, active controllers, and SEARCH logs reaching `settle_elapsed=6.0s` before another recenter command. The run was externally timed out in SEARCH before INSERT; best SEARCH 1 mm window improved to `4` ticks (`0.16 s`) and hold-like best feedback 1 mm window improved to `4` ticks, still below the required `8`. Contact-topic samples remained `0`; no insertion success is claimed.
+- `research_baseline_search_gain3000_settle_seconds_25hz_v1`: gain=3000, D=10 reached INSERT once after APPROACH finished at pre-insertion XY `0.0002 m`, but correctly aborted before meaningful depth when no-contact XY reached `0.0012 m` for 3 ticks, exceeding the `0.0010 m` physical clearance. This is not insertion success and is rejected as a default tuning.
+- `research_baseline_insert_handoff_gate_order_v1`: the INSERT state machine now allows the handoff settle window to run before the no-contact pre-depth descent gate; broad XY precondition, side-load-at-depth, and force aborts still run before descent. Retained validation timed out during SEARCH before INSERT and did not exercise the handoff path. SEARCH best 1 mm window was `3` ticks, best 2 mm window was `7` ticks, and hold-like best feedback 1 mm window was `4` ticks. No insertion success is claimed.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.

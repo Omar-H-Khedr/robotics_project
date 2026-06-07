@@ -1303,29 +1303,6 @@ class AdmittanceInsertionNode(Node):
             self._set_state(self.ABORT)
             return
 
-        precontact_misaligned = (
-            current_depth < self.INSERT_SIDELOAD_DEPTH_GATE_M
-            and xy_error > self.INSERT_FINAL_XY_TOLERANCE
-        )
-        self._insert_precontact_clearance_ticks = (
-            self._insert_precontact_clearance_ticks + 1
-            if precontact_misaligned
-            else 0
-        )
-        if self._insert_precontact_clearance_ticks >= self.INSERT_PRECONTACT_CLEARANCE_TICKS:
-            self._abort_reason = (
-                f'INSERT aborted: no-contact XY error {xy_error:.4f}m exceeds '
-                f'physical clearance {self.INSERT_FINAL_XY_TOLERANCE:.4f}m '
-                f'before meaningful insertion depth '
-                f'{self.INSERT_SIDELOAD_DEPTH_GATE_M:.4f}m for '
-                f'{self._insert_precontact_clearance_ticks} ticks.'
-            )
-            self.get_logger().warn(self._abort_reason)
-            self._final_insertion_xy_error_m = xy_error
-            self._end_phase(False, xy_error, 0.0, False, self._abort_reason)
-            self._set_state(self.ABORT)
-            return
-
         side_loaded = (
             current_depth >= self.INSERT_SIDELOAD_DEPTH_GATE_M
             and xy_error > self.INSERT_FINAL_XY_TOLERANCE
@@ -1359,10 +1336,32 @@ class AdmittanceInsertionNode(Node):
             self._set_state(self.ABORT)
             return
 
-
-
         if not self._insert_command_sent:
             self._handle_insert_handoff_settle(peg, xy_error, current_depth, fz)
+            return
+
+        precontact_misaligned = (
+            current_depth < self.INSERT_SIDELOAD_DEPTH_GATE_M
+            and xy_error > self.INSERT_FINAL_XY_TOLERANCE
+        )
+        self._insert_precontact_clearance_ticks = (
+            self._insert_precontact_clearance_ticks + 1
+            if precontact_misaligned
+            else 0
+        )
+        if self._insert_precontact_clearance_ticks >= self.INSERT_PRECONTACT_CLEARANCE_TICKS:
+            self._abort_reason = (
+                f'INSERT aborted: no-contact XY error {xy_error:.4f}m exceeds '
+                f'physical clearance {self.INSERT_FINAL_XY_TOLERANCE:.4f}m '
+                f'before meaningful insertion depth '
+                f'{self.INSERT_SIDELOAD_DEPTH_GATE_M:.4f}m for '
+                f'{self._insert_precontact_clearance_ticks} ticks after '
+                f'descent command start.'
+            )
+            self.get_logger().warn(self._abort_reason)
+            self._final_insertion_xy_error_m = xy_error
+            self._end_phase(False, xy_error, 0.0, False, self._abort_reason)
+            self._set_state(self.ABORT)
             return
 
         # --- Logging ---
