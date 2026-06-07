@@ -13,7 +13,8 @@ from statistics import mean
 
 
 WRENCH_FILE = "wrench_state_samples.csv"
-STATE_LOOP_HZ = 10.0
+TRIAL_OUTCOME_FILE = "trial_outcome.json"
+DEFAULT_STATE_LOOP_HZ = 10.0
 CLEARANCE_THRESHOLDS_M = (0.001, 0.002)
 
 
@@ -88,7 +89,11 @@ def _best_contiguous_window(samples: list[Sample], threshold_m: float) -> dict[s
     }
 
 
-def _estimated_state_loop_window(samples: list[Sample], threshold_m: float) -> dict[str, object]:
+def _estimated_state_loop_window(
+    samples: list[Sample],
+    threshold_m: float,
+    state_loop_hz: float,
+) -> dict[str, object]:
     if not samples:
         return {
             "ticks": 0,
@@ -99,7 +104,7 @@ def _estimated_state_loop_window(samples: list[Sample], threshold_m: float) -> d
             "end_z_m": None,
         }
 
-    tick_period_s = 1.0 / STATE_LOOP_HZ
+    tick_period_s = 1.0 / state_loop_hz
     next_tick_s = samples[0].stamp_s
     index = 0
     current_ticks = 0
@@ -142,7 +147,11 @@ def _estimated_state_loop_window(samples: list[Sample], threshold_m: float) -> d
     }
 
 
-def _state_summary(state: str, samples: list[Sample]) -> dict[str, object]:
+def _state_summary(
+    state: str,
+    samples: list[Sample],
+    state_loop_hz: float,
+) -> dict[str, object]:
     xy_values = [sample.xy_error_m for sample in samples]
     z_values = [sample.peg_z_m for sample in samples]
     force_values = [sample.force_norm_n for sample in samples]
@@ -154,7 +163,11 @@ def _state_summary(state: str, samples: list[Sample]) -> dict[str, object]:
             "samples_inside": len(below),
             "sample_fraction_inside": len(below) / len(samples) if samples else 0.0,
             "best_observer_window": _best_contiguous_window(samples, threshold),
-            "best_estimated_state_loop_window": _estimated_state_loop_window(samples, threshold),
+            "best_estimated_state_loop_window": _estimated_state_loop_window(
+                samples,
+                threshold,
+                state_loop_hz,
+            ),
         }
 
     return {
@@ -174,24 +187,44 @@ def _state_summary(state: str, samples: list[Sample]) -> dict[str, object]:
     }
 
 
-def analyze(input_dir: Path) -> dict[str, object]:
+def _infer_state_loop_hz(input_dir: Path, override_hz: float | None = None) -> float:
+    if override_hz is not None and override_hz > 0.0:
+        return override_hz
+
+    outcome_path = input_dir / TRIAL_OUTCOME_FILE
+    if outcome_path.exists():
+        try:
+            outcome = json.loads(outcome_path.read_text(encoding="utf-8"))
+            metrics = outcome.get("metrics", {})
+            if isinstance(metrics, dict):
+                control_rate_hz = float(metrics.get("control_rate_hz", 0.0))
+                if control_rate_hz > 0.0:
+                    return control_rate_hz
+        except (OSError, TypeError, ValueError, json.JSONDecodeError):
+            pass
+
+    return DEFAULT_STATE_LOOP_HZ
+
+
+def analyze(input_dir: Path, state_loop_hz: float | None = None) -> dict[str, object]:
     samples_path = input_dir / WRENCH_FILE
     if not samples_path.exists():
         raise FileNotFoundError(f"missing {samples_path}")
 
+    inferred_state_loop_hz = _infer_state_loop_hz(input_dir, state_loop_hz)
     samples = _read_samples(samples_path)
     by_state: dict[str, list[Sample]] = {}
     for sample in samples:
         by_state.setdefault(sample.state, []).append(sample)
 
     states = {
-        state: _state_summary(state, state_samples)
+        state: _state_summary(state, state_samples, inferred_state_loop_hz)
         for state, state_samples in sorted(by_state.items())
     }
     return {
         "input_dir": str(input_dir),
         "sample_source": WRENCH_FILE,
-        "state_loop_hz": STATE_LOOP_HZ,
+        "state_loop_hz": inferred_state_loop_hz,
         "clearance_thresholds_m": list(CLEARANCE_THRESHOLDS_M),
         "total_valid_samples": len(samples),
         "states": states,
@@ -217,7 +250,7 @@ def write_outputs(input_dir: Path, result: dict[str, object]) -> None:
         f"- input_dir: `{result['input_dir']}`",
         f"- sample_source: `{WRENCH_FILE}`",
         f"- total_valid_samples: `{result['total_valid_samples']}`",
-        f"- state_loop_hz: `{STATE_LOOP_HZ:.1f}`",
+        f"- state_loop_hz: `{float(result['state_loop_hz']):.1f}`",
         "",
         "| State | Samples | Min XY m | Mean XY m | P95 XY m | Final XY m | Z range m | Best 1mm ticks | Best 2mm ticks |",
         "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
@@ -264,9 +297,10 @@ def write_outputs(input_dir: Path, result: dict[str, object]) -> None:
         [
             "",
             "Interpretation: this is an offline passive-log diagnostic. The state-loop "
-            "window estimate samples the observer stream at 10 Hz, matching the task "
-            "controller cadence closely enough to decide whether a sustained gate is "
-            "plausible before changing controller behavior.",
+            "window estimate samples the observer stream at the task controller "
+            "cadence recorded in trial_outcome.json when available, or the explicit "
+            "--state-loop-hz override. This keeps sustained-clearance tick evidence "
+            "honest when running non-default cadence diagnostics.",
         ]
     )
     md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -277,9 +311,18 @@ def main() -> None:
         description="Analyze per-state XY clearance stability from wrench_state_samples.csv"
     )
     parser.add_argument("input_dir", type=Path)
+    parser.add_argument(
+        "--state-loop-hz",
+        type=float,
+        default=None,
+        help=(
+            "Task state-machine cadence in Hz. Defaults to metrics.control_rate_hz "
+            "from trial_outcome.json in input_dir, falling back to 10 Hz."
+        ),
+    )
     args = parser.parse_args()
 
-    result = analyze(args.input_dir)
+    result = analyze(args.input_dir, args.state_loop_hz)
     write_outputs(args.input_dir, result)
     print(json.dumps(result, indent=2))
 

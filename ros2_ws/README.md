@@ -9,9 +9,11 @@ from docs and git history is split by subsystem:
 
 - Perception: `live_v2_14_inference_node_validation` from `ab2a747`, a passive
   20 Hz live node with 62.6% live accuracy and no controller output.
-- Control: `research_baseline_search_velocity_state_v1`, a fail-closed SEARCH
-  diagnostic confirming the velocity-state injection path works but does not
-  unblock the 1 mm sustained clearance gate.
+- Control: `research_baseline_single_gz_control_25hz_v1`, a partial headless
+  diagnostic confirming the spawned SDF now contains one intended
+  `gz_ros2_control` plugin instead of the converted upstream vendor plugin plus
+  the research plugin. It reached SEARCH at 25 Hz and still failed to sustain
+  the 1 mm clearance gate before the external timeout.
 
 Next technical step: stabilize near-centered SEARCH and pre-insert handoff while
 preserving the physical clearance gates; do not bulk-add raw diagnostic CSVs or
@@ -122,6 +124,42 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_gain3000_v1 | Validated safely: gain=3000 with no D-term makes SEARCH worse (1 mm window 2 ticks, 2 mm window 4 ticks), confirming the D-term is necessary at higher gain |
 | research_baseline_search_position_controller_v1 / v2 | Validated safely: switch to position_controllers/JointGroupPositionController (driven by a 250 Hz trajectory_position_bridge) does not unblock the SEARCH 1 mm sustained window. 1 mm window 2-4 ticks, 2 mm window 10-12 ticks (best 2 mm seen in this line of work), SEARCH final XY 0.0014-0.0038 m. The position controller plugin is loaded from the extracted `ros-jazzy-position-controllers` deb (system package not installable without sudo). |
 | research_baseline_search_velocity_state_v1 | Validated safely: inject_velocity_state:=true adds a `velocity` state interface to every joint so the JTC's D-term uses real joint velocity from `gz_ros2_control/GazeboSimSystem` (not finite-difference of position). Centered-hold p95 actual XY drift 0.004015 m, SEARCH 1 mm window 2 ticks, SEARCH final XY 0.0018 m. The D-term's input source is not the binding constraint. |
+| research_baseline_single_gz_control_25hz_v1 | Completed startup fix and partial diagnostic: `spawn_robot_sdf.py` strips the upstream converted `gz_ros2_control` plugin that referenced `fake_hardware_config_6_axis.yaml`, leaving one research controller manager. A 25 Hz headless run reached SEARCH and timed out externally before INSERT; SEARCH best 1 mm window was 2 ticks and best hold-like feedback 1 mm window was 3 ticks. No insertion success claimed. |
+
+## 2026-06-07 Single Gazebo Control Plugin and 25 Hz Diagnostic
+
+Milestone: `research_baseline_single_gz_control_25hz_v1`
+
+Evidence: `diagnostics/research_baseline_single_gz_control_25hz_v1/summary.md`
+
+The upstream KUKA Xacro emits a Gazebo `gz_ros2_control-system` plugin pointing
+at `kuka_resources/config/fake_hardware_config_6_axis.yaml`. The project
+spawner also injects the research `gz_ros2_control` plugin after URDF-to-SDF
+conversion. Runtime logs from the first 25 Hz attempt showed this produced two
+controller managers and duplicate controller activation errors.
+
+`spawn_robot_sdf.py` now removes any converted pre-existing `gz_ros2_control`
+plugin from the SDF before injecting the canonical research plugin. A conversion
+smoke test confirmed exactly one `gz_ros2_control-system` plugin remains, using
+the intended research controller YAML.
+
+Validation passed Python syntax, targeted `colcon build --packages-select
+thesis_bringup`, and a headless Gazebo run with `control_rate:=25.0`,
+`position_gain:=2000.0`, `position_derivative_gain:=10.0`,
+`joint_damping_scale:=5.0`, and `inject_velocity_state:=true`. The retained run
+had clean single-controller startup, reached `SEARCH`, and timed out externally
+before INSERT. Passive analysis at 25 Hz reported:
+
+- SEARCH best estimated 1 mm window: `2` ticks (`0.08 s`);
+- SEARCH best estimated 2 mm window: `8` ticks (`0.32 s`);
+- SEARCH final XY in the partial log: `0.001735 m`;
+- hold-like best feedback 1 mm window: `3` ticks;
+- contact-topic samples: `0`.
+
+Decision: the duplicate-controller startup fault is fixed, but it was not the
+binding SEARCH limiter. The next control milestone should keep the single-plugin
+startup path and continue reducing measured no-contact SEARCH/hold drift without
+loosening the `0.0010 m` physical clearance gate.
 
 ## 2026-06-03 SEARCH Derivative Gain Plumbing
 

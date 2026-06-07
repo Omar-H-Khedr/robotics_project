@@ -1574,6 +1574,12 @@ class AdmittanceInsertionNode(Node):
                     2,
                 ),
                 'contact_threshold_N': self._contact_threshold,
+                'control_rate_hz': round(self._control_rate, 3),
+                'search_convergence_required_ticks': self.SEARCH_CONVERGENCE_TICKS,
+                'search_convergence_required_duration_s': round(
+                    self.SEARCH_CONVERGENCE_TICKS / self._control_rate,
+                    3,
+                ),
                 'gravity_baseline_valid': self._baseline_valid,
                 'baseline_window_samples': len(self._fz_buffer),
             },

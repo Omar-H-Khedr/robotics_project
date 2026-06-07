@@ -23,6 +23,7 @@ from launch.substitutions import (
     PathJoinSubstitution,
 )
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 
 
@@ -583,7 +584,10 @@ def launch_setup(context, *args, **kwargs):
             {
                 "contact_threshold": 5.0,
                 "safety_threshold": 350.0,
-                "control_rate": 10.0,
+                "control_rate": ParameterValue(
+                    LaunchConfiguration("control_rate"),
+                    value_type=float,
+                ),
                 "approach_speed": 0.01,
                 "use_sim_time": simulation["use_sim_time"],
             }
@@ -731,6 +735,15 @@ def generate_launch_description():
                 "use_gui",
                 default_value="true",
                 description="If true, launch gz_sim GUI. If false, launch gz_server only.",
+            ),
+            DeclareLaunchArgument(
+                "control_rate",
+                default_value="10.0",
+                description=(
+                    "Admittance insertion task state-machine rate in Hz. "
+                    "Default 10 Hz preserves canonical behavior; override only "
+                    "for documented SEARCH/hold cadence diagnostics."
+                ),
             ),
             DeclareLaunchArgument(
                 "allow_robot_renaming",

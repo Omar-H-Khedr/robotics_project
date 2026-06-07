@@ -132,6 +132,29 @@ def _inject_ros2_control_plugin(
         e.text = str(position_derivative_gain)
 
 
+def _remove_existing_ros2_control_plugins(root: ET.Element) -> list[str]:
+    """Remove gz_ros2_control plugins produced by URDF <gazebo> conversion.
+
+    The upstream KUKA Xacro emits a Gazebo plugin that points at the vendor
+    fake-hardware controller YAML. This spawner owns the canonical research
+    plugin injection, so any converted gz_ros2_control plugin must be removed
+    first or Gazebo starts two controller managers for the same entity.
+    """
+    removed: list[str] = []
+    model = root.find("model")
+    if model is None:
+        return removed
+    for plugin in list(model.findall("plugin")):
+        filename = plugin.get("filename", "")
+        name = plugin.get("name", "")
+        if "gz_ros2_control" not in filename and "gz_ros2_control" not in name:
+            continue
+        parameters = plugin.findtext("parameters", default="")
+        removed.append(parameters or filename or name)
+        model.remove(plugin)
+    return removed
+
+
 def _inject_velocity_state_interfaces(urdf_xml: str) -> str:
     """Add a velocity state interface to every joint that has only position.
 
@@ -269,6 +292,12 @@ def _inject_plugin(
     initial_positions = _extract_initial_positions(urdf_xml)
     model = root.find("model")
     if model is not None:
+        removed_plugins = _remove_existing_ros2_control_plugins(root)
+        for plugin_source in removed_plugins:
+            print(
+                "SDF plugin override: removed pre-existing gz_ros2_control "
+                f"plugin ({plugin_source})"
+            )
         _inject_initial_positions(model, initial_positions)
         changes = _scale_joint_dynamics(
             model,

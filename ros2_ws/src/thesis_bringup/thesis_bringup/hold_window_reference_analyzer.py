@@ -18,10 +18,11 @@ from kuka_task_control.robot_kinematics import RobotKinematics
 
 COMMANDS_FILE = "trajectory_commands.csv"
 CONTROLLER_STATE_TRACKING_FILE = "trajectory_controller_state_samples.csv"
+TRIAL_OUTCOME_FILE = "trial_outcome.json"
 HOLE_CENTRE_XY = np.array([0.520, -0.200])
 HOLE_TOP_Z_M = 0.810
 PHYSICAL_CLEARANCE_M = 0.001
-STATE_LOOP_HZ = 10.0
+DEFAULT_STATE_LOOP_HZ = 10.0
 HOLD_MIN_DURATION_S = 1.0
 
 
@@ -153,11 +154,33 @@ def _to_cartesian(sample: TrackingSample, command: CommandRow, kin: RobotKinemat
     )
 
 
-def _best_estimated_window(samples: list[CartesianSample], threshold_m: float, attr: str) -> dict[str, object]:
+def _infer_state_loop_hz(input_dir: Path, override_hz: float | None = None) -> float:
+    if override_hz is not None and override_hz > 0.0:
+        return override_hz
+    outcome_path = input_dir / TRIAL_OUTCOME_FILE
+    if outcome_path.exists():
+        try:
+            outcome = json.loads(outcome_path.read_text(encoding="utf-8"))
+            metrics = outcome.get("metrics", {})
+            if isinstance(metrics, dict):
+                control_rate_hz = float(metrics.get("control_rate_hz", 0.0))
+                if control_rate_hz > 0.0:
+                    return control_rate_hz
+        except (OSError, TypeError, ValueError, json.JSONDecodeError):
+            pass
+    return DEFAULT_STATE_LOOP_HZ
+
+
+def _best_estimated_window(
+    samples: list[CartesianSample],
+    threshold_m: float,
+    attr: str,
+    state_loop_hz: float,
+) -> dict[str, object]:
     if not samples:
         return {"ticks": 0, "duration_s": 0.0, "start_s": None, "end_s": None}
 
-    tick_period_s = 1.0 / STATE_LOOP_HZ
+    tick_period_s = 1.0 / state_loop_hz
     next_tick_s = samples[0].stamp_s
     index = 0
     current_ticks = 0
@@ -198,7 +221,12 @@ def _first_violation(samples: list[CartesianSample], attr: str) -> dict[str, obj
     return None
 
 
-def _summarize_command(command: CommandRow, samples: list[CartesianSample], next_stamp: float | None) -> dict[str, object]:
+def _summarize_command(
+    command: CommandRow,
+    samples: list[CartesianSample],
+    next_stamp: float | None,
+    state_loop_hz: float,
+) -> dict[str, object]:
     ref_xy = [sample.reference_xy_error_m for sample in samples]
     fb_xy = [sample.feedback_xy_error_m for sample in samples]
     cart_errors = [sample.cartesian_reference_feedback_error_m for sample in samples]
@@ -232,17 +260,17 @@ def _summarize_command(command: CommandRow, samples: list[CartesianSample], next
         "max_abs_joint_error_rad": max(joint_errors) if joint_errors else None,
         "p95_max_abs_joint_error_rad": _percentile(joint_errors, 95.0),
         "reference_best_1mm_window": _best_estimated_window(
-            samples, PHYSICAL_CLEARANCE_M, "reference_xy_error_m"
+            samples, PHYSICAL_CLEARANCE_M, "reference_xy_error_m", state_loop_hz
         ),
         "feedback_best_1mm_window": _best_estimated_window(
-            samples, PHYSICAL_CLEARANCE_M, "feedback_xy_error_m"
+            samples, PHYSICAL_CLEARANCE_M, "feedback_xy_error_m", state_loop_hz
         ),
         "first_reference_clearance_violation": _first_violation(samples, "reference_xy_error_m"),
         "first_feedback_clearance_violation": _first_violation(samples, "feedback_xy_error_m"),
     }
 
 
-def analyze(input_dir: Path) -> dict[str, object]:
+def analyze(input_dir: Path, state_loop_hz: float | None = None) -> dict[str, object]:
     commands_path = input_dir / COMMANDS_FILE
     tracking_path = input_dir / CONTROLLER_STATE_TRACKING_FILE
     if not commands_path.exists():
@@ -250,6 +278,7 @@ def analyze(input_dir: Path) -> dict[str, object]:
     if not tracking_path.exists():
         raise FileNotFoundError(f"missing {tracking_path}")
 
+    inferred_state_loop_hz = _infer_state_loop_hz(input_dir, state_loop_hz)
     commands = _read_commands(commands_path)
     if not commands:
         raise RuntimeError(f"no commands in {commands_path}")
@@ -265,7 +294,14 @@ def analyze(input_dir: Path) -> dict[str, object]:
             and (next_stamp is None or sample.stamp_s < next_stamp)
         ]
         cartesian_window = [_to_cartesian(sample, command, kin) for sample in raw_window]
-        summaries.append(_summarize_command(command, cartesian_window, next_stamp))
+        summaries.append(
+            _summarize_command(
+                command,
+                cartesian_window,
+                next_stamp,
+                inferred_state_loop_hz,
+            )
+        )
 
     hold_summaries = [summary for summary in summaries if summary["hold_like"]]
     return {
@@ -273,7 +309,7 @@ def analyze(input_dir: Path) -> dict[str, object]:
         "command_source": COMMANDS_FILE,
         "tracking_source": CONTROLLER_STATE_TRACKING_FILE,
         "physical_clearance_m": PHYSICAL_CLEARANCE_M,
-        "state_loop_hz": STATE_LOOP_HZ,
+        "state_loop_hz": inferred_state_loop_hz,
         "commands": summaries,
         "hold_like_command_count": len(hold_summaries),
         "hold_like_best_feedback_1mm_ticks": max(
@@ -299,7 +335,7 @@ def write_outputs(input_dir: Path, result: dict[str, object]) -> tuple[Path, Pat
         f"- command_source: `{COMMANDS_FILE}`",
         f"- tracking_source: `{CONTROLLER_STATE_TRACKING_FILE}`",
         f"- physical_clearance_m: `{PHYSICAL_CLEARANCE_M:.6f}`",
-        f"- state_loop_hz: `{STATE_LOOP_HZ:.1f}`",
+        f"- state_loop_hz: `{float(result['state_loop_hz']):.1f}`",
         f"- hold_like_command_count: `{result['hold_like_command_count']}`",
         f"- hold_like_best_feedback_1mm_ticks: `{result['hold_like_best_feedback_1mm_ticks']}`",
         "",
@@ -351,8 +387,17 @@ def write_outputs(input_dir: Path, result: dict[str, object]) -> tuple[Path, Pat
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("input_dir", type=Path)
+    parser.add_argument(
+        "--state-loop-hz",
+        type=float,
+        default=None,
+        help=(
+            "Task state-machine cadence in Hz. Defaults to metrics.control_rate_hz "
+            "from trial_outcome.json in input_dir, falling back to 10 Hz."
+        ),
+    )
     args = parser.parse_args()
-    result = analyze(args.input_dir)
+    result = analyze(args.input_dir, args.state_loop_hz)
     md_path, _ = write_outputs(args.input_dir, result)
     print(md_path)
 

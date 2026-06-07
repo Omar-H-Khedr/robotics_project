@@ -1,6 +1,6 @@
 # Project Context
 
-Last reviewed: 2026-06-03
+Last reviewed: 2026-06-07
 
 This workspace is the active ROS 2 Jazzy / Gazebo implementation for the PhD topic:
 
@@ -32,7 +32,30 @@ The current workspace contains a Gazebo workcell with:
 - FT sensor injection and ROS bridge to `/ft_sensor_wrench`;
 - RGB-D D405 camera model in the world, with perception config aligned to `/d405/*` topics;
 - task-level admittance insertion node with phase logging;
+- single-plugin `gz_ros2_control` spawning: `spawn_robot_sdf.py` strips the
+  upstream converted vendor `gz_ros2_control` plugin before injecting the
+  research plugin, preventing duplicate controller managers;
 - dry-run experiment/context scaffolds from earlier proposal milestones.
+
+The latest control-runtime diagnostic is
+`diagnostics/research_baseline_single_gz_control_25hz_v1`:
+
+- startup fix: the converted upstream plugin pointing at
+  `fake_hardware_config_6_axis.yaml` is removed before SDF spawn;
+- retained run initialized one intended controller manager with
+  `position_proportional_gain=2000` and `position velocity` JTC state
+  interfaces;
+- task cadence override `control_rate:=25.0` is now launch-configurable and
+  recorded/analyzed by the offline stability tools;
+- run reached SEARCH and was externally timed out before INSERT;
+- SEARCH best estimated 1 mm window: `2` ticks at 25 Hz;
+- SEARCH best estimated 2 mm window: `8` ticks at 25 Hz;
+- hold-like best feedback 1 mm window: `3` ticks;
+- contact-topic samples: `0`.
+
+Decision: the duplicate-controller startup/configuration fault is fixed, but no
+new insertion success is claimed. Sustained no-contact SEARCH centering remains
+the blocker under the `0.0010 m` physical radial clearance gate.
 
 The strongest historical single-run iisy6 insertion-depth evidence is
 `diagnostics/research_baseline_insert_sim_time_completion_v4`, which passed the

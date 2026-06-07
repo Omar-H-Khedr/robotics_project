@@ -19,7 +19,8 @@ from kuka_task_control.robot_kinematics import RobotKinematics
 AXIS_ALIGN_POSE = np.array([0.520, -0.200, 0.885])
 COMMAND_TARGET_TOLERANCE_M = 0.02
 STRICT_XY_M = 0.002
-STATE_LOOP_HZ = 10.0
+TRIAL_OUTCOME_FILE = "trial_outcome.json"
+DEFAULT_STATE_LOOP_HZ = 10.0
 CONTROLLER_STATE_TRACKING_FILE = "trajectory_controller_state_samples.csv"
 JOINT_STATE_TRACKING_FILE = "trajectory_tracking_samples.csv"
 
@@ -107,17 +108,38 @@ def _select_axis_align_command(commands: list[CommandRow]) -> int | None:
     return best_index
 
 
-def _strict_bins(samples: list[TrackingSample], xy_errors: list[float]) -> dict[str, object]:
+def _infer_state_loop_hz(input_dir: Path, override_hz: float | None = None) -> float:
+    if override_hz is not None and override_hz > 0.0:
+        return override_hz
+    outcome_path = input_dir / TRIAL_OUTCOME_FILE
+    if outcome_path.exists():
+        try:
+            outcome = json.loads(outcome_path.read_text(encoding="utf-8"))
+            metrics = outcome.get("metrics", {})
+            if isinstance(metrics, dict):
+                control_rate_hz = float(metrics.get("control_rate_hz", 0.0))
+                if control_rate_hz > 0.0:
+                    return control_rate_hz
+        except (OSError, TypeError, ValueError, json.JSONDecodeError):
+            pass
+    return DEFAULT_STATE_LOOP_HZ
+
+
+def _strict_bins(
+    samples: list[TrackingSample],
+    xy_errors: list[float],
+    state_loop_hz: float,
+) -> dict[str, object]:
     bins: dict[int, list[float]] = {}
     if not samples:
         return {
             "strict_bin_count": 0,
             "max_consecutive_strict_bins": 0,
-            "estimated_state_loop_hz": STATE_LOOP_HZ,
+            "estimated_state_loop_hz": state_loop_hz,
         }
     start_s = samples[0].stamp_s
     for sample, xy_error in zip(samples, xy_errors):
-        index = int(math.floor((sample.stamp_s - start_s) * STATE_LOOP_HZ))
+        index = int(math.floor((sample.stamp_s - start_s) * state_loop_hz))
         bins.setdefault(index, []).append(xy_error)
     strict_indexes = sorted(
         index for index, values in bins.items() if values and max(values) <= STRICT_XY_M
@@ -132,11 +154,11 @@ def _strict_bins(samples: list[TrackingSample], xy_errors: list[float]) -> dict[
     return {
         "strict_bin_count": len(strict_indexes),
         "max_consecutive_strict_bins": best,
-        "estimated_state_loop_hz": STATE_LOOP_HZ,
+        "estimated_state_loop_hz": state_loop_hz,
     }
 
 
-def analyze(input_dir: Path) -> dict[str, object]:
+def analyze(input_dir: Path, state_loop_hz: float | None = None) -> dict[str, object]:
     commands_path = input_dir / "trajectory_commands.csv"
     controller_tracking_path = input_dir / CONTROLLER_STATE_TRACKING_FILE
     joint_tracking_path = input_dir / JOINT_STATE_TRACKING_FILE
@@ -150,6 +172,7 @@ def analyze(input_dir: Path) -> dict[str, object]:
     if not tracking_path.exists():
         raise FileNotFoundError(f"missing {tracking_path}")
 
+    inferred_state_loop_hz = _infer_state_loop_hz(input_dir, state_loop_hz)
     commands = _read_commands(commands_path)
     command_index = _select_axis_align_command(commands)
     if command_index is None:
@@ -217,7 +240,7 @@ def analyze(input_dir: Path) -> dict[str, object]:
         )
 
     position_array = np.array(positions, dtype=float)
-    bins = _strict_bins(hold, xy_errors)
+    bins = _strict_bins(hold, xy_errors, inferred_state_loop_hz)
     return {
         "input_dir": str(input_dir),
         "result": "OK",
@@ -298,6 +321,7 @@ def write_outputs(input_dir: Path, result: dict[str, object]) -> None:
             f"- strict_xy_sample_fraction: `{_fmt(result.get('strict_xy_sample_fraction'))}`",
             f"- strict_bin_count: `{result.get('strict_bin_count')}`",
             f"- max_consecutive_strict_bins: `{result.get('max_consecutive_strict_bins')}`",
+            f"- estimated_state_loop_hz: `{_fmt(result.get('estimated_state_loop_hz'), 1)}`",
             f"- largest_feedback_range_joint: `{largest.get('joint')}` `{_fmt(largest.get('feedback_range_rad'))}` rad",
             "",
             "## Per Joint Hold Dynamics",
@@ -340,8 +364,17 @@ def write_outputs(input_dir: Path, result: dict[str, object]) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("input_dir", type=Path)
+    parser.add_argument(
+        "--state-loop-hz",
+        type=float,
+        default=None,
+        help=(
+            "Task state-machine cadence in Hz. Defaults to metrics.control_rate_hz "
+            "from trial_outcome.json in input_dir, falling back to 10 Hz."
+        ),
+    )
     args = parser.parse_args()
-    result = analyze(args.input_dir)
+    result = analyze(args.input_dir, args.state_loop_hz)
     write_outputs(args.input_dir, result)
     print(json.dumps(result, indent=2))
 

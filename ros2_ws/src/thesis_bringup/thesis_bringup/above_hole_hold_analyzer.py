@@ -13,7 +13,8 @@ from statistics import mean
 
 
 STRICT_XY_M = 0.002
-STATE_LOOP_HZ = 10.0
+TRIAL_OUTCOME_FILE = "trial_outcome.json"
+DEFAULT_STATE_LOOP_HZ = 10.0
 REQUIRED_STABLE_TICKS = 5
 STATE_NAME = "MOVING_TO_START"
 
@@ -66,19 +67,39 @@ def _continuous_strict_windows(samples: list[HoldSample]) -> list[list[HoldSampl
     return windows
 
 
-def _estimated_state_loop_ticks(samples: list[HoldSample]) -> tuple[int, float | None, float | None]:
-    """Replay strict samples at the task node's 10 Hz cadence.
+def _infer_state_loop_hz(input_dir: Path, override_hz: float | None = None) -> float:
+    if override_hz is not None and override_hz > 0.0:
+        return override_hz
+    outcome_path = input_dir / TRIAL_OUTCOME_FILE
+    if outcome_path.exists():
+        try:
+            outcome = json.loads(outcome_path.read_text(encoding="utf-8"))
+            metrics = outcome.get("metrics", {})
+            if isinstance(metrics, dict):
+                control_rate_hz = float(metrics.get("control_rate_hz", 0.0))
+                if control_rate_hz > 0.0:
+                    return control_rate_hz
+        except (OSError, TypeError, ValueError, json.JSONDecodeError):
+            pass
+    return DEFAULT_STATE_LOOP_HZ
+
+
+def _estimated_state_loop_ticks(
+    samples: list[HoldSample],
+    state_loop_hz: float,
+) -> tuple[int, float | None, float | None]:
+    """Replay strict samples at the task node's configured cadence.
 
     Observer data is higher-rate than the task state machine. This samples the
-    recorded state/XY stream at 0.1 s intervals by nearest sample at or after
-    each tick. It is an approximation, but it is stricter than counting
-    adjacent high-rate observer rows.
+    recorded state/XY stream by nearest sample at or after each tick. It is an
+    approximation, but it is stricter than counting adjacent high-rate observer
+    rows.
     """
     moving = [sample for sample in samples if sample.state == STATE_NAME]
     if not moving:
         return 0, None, None
 
-    tick_period = 1.0 / STATE_LOOP_HZ
+    tick_period = 1.0 / state_loop_hz
     next_tick = moving[0].stamp_s
     index = 0
     current = 0
@@ -107,11 +128,12 @@ def _estimated_state_loop_ticks(samples: list[HoldSample]) -> tuple[int, float |
     return best, best_start, best_end
 
 
-def analyze(input_dir: Path) -> dict[str, object]:
+def analyze(input_dir: Path, state_loop_hz: float | None = None) -> dict[str, object]:
     samples_path = input_dir / "wrench_state_samples.csv"
     if not samples_path.exists():
         raise FileNotFoundError(f"missing {samples_path}")
 
+    inferred_state_loop_hz = _infer_state_loop_hz(input_dir, state_loop_hz)
     samples = _read_samples(samples_path)
     moving = [sample for sample in samples if sample.state == STATE_NAME]
     if not moving:
@@ -131,7 +153,10 @@ def analyze(input_dir: Path) -> dict[str, object]:
         if len(best_window) >= 2
         else 0.0
     )
-    best_ticks, best_tick_start, best_tick_end = _estimated_state_loop_ticks(samples)
+    best_ticks, best_tick_start, best_tick_end = _estimated_state_loop_ticks(
+        samples,
+        inferred_state_loop_hz,
+    )
     min_sample = min(moving, key=lambda sample: sample.xy_error_m)
     final_sample = moving[-1]
     strict_count = sum(1 for sample in moving if sample.xy_error_m <= STRICT_XY_M)
@@ -142,7 +167,7 @@ def analyze(input_dir: Path) -> dict[str, object]:
         "state": STATE_NAME,
         "strict_xy_m": STRICT_XY_M,
         "required_stable_ticks": REQUIRED_STABLE_TICKS,
-        "state_loop_hz": STATE_LOOP_HZ,
+        "state_loop_hz": inferred_state_loop_hz,
         "samples": len(samples),
         "moving_to_start_samples": len(moving),
         "strict_samples": strict_count,
@@ -184,7 +209,7 @@ def write_outputs(input_dir: Path, result: dict[str, object]) -> None:
         f"- state: `{STATE_NAME}`",
         f"- strict_xy_m: `{_fmt(result.get('strict_xy_m'))}`",
         f"- required_stable_ticks: `{REQUIRED_STABLE_TICKS}`",
-        f"- state_loop_hz: `{STATE_LOOP_HZ:.1f}`",
+        f"- state_loop_hz: `{float(result.get('state_loop_hz', DEFAULT_STATE_LOOP_HZ)):.1f}`",
         f"- moving_to_start_samples: `{result.get('moving_to_start_samples', 0)}`",
         f"- strict_samples: `{result.get('strict_samples', 0)}`",
         f"- best_continuous_strict_samples: `{result.get('best_continuous_strict_samples', 0)}`",
@@ -198,7 +223,8 @@ def write_outputs(input_dir: Path, result: dict[str, object]) -> None:
         "",
         "Interpretation: this is an offline diagnostic over passive observer CSVs. "
         "It estimates whether the recorded above-hole hold would satisfy the "
-        "task controller's strict 2 mm XY gate for five 10 Hz state-loop ticks. "
+        "task controller's strict 2 mm XY gate for five configured-cadence "
+        "state-loop ticks. "
         "It does not publish commands or alter task safety gates.",
     ]
     md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -209,9 +235,18 @@ def main() -> None:
         description="Analyze above-hole hold stability from wrench_state_samples.csv"
     )
     parser.add_argument("input_dir", type=Path)
+    parser.add_argument(
+        "--state-loop-hz",
+        type=float,
+        default=None,
+        help=(
+            "Task state-machine cadence in Hz. Defaults to metrics.control_rate_hz "
+            "from trial_outcome.json in input_dir, falling back to 10 Hz."
+        ),
+    )
     args = parser.parse_args()
 
-    result = analyze(args.input_dir)
+    result = analyze(args.input_dir, args.state_loop_hz)
     write_outputs(args.input_dir, result)
     print(json.dumps(result, indent=2))
 

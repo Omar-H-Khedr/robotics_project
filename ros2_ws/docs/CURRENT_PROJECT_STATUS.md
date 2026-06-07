@@ -32,10 +32,14 @@ Verification after cleanup:
 
 The latest verified milestone from README/docs/git history is
 `live_v2_14_inference_node_validation` for perception and
-`research_baseline_search_velocity_state_v1` for control. The next technical
-step remains near-centered SEARCH / pre-insert handoff stabilization while
-preserving physical clearance gates; repeated validation should follow only
-after those gates pass.
+`research_baseline_single_gz_control_25hz_v1` for control. The control update
+fixes duplicate Gazebo controller-manager startup by stripping the converted
+upstream vendor `gz_ros2_control` plugin before injecting the research plugin.
+The retained 25 Hz run reached SEARCH but still did not sustain the 1 mm
+physical clearance gate before the external timeout. The next technical step
+remains near-centered SEARCH / pre-insert handoff stabilization while preserving
+physical clearance gates; repeated validation should follow only after those
+gates pass.
 
 ## Evidence Reviewed
 
@@ -45,7 +49,7 @@ after those gates pass.
 - `docs/context/proposal_full.md`
 - `docs/context/robot_cell_audit.md`
 - `docs/ROBOT_DATASHEET_CHECK.md`
-- recent git history through `e210b5e`
+- recent git history through `0431711`
 - launch/config/model/task-control source files
 - `admittance_insertion_node.py`
 - `baseline_joint_sequence_executor.py`
@@ -97,6 +101,7 @@ after those gates pass.
 - `diagnostics/research_baseline_endpoint_hold_dynamics_analyzer_v1/summary.md`
 - `diagnostics/research_baseline_joint_damping_scale_5p0_v1/summary.md`
 - `diagnostics/research_baseline_joint_damping_scale_5p0_v1/approach_tracking_analysis.md`
+- `diagnostics/research_baseline_single_gz_control_25hz_v1/summary.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -147,6 +152,7 @@ until repeated validation demonstrates robust success.
   - `research_baseline_search_gain3000_v1` (no D-term, gain=3000.0): SEARCH failed closed at final XY `0.0038 m` reporter / `0.002071 m` mean, max centered-hold p95 actual XY drift `0.004013 m`, max centered-hold p95 joint error `0.008314 rad`, best SEARCH `0.0010 m` window `2` ticks (worst seen), best `0.0020 m` window `4` ticks (worse than the 3 from the canonical gain=2000 baseline).
   - `research_baseline_search_position_controller_v1` / `v2` (use_position_controller:=true): switched the underlying ros2_control controller type from `joint_trajectory_controller/JointTrajectoryController` to `position_controllers/JointGroupPositionController`, driven by a new `trajectory_position_bridge` node that subscribes to the JTC-style trajectory topic, stores the active multi-point trajectory, and at 250 Hz linearly interpolates the current reference and republishes it as a `Float64MultiArray`. The position controller plugin is loaded from the extracted `ros-jazzy-position-controllers` deb at `/tmp/ros_install` because the system package is not installable without sudo; `/tmp/pos_controllers_setup.bash` sets `AMENT_PREFIX_PATH` and `LD_LIBRARY_PATH`. v1 SEARCH final XY `0.0014 m` reporter / `0.001782 m` mean, best SEARCH 1 mm window `2` ticks, best 2 mm window `12` ticks (the best 2 mm SEARCH window seen in this line of work). v2 SEARCH final XY `0.0024 m` reporter / `0.003757 m` mean, best SEARCH 1 mm window `4` ticks, best 2 mm window `10` ticks. The position controller does not publish `JointTrajectoryControllerState` on `/position_controller/controller_state` (the `ForwardCommandController` base does not include a state publisher by default), so the controller-state-samples CSV is empty for this path and the centered-hold JTC joint error diagnostic cannot run; the `trajectory_tracking_samples.csv` shows final max abs joint-position error `0.006608 rad` (better than the best JTC derivative-gain run at `0.008472 rad`). All runs are fail-closed and safe. The 1 mm sustained window remains the binding constraint; switching controller type does not unblock it.
   - `research_baseline_search_velocity_state_v1` (inject_velocity_state:=true, position_derivative_gain=10.0, position_gain=2000.0): added a `velocity` state interface to every joint's URDF via `inject_velocity_state_urdf.py` and switched the JTC's `state_interfaces` to `[position, velocity]`. The D-term's input is now real joint velocity from `gz_ros2_control/GazeboSimSystem` (not finite-difference of position). SEARCH failed closed at final XY `0.0018 m`, max centered-hold p95 actual XY drift `0.004015 m`, controller-state p95 joint error `0.011460 rad`, best SEARCH 1 mm window `2` ticks. Linearization residual p95 `0.000016-0.000020 m` (consistent with Jacobian estimate). The 1 mm sustained window remains unblocked; the D-term's input source (finite-difference vs. real velocity) is not the binding constraint. This closes out the velocity-state lever.
+- `research_baseline_single_gz_control_25hz_v1`: `spawn_robot_sdf.py` now removes the upstream converted `gz_ros2_control` plugin that referenced `fake_hardware_config_6_axis.yaml` before injecting the research controller plugin. Runtime startup used one intended controller manager, with no duplicate controller activation errors. The 25 Hz diagnostic reached SEARCH and was externally timed out before INSERT; SEARCH best 1 mm window was `2` ticks (`0.08 s`), best 2 mm window was `8` ticks (`0.32 s`), hold-like best feedback 1 mm window was `3` ticks, and contact-topic samples were `0`. This fixes the duplicate-plugin startup fault but does not claim insertion success or unblock sustained physical centering.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
