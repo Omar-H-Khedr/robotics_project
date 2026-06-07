@@ -1,0 +1,74 @@
+{
+  "trial_outcome": "SUCCESS",
+  "reason": "Full cycle completed. Insertion depth 0.020m, contact 54.8N during INSERT.",
+  "phases": [
+    {
+      "phase": "MOVING_TO_START",
+      "success": true,
+      "cart_error_m": 0.000586,
+      "joint_error_rad": 0.002131,
+      "timed_out": false,
+      "duration_s": 40.04,
+      "message": ""
+    },
+    {
+      "phase": "APPROACH",
+      "success": true,
+      "cart_error_m": 0.014289,
+      "joint_error_rad": 0.02597,
+      "timed_out": false,
+      "duration_s": 11.48,
+      "message": ""
+    },
+    {
+      "phase": "INSERT",
+      "success": true,
+      "cart_error_m": 0.0,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 49.68,
+      "message": "Insertion depth 0.020m with insert contact evidence 54.8N and final XY error 0.0002m"
+    },
+    {
+      "phase": "RETREAT",
+      "success": true,
+      "cart_error_m": 0.0,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 24.6,
+      "message": ""
+    }
+  ],
+  "metrics": {
+    "initial_xy_error_m": 0.0005,
+    "pre_insertion_xy_error_m": 0.0005,
+    "final_insertion_xy_error_m": 0.0002,
+    "insert_final_xy_tolerance_m": 0.001,
+    "insertion_depth_m": 0.02,
+    "max_fz_N": 96.92,
+    "max_abs_fz_N": 96.92,
+    "max_force_norm_N": 169.43,
+    "baseline_fz_N": 37.29,
+    "max_contact_force_N": 65.08,
+    "max_insert_contact_force_N": 54.84,
+    "contact_threshold_N": 5.0,
+    "control_rate_hz": 25.0,
+    "search_convergence_required_ticks": 8,
+    "search_convergence_required_duration_s": 0.32,
+    "search_recenter_duration_s": 8.0,
+    "search_settle_duration_s": 9.0,
+    "insert_handoff_hold_duration_s": 2.0,
+    "insert_handoff_timeout_s": 12.0,
+    "insert_predepth_recenter_attempts": 0,
+    "insert_predepth_recenter_budget_attempts": 0,
+    "insert_predepth_recenter_budget_resets": 0,
+    "insert_max_predepth_xy_error_m": 0.0014,
+    "insert_entry_descent_count": 1,
+    "insert_capture_descent_count": 1,
+    "insert_shallow_sideload_recovery_attempts": 0,
+    "insert_final_sideload_retry_attempts": 0,
+    "gravity_baseline_valid": true,
+    "baseline_window_samples": 50
+  },
+  "status": "DONE"
+}

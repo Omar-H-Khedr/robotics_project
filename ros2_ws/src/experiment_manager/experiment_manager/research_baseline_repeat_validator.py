@@ -71,11 +71,16 @@ def _row_from_outcome(
             "failed_phase": "launch_or_logging",
             "insertion_depth_m": 0.0,
             "final_xy_error_m": 0.0,
+            "max_predepth_xy_error_m": 0.0,
             "peak_raw_fz_N": 0.0,
             "sustained_contact_force_N": 0.0,
             "max_insert_contact_force_N": 0.0,
             "insert_predepth_recenter_attempts": 0,
+            "insert_predepth_recenter_budget_resets": 0,
+            "insert_entry_descent_count": 0,
+            "insert_capture_descent_count": 0,
             "insert_shallow_sideload_recovery_attempts": 0,
+            "insert_final_sideload_retry_attempts": 0,
             "side_load_abort": False,
             "max_cartesian_error_m": 0.0,
             "timeout": timed_out,
@@ -120,6 +125,9 @@ def _row_from_outcome(
         "final_xy_error_m": float(
             metrics.get("final_insertion_xy_error_m", 0.0)
         ),
+        "max_predepth_xy_error_m": float(
+            metrics.get("insert_max_predepth_xy_error_m", 0.0)
+        ),
         "peak_raw_fz_N": float(metrics.get("max_fz_N", 0.0)),
         "sustained_contact_force_N": float(
             metrics.get("max_contact_force_N", insert.get("contact_force_N", 0.0))
@@ -130,8 +138,20 @@ def _row_from_outcome(
         "insert_predepth_recenter_attempts": int(
             metrics.get("insert_predepth_recenter_attempts", 0)
         ),
+        "insert_predepth_recenter_budget_resets": int(
+            metrics.get("insert_predepth_recenter_budget_resets", 0)
+        ),
+        "insert_entry_descent_count": int(
+            metrics.get("insert_entry_descent_count", 0)
+        ),
+        "insert_capture_descent_count": int(
+            metrics.get("insert_capture_descent_count", 0)
+        ),
         "insert_shallow_sideload_recovery_attempts": int(
             metrics.get("insert_shallow_sideload_recovery_attempts", 0)
+        ),
+        "insert_final_sideload_retry_attempts": int(
+            metrics.get("insert_final_sideload_retry_attempts", 0)
         ),
         "side_load_abort": (
             trial_outcome == "ABORTED"
@@ -244,11 +264,16 @@ def _write_outputs(rows: list[dict[str, Any]], output_dir: Path, args: argparse.
         "failed_phase",
         "insertion_depth_m",
         "final_xy_error_m",
+        "max_predepth_xy_error_m",
         "peak_raw_fz_N",
         "sustained_contact_force_N",
         "max_insert_contact_force_N",
         "insert_predepth_recenter_attempts",
+        "insert_predepth_recenter_budget_resets",
+        "insert_entry_descent_count",
+        "insert_capture_descent_count",
         "insert_shallow_sideload_recovery_attempts",
+        "insert_final_sideload_retry_attempts",
         "side_load_abort",
         "max_cartesian_error_m",
         "timeout",
@@ -315,20 +340,27 @@ def _write_outputs(rows: list[dict[str, Any]], output_dir: Path, args: argparse.
                 "robustness claim.",
                 "",
                 "| Trial | Outcome | Success | Failed phase | Depth m | Final XY m | "
-                "Peak raw Fz N | Contact N | Insert contact N | Pre-depth recenters | "
-                "Shallow side-load recoveries | Timeout | Safety abort | Side-load abort |",
-                "| ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- |",
+                "Max pre-depth XY m | Peak raw Fz N | Contact N | Insert contact N | "
+                "Pre-depth recenters | Recenter budget resets | Entry descents | "
+                "Capture descents | Shallow side-load recoveries | Final side-load "
+                "retries | Timeout | Safety abort | Side-load abort |",
+                "| ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- |",
                 *[
                     (
                         f"| {row['trial']} | `{row['trial_outcome']}` | "
                         f"`{row['success']}` | `{row['failed_phase']}` | "
                         f"{float(row['insertion_depth_m']):.4f} | "
                         f"{float(row['final_xy_error_m']):.4f} | "
+                        f"{float(row['max_predepth_xy_error_m']):.4f} | "
                         f"{float(row['peak_raw_fz_N']):.2f} | "
                         f"{float(row['sustained_contact_force_N']):.2f} | "
                         f"{float(row['max_insert_contact_force_N']):.2f} | "
                         f"{row['insert_predepth_recenter_attempts']} | "
+                        f"{row['insert_predepth_recenter_budget_resets']} | "
+                        f"{row['insert_entry_descent_count']} | "
+                        f"{row['insert_capture_descent_count']} | "
                         f"{row['insert_shallow_sideload_recovery_attempts']} | "
+                        f"{row['insert_final_sideload_retry_attempts']} | "
                         f"`{row['timeout']}` | `{row['safety_abort']}` | "
                         f"`{row['side_load_abort']}` |"
                     )

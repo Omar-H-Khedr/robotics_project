@@ -110,6 +110,25 @@ This is an improvement over `1/3`, but not final robust success. SEARCH was
 still bypassed in these repeats, so SEARCH-entering robustness remains
 unresolved.
 
+The latest retained INSERT repeat milestone,
+`research_baseline_final_sideload_retry_500hz_repeat_v2`, adds staged INSERT
+entry/capture descents, reports max pre-depth XY drift/recenter counts, extends
+the bounded shallow side-load recovery envelope from `0.005 m` to `0.006 m`,
+and adds a one-attempt final/deep side-load withdrawal-retry path before
+aborting. The fixed `0.0010 m` physical clearance, `8`-tick handoff gate, force
+safety gates, and bounded recenter limits are unchanged. Five fresh headless
+repeats produced `5/5` physical successes, `0` timeouts, `0` safety aborts,
+and `0` side-load aborts. Trials 3, 4, and 5 exercised pre-depth recenter
+recovery, with Trial 3 using both allowed recenters before recovering to
+`0.0203 m` depth and `0.0006 m` final XY. The final/deep side-load retry did
+not trigger in the retained v2 pass; it is implemented as a fail-closed
+recovery path but still needs a repeat set that actually exercises it. SEARCH
+was bypassed in the retained v2 pass; the previous candidate v1 pass included
+one SEARCH-entered physical success, but SEARCH-entering robustness is not yet
+validated. This is the strongest current repeated simulated insertion evidence,
+not final autonomous peg-in-hole success, and a later 10-trial validation is
+still needed.
+
 Operational note: after restoring tracked generated directories, clean and
 rebuild selected package build/install trees before runtime. A stale tracked
 `install/thesis_bringup` launch file was observed to launch the older iisy3
@@ -118,10 +137,10 @@ path until `build/kuka_task_control`, `install/kuka_task_control`,
 
 Remaining shutdown limitation: the Python-side cleanup does not fix
 `ros_gz_bridge` exit `-11` or `gzserver` forced-kill behavior during launch
-teardown. Next technical step: reduce or prevent no-contact pre-depth XY drift
-after repeated handoff recenters, while continuing to treat SEARCH-entering
-robustness as unresolved; do not bulk-add raw diagnostic CSVs or claim final
-autonomous peg-in-hole success before broader repeated validation passes.
+teardown. Next technical step: validate SEARCH-entering repeats and exercise
+the implemented final/deep side-load retry path, while continuing to treat
+`5/5` simulated repeats as a strong milestone rather than final autonomous
+peg-in-hole success.
 
 The strongest historical iisy6 evidence is a controller-driven simulated insertion-depth event from `diagnostics/research_baseline_insert_sim_time_completion_v4`: final outcome `SUCCESS` under older depth/contact criteria, insertion depth `0.0191 m`, task F/T insert-contact evidence `60.1 N`, max raw `|Fz|=133.33 N`, and no safety abort or invalid timeout. That claim is now superseded by a stricter physical-clearance gate: `diagnostics/research_baseline_insert_physical_xy_gate_v1` reached depth `0.0177 m` and insert contact `55.4 N`, but correctly reported `DEGRADED` because final insertion XY error `0.0030 m` exceeds the 25 mm peg / 27 mm hole radial clearance of `0.0010 m`. Current status: shallow side-load withdrawal recovery improved repeat validation to `4/5` physical successes in `research_baseline_shallow_sideload_withdraw_500hz_repeat_v1`, with one explicit fail-closed pre-depth drift abort. This is promising repeated simulation evidence, not final robust autonomous peg-in-hole success.
 
