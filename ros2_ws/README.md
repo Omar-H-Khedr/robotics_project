@@ -37,6 +37,17 @@ and reason `SEARCH timeout (45s). XY error 0.0013m remains above physical
 clearance 0.0010m.` The SEARCH gate trace recorded `1125` online decision rows
 and ended in `timeout_abort`. No insertion success is claimed.
 
+The latest control diagnostic,
+`research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1`,
+tested gain=3000, D=20, damping-scale=10, velocity-state injection, and the
+same 8 s / 9 s SEARCH timing. It also reached DONE with launch exit code `0`,
+but still failed safely in SEARCH: final outcome `ABORTED`, insertion depth
+`0.0000 m`, and reason `SEARCH timeout (45s). Instantaneous XY error 0.0006m
+is within physical clearance 0.0010m but was not sustained for 8 post-command
+ticks.` The online SEARCH trace recorded `1125` rows, only `2`
+`post_settle_count` rows, and a best counted post-command 1 mm streak of `1`
+tick against the required `8`. D=20 is rejected as a baseline change.
+
 Operational note: after restoring tracked generated directories, clean and
 rebuild selected package build/install trees before runtime. A stale tracked
 `install/thesis_bringup` launch file was observed to launch the older iisy3
@@ -166,6 +177,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_current_joint_handoff_recenter8_gain3000_damping10_25hz_v1 | Rejected/unvalidated candidate: a current-joint INSERT handoff hold edit was built, but the validation failed closed in SEARCH before INSERT and no handoff command was published. Source reverted; diagnostic retained for SEARCH instability evidence. |
 | research_baseline_search_gate_trace_recenter8_gain3000_damping10_25hz_v1 | Completed diagnostic hook: the task node writes online SEARCH gate decisions to `search_gate_trace.csv` in `tracking_log_dir`. Validation bypassed SEARCH, so the trace had no rows; the run reached INSERT and failed safely at handoff with 4/8 best INSERT 1 mm ticks. No insertion success claimed. |
 | research_baseline_clean_python_shutdown_recenter8_gain3000_damping10_25hz_v3 | Completed shutdown cleanup: Python observers, safety monitor, and data logger finish cleanly after DONE-reaching launch. Validation failed safely in SEARCH with 0 m insertion depth; bridge/gzserver shutdown faults remain external limitations. |
+| research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1 | Rejected diagnostic: D=20 improves some passive SEARCH indicators but the online post-command gate still counts only 1/8 required 1 mm ticks; no INSERT and no insertion success. |
 
 ## 2026-06-07 Clean Python Shutdown
 
@@ -206,6 +218,36 @@ Shutdown result:
 Decision: keep the Python shutdown cleanup. It improves diagnostic reliability
 but does not alter the physical task result; sustained SEARCH centering remains
 the active blocker.
+
+## 2026-06-07 D20 SEARCH Stability Diagnostic
+
+Milestone: `research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1`
+
+Evidence: `diagnostics/research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1/summary.md`
+
+The latest gain diagnostic tested gain=3000, `position_derivative_gain=20.0`,
+damping scale 10, velocity-state injection, 25 Hz task cadence, and the same
+8 s / 9 s SEARCH timing. The launch reached DONE and exited with wrapper code
+`0`, but the physical task still failed closed in SEARCH.
+
+Task result:
+
+- final outcome: `ABORTED`;
+- failed phase: `SEARCH`;
+- reason: `SEARCH timeout (45s). Instantaneous XY error 0.0006m is within physical clearance 0.0010m but was not sustained for 8 post-command ticks.`;
+- insertion depth: `0.0000 m`;
+- SEARCH gate trace rows: `1125`;
+- online counted post-command 1 mm streak: `1/8` ticks;
+- all-trace best 1 mm streak: `5` ticks;
+- passive SEARCH best 1 mm window: `6` estimated task ticks;
+- hold-like best feedback 1 mm window: `9` ticks;
+- max centered-hold p95 actual XY drift: `0.002337 m`;
+- max raw `|Fz|`: `100.51 N`;
+- positive Gazebo contact-topic samples: `0`.
+
+Decision: reject D=20 as a baseline change. The authoritative online gate did
+not sustain physical clearance, so INSERT remains correctly blocked and no
+insertion success is claimed.
 
 ## 2026-06-07 SEARCH Gate Trace Hook
 

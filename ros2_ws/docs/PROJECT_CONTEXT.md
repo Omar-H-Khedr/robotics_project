@@ -38,7 +38,7 @@ The current workspace contains a Gazebo workcell with:
 - dry-run experiment/context scaffolds from earlier proposal milestones.
 
 The latest control-runtime diagnostic is
-`diagnostics/research_baseline_clean_python_shutdown_recenter8_gain3000_damping10_25hz_v3`,
+`diagnostics/research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1`,
 following the retained
 `diagnostics/research_baseline_insert_handoff_gate_order_v1` sequencing fix and
 the rejected `diagnostics/research_baseline_search_gain3000_settle_seconds_25hz_v1`
@@ -148,6 +148,24 @@ gain retest:
 - `ros_gz_bridge` still exits with signal `-11`, and `gzserver` still requires
   forced teardown; this is a remaining Gazebo/bridge shutdown limitation, not a
   Python-node traceback.
+- a follow-up D=20 diagnostic kept gain=3000, damping-scale=10,
+  velocity-state injection, 25 Hz task cadence, and the same 8 s / 9 s SEARCH
+  timing;
+- that run reached DONE with launch wrapper exit code `0`, but still failed
+  safely in SEARCH;
+- final outcome was `ABORTED`, reason `SEARCH timeout (45s). Instantaneous XY
+  error 0.0006m is within physical clearance 0.0010m but was not sustained for
+  8 post-command ticks.`, insertion depth `0.0000 m`;
+- the online SEARCH gate trace recorded `1125` rows, only `2`
+  `post_settle_count` decisions, and a best counted post-command 1 mm streak
+  of `1` tick against the required `8`;
+- passive replay reported SEARCH best `0.0010 m` stability `6` estimated task
+  ticks and hold-like best feedback `0.0010 m` stability `9` ticks;
+- max centered-hold p95 actual XY drift was `0.002337 m`, max raw `|Fz|` was
+  `100.51 N`, max force norm was `170.49 N`, and positive contact-topic
+  samples were `0`;
+- D=20 is rejected as a baseline change because the authoritative online gate
+  still blocks INSERT.
 
 Decision: the duplicate-controller startup/configuration fault and the
 non-default-cadence SEARCH hold-shortening bug are fixed. The INSERT handoff
@@ -155,12 +173,13 @@ gate ordering now matches the intended safety design and has been exercised in
 runtime. Damping scale 10 is rejected as a default because it does not satisfy
 the strict handoff stability gate and slows startup motion. Longer handoff
 waiting and SEARCH recenter/settle timing are now configurable for diagnostics,
-but the latest run shows the physical blocker remains INSERT handoff feedback
-stability after SEARCH convergence. No new insertion success is claimed. The
-shutdown hook and Python-node teardown have now been exercised in a full
-DONE-reaching launch, but the result was a safe SEARCH abort, not a physical
-insertion success. Sustained no-contact SEARCH/hold/handoff feedback centering
-remains the blocker under the `0.0010 m` physical radial clearance gate.
+but the latest run shows the physical blocker remains SEARCH/post-command
+feedback stability before INSERT. No new insertion success is claimed. The
+shutdown hook and Python-node teardown have now been exercised in full
+DONE-reaching launches, but the latest D=20 run was still a safe SEARCH abort,
+not a physical insertion success. Sustained no-contact SEARCH/hold/handoff
+feedback centering remains the blocker under the `0.0010 m` physical radial
+clearance gate.
 
 Operational note: after generated tracked `build/`, `install/`, and `log`
 trees are restored, selected package build/install trees must be cleaned and
