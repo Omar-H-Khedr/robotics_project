@@ -589,6 +589,14 @@ def launch_setup(context, *args, **kwargs):
                     value_type=float,
                 ),
                 "approach_speed": 0.01,
+                "insert_handoff_hold_duration_s": ParameterValue(
+                    LaunchConfiguration("insert_handoff_hold_duration_s"),
+                    value_type=float,
+                ),
+                "insert_handoff_timeout_s": ParameterValue(
+                    LaunchConfiguration("insert_handoff_timeout_s"),
+                    value_type=float,
+                ),
                 "use_sim_time": simulation["use_sim_time"],
             }
         ],
@@ -743,6 +751,24 @@ def generate_launch_description():
                     "Admittance insertion task state-machine rate in Hz. "
                     "Default 10 Hz preserves canonical behavior; override only "
                     "for documented SEARCH/hold cadence diagnostics."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "insert_handoff_hold_duration_s",
+                default_value="2.0",
+                description=(
+                    "No-descent INSERT handoff hold command duration. "
+                    "Default 2.0 s preserves canonical behavior; this does "
+                    "not change the 1 mm clearance or 8-tick stability gate."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "insert_handoff_timeout_s",
+                default_value="6.0",
+                description=(
+                    "Maximum wait for INSERT handoff feedback to satisfy the "
+                    "fixed physical-clearance stability gate before aborting. "
+                    "Default 6.0 s preserves canonical behavior."
                 ),
             ),
             DeclareLaunchArgument(

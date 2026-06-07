@@ -167,6 +167,14 @@ class AdmittanceInsertionNode(Node):
         self.declare_parameter('action_timeout', 15.0)
         self.declare_parameter('trajectory_discovery_wait_s', 2.0)
         self.declare_parameter('expected_trajectory_subscribers', 2)
+        self.declare_parameter(
+            'insert_handoff_hold_duration_s',
+            self.INSERT_HANDOFF_HOLD_DURATION_S,
+        )
+        self.declare_parameter(
+            'insert_handoff_timeout_s',
+            self.INSERT_HANDOFF_TIMEOUT_S,
+        )
 
         self._contact_threshold: float = (
             self.get_parameter('contact_threshold').value
@@ -188,6 +196,14 @@ class AdmittanceInsertionNode(Node):
         )
         self._expected_trajectory_subscribers: int = int(
             self.get_parameter('expected_trajectory_subscribers').value
+        )
+        self._insert_handoff_hold_duration_s: float = max(
+            0.1,
+            float(self.get_parameter('insert_handoff_hold_duration_s').value),
+        )
+        self._insert_handoff_timeout_s: float = max(
+            self._insert_handoff_hold_duration_s,
+            float(self.get_parameter('insert_handoff_timeout_s').value),
         )
 
         self._state: str = self.IDLE
@@ -284,7 +300,10 @@ class AdmittanceInsertionNode(Node):
             f'control_rate={self._control_rate:.1f} Hz, '
             f'approach_speed={self._approach_speed:.3f}, '
             f'trajectory_discovery_wait_s={self._trajectory_discovery_wait_s:.1f}, '
-            f'expected_trajectory_subscribers={self._expected_trajectory_subscribers}'
+            f'expected_trajectory_subscribers={self._expected_trajectory_subscribers}, '
+            f'insert_handoff_hold_duration_s='
+            f'{self._insert_handoff_hold_duration_s:.1f}, '
+            f'insert_handoff_timeout_s={self._insert_handoff_timeout_s:.1f}'
         )
 
     def _joint_states_cb(self, msg: JointState) -> None:
@@ -1224,19 +1243,19 @@ class AdmittanceInsertionNode(Node):
                 self._set_state(self.ABORT)
                 return False
 
-            self._send_trajectory_goal(q, self.INSERT_HANDOFF_HOLD_DURATION_S)
+            self._send_trajectory_goal(q, self._insert_handoff_hold_duration_s)
             self._insert_handoff_hold_start_s = self._now_s()
             self._insert_handoff_hold_sent = True
             self._insert_handoff_stable_ticks = 0
             self.get_logger().info(
                 f'INSERT handoff hold started: duration='
-                f'{self.INSERT_HANDOFF_HOLD_DURATION_S:.1f}s, '
+                f'{self._insert_handoff_hold_duration_s:.1f}s, '
                 f'xy_error={xy_error:.4f}m, peg_z={peg[2]:.4f}m'
             )
             return False
 
         elapsed = self._now_s() - self._insert_handoff_hold_start_s
-        ready_to_count = elapsed >= self.INSERT_HANDOFF_HOLD_DURATION_S
+        ready_to_count = elapsed >= self._insert_handoff_hold_duration_s
         stable = (
             ready_to_count
             and current_depth < self.INSERT_SIDELOAD_DEPTH_GATE_M
@@ -1260,7 +1279,7 @@ class AdmittanceInsertionNode(Node):
         if self._insert_handoff_stable_ticks >= self.INSERT_HANDOFF_SETTLE_TICKS:
             return self._send_insert_descent(peg)
 
-        if elapsed >= self.INSERT_HANDOFF_TIMEOUT_S:
+        if elapsed >= self._insert_handoff_timeout_s:
             self._abort_reason = (
                 f'INSERT handoff settle timeout: XY error {xy_error:.4f}m did '
                 f'not remain within physical clearance '
@@ -1589,6 +1608,14 @@ class AdmittanceInsertionNode(Node):
                     3,
                 ),
                 'search_settle_duration_s': round(self.SEARCH_SETTLE_DURATION_S, 3),
+                'insert_handoff_hold_duration_s': round(
+                    self._insert_handoff_hold_duration_s,
+                    3,
+                ),
+                'insert_handoff_timeout_s': round(
+                    self._insert_handoff_timeout_s,
+                    3,
+                ),
                 'gravity_baseline_valid': self._baseline_valid,
                 'baseline_window_samples': len(self._fz_buffer),
             },

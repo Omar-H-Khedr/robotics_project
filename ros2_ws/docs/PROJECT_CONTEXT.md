@@ -38,11 +38,11 @@ The current workspace contains a Gazebo workcell with:
 - dry-run experiment/context scaffolds from earlier proposal milestones.
 
 The latest control-runtime diagnostic is
-`diagnostics/research_baseline_search_damping10_gain3000_25hz_v1`, following
-the retained `diagnostics/research_baseline_insert_handoff_gate_order_v1`
-sequencing fix and the rejected
-`diagnostics/research_baseline_search_gain3000_settle_seconds_25hz_v1` gain
-retest:
+`diagnostics/research_baseline_handoff_timeout12_gain3000_damping10_25hz_v1`,
+following the retained
+`diagnostics/research_baseline_insert_handoff_gate_order_v1` sequencing fix and
+the rejected `diagnostics/research_baseline_search_gain3000_settle_seconds_25hz_v1`
+gain retest:
 
 - startup fix: the converted upstream plugin pointing at
   `fake_hardware_config_6_axis.yaml` is removed before SDF spawn;
@@ -69,14 +69,25 @@ retest:
 - max raw `|Fz|` was `102.21 N`, max force norm was `171.00 N`, and positive
   Gazebo contact-topic samples were `0`;
 - `MOVING_TO_START` slowed to about `40.08 s`.
+- INSERT handoff hold duration and timeout are now launch/node parameters for
+  diagnostics, with canonical defaults `2.0 s` and `6.0 s`;
+- the fixed `8`-tick stability count and `0.0010 m` physical clearance are not
+  launch arguments;
+- a 12 s handoff-timeout diagnostic did not reach INSERT because SEARCH failed
+  closed first;
+- SEARCH best estimated 1 mm stability in that run: `5` ticks at 25 Hz;
+- hold-like best feedback 1 mm stability: `6` ticks.
 
 Decision: the duplicate-controller startup/configuration fault and the
 non-default-cadence SEARCH hold-shortening bug are fixed. The INSERT handoff
 gate ordering now matches the intended safety design and has been exercised in
 runtime. Damping scale 10 is rejected as a default because it does not satisfy
-the strict handoff stability gate and slows startup motion. No new insertion
-success is claimed. Sustained no-contact SEARCH/hold feedback centering remains
-the blocker under the `0.0010 m` physical radial clearance gate.
+the strict handoff stability gate and slows startup motion. Longer handoff
+waiting is now configurable for diagnostics, but the latest run shows SEARCH
+must first satisfy sustained clearance before INSERT handoff timing can matter.
+No new insertion success is claimed. Sustained no-contact SEARCH/hold feedback
+centering remains the blocker under the `0.0010 m` physical radial clearance
+gate.
 
 The strongest historical single-run iisy6 insertion-depth evidence is
 `diagnostics/research_baseline_insert_sim_time_completion_v4`, which passed the
