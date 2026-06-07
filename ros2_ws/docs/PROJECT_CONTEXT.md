@@ -38,7 +38,7 @@ The current workspace contains a Gazebo workcell with:
 - dry-run experiment/context scaffolds from earlier proposal milestones.
 
 The latest control-runtime diagnostic is
-`diagnostics/research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1`,
+`diagnostics/research_baseline_insert_predepth_recenter_500hz_v1`,
 following the retained
 `diagnostics/research_baseline_insert_handoff_gate_order_v1` sequencing fix and
 the rejected `diagnostics/research_baseline_search_gain3000_settle_seconds_25hz_v1`
@@ -196,6 +196,32 @@ gain retest:
   after descent command start (`0.0012 m` and `0.0010 m`);
 - SEARCH was bypassed in all three repeats, and the Gazebo contact-topic
   observer still recorded `0` positive samples in every trial.
+- INSERT now has bounded pre-depth recenter recovery after no-contact XY drift:
+  before meaningful depth, the task stops the descent, restarts the INSERT
+  handoff hold, and requires the same fixed `0.0010 m` / `8`-tick stability
+  gate again;
+- the recovery cap is `2` attempts; exceeding the cap still aborts instead of
+  relaxing clearance;
+- the latest valid 500 Hz diagnostic exercised one such recenter attempt and
+  then reached one measured insertion-depth event: final outcome `SUCCESS`,
+  depth `0.0197 m`, final INSERT XY `0.0003 m`, max task INSERT contact
+  `49.74 N`, max raw `|Fz|` `98.87 N`, and max force norm `171.07 N`;
+- passive analysis reported INSERT p95 XY `0.001138 m`, best INSERT 1 mm
+  window `62` estimated task ticks, and the second descent command holding
+  `46` feedback ticks inside `0.0010 m`;
+- SEARCH was again bypassed, and Gazebo contact-topic positives remained `0`.
+- entering ABORT now writes final outcome JSON once, so repeat validation can
+  classify task-level failures instead of timing out with harness `NO_OUTCOME`;
+- repeat validation of the bounded recenter behavior in
+  `diagnostics/research_baseline_insert_predepth_recenter_500hz_repeat_v3`
+  used a 300 s per-trial timeout and per-trial tracking logs;
+- repeat result: `1/3` physical successes, `0` timeouts, `0` safety aborts;
+- Trial 1 aborted after one recenter at depth `0.0021 m`, final XY
+  `0.0012 m`;
+- Trial 2 succeeded after two recenter attempts at depth `0.0206 m`, final XY
+  `0.0006 m`;
+- Trial 3 aborted after two recenter attempts at depth `0.0040 m`, final XY
+  `0.0013 m`.
 
 Decision: the duplicate-controller startup/configuration fault and the
 non-default-cadence SEARCH hold-shortening bug are fixed. The INSERT handoff
@@ -207,8 +233,10 @@ but SEARCH-entering runs still show that post-command feedback stability can be
 the physical blocker before INSERT. The shutdown hook and Python-node teardown
 have now been exercised in full DONE-reaching launches. The 500 Hz variant is
 useful diagnostic evidence but failed robustness validation at `1/3` successes.
-The next control blocker is deterministic INSERT handoff/descent centering
-after APPROACH bypasses SEARCH, while sustained no-contact SEARCH/hold/handoff
+Bounded pre-depth recentering and immediate ABORT outcome logging are the
+latest retained INSERT-runtime changes. Repeat validation still failed at
+`1/3` successes, so the next control blocker is shallow inserted-depth
+side-load drift after recenter, while sustained no-contact SEARCH/hold/handoff
 feedback centering remains an unresolved robustness risk in SEARCH-entering
 runs under the `0.0010 m` physical radial clearance gate.
 

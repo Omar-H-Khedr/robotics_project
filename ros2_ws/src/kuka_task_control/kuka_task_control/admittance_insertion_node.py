@@ -159,6 +159,7 @@ class AdmittanceInsertionNode(Node):
     INSERT_HANDOFF_HOLD_DURATION_S = 2.0
     INSERT_HANDOFF_SETTLE_TICKS = 8
     INSERT_HANDOFF_TIMEOUT_S = 6.0
+    INSERT_PREDEPTH_RECENTER_MAX_ATTEMPTS = 2
 
     def __init__(self) -> None:
         super().__init__('admittance_insertion_node')
@@ -244,6 +245,7 @@ class AdmittanceInsertionNode(Node):
         self._startup_time = self.get_clock().now()
         self._abort_reason: str = ''
         self._trial_outcome: str = ''
+        self._final_outcome_logged: bool = False
 
         # Action client for FollowJointTrajectory
         self._insert_joints: np.ndarray | None = None
@@ -266,6 +268,7 @@ class AdmittanceInsertionNode(Node):
         self._insert_handoff_stable_ticks: int = 0
         self._insert_precontact_clearance_ticks: int = 0
         self._insert_sideload_ticks: int = 0
+        self._insert_predepth_recenter_attempts: int = 0
 
         self.current_joints: np.ndarray = np.zeros(6)
         self.current_wrench: Wrench = Wrench()
@@ -646,6 +649,7 @@ class AdmittanceInsertionNode(Node):
             self._insert_handoff_stable_ticks = 0
             self._insert_precontact_clearance_ticks = 0
             self._insert_sideload_ticks = 0
+            self._insert_predepth_recenter_attempts = 0
         if new_state == self.SEARCH:
             self._search_total_ticks = 0
             self._search_convergence_ticks = 0
@@ -656,6 +660,9 @@ class AdmittanceInsertionNode(Node):
         state_msg.data = self._state
         self._state_pub.publish(state_msg)
         self._task_phase_pub.publish(state_msg)
+
+        if new_state == self.ABORT:
+            self._log_final_outcome()
 
     def _begin_phase(self, name: str) -> None:
         self._current_phase_result = PhaseResult(name)
@@ -743,6 +750,7 @@ class AdmittanceInsertionNode(Node):
             self._phase_results = []
             self._trial_outcome = ''
             self._abort_reason = ''
+            self._final_outcome_logged = False
             self._raw_force_abort_reason = ''
             self._max_fz = 0.0
             self._max_force_norm = 0.0
@@ -756,6 +764,7 @@ class AdmittanceInsertionNode(Node):
             self._insert_handoff_stable_ticks = 0
             self._insert_precontact_clearance_ticks = 0
             self._insert_sideload_ticks = 0
+            self._insert_predepth_recenter_attempts = 0
             self._begin_phase(self.MOVING_TO_START)
             self._set_state(self.MOVING_TO_START)
 
@@ -1466,6 +1475,7 @@ class AdmittanceInsertionNode(Node):
         self._send_trajectory_goal(q, self._insert_traj_dur)
         self._insert_command_start_s = self._now_s()
         self._insert_command_sent = True
+        self._insert_precontact_clearance_ticks = 0
 
         q_current = self.current_joints.copy()
         q_dist = np.max(np.abs(q_current - q))
@@ -1477,6 +1487,45 @@ class AdmittanceInsertionNode(Node):
             f'xy_error={xy_error:.4f}m'
         )
         return True
+
+    def _restart_insert_handoff_after_predepth_drift(
+        self,
+        xy_error: float,
+        current_depth: float,
+    ) -> bool:
+        if (
+            self._insert_predepth_recenter_attempts
+            >= self.INSERT_PREDEPTH_RECENTER_MAX_ATTEMPTS
+        ):
+            self._abort_reason = (
+                f'INSERT aborted: no-contact XY error {xy_error:.4f}m exceeds '
+                f'physical clearance {self.INSERT_FINAL_XY_TOLERANCE:.4f}m '
+                f'before meaningful insertion depth '
+                f'{self.INSERT_SIDELOAD_DEPTH_GATE_M:.4f}m for '
+                f'{self._insert_precontact_clearance_ticks} ticks after '
+                f'{self._insert_predepth_recenter_attempts} bounded recenter '
+                f'attempts.'
+            )
+            self.get_logger().warn(self._abort_reason)
+            self._final_insertion_xy_error_m = xy_error
+            self._end_phase(False, xy_error, 0.0, False, self._abort_reason)
+            self._set_state(self.ABORT)
+            return True
+
+        self._insert_predepth_recenter_attempts += 1
+        self.get_logger().warn(
+            f'INSERT pre-depth XY drift {xy_error:.4f}m at depth '
+            f'{current_depth:.4f}m; stopping descent and restarting handoff '
+            f'recenter attempt {self._insert_predepth_recenter_attempts}/'
+            f'{self.INSERT_PREDEPTH_RECENTER_MAX_ATTEMPTS}.'
+        )
+        self._insert_command_sent = False
+        self._insert_command_start_s = 0.0
+        self._insert_handoff_hold_sent = False
+        self._insert_handoff_hold_start_s = 0.0
+        self._insert_handoff_stable_ticks = 0
+        self._insert_precontact_clearance_ticks = 0
+        return False
 
     def _handle_insert_handoff_settle(
         self,
@@ -1625,18 +1674,10 @@ class AdmittanceInsertionNode(Node):
             else 0
         )
         if self._insert_precontact_clearance_ticks >= self.INSERT_PRECONTACT_CLEARANCE_TICKS:
-            self._abort_reason = (
-                f'INSERT aborted: no-contact XY error {xy_error:.4f}m exceeds '
-                f'physical clearance {self.INSERT_FINAL_XY_TOLERANCE:.4f}m '
-                f'before meaningful insertion depth '
-                f'{self.INSERT_SIDELOAD_DEPTH_GATE_M:.4f}m for '
-                f'{self._insert_precontact_clearance_ticks} ticks after '
-                f'descent command start.'
+            self._restart_insert_handoff_after_predepth_drift(
+                xy_error,
+                current_depth,
             )
-            self.get_logger().warn(self._abort_reason)
-            self._final_insertion_xy_error_m = xy_error
-            self._end_phase(False, xy_error, 0.0, False, self._abort_reason)
-            self._set_state(self.ABORT)
             return
 
         # --- Logging ---
@@ -1770,6 +1811,10 @@ class AdmittanceInsertionNode(Node):
     # --- Outcome logging ----------------------------------------------------
 
     def _log_final_outcome(self) -> None:
+        if self._final_outcome_logged:
+            return
+        self._final_outcome_logged = True
+
         timeline = [r.to_dict() for r in self._phase_results]
 
         all_success = all(
@@ -1879,10 +1924,13 @@ class AdmittanceInsertionNode(Node):
                     self._insert_handoff_timeout_s,
                     3,
                 ),
+                'insert_predepth_recenter_attempts': (
+                    self._insert_predepth_recenter_attempts
+                ),
                 'gravity_baseline_valid': self._baseline_valid,
                 'baseline_window_samples': len(self._fz_buffer),
             },
-            'status': self.DONE,
+            'status': self._state,
         }
 
         self.get_logger().info(

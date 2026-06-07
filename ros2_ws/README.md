@@ -72,6 +72,31 @@ no-contact XY drift reached `0.0012 m` and `0.0010 m` against the fixed
 `0.0010 m` physical clearance gate. SEARCH was bypassed in all three trials,
 and Gazebo contact-topic samples remained zero.
 
+The latest implemented INSERT source milestone,
+`research_baseline_insert_predepth_recenter_500hz_v1`, adds bounded recovery
+when no-contact XY drift crosses the fixed `0.0010 m` physical clearance before
+meaningful insertion depth. The state machine stops the descent, re-enters the
+same INSERT handoff hold, and requires the unchanged `8`-tick stability gate
+again, with a cap of `2` attempts before abort. A single valid iisy6 headless
+diagnostic exercised one recenter attempt and then reached a measured
+insertion-depth event: final outcome `SUCCESS`, depth `0.0197 m`, final INSERT
+XY `0.0003 m`, max task INSERT contact `49.74 N`, max raw `|Fz|` `98.87 N`,
+and max force norm `171.07 N`. Passive analysis reported INSERT p95 XY
+`0.001138 m`, best INSERT 1 mm window `62` estimated task ticks, and the
+second descent command holding `46` feedback ticks inside `0.0010 m`.
+SEARCH was still bypassed and Gazebo contact-topic positives remained `0`.
+
+The repeat validation of that bounded recovery,
+`research_baseline_insert_predepth_recenter_500hz_repeat_v3`, used a 300 s
+per-trial timeout so recenter restarts could complete. It failed robustness
+validation: `1/3` physical successes, `0` timeouts, and `0` safety aborts.
+Trial 1 aborted in INSERT after one recenter at shallow side-loaded depth
+`0.0019 m` / XY `0.0012 m`; Trial 2 succeeded after two recenter attempts with
+depth `0.0206 m` and final INSERT XY `0.0006 m`; Trial 3 aborted after two
+recenter attempts at depth `0.0038 m` / XY `0.0013 m`. The task node now writes
+final outcome JSON immediately on ABORT, so these failures are explicit task
+outcomes rather than harness `NO_OUTCOME` rows.
+
 Operational note: after restoring tracked generated directories, clean and
 rebuild selected package build/install trees before runtime. A stale tracked
 `install/thesis_bringup` launch file was observed to launch the older iisy3
@@ -80,13 +105,12 @@ path until `build/kuka_task_control`, `install/kuka_task_control`,
 
 Remaining shutdown limitation: the Python-side cleanup does not fix
 `ros_gz_bridge` exit `-11` or `gzserver` forced-kill behavior during launch
-teardown. Next technical step: stabilize deterministic INSERT handoff/descent
-centering after APPROACH bypasses SEARCH, while preserving the physical
-clearance gates and continuing to track SEARCH non-determinism; do not bulk-add
-raw diagnostic CSVs or claim robust insertion success before repeated
-validation passes.
+teardown. Next technical step: reduce shallow inserted-depth side-load drift
+after bounded recenter, while continuing to treat SEARCH-entering robustness as
+unresolved; do not bulk-add raw diagnostic CSVs or claim robust insertion
+success before repeated validation passes.
 
-The strongest historical iisy6 evidence is a controller-driven simulated insertion-depth event from `diagnostics/research_baseline_insert_sim_time_completion_v4`: final outcome `SUCCESS` under older depth/contact criteria, insertion depth `0.0191 m`, task F/T insert-contact evidence `60.1 N`, max raw `|Fz|=133.33 N`, and no safety abort or invalid timeout. That claim is now superseded by a stricter physical-clearance gate: `diagnostics/research_baseline_insert_physical_xy_gate_v1` reached depth `0.0177 m` and insert contact `55.4 N`, but correctly reported `DEGRADED` because final insertion XY error `0.0030 m` exceeds the 25 mm peg / 27 mm hole radial clearance of `0.0010 m`. Current status: the 500 Hz diagnostic produced one strict-gate single-run insertion-depth event and then only `1/3` repeat successes, so there is still no repeated validated physical insertion success under the latest criteria.
+The strongest historical iisy6 evidence is a controller-driven simulated insertion-depth event from `diagnostics/research_baseline_insert_sim_time_completion_v4`: final outcome `SUCCESS` under older depth/contact criteria, insertion depth `0.0191 m`, task F/T insert-contact evidence `60.1 N`, max raw `|Fz|=133.33 N`, and no safety abort or invalid timeout. That claim is now superseded by a stricter physical-clearance gate: `diagnostics/research_baseline_insert_physical_xy_gate_v1` reached depth `0.0177 m` and insert contact `55.4 N`, but correctly reported `DEGRADED` because final insertion XY error `0.0030 m` exceeds the 25 mm peg / 27 mm hole radial clearance of `0.0010 m`. Current status: bounded pre-depth recentering has produced one single-run insertion-depth event and only `1/3` repeat successes in `research_baseline_insert_predepth_recenter_500hz_repeat_v3`, so there is still no repeated validated physical insertion success under the latest criteria.
 
 Latest timing evidence shows the prior failed insert was partly a clock-domain bug: the task advanced to RETREAT after about `10.6 s` of controller-state INSERT time despite commanding a `20 s` trajectory. The current task node uses ROS/Gazebo time for INSERT completion and now checks final insertion XY against physical hole clearance. The latest runtime gate aborts INSERT before meaningful depth when no-contact XY feedback exceeds the `0.001 m` physical radial clearance, so future work should reduce or constrain single-point INSERT path drift; do not treat depth/contact alone as robust autonomous peg-in-hole performance.
 
@@ -207,6 +231,62 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1 | Rejected diagnostic: D=20 improves some passive SEARCH indicators but the online gate still reaches only 4/8 required 1 mm ticks; no INSERT and no insertion success. |
 | research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1 | Promising single-run diagnostic: 500 Hz velocity-state controller reached task `SUCCESS` once with depth 0.0202 m, final INSERT XY 0.000848 m, and insert contact 60.2 N; SEARCH was bypassed and Gazebo contact-topic samples remained zero, so repeat validation is still required. |
 | research_baseline_velocity_state_500hz_repeat_v1 | Failed robustness validation: 1/3 physical successes, 0 timeouts, 0 safety aborts; two repeats aborted safely in INSERT before meaningful depth when no-contact XY drift crossed the 1 mm clearance gate. |
+| research_baseline_insert_predepth_recenter_500hz_v1 | Promising single-run diagnostic: bounded INSERT pre-depth recenter fired once, restarted handoff, and reached one measured insertion-depth event at depth 0.0197 m with final INSERT XY 0.0003 m. |
+| research_baseline_abort_outcome_logging_v1 | Completed: ABORT now writes final outcome JSON immediately, so repeat validation records explicit task failures instead of harness NO_OUTCOME rows. |
+| research_baseline_insert_predepth_recenter_500hz_repeat_v3 | Failed robustness validation: 1/3 physical successes, 0 timeouts, 0 safety aborts; failures are shallow INSERT side-load aborts after bounded recenter attempts. |
+
+## 2026-06-07 INSERT Pre-Depth Recenter Repeat Validation
+
+Milestone: `research_baseline_insert_predepth_recenter_500hz_repeat_v3`
+
+Evidence: `diagnostics/research_baseline_insert_predepth_recenter_500hz_repeat_v3/summary.md`
+
+Three fresh headless Gazebo trials were run with the bounded INSERT recenter
+source active and a 300 s per-trial timeout.
+
+Result:
+
+- physical successes: `1/3`;
+- timeouts: `0`;
+- safety aborts: `0`;
+- Trial 1: `ABORTED`, one recenter, depth `0.0021 m`, final XY `0.0012 m`;
+- Trial 2: `SUCCESS`, two recenter attempts, depth `0.0206 m`, final XY
+  `0.0006 m`;
+- Trial 3: `ABORTED`, two recenter attempts, depth `0.0040 m`, final XY
+  `0.0013 m`.
+
+Decision: keep bounded recenter and ABORT outcome logging, but do not claim
+robust success. The remaining control blocker is shallow inserted-depth
+side-load drift after recenter.
+
+## 2026-06-07 INSERT Pre-Depth Recenter Diagnostic
+
+Milestone: `research_baseline_insert_predepth_recenter_500hz_v1`
+
+Evidence: `diagnostics/research_baseline_insert_predepth_recenter_500hz_v1/summary.md`
+
+The task node now handles no-contact XY drift during early INSERT descent as a
+bounded recovery instead of immediately ending the trial on the first pre-depth
+drift event. The recovery stops the descent, restarts the INSERT handoff hold,
+and requires the same fixed `0.0010 m` / `8`-tick gate again. It is capped at
+`2` attempts and still aborts if centering cannot be recovered.
+
+Result:
+
+- final outcome: `SUCCESS`;
+- insertion depth: `0.0197 m`;
+- final INSERT XY error: `0.0003 m`;
+- max task INSERT contact: `49.74 N`;
+- max raw `|Fz|`: `98.87 N`;
+- max force norm: `171.07 N`;
+- INSERT pre-depth recenter attempts: `1`;
+- SEARCH gate trace rows: `0`;
+- positive Gazebo contact-topic samples: `0`.
+
+Decision: keep the bounded recovery because this diagnostic exercised it once
+without relaxing the physical clearance gate. Follow-up repeat validation still
+failed robustness at `1/3`, so this remains a single-run insertion-depth event
+plus one repeat success, not robust autonomous peg-in-hole success.
 
 ## 2026-06-07 500 Hz Repeat Validation
 

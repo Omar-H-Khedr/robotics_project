@@ -127,6 +127,32 @@ blocker is deterministic INSERT handoff/descent centering under the fixed
 physical clearance gate, with SEARCH robustness still unresolved in
 SEARCH-entering runs.
 
+The latest implemented INSERT source milestone is
+`research_baseline_insert_predepth_recenter_500hz_v1`. It adds a bounded
+pre-depth recenter restart inside INSERT: when no-contact XY drift crosses the
+fixed `0.0010 m` physical clearance before meaningful insertion depth, the
+node stops the descent, restarts the INSERT handoff hold, and requires the
+same `8`-tick gate again. The cap is `2` attempts, after which the task aborts.
+A valid iisy6 500 Hz headless diagnostic exercised this path once and then
+reached a measured insertion-depth event: final outcome `SUCCESS`, depth
+`0.0197 m`, final INSERT XY `0.0003 m`, max INSERT contact `49.74 N`, max raw
+`|Fz|` `98.87 N`, and max force norm `171.07 N`. SEARCH was bypassed and
+Gazebo contact-topic positives were still `0`, so the result is not robust
+autonomous success.
+
+Repeat validation of that bounded recovery is
+`research_baseline_insert_predepth_recenter_500hz_repeat_v3`. It used a
+300 s per-trial timeout and per-trial tracking logs. Result: `1/3` physical
+successes, `0` timeouts, and `0` safety aborts. Trial 1 aborted in INSERT
+after one recenter at depth `0.0021 m` and final XY `0.0012 m`; Trial 2
+succeeded after two recenter attempts at depth `0.0206 m` and final XY
+`0.0006 m`; Trial 3 aborted after two recenter attempts at depth `0.0040 m`
+and final XY `0.0013 m`. ABORT now writes final outcome JSON immediately, so
+these failures are explicit task outcomes rather than harness `NO_OUTCOME`
+rows. The current blocker is shallow inserted-depth side-load drift after
+bounded recenter, while SEARCH robustness is still unresolved in
+SEARCH-entering runs.
+
 ## Evidence Reviewed
 
 - `README.md`
@@ -211,6 +237,17 @@ SEARCH-entering runs.
 - `diagnostics/research_baseline_velocity_state_500hz_repeat_v1/trial_01_outcome.json`
 - `diagnostics/research_baseline_velocity_state_500hz_repeat_v1/trial_02_outcome.json`
 - `diagnostics/research_baseline_velocity_state_500hz_repeat_v1/trial_03_outcome.json`
+- `diagnostics/research_baseline_insert_predepth_recenter_500hz_v1/summary.md`
+- `diagnostics/research_baseline_insert_predepth_recenter_500hz_v1/trial_outcome.json`
+- `diagnostics/research_baseline_insert_predepth_recenter_500hz_v1/xy_stability_analysis.md`
+- `diagnostics/research_baseline_insert_predepth_recenter_500hz_v1/hold_window_reference_analysis.md`
+- `diagnostics/research_baseline_insert_predepth_recenter_500hz_v1/search_tracking_sensitivity_analysis.md`
+- `diagnostics/research_baseline_insert_predepth_recenter_500hz_v1/search_gate_trace_analysis.md`
+- `diagnostics/research_baseline_insert_predepth_recenter_500hz_repeat_v3/summary.md`
+- `diagnostics/research_baseline_insert_predepth_recenter_500hz_repeat_v3/repeat_trials.csv`
+- `diagnostics/research_baseline_insert_predepth_recenter_500hz_repeat_v3/trial_01_outcome.json`
+- `diagnostics/research_baseline_insert_predepth_recenter_500hz_repeat_v3/trial_02_outcome.json`
+- `diagnostics/research_baseline_insert_predepth_recenter_500hz_repeat_v3/trial_03_outcome.json`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -277,6 +314,9 @@ until repeated validation demonstrates robust success.
 - `research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1`: D=20 was tested as a launch-parameter diagnostic after the clean Python shutdown milestone. The launch reached DONE and exited with code `0`, but failed safely in SEARCH: final outcome `ABORTED`, reason `SEARCH timeout (45s). Instantaneous XY error 0.0006m is within physical clearance 0.0010m but was not sustained for 8 post-command ticks.`, insertion depth `0.0000 m`, max raw `|Fz|` `100.51 N`, max force norm `170.49 N`, and `0` positive contact-topic samples. The online trace recorded `1125` rows, only `2` `post_settle_count` rows, and max online convergence count `4/8` ticks. Passive SEARCH best 1 mm window was `6` estimated ticks and hold-like best feedback 1 mm window was `9` ticks. D=20 is rejected as a baseline change because the online state-machine gate still blocks INSERT correctly.
 - `research_baseline_velocity_state_500hz_gain3000_damping10_25hz_v1`: a 500 Hz velocity-state controller-manager diagnostic was run after a clean selected package rebuild. It reached one task `SUCCESS` with insertion depth `0.0202 m`, final INSERT XY `0.000848 m`, task INSERT contact `60.2 N`, max raw `|Fz|` `96.97 N`, and no task safety abort. SEARCH was bypassed, `search_gate_trace.csv` had `0` rows, and the Gazebo contact-topic observer recorded `0` positive samples. This is a single simulated insertion-depth event that must be repeat-validated before any robust physical success claim.
 - `research_baseline_velocity_state_500hz_repeat_v1`: repeated validation of the same 500 Hz configuration completed 3 fresh launches with per-trial tracking logs. Result: `1/3` physical successes, `0` timeouts, `0` safety aborts. Trial 1 reached depth `0.0202 m`; trials 2 and 3 aborted safely in INSERT before meaningful depth on no-contact XY drift at the `0.0010 m` physical clearance boundary. SEARCH was bypassed in all repeats, and contact-topic positives remained `0`. The 500 Hz variant is not a robust validated baseline.
+- `research_baseline_insert_predepth_recenter_500hz_v1`: bounded INSERT pre-depth recentering now restarts handoff instead of immediately aborting after the first no-contact XY drift event before meaningful depth. The fixed `0.0010 m` clearance and `8`-tick handoff gate are unchanged, and recovery is capped at `2` attempts. A valid 500 Hz iisy6 diagnostic exercised one recenter attempt and reached final outcome `SUCCESS` with depth `0.0197 m`, final INSERT XY `0.0003 m`, max task INSERT contact `49.74 N`, max raw `|Fz|` `98.87 N`, max force norm `171.07 N`, and `0` positive contact-topic samples. Passive analysis reported INSERT p95 XY `0.001138 m`, best INSERT 1 mm window `62` estimated task ticks, and second-descent hold feedback `46` ticks inside `0.0010 m`.
+- `research_baseline_abort_outcome_logging_v1`: entering ABORT now writes final outcome JSON once and schedules the existing `exit_on_done` shutdown path. This fixes repeat-harness `NO_OUTCOME` rows for task-level aborts that previously remained in ABORT/retreat until the harness killed the launch.
+- `research_baseline_insert_predepth_recenter_500hz_repeat_v3`: repeated validation of bounded pre-depth recentering completed 3 fresh launches with a 300 s per-trial timeout. Result: `1/3` physical successes, `0` timeouts, `0` safety aborts. The success used two recenter attempts and reached depth `0.0206 m`; the two failures were explicit INSERT side-load aborts at shallow depths `0.0021 m` and `0.0040 m`. This is not robust success.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.
