@@ -9,6 +9,7 @@ from typing import Any
 
 import rclpy
 import yaml
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from std_msgs.msg import String
@@ -374,7 +375,7 @@ def main(args: list[str] | None = None) -> None:
     try:
         node = SafetyMonitor()
         rclpy.spin(node)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, ExternalShutdownException):
         pass
     except Exception as exc:  # noqa: BLE001 - top-level node failure logging.
         if node is not None:
@@ -385,7 +386,8 @@ def main(args: list[str] | None = None) -> None:
     finally:
         if node is not None:
             node.destroy_node()
-        rclpy.shutdown()
+        if rclpy.ok():
+            rclpy.shutdown()
 
 
 if __name__ == "__main__":

@@ -70,14 +70,20 @@ candidate source edit was reverted; this is retained as SEARCH instability
 evidence only.
 
 The latest implemented source milestone is
-`research_baseline_search_gate_trace_recenter8_gain3000_damping10_25hz_v1`.
-It adds diagnostic-only task-side SEARCH gate tracing to `tracking_log_dir`,
-recording the online convergence counter and branch decision per SEARCH tick.
-Validation built cleanly and exited through DONE with launch code `0`, but
-SEARCH was bypassed because APPROACH reached pre-insertion XY `0.0009 m`.
-The trace file therefore had no data rows. The run still failed safely in
-INSERT handoff at XY `0.0016 m`, with insertion depth `0.0000 m`, best INSERT
-1 mm stability `4` ticks, and `0` positive contact-topic samples.
+`research_baseline_clean_python_shutdown_recenter8_gain3000_damping10_25hz_v3`.
+It preserves the previous SEARCH gate tracing hook and cleans Python-node
+shutdown handling for DONE-reaching launches. Passive observers, the safety
+monitor, and the data logger now tolerate external ROS shutdown and guard
+`rclpy.shutdown()` calls; the data logger also avoids rosout logging after the
+context is invalid. Validation built cleanly and exited through DONE with
+launch code `0`. The Python observer/safety/logger processes finished cleanly,
+but the task still failed safely in SEARCH with final outcome `ABORTED`, reason
+`SEARCH timeout (45s). XY error 0.0013m remains above physical clearance
+0.0010m.`, insertion depth `0.0000 m`, `1125` SEARCH gate rows ending in
+`timeout_abort`, SEARCH best passive 1 mm window `9` estimated ticks, and
+hold-like best feedback 1 mm window `6` ticks. `ros_gz_bridge` still exits with
+`-11`, and `gzserver` still requires forced teardown; those remain Gazebo/bridge
+shutdown limitations, not Python-node tracebacks.
 
 ## Evidence Reviewed
 
@@ -150,6 +156,7 @@ INSERT handoff at XY `0.0016 m`, with insertion depth `0.0000 m`, best INSERT
 - `diagnostics/research_baseline_search_post_settle_count_recenter8_gain3000_damping10_25hz_v1/summary.md`
 - `diagnostics/research_baseline_current_joint_handoff_recenter8_gain3000_damping10_25hz_v1/summary.md`
 - `diagnostics/research_baseline_search_gate_trace_recenter8_gain3000_damping10_25hz_v1/summary.md`
+- `diagnostics/research_baseline_clean_python_shutdown_recenter8_gain3000_damping10_25hz_v3/summary.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -211,6 +218,7 @@ until repeated validation demonstrates robust success.
 - `research_baseline_search_post_settle_count_recenter8_gain3000_damping10_25hz_v1`: SEARCH now counts a valid post-settle feedback sample inside the fixed `0.0010 m` physical clearance before issuing another command. The validation reached INSERT and final DONE status, and launch exited with code `0`. It still failed safely before descent: final outcome `ABORTED`, reason `INSERT handoff settle timeout: XY error 0.0023m did not remain within physical clearance 0.0010m for 8 ticks before descent`, insertion depth `0.0000 m`, pre-insertion XY `0.0009 m`, max raw `|Fz|` `103.01 N`, max force norm `169.95 N`, hold-like best feedback 1 mm window `5` ticks, max centered-hold p95 actual XY drift `0.002226 m`, and `0` positive contact-topic samples. No insertion success is claimed.
 - `research_baseline_current_joint_handoff_recenter8_gain3000_damping10_25hz_v1`: a candidate source edit to hold current measured joints during INSERT handoff was built after cleaning stale selected package build/install trees. The run used the corrected iisy6 installed launch path, but failed closed in SEARCH before INSERT: no INSERT state samples and no handoff command were recorded. The task log reported instantaneous XY `0.0005 m` inside physical clearance, but not sustained for 8 post-command ticks. Passive replay reported SEARCH best 1 mm stability `9` ticks, hold-like best feedback 1 mm window `7` ticks, max centered-hold p95 XY drift `0.002290 m`, max raw `|Fz|` `101.52 N`, and `0` positive contact-topic samples. The candidate source edit was reverted; this is not insertion progress.
 - `research_baseline_search_gate_trace_recenter8_gain3000_damping10_25hz_v1`: the task node now writes online SEARCH gate counter/decision rows to `search_gate_trace.csv` in `tracking_log_dir`, and the launch passes that directory into the task node. The validation bypassed SEARCH, so the trace contained only its header. It reached INSERT and aborted safely before descent because handoff XY `0.0016 m` did not remain inside physical clearance for 8 ticks. INSERT best 1 mm stability was `4` ticks, hold-like best feedback 1 mm window was `5` ticks, max centered-hold p95 XY drift was `0.002246 m`, max raw `|Fz|` was `101.55 N`, and positive contact-topic samples were `0`. No insertion success is claimed.
+- `research_baseline_clean_python_shutdown_recenter8_gain3000_damping10_25hz_v3`: Python passive observers, `safety_monitor`, and `data_logger_node` now shut down cleanly on task-node-driven DONE launch teardown. The validation exited the launch wrapper with code `0`; those Python processes finished cleanly and the data logger closed its CSV without rosout context errors. The task result was still `ABORTED` in SEARCH with reason `SEARCH timeout (45s). XY error 0.0013m remains above physical clearance 0.0010m.`, insertion depth `0.0000 m`, `1125` online SEARCH trace rows ending in `timeout_abort`, SEARCH best passive 1 mm window `9` estimated ticks, hold-like best feedback 1 mm window `6` ticks, max centered-hold p95 XY drift `0.002290 m`, max raw `|Fz|` `102.83 N`, and `0` positive contact-topic samples. Bridge nodes still exit with `-11` and `gzserver` still requires forced teardown.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.

@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 
 import rclpy
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 
 from geometry_msgs.msg import Wrench
@@ -100,10 +101,14 @@ class DataLoggerNode(Node):
         if self._csv_file and not self._csv_file.closed:
             self._csv_file.flush()
             self._csv_file.close()
-            self.get_logger().info(
+            message = (
                 f'CSV closed: {self._csv_path}  '
                 f'({self._rows_written} rows written)'
             )
+            if rclpy.ok():
+                self.get_logger().info(message)
+            else:
+                print(message)
         super().destroy_node()
 
 
@@ -112,8 +117,8 @@ def main(args=None) -> None:
     node = DataLoggerNode()
     try:
         rclpy.spin(node)
-    except KeyboardInterrupt:
-        node.get_logger().info('Keyboard interrupt \u2013 shutting down.')
+    except (KeyboardInterrupt, ExternalShutdownException):
+        pass
     finally:
         node.destroy_node()
         if rclpy.ok():

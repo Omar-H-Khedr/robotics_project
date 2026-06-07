@@ -27,11 +27,15 @@ was reverted; the retained evidence is a SEARCH instability diagnostic, not an
 insertion milestone.
 
 The latest source milestone,
-`research_baseline_search_gate_trace_recenter8_gain3000_damping10_25hz_v1`,
-adds task-side SEARCH gate tracing to the existing `tracking_log_dir`. Its
-validation bypassed SEARCH and therefore produced only a trace header, then
-failed safely in INSERT handoff at `0.0016 m` XY against the `0.0010 m` gate.
-No insertion success is claimed.
+`research_baseline_clean_python_shutdown_recenter8_gain3000_damping10_25hz_v3`,
+cleans shutdown handling for Python observers, the safety monitor, and the data
+logger after DONE-reaching launch runs. The retained validation reached DONE
+with launch exit code `0`; those Python processes finished cleanly and the data
+logger closed its CSV without rosout context failures. The task still failed
+safely in SEARCH, with final outcome `ABORTED`, insertion depth `0.0000 m`,
+and reason `SEARCH timeout (45s). XY error 0.0013m remains above physical
+clearance 0.0010m.` The SEARCH gate trace recorded `1125` online decision rows
+and ended in `timeout_abort`. No insertion success is claimed.
 
 Operational note: after restoring tracked generated directories, clean and
 rebuild selected package build/install trees before runtime. A stale tracked
@@ -39,9 +43,11 @@ rebuild selected package build/install trees before runtime. A stale tracked
 path until `build/kuka_task_control`, `install/kuka_task_control`,
 `build/thesis_bringup`, and `install/thesis_bringup` were removed and rebuilt.
 
-Next technical step: stabilize near-centered SEARCH and pre-insert handoff while
-preserving the physical clearance gates; do not bulk-add raw diagnostic CSVs or
-claim insertion success before repeat validation passes.
+Remaining shutdown limitation: the Python-side cleanup does not fix
+`ros_gz_bridge` exit `-11` or `gzserver` forced-kill behavior during launch
+teardown. Next technical step: stabilize near-centered SEARCH and pre-insert
+handoff while preserving the physical clearance gates; do not bulk-add raw
+diagnostic CSVs or claim insertion success before repeat validation passes.
 
 The strongest historical iisy6 evidence is a controller-driven simulated insertion-depth event from `diagnostics/research_baseline_insert_sim_time_completion_v4`: final outcome `SUCCESS` under older depth/contact criteria, insertion depth `0.0191 m`, task F/T insert-contact evidence `60.1 N`, max raw `|Fz|=133.33 N`, and no safety abort or invalid timeout. That claim is now superseded by a stricter physical-clearance gate: `diagnostics/research_baseline_insert_physical_xy_gate_v1` reached depth `0.0177 m` and insert contact `55.4 N`, but correctly reported `DEGRADED` because final insertion XY error `0.0030 m` exceeds the 25 mm peg / 27 mm hole radial clearance of `0.0010 m`. Current status: no validated physical insertion success under the latest criteria.
 
@@ -159,6 +165,47 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_post_settle_count_recenter8_gain3000_damping10_25hz_v1 | Completed sequencing fix, failed safely: SEARCH now preserves post-settle inside-clearance samples before issuing another command. The validation reached INSERT and launch exited with code 0 after final DONE status, but aborted before descent because INSERT handoff XY reached 0.0023 m and did not remain within the 0.0010 m clearance for 8 ticks. No insertion success claimed. |
 | research_baseline_current_joint_handoff_recenter8_gain3000_damping10_25hz_v1 | Rejected/unvalidated candidate: a current-joint INSERT handoff hold edit was built, but the validation failed closed in SEARCH before INSERT and no handoff command was published. Source reverted; diagnostic retained for SEARCH instability evidence. |
 | research_baseline_search_gate_trace_recenter8_gain3000_damping10_25hz_v1 | Completed diagnostic hook: the task node writes online SEARCH gate decisions to `search_gate_trace.csv` in `tracking_log_dir`. Validation bypassed SEARCH, so the trace had no rows; the run reached INSERT and failed safely at handoff with 4/8 best INSERT 1 mm ticks. No insertion success claimed. |
+| research_baseline_clean_python_shutdown_recenter8_gain3000_damping10_25hz_v3 | Completed shutdown cleanup: Python observers, safety monitor, and data logger finish cleanly after DONE-reaching launch. Validation failed safely in SEARCH with 0 m insertion depth; bridge/gzserver shutdown faults remain external limitations. |
+
+## 2026-06-07 Clean Python Shutdown
+
+Milestone: `research_baseline_clean_python_shutdown_recenter8_gain3000_damping10_25hz_v3`
+
+Evidence: `diagnostics/research_baseline_clean_python_shutdown_recenter8_gain3000_damping10_25hz_v3/summary.md`
+
+The DONE-reaching launch shutdown path now handles ROS external shutdown
+cleanly in the passive observers, safety monitor, and data logger. The final
+validation built selected packages, ran the 25 Hz gain=3000 / D=10 /
+damping-scale-10 headless configuration, and exited the launch wrapper with
+code `0`.
+
+Task result:
+
+- final outcome: `ABORTED`;
+- failed phase: `SEARCH`;
+- reason: `SEARCH timeout (45s). XY error 0.0013m remains above physical clearance 0.0010m.`;
+- insertion depth: `0.0000 m`;
+- SEARCH gate trace rows: `1125`;
+- online trace result: `timeout_abort`;
+- SEARCH best passive 1 mm window: `9` estimated task ticks;
+- hold-like best feedback 1 mm window: `6` ticks;
+- max centered-hold p95 actual XY drift: `0.002290 m`;
+- max raw `|Fz|`: `102.83 N`;
+- positive Gazebo contact-topic samples: `0`.
+
+Shutdown result:
+
+- `trajectory_tracking_observer`, `wrench_state_observer`,
+  `contact_state_observer`, `safety_monitor`, and `data_logger_node` finished
+  cleanly;
+- data logger printed a plain `CSV closed` line instead of rosout context
+  failures;
+- `ros_gz_bridge` nodes still exited with `-11`, and `gzserver` required
+  SIGKILL after teardown.
+
+Decision: keep the Python shutdown cleanup. It improves diagnostic reliability
+but does not alter the physical task result; sustained SEARCH centering remains
+the active blocker.
 
 ## 2026-06-07 SEARCH Gate Trace Hook
 

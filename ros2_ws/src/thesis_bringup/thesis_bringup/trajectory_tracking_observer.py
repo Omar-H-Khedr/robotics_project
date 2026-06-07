@@ -11,6 +11,7 @@ from typing import Iterable
 
 import rclpy
 from control_msgs.msg import JointTrajectoryControllerState
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
@@ -409,9 +410,12 @@ def main() -> None:
     node = TrajectoryTrackingObserver()
     try:
         rclpy.spin(node)
+    except (KeyboardInterrupt, ExternalShutdownException):
+        pass
     finally:
         node.destroy_node()
-        rclpy.shutdown()
+        if rclpy.ok():
+            rclpy.shutdown()
 
 
 if __name__ == "__main__":

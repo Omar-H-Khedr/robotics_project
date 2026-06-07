@@ -14,6 +14,7 @@ import numpy as np
 
 import rclpy
 from geometry_msgs.msg import Wrench
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from std_msgs.msg import String
@@ -234,9 +235,12 @@ def main() -> None:
     node = WrenchStateObserver()
     try:
         rclpy.spin(node)
+    except (KeyboardInterrupt, ExternalShutdownException):
+        pass
     finally:
         node.destroy_node()
-        rclpy.shutdown()
+        if rclpy.ok():
+            rclpy.shutdown()
 
 
 if __name__ == "__main__":
