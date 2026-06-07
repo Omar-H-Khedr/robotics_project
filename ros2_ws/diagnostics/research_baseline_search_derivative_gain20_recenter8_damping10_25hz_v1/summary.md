@@ -40,6 +40,7 @@ source /opt/ros/jazzy/setup.bash
 source install/setup.bash
 python3 -m thesis_bringup.xy_stability_analyzer --state-loop-hz 25.0 diagnostics/research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1
 python3 -m thesis_bringup.hold_window_reference_analyzer --state-loop-hz 25.0 diagnostics/research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1
+python3 -m thesis_bringup.search_gate_trace_analyzer diagnostics/research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1
 python3 -m thesis_bringup.search_tracking_sensitivity_analyzer diagnostics/research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1
 ```
 
@@ -69,7 +70,8 @@ Source: `search_gate_trace.csv`
   - `recenter_command`: `4`
   - `timeout_abort`: `1`
 - best all-trace `0.0010 m` streak: `5` ticks
-- best online counted post-command `0.0010 m` streak: `1` tick
+- best ready-to-count `0.0010 m` streak: `4` ticks
+- max online convergence counter: `4` ticks
 - required online gate: `8` ticks
 
 The online state machine therefore remained correct to reject INSERT, even
@@ -105,10 +107,10 @@ clearance.
 
 ## Decision
 
-Reject D=20 as a baseline change. It improved some passive indicators relative
-to the previous D=10 clean-shutdown run, but the authoritative online SEARCH
-gate still observed only `1` counted post-command tick inside the `0.0010 m`
-physical clearance, far below the required `8`.
+Reject D=20 as a baseline change. It improved some passive indicators, but the
+authoritative online SEARCH gate still reached only `4` counted ticks inside
+the `0.0010 m` physical clearance, below the required `8` and worse than the
+previous D=10 clean-shutdown trace's `6` counted ticks.
 
 No insertion success is claimed. The next control milestone should address
 near-centered feedback stabilization or command sequencing while keeping the

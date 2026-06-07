@@ -157,8 +157,8 @@ gain retest:
   error 0.0006m is within physical clearance 0.0010m but was not sustained for
   8 post-command ticks.`, insertion depth `0.0000 m`;
 - the online SEARCH gate trace recorded `1125` rows, only `2`
-  `post_settle_count` decisions, and a best counted post-command 1 mm streak
-  of `1` tick against the required `8`;
+  `post_settle_count` decisions, and a max online convergence count of `4`
+  ticks against the required `8`;
 - passive replay reported SEARCH best `0.0010 m` stability `6` estimated task
   ticks and hold-like best feedback `0.0010 m` stability `9` ticks;
 - max centered-hold p95 actual XY drift was `0.002337 m`, max raw `|Fz|` was
@@ -166,6 +166,11 @@ gain retest:
   samples were `0`;
 - D=20 is rejected as a baseline change because the authoritative online gate
   still blocks INSERT.
+- `search_gate_trace_analyzer` now reads `search_gate_trace.csv` directly and
+  reports the task node's online convergence counter. This corrected the D=20
+  trace interpretation from a post-settle-only ad hoc count to the actual
+  state-machine max: D=20 reached `4/8` ticks, while the previous D=10
+  clean-shutdown trace reached `6/8`.
 
 Decision: the duplicate-controller startup/configuration fault and the
 non-default-cadence SEARCH hold-shortening bug are fixed. The INSERT handoff

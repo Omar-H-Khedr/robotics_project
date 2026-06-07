@@ -1,0 +1,39 @@
+{
+  "best_all_trace_inside_clearance_streak": {
+    "end_elapsed_s": 1.72,
+    "end_search_tick": 43,
+    "max_xy_error_m": 0.000909172,
+    "min_xy_error_m": 0.000546494,
+    "start_elapsed_s": 1.52,
+    "start_search_tick": 38,
+    "ticks": 6
+  },
+  "best_ready_inside_clearance_streak": {
+    "end_elapsed_s": 1.72,
+    "end_search_tick": 43,
+    "max_xy_error_m": 0.000909172,
+    "min_xy_error_m": 0.000546494,
+    "start_elapsed_s": 1.52,
+    "start_search_tick": 38,
+    "ticks": 6
+  },
+  "converged_decisions": [],
+  "decision_counts": {
+    "post_settle_count": 2,
+    "recenter_command": 4,
+    "settling_count": 134,
+    "settling_reset": 984,
+    "timeout_abort": 1
+  },
+  "final_decision": "timeout_abort",
+  "final_xy_error_m": 0.001284753,
+  "first_elapsed_s": 0.04,
+  "input": "diagnostics/research_baseline_clean_python_shutdown_recenter8_gain3000_damping10_25hz_v3/search_gate_trace.csv",
+  "last_elapsed_s": 45.0,
+  "max_convergence_ticks_after": 6,
+  "max_convergence_ticks_before": 6,
+  "passed_online_gate": false,
+  "physical_clearance_m": 0.001,
+  "required_ticks": 8,
+  "rows": 1125
+}

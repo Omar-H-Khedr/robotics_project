@@ -45,8 +45,8 @@ but still failed safely in SEARCH: final outcome `ABORTED`, insertion depth
 `0.0000 m`, and reason `SEARCH timeout (45s). Instantaneous XY error 0.0006m
 is within physical clearance 0.0010m but was not sustained for 8 post-command
 ticks.` The online SEARCH trace recorded `1125` rows, only `2`
-`post_settle_count` rows, and a best counted post-command 1 mm streak of `1`
-tick against the required `8`. D=20 is rejected as a baseline change.
+`post_settle_count` rows, and a max online 1 mm convergence count of `4`
+ticks against the required `8`. D=20 is rejected as a baseline change.
 
 Operational note: after restoring tracked generated directories, clean and
 rebuild selected package build/install trees before runtime. A stale tracked
@@ -177,7 +177,8 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_current_joint_handoff_recenter8_gain3000_damping10_25hz_v1 | Rejected/unvalidated candidate: a current-joint INSERT handoff hold edit was built, but the validation failed closed in SEARCH before INSERT and no handoff command was published. Source reverted; diagnostic retained for SEARCH instability evidence. |
 | research_baseline_search_gate_trace_recenter8_gain3000_damping10_25hz_v1 | Completed diagnostic hook: the task node writes online SEARCH gate decisions to `search_gate_trace.csv` in `tracking_log_dir`. Validation bypassed SEARCH, so the trace had no rows; the run reached INSERT and failed safely at handoff with 4/8 best INSERT 1 mm ticks. No insertion success claimed. |
 | research_baseline_clean_python_shutdown_recenter8_gain3000_damping10_25hz_v3 | Completed shutdown cleanup: Python observers, safety monitor, and data logger finish cleanly after DONE-reaching launch. Validation failed safely in SEARCH with 0 m insertion depth; bridge/gzserver shutdown faults remain external limitations. |
-| research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1 | Rejected diagnostic: D=20 improves some passive SEARCH indicators but the online post-command gate still counts only 1/8 required 1 mm ticks; no INSERT and no insertion success. |
+| research_baseline_search_gate_trace_analyzer_v1 | Completed diagnostic: reusable analyzer now reports the online SEARCH gate counter directly from `search_gate_trace.csv`, avoiding passive replay overstatement. |
+| research_baseline_search_derivative_gain20_recenter8_damping10_25hz_v1 | Rejected diagnostic: D=20 improves some passive SEARCH indicators but the online gate still reaches only 4/8 required 1 mm ticks; no INSERT and no insertion success. |
 
 ## 2026-06-07 Clean Python Shutdown
 
@@ -237,7 +238,8 @@ Task result:
 - reason: `SEARCH timeout (45s). Instantaneous XY error 0.0006m is within physical clearance 0.0010m but was not sustained for 8 post-command ticks.`;
 - insertion depth: `0.0000 m`;
 - SEARCH gate trace rows: `1125`;
-- online counted post-command 1 mm streak: `1/8` ticks;
+- online max convergence count: `4/8` ticks;
+- ready-to-count 1 mm streak: `4` ticks;
 - all-trace best 1 mm streak: `5` ticks;
 - passive SEARCH best 1 mm window: `6` estimated task ticks;
 - hold-like best feedback 1 mm window: `9` ticks;
@@ -246,8 +248,9 @@ Task result:
 - positive Gazebo contact-topic samples: `0`.
 
 Decision: reject D=20 as a baseline change. The authoritative online gate did
-not sustain physical clearance, so INSERT remains correctly blocked and no
-insertion success is claimed.
+not sustain physical clearance, and the max online convergence count regressed
+relative to the previous D=10 clean-shutdown run's `6/8` ticks. INSERT remains
+correctly blocked and no insertion success is claimed.
 
 ## 2026-06-07 SEARCH Gate Trace Hook
 
