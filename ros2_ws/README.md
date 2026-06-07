@@ -9,11 +9,11 @@ from docs and git history is split by subsystem:
 
 - Perception: `live_v2_14_inference_node_validation` from `ab2a747`, a passive
   20 Hz live node with 62.6% live accuracy and no controller output.
-- Control: `research_baseline_single_gz_control_25hz_v1`, a partial headless
-  diagnostic confirming the spawned SDF now contains one intended
-  `gz_ros2_control` plugin instead of the converted upstream vendor plugin plus
-  the research plugin. It reached SEARCH at 25 Hz and still failed to sustain
-  the 1 mm clearance gate before the external timeout.
+- Control: `research_baseline_search_settle_seconds_25hz_v1`, a fail-closed
+  SEARCH diagnostic confirming the non-default 25 Hz task cadence now preserves
+  a 6.0 s post-command hold instead of shortening the old hardcoded 60-tick
+  window to 2.4 s. It still fails the 1 mm sustained clearance gate and does
+  not claim insertion success.
 
 Next technical step: stabilize near-centered SEARCH and pre-insert handoff while
 preserving the physical clearance gates; do not bulk-add raw diagnostic CSVs or
@@ -125,6 +125,38 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_position_controller_v1 / v2 | Validated safely: switch to position_controllers/JointGroupPositionController (driven by a 250 Hz trajectory_position_bridge) does not unblock the SEARCH 1 mm sustained window. 1 mm window 2-4 ticks, 2 mm window 10-12 ticks (best 2 mm seen in this line of work), SEARCH final XY 0.0014-0.0038 m. The position controller plugin is loaded from the extracted `ros-jazzy-position-controllers` deb (system package not installable without sudo). |
 | research_baseline_search_velocity_state_v1 | Validated safely: inject_velocity_state:=true adds a `velocity` state interface to every joint so the JTC's D-term uses real joint velocity from `gz_ros2_control/GazeboSimSystem` (not finite-difference of position). Centered-hold p95 actual XY drift 0.004015 m, SEARCH 1 mm window 2 ticks, SEARCH final XY 0.0018 m. The D-term's input source is not the binding constraint. |
 | research_baseline_single_gz_control_25hz_v1 | Completed startup fix and partial diagnostic: `spawn_robot_sdf.py` strips the upstream converted `gz_ros2_control` plugin that referenced `fake_hardware_config_6_axis.yaml`, leaving one research controller manager. A 25 Hz headless run reached SEARCH and timed out externally before INSERT; SEARCH best 1 mm window was 2 ticks and best hold-like feedback 1 mm window was 3 ticks. No insertion success claimed. |
+| research_baseline_search_settle_seconds_25hz_v1 | Completed timing fix and fail-closed diagnostic: SEARCH post-command settling is now seconds-based (`6.0 s`) so 25 Hz diagnostics no longer interrupt 5 s recenter holds after 2.4 s. A retained 25 Hz run reached SEARCH and timed out externally before INSERT; SEARCH best 1 mm window improved to 4 ticks but still remained below the required 8. No insertion success claimed. |
+
+## 2026-06-07 SEARCH Settling Cadence Fix
+
+Milestone: `research_baseline_search_settle_seconds_25hz_v1`
+
+Evidence: `diagnostics/research_baseline_search_settle_seconds_25hz_v1/summary.md`
+
+The previous SEARCH settling logic used a hardcoded `60` state ticks. That was
+6.0 s at the canonical 10 Hz task rate, but only 2.4 s when running
+`control_rate:=25.0`, shorter than the 5.0 s recenter command. SEARCH could
+therefore publish another recenter before the active command was eligible for
+stability counting.
+
+`AdmittanceInsertionNode` now uses `SEARCH_SETTLE_DURATION_S = 6.0` and keeps
+waiting while the active recenter/search command is still running. The retained
+25 Hz run confirmed the iisy6 launch path, single research `gz_ros2_control`
+plugin startup, active controllers, and SEARCH logs reaching
+`settle_elapsed=6.0s` before new recenter commands.
+
+Passive analysis of the externally timed-out SEARCH run reported:
+
+- SEARCH best estimated 1 mm window: `4` ticks (`0.16 s`);
+- SEARCH best estimated 2 mm window: `6` ticks (`0.24 s`);
+- hold-like best feedback 1 mm window: `4` ticks;
+- SEARCH final XY in the partial log: `0.001588 m`;
+- contact-topic samples: `0`;
+- controller-state p95 max joint-position error: `0.011514 rad`.
+
+Decision: the cadence bug is fixed, but sustained 1 mm physical centering is
+still unresolved. Continue with tracking/near-hole stabilization work and do
+not relax the `0.0010 m` radial clearance gate.
 
 ## 2026-06-07 Single Gazebo Control Plugin and 25 Hz Diagnostic
 

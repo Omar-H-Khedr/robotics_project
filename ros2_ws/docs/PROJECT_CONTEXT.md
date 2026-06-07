@@ -38,7 +38,7 @@ The current workspace contains a Gazebo workcell with:
 - dry-run experiment/context scaffolds from earlier proposal milestones.
 
 The latest control-runtime diagnostic is
-`diagnostics/research_baseline_single_gz_control_25hz_v1`:
+`diagnostics/research_baseline_search_settle_seconds_25hz_v1`:
 
 - startup fix: the converted upstream plugin pointing at
   `fake_hardware_config_6_axis.yaml` is removed before SDF spawn;
@@ -47,15 +47,19 @@ The latest control-runtime diagnostic is
   interfaces;
 - task cadence override `control_rate:=25.0` is now launch-configurable and
   recorded/analyzed by the offline stability tools;
+- SEARCH post-command settling is now seconds-based (`6.0 s`) instead of a
+  hardcoded `60` state ticks, so 25 Hz diagnostics do not shorten the hold to
+  `2.4 s`;
 - run reached SEARCH and was externally timed out before INSERT;
-- SEARCH best estimated 1 mm window: `2` ticks at 25 Hz;
-- SEARCH best estimated 2 mm window: `8` ticks at 25 Hz;
-- hold-like best feedback 1 mm window: `3` ticks;
+- SEARCH best estimated 1 mm window: `4` ticks at 25 Hz;
+- SEARCH best estimated 2 mm window: `6` ticks at 25 Hz;
+- hold-like best feedback 1 mm window: `4` ticks;
 - contact-topic samples: `0`.
 
-Decision: the duplicate-controller startup/configuration fault is fixed, but no
-new insertion success is claimed. Sustained no-contact SEARCH centering remains
-the blocker under the `0.0010 m` physical radial clearance gate.
+Decision: the duplicate-controller startup/configuration fault and the
+non-default-cadence SEARCH hold-shortening bug are fixed, but no new insertion
+success is claimed. Sustained no-contact SEARCH centering remains the blocker
+under the `0.0010 m` physical radial clearance gate.
 
 The strongest historical single-run iisy6 insertion-depth evidence is
 `diagnostics/research_baseline_insert_sim_time_completion_v4`, which passed the

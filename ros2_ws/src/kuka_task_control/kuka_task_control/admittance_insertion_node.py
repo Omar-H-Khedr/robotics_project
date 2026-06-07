@@ -143,6 +143,7 @@ class AdmittanceInsertionNode(Node):
     SEARCH_CONVERGENCE_TICKS = 8
     SEARCH_RECENTER_XY_TOLERANCE = 0.004
     SEARCH_RECENTER_DURATION_S = 5.0
+    SEARCH_SETTLE_DURATION_S = 6.0
     INSERT_PRECONDITION_XY_TOLERANCE = 0.015
     INSERT_PRECONDITION_MAX_Z = 0.845
     APPROACH_START_XY_TOLERANCE = INSERTION_XY_TOLERANCE
@@ -986,20 +987,27 @@ class AdmittanceInsertionNode(Node):
         n_steps = self.SEARCH_STEPS
         d_angle = 2.0 * math.pi / n_steps
 
-        # Wait for current trajectory to settle before next step. If a
-        # post-command physical-clearance streak has started, keep waiting
-        # instead of interrupting it with the next search command.
+        # Wait for current trajectory to settle before next step. The settling
+        # window is in seconds, not ticks, so non-default control rates do not
+        # shorten the hold below the recenter command duration.
+        search_settle_elapsed_s = self._state_entry_ticks / self._control_rate
+        ready_to_count = self._now_s() >= self._search_stability_ready_s
+        settling_window_active = search_settle_elapsed_s < self.SEARCH_SETTLE_DURATION_S
+        command_still_running = (
+            self._search_stability_ready_s > 0.0
+            and not ready_to_count
+        )
         if (
             self._search_step < n_steps
             and (
-                self._state_entry_ticks < 60
+                settling_window_active
+                or command_still_running
                 or self._search_convergence_ticks > 0
             )
         ):
             self._state_entry_ticks += 1
             peg, _ = self._kinematics.pose(self.current_joints)
             xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
-            ready_to_count = self._now_s() >= self._search_stability_ready_s
             if ready_to_count and xy_err <= self.INSERT_FINAL_XY_TOLERANCE:
                 self._search_convergence_ticks += 1
                 if self._search_convergence_ticks >= self.SEARCH_CONVERGENCE_TICKS:
@@ -1031,7 +1039,8 @@ class AdmittanceInsertionNode(Node):
                     f'SEARCH settling: xy_error={xy_err:.4f}m, stable='
                     f'{self._search_convergence_ticks}/'
                     f'{self.SEARCH_CONVERGENCE_TICKS}, '
-                    f'ready_to_count={ready_to_count}'
+                    f'ready_to_count={ready_to_count}, '
+                    f'settle_elapsed={search_settle_elapsed_s:.1f}s'
                 )
             return  # keep waiting for settling
 
@@ -1580,6 +1589,7 @@ class AdmittanceInsertionNode(Node):
                     self.SEARCH_CONVERGENCE_TICKS / self._control_rate,
                     3,
                 ),
+                'search_settle_duration_s': round(self.SEARCH_SETTLE_DURATION_S, 3),
                 'gravity_baseline_valid': self._baseline_valid,
                 'baseline_window_samples': len(self._fz_buffer),
             },
