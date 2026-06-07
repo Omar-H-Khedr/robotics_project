@@ -1,0 +1,348 @@
+{
+  "input_dir": "diagnostics/research_baseline_search_post_settle_count_recenter8_gain3000_damping10_25hz_v1",
+  "sample_source": "wrench_state_samples.csv",
+  "state_loop_hz": 25.0,
+  "clearance_thresholds_m": [
+    0.001,
+    0.002
+  ],
+  "total_valid_samples": 9159,
+  "states": {
+    "ABORT": {
+      "state": "ABORT",
+      "samples": 2452,
+      "start_s": 66.49,
+      "end_s": 91.001,
+      "duration_s": 24.51100000000001,
+      "min_xy_error_m": 5.1409e-05,
+      "mean_xy_error_m": 0.12602946988662317,
+      "p95_xy_error_m": 0.370364645,
+      "final_xy_error_m": 0.395903725,
+      "min_peg_z_m": 0.83919808,
+      "max_peg_z_m": 1.023646735,
+      "max_force_norm_n": 169.94738837,
+      "thresholds": {
+        "0.001m": {
+          "samples_inside": 398,
+          "sample_fraction_inside": 0.16231647634584012,
+          "best_observer_window": {
+            "samples": 8,
+            "duration_s": 0.06999999999999318,
+            "start_s": 73.14,
+            "end_s": 73.21,
+            "start_z_m": 0.866028623,
+            "end_z_m": 0.867544897
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 5,
+            "duration_s": 0.2,
+            "start_s": 76.0900000000015,
+            "end_s": 76.25000000000152,
+            "start_z_m": 0.88089906,
+            "end_z_m": 0.882265029
+          }
+        },
+        "0.002m": {
+          "samples_inside": 893,
+          "sample_fraction_inside": 0.36419249592169656,
+          "best_observer_window": {
+            "samples": 59,
+            "duration_s": 0.5799999999999983,
+            "start_s": 67.0,
+            "end_s": 67.58,
+            "start_z_m": 0.842463495,
+            "end_z_m": 0.841914102
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 30,
+            "duration_s": 1.2,
+            "start_s": 73.01000000000101,
+            "end_s": 74.1700000000012,
+            "start_z_m": 0.866890009,
+            "end_z_m": 0.872282297
+          }
+        }
+      }
+    },
+    "APPROACH": {
+      "state": "APPROACH",
+      "samples": 1176,
+      "start_s": 42.65,
+      "end_s": 54.404,
+      "duration_s": 11.754000000000005,
+      "min_xy_error_m": 6.7211e-05,
+      "mean_xy_error_m": 0.0012733058656462584,
+      "p95_xy_error_m": 0.002542766,
+      "final_xy_error_m": 0.000941701,
+      "min_peg_z_m": 0.842576357,
+      "max_peg_z_m": 0.886677409,
+      "max_force_norm_n": 169.20734143,
+      "thresholds": {
+        "0.001m": {
+          "samples_inside": 468,
+          "sample_fraction_inside": 0.3979591836734694,
+          "best_observer_window": {
+            "samples": 7,
+            "duration_s": 0.06099999999999994,
+            "start_s": 43.429,
+            "end_s": 43.49,
+            "start_z_m": 0.884886872,
+            "end_z_m": 0.885160677
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 5,
+            "duration_s": 0.2,
+            "start_s": 51.769999999999804,
+            "end_s": 51.9299999999998,
+            "start_z_m": 0.854737915,
+            "end_z_m": 0.852646246
+          }
+        },
+        "0.002m": {
+          "samples_inside": 1005,
+          "sample_fraction_inside": 0.8545918367346939,
+          "best_observer_window": {
+            "samples": 44,
+            "duration_s": 0.4299999999999997,
+            "start_s": 49.02,
+            "end_s": 49.45,
+            "start_z_m": 0.86625981,
+            "end_z_m": 0.865611469
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 37,
+            "duration_s": 1.48,
+            "start_s": 49.04999999999986,
+            "end_s": 50.48999999999983,
+            "start_z_m": 0.865569171,
+            "end_z_m": 0.8604429
+          }
+        }
+      }
+    },
+    "DONE": {
+      "state": "DONE",
+      "samples": 59,
+      "start_s": 91.01,
+      "end_s": 91.59,
+      "duration_s": 0.5799999999999983,
+      "min_xy_error_m": 0.395990749,
+      "mean_xy_error_m": 0.4042449948135593,
+      "p95_xy_error_m": 0.409839963,
+      "final_xy_error_m": 0.409999402,
+      "min_peg_z_m": 1.023711142,
+      "max_peg_z_m": 1.040948588,
+      "max_force_norm_n": 92.625168933,
+      "thresholds": {
+        "0.001m": {
+          "samples_inside": 0,
+          "sample_fraction_inside": 0.0,
+          "best_observer_window": {
+            "samples": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          }
+        },
+        "0.002m": {
+          "samples_inside": 0,
+          "sample_fraction_inside": 0.0,
+          "best_observer_window": {
+            "samples": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          }
+        }
+      }
+    },
+    "INSERT": {
+      "state": "INSERT",
+      "samples": 1208,
+      "start_s": 54.41,
+      "end_s": 66.48,
+      "duration_s": 12.070000000000007,
+      "min_xy_error_m": 5.4226e-05,
+      "mean_xy_error_m": 0.0012156727682119206,
+      "p95_xy_error_m": 0.002365454,
+      "final_xy_error_m": 0.000557334,
+      "min_peg_z_m": 0.839504227,
+      "max_peg_z_m": 0.845127052,
+      "max_force_norm_n": 165.547486175,
+      "thresholds": {
+        "0.001m": {
+          "samples_inside": 499,
+          "sample_fraction_inside": 0.41307947019867547,
+          "best_observer_window": {
+            "samples": 7,
+            "duration_s": 0.05999999999999517,
+            "start_s": 60.84,
+            "end_s": 60.9,
+            "start_z_m": 0.843522356,
+            "end_z_m": 0.843319446
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 9,
+            "duration_s": 0.36,
+            "start_s": 62.889999999999816,
+            "end_s": 63.20999999999981,
+            "start_z_m": 0.843503219,
+            "end_z_m": 0.842777472
+          }
+        },
+        "0.002m": {
+          "samples_inside": 1065,
+          "sample_fraction_inside": 0.8816225165562914,
+          "best_observer_window": {
+            "samples": 62,
+            "duration_s": 0.6099999999999994,
+            "start_s": 64.69,
+            "end_s": 65.3,
+            "start_z_m": 0.842358951,
+            "end_z_m": 0.841182231
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 53,
+            "duration_s": 2.12,
+            "start_s": 57.249999999999936,
+            "end_s": 59.32999999999989,
+            "start_z_m": 0.843146514,
+            "end_z_m": 0.843158844
+          }
+        }
+      }
+    },
+    "MOVING_TO_START": {
+      "state": "MOVING_TO_START",
+      "samples": 4005,
+      "start_s": 2.6,
+      "end_s": 42.642,
+      "duration_s": 40.042,
+      "min_xy_error_m": 0.000441642,
+      "mean_xy_error_m": 0.2268310809917603,
+      "p95_xy_error_m": 0.406499463,
+      "final_xy_error_m": 0.000477946,
+      "min_peg_z_m": 0.860287685,
+      "max_peg_z_m": 1.040358889,
+      "max_force_norm_n": 165.076429756,
+      "thresholds": {
+        "0.001m": {
+          "samples_inside": 10,
+          "sample_fraction_inside": 0.0024968789013732834,
+          "best_observer_window": {
+            "samples": 3,
+            "duration_s": 0.01999999999999602,
+            "start_s": 42.46,
+            "end_s": 42.48,
+            "start_z_m": 0.882965377,
+            "end_z_m": 0.884923161
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 1,
+            "duration_s": 0.04,
+            "start_s": 42.47999999999927,
+            "end_s": 42.47999999999927,
+            "start_z_m": 0.884923161,
+            "end_z_m": 0.884923161
+          }
+        },
+        "0.002m": {
+          "samples_inside": 24,
+          "sample_fraction_inside": 0.00599250936329588,
+          "best_observer_window": {
+            "samples": 14,
+            "duration_s": 0.132000000000005,
+            "start_s": 42.51,
+            "end_s": 42.642,
+            "start_z_m": 0.883973433,
+            "end_z_m": 0.885327019
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 5,
+            "duration_s": 0.2,
+            "start_s": 42.47999999999927,
+            "end_s": 42.63999999999927,
+            "start_z_m": 0.884923161,
+            "end_z_m": 0.885327019
+          }
+        }
+      }
+    },
+    "UNKNOWN": {
+      "state": "UNKNOWN",
+      "samples": 259,
+      "start_s": 0.01,
+      "end_s": 2.591,
+      "duration_s": 2.5810000000000004,
+      "min_xy_error_m": 0.40715793,
+      "mean_xy_error_m": 0.40961173215830116,
+      "p95_xy_error_m": 0.410723786,
+      "final_xy_error_m": 0.409086883,
+      "min_peg_z_m": 1.036182185,
+      "max_peg_z_m": 1.041355354,
+      "max_force_norm_n": 126.262427218,
+      "thresholds": {
+        "0.001m": {
+          "samples_inside": 0,
+          "sample_fraction_inside": 0.0,
+          "best_observer_window": {
+            "samples": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          }
+        },
+        "0.002m": {
+          "samples_inside": 0,
+          "sample_fraction_inside": 0.0,
+          "best_observer_window": {
+            "samples": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          },
+          "best_estimated_state_loop_window": {
+            "ticks": 0,
+            "duration_s": 0.0,
+            "start_s": null,
+            "end_s": null,
+            "start_z_m": null,
+            "end_z_m": null
+          }
+        }
+      }
+    }
+  }
+}

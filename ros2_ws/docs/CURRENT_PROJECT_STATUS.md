@@ -32,8 +32,8 @@ Verification after cleanup:
 
 The latest verified milestone from README/docs/git history is
 `live_v2_14_inference_node_validation` for perception and
-`research_baseline_search_recenter8_settle9_gain3000_damping10_25hz_v1` for
-the latest control diagnostic. The latest control line keeps the
+`research_baseline_search_post_settle_count_recenter8_gain3000_damping10_25hz_v1`
+for the latest control diagnostic. The latest control line keeps the
 duplicate-controller startup fix, the seconds-based SEARCH settling fix for
 25 Hz runs, and a focused INSERT sequencing correction: the no-contact
 pre-depth clearance abort now applies after the final descent command starts,
@@ -50,11 +50,14 @@ descent because handoff feedback reached only `5/8` physical-clearance ticks.
 The launch now also has an `exit_on_done` / `shutdown_on_task_exit` operational
 hook so successful or failed DONE-reaching trials do not keep publishing DONE
 until an outer timeout kills the launch. The direct node-level hook smoke test
-passed, but the full launch repeat timed out externally in SEARCH before DONE,
-with best SEARCH `0.0010 m` stability at `7/8` ticks. The next technical step
-remains near-centered SEARCH/pre-insert feedback stabilization while preserving
-physical clearance gates; repeated validation should follow only after those
-gates pass.
+passed. A follow-up SEARCH sequencing fix now counts a valid post-settle
+inside-clearance feedback sample before publishing another SEARCH command. That
+full launch reached INSERT and exited with code `0` after final DONE status,
+but the task still aborted before descent because INSERT handoff XY reached
+`0.0023 m` and did not remain within the `0.0010 m` physical clearance for
+`8` ticks. The next technical step remains near-centered SEARCH/pre-insert
+feedback stabilization while preserving physical clearance gates; repeated
+validation should follow only after those gates pass.
 
 ## Evidence Reviewed
 
@@ -124,6 +127,7 @@ gates pass.
 - `diagnostics/research_baseline_handoff_timeout12_gain3000_damping10_25hz_v1/summary.md`
 - `diagnostics/research_baseline_search_recenter8_settle9_gain3000_damping10_25hz_v1/summary.md`
 - `diagnostics/research_baseline_done_shutdown_recenter8_settle9_gain3000_damping10_25hz_v1/summary.md`
+- `diagnostics/research_baseline_search_post_settle_count_recenter8_gain3000_damping10_25hz_v1/summary.md`
 - existing diagnostics under `diagnostics/` and `results/`
 
 ## Corrected Documentation Position
@@ -182,6 +186,7 @@ until repeated validation demonstrates robust success.
 - `research_baseline_handoff_timeout12_gain3000_damping10_25hz_v1`: `insert_handoff_hold_duration_s` and `insert_handoff_timeout_s` are now launch/node parameters with canonical defaults and final-outcome metric recording; the fixed `8`-tick/`0.0010 m` stability gate is not exposed as a launch argument. A 12 s handoff-timeout diagnostic did not reach INSERT. SEARCH timed out safely with instantaneous XY inside clearance but not sustained; passive analysis reported SEARCH best 1 mm window `5` ticks, best 2 mm window `46` ticks, hold-like best feedback 1 mm window `6` ticks, max raw `|Fz|` `100.75 N`, max force norm `169.80 N`, and `0` positive contact-topic samples. No insertion success is claimed.
 - `research_baseline_search_recenter8_settle9_gain3000_damping10_25hz_v1`: `search_recenter_duration_s` and `search_settle_duration_s` are now launch/node parameters with canonical defaults `5.0 s` and `6.0 s`; the fixed `8`-tick/`0.0010 m` SEARCH/INSERT stability gates are not exposed as launch arguments. An 8 s recenter / 9 s settle diagnostic reached INSERT, but aborted before descent with final outcome `ABORTED` because INSERT handoff XY `0.0011 m` did not remain within physical clearance for 8 ticks. Passive analysis reported INSERT best 1 mm window `5` ticks, hold-like best feedback 1 mm window `4` ticks, max centered-hold p95 XY drift `0.002232 m`, max raw `|Fz|` `101.68 N`, max force norm `169.48 N`, and `0` positive contact-topic samples. No insertion success is claimed.
 - `research_baseline_done_shutdown_hook_v1`: `exit_on_done`, `done_exit_delay_s`, and `shutdown_on_task_exit` now let the task node exit after writing a final DONE outcome and let the launch system stop on that process exit. A direct node-level smoke test exited with code `0` before an 8 s wrapper. The full headless launch repeat did not validate launch shutdown because it timed out externally in SEARCH before DONE; passive analysis reported SEARCH best 1 mm window `7` ticks, best 2 mm window `54` ticks, hold-like best feedback 1 mm window `6` ticks, max raw `|Fz|` `102.14 N`, max force norm `168.21 N`, and `0` positive contact-topic samples. No insertion success is claimed.
+- `research_baseline_search_post_settle_count_recenter8_gain3000_damping10_25hz_v1`: SEARCH now counts a valid post-settle feedback sample inside the fixed `0.0010 m` physical clearance before issuing another command. The validation reached INSERT and final DONE status, and launch exited with code `0`. It still failed safely before descent: final outcome `ABORTED`, reason `INSERT handoff settle timeout: XY error 0.0023m did not remain within physical clearance 0.0010m for 8 ticks before descent`, insertion depth `0.0000 m`, pre-insertion XY `0.0009 m`, max raw `|Fz|` `103.01 N`, max force norm `169.95 N`, hold-like best feedback 1 mm window `5` ticks, max centered-hold p95 actual XY drift `0.002226 m`, and `0` positive contact-topic samples. No insertion success is claimed.
 - Older controller-state tracking and endpoint-hold diagnostics remain important historical evidence: canonical pre-damping runs failed the strict above-hole hold gate, while 5x damping moved the blocker downstream to approach/insert timing.
 - Canonical `research_baseline.launch.py` uses `thesis_bringup/config/research_baseline_bridge.yaml` without a `/joint_states` Gazebo bridge. `joint_state_broadcaster` is the intended single `/joint_states` source.
 - FT bridge target: `/ft_sensor_wrench`.

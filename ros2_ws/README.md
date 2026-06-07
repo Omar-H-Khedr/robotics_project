@@ -9,19 +9,15 @@ from docs and git history is split by subsystem:
 
 - Perception: `live_v2_14_inference_node_validation` from `ab2a747`, a passive
   20 Hz live node with 62.6% live accuracy and no controller output.
-- Control: `research_baseline_search_damping10_gain3000_25hz_v1`, a rejected
-  damping diagnostic plus
-  `research_baseline_search_recenter8_settle9_gain3000_damping10_25hz_v1`, an
-  extended SEARCH timing diagnostic. The state-machine fix is retained:
-  no-contact pre-depth INSERT clearance abort applies only after the final
-  descent command has started, while side-load/force aborts remain active.
-  Launch-level SEARCH and INSERT handoff timing diagnostics are now available
-  without exposing the 1 mm clearance or 8-tick gate. The latest run reached
-  INSERT but aborted before descent: handoff feedback reached only 5 of 8
-  required stable 25 Hz ticks inside the 1 mm clearance. No insertion success is
-  claimed. A follow-up run added `exit_on_done` launch support; the node-level
-  exit hook passed a direct smoke test, but the full launch repeat timed out in
-  SEARCH before DONE and therefore did not exercise launch shutdown.
+- Control: `research_baseline_search_post_settle_count_recenter8_gain3000_damping10_25hz_v1`,
+  a retained SEARCH sequencing fix on top of the earlier single-plugin startup,
+  seconds-based SEARCH settling, and INSERT handoff-ordering fixes. SEARCH now
+  counts a valid post-settle inside-clearance sample before sending another
+  command, without exposing or relaxing the fixed 1 mm / 8-tick gate. The run
+  reached INSERT and launch exited cleanly after final DONE status, but the task
+  still aborted before descent: INSERT handoff feedback timed out at `0.0023 m`
+  XY error against the `0.0010 m` physical radial clearance. No insertion
+  success is claimed.
 
 Next technical step: stabilize near-centered SEARCH and pre-insert handoff while
 preserving the physical clearance gates; do not bulk-add raw diagnostic CSVs or
@@ -139,7 +135,47 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_search_damping10_gain3000_25hz_v1 | Rejected diagnostic: gain=3000, D=10, damping scale 10 reached INSERT and exercised the reordered handoff path, but aborted safely before descent because INSERT handoff feedback reached only 4 of 8 required 25 Hz ticks inside the 0.0010 m clearance. No insertion success claimed. |
 | research_baseline_handoff_timeout12_gain3000_damping10_25hz_v1 | Completed diagnostic hook, failed runtime: handoff hold duration/timeout are now launch parameters with canonical defaults, but the fixed 8-tick/1 mm gate is not configurable. A 12 s handoff-timeout run did not reach INSERT; SEARCH failed closed with best 1 mm stability 5 ticks and best hold-like feedback 6 ticks. No insertion success claimed. |
 | research_baseline_search_recenter8_settle9_gain3000_damping10_25hz_v1 | Improved but failed safely: SEARCH recenter/settle durations are now launch parameters. An 8 s / 9 s diagnostic reached INSERT, but aborted before descent because INSERT handoff reached only 5 of 8 required 1 mm stability ticks. No insertion success claimed. |
-| research_baseline_done_shutdown_hook_v1 | Implemented operational hook: task node can exit after writing DONE and launch can shut down on task exit. Direct node smoke test passed; full launch repeat timed out in SEARCH with best 1 mm window 7 ticks, so launch shutdown-on-DONE still needs a DONE-reaching runtime repeat. |
+| research_baseline_done_shutdown_hook_v1 | Implemented operational hook: task node can exit after writing DONE and launch can shut down on task exit. Direct node smoke test passed; full launch repeat timed out in SEARCH with best 1 mm window 7 ticks, so launch shutdown-on-DONE still needed a DONE-reaching runtime repeat. |
+| research_baseline_search_post_settle_count_recenter8_gain3000_damping10_25hz_v1 | Completed sequencing fix, failed safely: SEARCH now preserves post-settle inside-clearance samples before issuing another command. The validation reached INSERT and launch exited with code 0 after final DONE status, but aborted before descent because INSERT handoff XY reached 0.0023 m and did not remain within the 0.0010 m clearance for 8 ticks. No insertion success claimed. |
+
+## 2026-06-07 SEARCH Post-Settle Count Fix
+
+Milestone: `research_baseline_search_post_settle_count_recenter8_gain3000_damping10_25hz_v1`
+
+Evidence: `diagnostics/research_baseline_search_post_settle_count_recenter8_gain3000_damping10_25hz_v1/summary.md`
+
+SEARCH had one remaining command-boundary sequencing hole: after the active
+SEARCH/recenter command and fixed settle interval completed, the state machine
+could publish another command before counting a valid current feedback sample
+inside physical clearance. That could discard near-success windows such as the
+prior `7/8` tick diagnostic.
+
+`AdmittanceInsertionNode` now counts the post-settle feedback sample first when
+it is inside the fixed `0.0010 m` physical clearance. The `8`-tick SEARCH gate
+and the INSERT handoff gate remain fixed in code.
+
+Validation with `control_rate:=25.0`, gain `3000`, D `10`, damping scale `10`,
+velocity-state injection, `8.0 s` SEARCH recenter, `9.0 s` SEARCH settle, and a
+`12.0 s` handoff timeout reached INSERT and produced final DONE status with
+launch exit code `0`. It still reported final outcome `ABORTED`:
+
+- reason: `INSERT handoff settle timeout: XY error 0.0023m did not remain within physical clearance 0.0010m for 8 ticks before descent.`;
+- phase sequence: `MOVING_TO_START` OK, `APPROACH` OK, `INSERT` failed;
+- insertion depth: `0.0000 m`;
+- pre-insertion XY: `0.0009 m`;
+- final insertion XY: `0.0023 m`;
+- max raw `|Fz|`: `103.01 N`;
+- max force norm: `169.95 N`;
+- positive Gazebo contact-topic samples: `0`;
+- hold-like best feedback 1 mm window: `5` ticks;
+- max centered-hold p95 actual XY drift: `0.002226 m`;
+- max centered-hold p95 JTC joint-position error: `0.007530 rad`.
+
+Decision: keep the sequencing fix because it lets a valid post-settle SEARCH
+sample contribute to the strict gate and it exercised the DONE shutdown path in
+a real full launch. Do not claim insertion success: the binding blocker remains
+stable no-contact feedback centering at SEARCH/INSERT handoff under the
+`0.0010 m` physical radial clearance.
 
 ## 2026-06-07 INSERT Handoff Gate Ordering
 

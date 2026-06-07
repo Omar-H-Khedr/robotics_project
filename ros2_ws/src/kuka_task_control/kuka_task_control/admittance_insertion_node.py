@@ -1117,6 +1117,39 @@ class AdmittanceInsertionNode(Node):
 
         peg, _ = self._kinematics.pose(self.current_joints)
         xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
+        if ready_to_count and xy_err <= self.INSERT_FINAL_XY_TOLERANCE:
+            self._search_convergence_ticks += 1
+            self._state_entry_ticks += 1
+            if self._search_convergence_ticks >= self.SEARCH_CONVERGENCE_TICKS:
+                self.get_logger().info(
+                    f'SEARCH converged. XY error {xy_err:.4f}m within '
+                    f'physical clearance for '
+                    f'{self._search_convergence_ticks} ticks.'
+                )
+                self._end_phase(
+                    True,
+                    xy_err,
+                    0.0,
+                    False,
+                    'SEARCH converged with sustained physical clearance',
+                )
+                self._pre_insertion_xy_error = xy_err
+                if not self._insert_preconditions_ok(peg):
+                    self._set_state(self.ABORT)
+                    return
+                self._insert_start_z = peg[2]
+                self._progress = 0.0
+                self._begin_phase(self.INSERT)
+                self._set_state(self.INSERT)
+                return
+            self.get_logger().info(
+                f'SEARCH post-settle hold: xy_error={xy_err:.4f}m, '
+                f'stable={self._search_convergence_ticks}/'
+                f'{self.SEARCH_CONVERGENCE_TICKS}; continuing to observe '
+                f'before sending another command.'
+            )
+            return
+        self._search_convergence_ticks = 0
         if xy_err <= self.SEARCH_RECENTER_XY_TOLERANCE:
             recenter_target = np.array([
                 self.HOLE_CENTRE_XY[0],
