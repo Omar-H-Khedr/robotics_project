@@ -248,14 +248,13 @@ position_derivative_gain=10.0, joint_damping_scale=10.0, inject_velocity_state,
 handoff_timeout=12.0s, approach_offset_xy=0.003.
 
 **Honest limitations**:
-- The `approach_offset_xy` is a validation aid, not a production parameter.
-  It exists to exercise the SEARCH code path. Production deployments should
-  use `approach_offset_xy=0.0` and rely on controller tracking accuracy.
+- The `approach_offset_xy` is retained for backward compatibility but is no
+  longer required. The production-safe `search_entry_threshold_m=0.0` (default)
+  guarantees SEARCH entry without any offset.
 - The 4-tick convergence gate is calibrated for the 500 Hz gain=3000/D=10
   configuration. Different controller settings may require re-calibration.
-- The 1 remaining failure (stochastic final-descent side-load) is the next
-  improvement target. Recovery mechanisms successfully handle 4/5 cases.
-- This is validated SEARCH-entered simulation robustness, not final full
+- Production-safe validation (10/10) is the strongest current evidence set.
+  This is validated SEARCH-entered simulation robustness, not final full
   autonomous peg-in-hole success.
 
 ## Evidence Reviewed
