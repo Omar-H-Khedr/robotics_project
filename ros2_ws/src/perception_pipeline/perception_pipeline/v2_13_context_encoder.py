@@ -1,9 +1,11 @@
 """v2_13 self-supervised context encoder.
 
-Trains a 74 -> 32 -> 74 autoencoder on a context_log.parquet produced
-by the v2_12 context_vector_extractor. The encoder learns a 32-dim
-latent that v2_14 (context-conditioned action) reuses for the
-context -> action mapping.
+Trains a N -> 32 -> N autoencoder on a context_log.parquet produced
+by the context_vector_extractor. The encoder learns a 32-dim latent
+that v2_14 (context-conditioned action) reuses for the context ->
+action mapping.  N is auto-detected from the parquet metadata
+(context_dim field in context_spec_json), currently 68 for v2_13
+(no wrench features) or 74 for legacy v2_12 (with wrench).
 
 This is offline training only; it does not need ROS. The script is
 registered as a console script so it can be run with `ros2 run
@@ -41,7 +43,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 
-CONTEXT_DIM = 74
+CONTEXT_DIM = 68
 LATENT_DIM = 32
 DEFAULT_EPOCHS = 200
 DEFAULT_BATCH = 64
@@ -54,7 +56,6 @@ WEIGHT_DECAY = 1e-4
 DEPTH_DIM_INDICES = (48, 49)
 DEPTH_VALUE_INDICES = (50, 51, 52, 53)
 DEPTH_CLIP_VALUE = 5.0
-ZERO_VAR_FEATURES = (54, 55, 56, 57, 58, 59, 66, 67, 68, 69, 70, 71)
 
 
 def _load_parquet(path: Path) -> Tuple[np.ndarray, np.ndarray, np.ndarray, dict]:
@@ -68,9 +69,11 @@ def _load_parquet(path: Path) -> Tuple[np.ndarray, np.ndarray, np.ndarray, dict]
     spec = {}
     if table.schema.metadata and b"context_spec_json" in table.schema.metadata:
         spec = json.loads(table.schema.metadata[b"context_spec_json"].decode())
-    if X.shape[1] != CONTEXT_DIM:
-        raise RuntimeError(
-            f"expected context_dim={CONTEXT_DIM}, got {X.shape[1]}"
+    detected_dim = X.shape[1]
+    if detected_dim != CONTEXT_DIM:
+        print(
+            f"WARNING: context_dim mismatch: code default={CONTEXT_DIM}, "
+            f"parquet={detected_dim}. Using parquet dimension."
         )
     return X, phases, safety, spec
 
@@ -152,11 +155,12 @@ class Autoencoder(nn.Module):
 def train(
     X_train: np.ndarray, X_test: np.ndarray,
     epochs: int, batch_size: int, lr: float, seed: int,
+    input_dim: int = CONTEXT_DIM,
 ) -> Tuple[Autoencoder, list, list]:
     torch.manual_seed(seed)
     np.random.seed(seed)
     device = torch.device("cpu")
-    model = Autoencoder().to(device)
+    model = Autoencoder(input_dim=input_dim).to(device)
     opt = optim.Adam(model.parameters(), lr=lr, weight_decay=WEIGHT_DECAY)
     loss_fn = nn.MSELoss()
     train_ds = TensorDataset(torch.from_numpy(X_train).float())
@@ -270,6 +274,8 @@ def main(argv=None) -> int:
     train_idx, test_idx = idx[:n_train], idx[n_train:]
     X_train, X_test = X[train_idx], X[test_idx]
     print(f"  train={X_train.shape[0]} test={X_test.shape[0]}")
+    input_dim = X_train.shape[1]
+    print(f"  detected context_dim={input_dim}")
 
     print("v2_13_context_encoder: standardizing (train stats only)")
     X_train, X_test, scaler = _normalize(X_train, X_test)
@@ -279,11 +285,11 @@ def main(argv=None) -> int:
     print(f"v2_13_context_encoder: wrote {scaler_path}")
 
     print(f"v2_13_context_encoder: training {args.epochs} epochs "
-          f"(latent_dim={args.latent_dim}, batch={args.batch_size}, lr={args.lr})")
+          f"(input_dim={input_dim}, latent_dim={args.latent_dim}, batch={args.batch_size}, lr={args.lr})")
     model, history, train_curve, test_curve = train(
         X_train, X_test,
         epochs=args.epochs, batch_size=args.batch_size,
-        lr=args.lr, seed=args.seed,
+        lr=args.lr, seed=args.seed, input_dim=input_dim,
     )
     train_mse = float(train_curve[-1])
     test_mse = float(test_curve[-1])
@@ -293,12 +299,12 @@ def main(argv=None) -> int:
     torch.save(model.state_dict(), autoencoder_path)
     print(f"v2_13_context_encoder: wrote {autoencoder_path}")
 
-    encoder = Autoencoder(input_dim=CONTEXT_DIM, latent_dim=args.latent_dim)
+    encoder = Autoencoder(input_dim=input_dim, latent_dim=args.latent_dim)
     encoder.load_state_dict(model.state_dict())
     encoder_path = output_dir / "encoder.pt"
     torch.save({
         "state_dict": encoder.state_dict(),
-        "input_dim": CONTEXT_DIM,
+        "input_dim": input_dim,
         "latent_dim": args.latent_dim,
         "hidden_dims": list(HIDDEN_DIMS),
         "dropout": DROPOUT,
@@ -316,14 +322,14 @@ def main(argv=None) -> int:
         z = smoke_model.encode(sample)
         xh = smoke_model(sample)
     assert z.shape == (8, args.latent_dim), f"latent shape mismatch: {z.shape}"
-    assert xh.shape == (8, CONTEXT_DIM), f"recon shape mismatch: {xh.shape}"
-    print(f"  latent shape {tuple(z.shape)} = OK (32-dim expected)")
-    print(f"  recon   shape {tuple(xh.shape)} = OK (74-dim expected)")
+    assert xh.shape == (8, input_dim), f"recon shape mismatch: {xh.shape}"
+    print(f"  latent shape {tuple(z.shape)} = OK ({args.latent_dim}-dim expected)")
+    print(f"  recon   shape {tuple(xh.shape)} = OK ({input_dim}-dim expected)")
 
     metadata = {
         "version": "v2_13",
         "model_type": "mlp_autoencoder",
-        "input_dim": CONTEXT_DIM,
+        "input_dim": input_dim,
         "latent_dim": args.latent_dim,
         "hidden_dims": list(HIDDEN_DIMS),
         "dropout": DROPOUT,

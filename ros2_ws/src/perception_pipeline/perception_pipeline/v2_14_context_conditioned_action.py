@@ -48,7 +48,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 
 
-CONTEXT_DIM = 74
+CONTEXT_DIM = 68
 LATENT_DIM = 32
 NUM_PHASE_CLASSES = 9
 JOINT_DIM = 6
@@ -73,9 +73,13 @@ def _load_parquet(path: Path) -> Tuple[np.ndarray, np.ndarray]:
     if "phase_int" not in df.columns:
         raise RuntimeError(f"parquet is missing 'phase_int' column: {path}")
     phases = df["phase_int"].to_numpy(dtype=np.int64)
-    if X.shape[1] != CONTEXT_DIM:
-        raise RuntimeError(f"expected context_dim={CONTEXT_DIM}, got {X.shape[1]}")
-    return X, phases
+    detected_dim = X.shape[1]
+    if detected_dim != CONTEXT_DIM:
+        print(
+            f"WARNING: context_dim mismatch: code default={CONTEXT_DIM}, "
+            f"parquet={detected_dim}. Using parquet dimension."
+        )
+    return X, phases, detected_dim
 
 
 def _validate(X: np.ndarray, phases: np.ndarray) -> dict:
@@ -203,8 +207,8 @@ def main(argv=None) -> int:
     print(f"v2_14_context_conditioned_action: output_dir = {output_dir}")
 
     print(f"v2_14_context_conditioned_action: loading {args.input_parquet}")
-    X, phases = _load_parquet(Path(args.input_parquet))
-    print(f"v2_14_context_conditioned_action: X.shape = {X.shape} phases.shape = {phases.shape}")
+    X, phases, context_dim = _load_parquet(Path(args.input_parquet))
+    print(f"v2_14_context_conditioned_action: X.shape = {X.shape} phases.shape = {phases.shape} context_dim={context_dim}")
 
     print("v2_14_context_conditioned_action: validating data")
     report = _validate(X, phases)
@@ -241,7 +245,7 @@ def main(argv=None) -> int:
         p.requires_grad = False
     encoder.eval()
 
-    print("v2_14_context_conditioned_action: encoding 74 -> 32 with frozen v2_13 encoder")
+    print(f"v2_14_context_conditioned_action: encoding {context_dim} -> 32 with frozen v2_13 encoder")
     with torch.no_grad():
         Z = encoder.encode(torch.from_numpy(Xp).float()).numpy()
     print(f"  Z.shape = {Z.shape}")

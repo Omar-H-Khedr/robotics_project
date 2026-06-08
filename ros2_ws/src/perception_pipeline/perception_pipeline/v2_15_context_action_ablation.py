@@ -1,13 +1,13 @@
-"""v2_15 ablation: with v2_13 encoder pre-training vs raw 74-dim input.
+"""v2_15 ablation: with v2_13 encoder pre-training vs raw input.
 
-Phase 5/6 v2_15 ablation. The v2_14 task (phase classification +
-per-phase target joint regression) is run with two architectures
-on the same multi-phase synthetic dataset:
+A clean paired comparison of two action classifiers on the same data:
+  A: with encoder
+       N -> [frozen v2_13 encoder] -> 32 -> [head] -> 9 (CE) + 6 (MSE)
+  B: no encoder
+       N -> [Linear 32 + ReLU + Dropout] -> 32 -> [head] -> 9 (CE) + 6 (MSE)
 
-  A. v2_14 (with pre-trained v2_13 encoder)
-       74 -> [frozen v2_13 encoder] -> 32 -> [head] -> 9 (CE) + 6 (MSE)
-  B. Baseline (no pre-trained encoder)
-       74 -> [Linear 32 + ReLU + Dropout] -> 32 -> [head] -> 9 (CE) + 6 (MSE)
+Where N is the context vector dimension (68 for v2_13, auto-detected from
+parquet metadata).
        The "Linear 32" is trained from scratch with the same loss.
 
 If the v2_13 pre-training is useful, A should be at least comparable
@@ -42,7 +42,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 
 
-CONTEXT_DIM = 74
+CONTEXT_DIM = 68
 LATENT_DIM = 32
 NUM_PHASE_CLASSES = 9
 JOINT_DIM = 6
@@ -58,12 +58,12 @@ DEPTH_VALUE_INDICES = (50, 51, 52, 53)
 DEPTH_CLIP_VALUE = 5.0
 
 
-def _load_parquet(path: Path) -> Tuple[np.ndarray, np.ndarray]:
+def _load_parquet(path: Path) -> Tuple[np.ndarray, np.ndarray, int]:
     table = pq.read_table(path)
     df = table.to_pandas()
     X = np.stack([np.array(v, dtype=np.float32) for v in df["context_vec"]])
     phases = df["phase_int"].to_numpy(dtype=np.int64)
-    return X, phases
+    return X, phases, X.shape[1]
 
 
 def _preprocess(X: np.ndarray, mn: np.ndarray, rng: np.ndarray) -> np.ndarray:
@@ -260,7 +260,7 @@ def main(argv=None) -> int:
     output_dir.mkdir(parents=True, exist_ok=True)
     print(f"v2_15_ablation: output_dir = {output_dir}")
 
-    X, phases = _load_parquet(Path(args.input_parquet))
+    X, phases, context_dim = _load_parquet(Path(args.input_parquet))
     print(f"v2_15_ablation: X.shape = {X.shape} phases.shape = {phases.shape}")
     rgb_sum = X[:, :48].sum(axis=1)
     valid = (rgb_sum > 1.0) & (X[:, 48] > 0) & (X[:, 49] > 0)
@@ -320,7 +320,7 @@ def main(argv=None) -> int:
     _plot_cm(cm_a, output_dir / "confusion_with_encoder.png",
              "v2_15 phase classifier with v2_13 encoder")
 
-    print("v2_15_ablation: training B (no encoder, input_dim=74)")
+    print(f"v2_15_ablation: training B (no encoder, input_dim={CONTEXT_DIM})")
     res_b = _train_eval(
         torch.from_numpy(Xp_train).float(),
         torch.from_numpy(Xp_test).float(),
@@ -363,7 +363,7 @@ def main(argv=None) -> int:
 
     summary = {
         "version": "v2_15",
-        "ablation": "with_v2_13_encoder vs raw_74_dim_input",
+        "ablation": f"with_v2_13_encoder vs raw_{CONTEXT_DIM}_dim_input",
         "dataset": str(args.input_parquet),
         "encoder_pt": str(args.encoder_pt),
         "scaler_json": str(args.scaler_json),
