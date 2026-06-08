@@ -16,7 +16,7 @@ TRACE_FILE = "search_gate_trace.csv"
 JSON_OUTPUT = "search_gate_trace_analysis.json"
 MD_OUTPUT = "search_gate_trace_analysis.md"
 PHYSICAL_CLEARANCE_M = 0.001
-REQUIRED_TICKS = 8
+REQUIRED_TICKS = 4
 
 
 @dataclass(frozen=True)

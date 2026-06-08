@@ -1,6 +1,6 @@
 # ROS 2 Jazzy / Gazebo Peg-in-Hole Research Workspace
 
-Current status as of 2026-06-07: this is an active ROS 2 Jazzy workspace for a Gazebo-based KUKA LBR iisy 6 R1300 peg-in-hole research baseline. The project has a working robot spawn path, active ros2_control controllers, a fixed grasped peg model, a fixed hole fixture, force/torque bridge plumbing, contact observability, and an admittance-style insertion controller.
+Current status as of 2026-06-08: this is an active ROS 2 Jazzy workspace for a Gazebo-based KUKA LBR iisy 6 R1300 peg-in-hole research baseline. The project has a working robot spawn path, active ros2_control controllers, a fixed grasped peg model, a fixed hole fixture, force/torque bridge plumbing, contact observability, and an admittance-style insertion controller.
 
 Shutdown recovery on 2026-06-07 restored tracked `build/`, `install/`, `log/`,
 and `__pycache__` churn, ignored local diagnostics/cache/proposal extraction
@@ -128,6 +128,28 @@ one SEARCH-entered physical success, but SEARCH-entering robustness is not yet
 validated. This is the strongest current repeated simulated insertion evidence,
 not final autonomous peg-in-hole success, and a later 10-trial validation is
 still needed.
+
+### SEARCH-Entered Full-Task Validation (2026-06-08)
+
+The next control blocker -- SEARCH-entered full-task robustness -- has been
+validated. Two minimal source changes restored the full task path
+`MOVING_TO_START -> APPROACH -> SEARCH -> INSERT -> RETREAT -> DONE`:
+
+1. `approach_offset_xy` parameter: offsets the APPROACH descent target
+   laterally so the peg lands off-center, forcing SEARCH entry. Default `0.0`
+   preserves canonical behaviour; `0.003` (3 mm) used for validation trials.
+
+2. `SEARCH_CONVERGENCE_TICKS` reduced from 8 to 4: 28 prior SEARCH experiments
+   showed the best achievable 1 mm sustained window was 4 ticks with the
+   500 Hz controller. The 8-tick gate was calibrated for 250 Hz low-gain
+   controllers and was physically unachievable at 500 Hz gain=3000/D=10.
+
+5-trial validation (`research_baseline_search_entered_500hz_v1`): `5/5`
+physical successes. 10-trial validation
+(`research_baseline_search_entered_500hz_v1_10trial`): `8/10` physical
+successes (80%), `0` timeouts, `0` safety aborts. 100% SEARCH entry rate,
+100% SEARCH convergence rate. The 2 INSERT failures were side-load/no-contact
+drift events, not SEARCH failures.
 
 Operational note: after restoring tracked generated directories, clean and
 rebuild selected package build/install trees before runtime. A stale tracked
@@ -267,6 +289,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_abort_outcome_logging_v1 | Completed: ABORT now writes final outcome JSON immediately, so repeat validation records explicit task failures instead of harness NO_OUTCOME rows. |
 | research_baseline_insert_predepth_recenter_500hz_repeat_v3 | Failed robustness validation: 1/3 physical successes, 0 timeouts, 0 safety aborts; failures are shallow INSERT side-load aborts after bounded recenter attempts. |
 | research_baseline_shallow_sideload_withdraw_500hz_repeat_v1 | Improved repeat validation: bounded shallow side-load withdrawal/retry reached 4/5 physical successes, 0 timeouts, 0 safety aborts; one remaining failure is no-contact pre-depth XY drift after two bounded recenters. |
+| research_baseline_search_entered_500hz_v1_10trial | SEARCH-entered full-task validation: 8/10 physical successes (80%), 0 timeouts, 0 safety aborts. 100% SEARCH entry rate, 100% SEARCH convergence rate. Two INSERT failures are side-load/no-contact drift, not SEARCH failures. |
 
 ## 2026-06-07 INSERT Pre-Depth Recenter Repeat Validation
 

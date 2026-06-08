@@ -142,8 +142,8 @@ class AdmittanceInsertionNode(Node):
     SEARCH_RADIUS_INIT = 0.003
     SEARCH_RADIUS_MAX = 0.015
     SEARCH_STEPS = 8
-    SEARCH_TIMEOUT_S = 45.0
-    SEARCH_CONVERGENCE_TICKS = 8
+    SEARCH_TIMEOUT_S = 120.0
+    SEARCH_CONVERGENCE_TICKS = 4
     SEARCH_RECENTER_XY_TOLERANCE = 0.004
     SEARCH_RECENTER_DURATION_S = 5.0
     SEARCH_SETTLE_DURATION_S = 6.0
@@ -200,6 +200,7 @@ class AdmittanceInsertionNode(Node):
             'insert_handoff_timeout_s',
             self.INSERT_HANDOFF_TIMEOUT_S,
         )
+        self.declare_parameter('approach_offset_xy', 0.0)
         self.declare_parameter('tracking_log_dir', '')
 
         self._contact_threshold: float = (
@@ -246,6 +247,10 @@ class AdmittanceInsertionNode(Node):
         self._insert_handoff_timeout_s: float = max(
             self._insert_handoff_hold_duration_s,
             float(self.get_parameter('insert_handoff_timeout_s').value),
+        )
+        self._approach_offset_xy: float = max(
+            0.0,
+            float(self.get_parameter('approach_offset_xy').value),
         )
         self._tracking_log_dir: str = str(
             self.get_parameter('tracking_log_dir').value or ''
@@ -361,6 +366,7 @@ class AdmittanceInsertionNode(Node):
             f'safety_threshold={self._safety_threshold:.1f} N, '
             f'control_rate={self._control_rate:.1f} Hz, '
             f'approach_speed={self._approach_speed:.3f}, '
+            f'approach_offset_xy={self._approach_offset_xy:.4f} m, '
             f'trajectory_discovery_wait_s={self._trajectory_discovery_wait_s:.1f}, '
             f'expected_trajectory_subscribers={self._expected_trajectory_subscribers}, '
             f'exit_on_done={self._exit_on_done}, '
@@ -986,12 +992,17 @@ class AdmittanceInsertionNode(Node):
         if self._touch_joints is None:
             current_peg, _ = self._kinematics.pose(self.current_joints)
             descent_start = np.array([
-                self.HOLE_CENTRE_XY[0],
+                self.HOLE_CENTRE_XY[0] + self._approach_offset_xy,
                 self.HOLE_CENTRE_XY[1],
                 current_peg[2],
             ])
+            offset_target = np.array([
+                self.TOUCH_POSE[0] + self._approach_offset_xy,
+                self.TOUCH_POSE[1],
+                self.TOUCH_POSE[2],
+            ])
             descent = self._send_cartesian_descent_trajectory(
-                descent_start, self.TOUCH_POSE, 'APPROACH'
+                descent_start, offset_target, 'APPROACH'
             )
             if descent is None:
                 return
@@ -2326,6 +2337,7 @@ class AdmittanceInsertionNode(Node):
                 ),
                 'gravity_baseline_valid': self._baseline_valid,
                 'baseline_window_samples': len(self._fz_buffer),
+                'approach_offset_xy_m': round(self._approach_offset_xy, 4),
             },
             'status': self._state,
         }

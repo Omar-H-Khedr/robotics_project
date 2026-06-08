@@ -616,6 +616,10 @@ def launch_setup(context, *args, **kwargs):
                     value_type=float,
                 ),
                 "tracking_log_dir": LaunchConfiguration("tracking_log_dir"),
+                "approach_offset_xy": ParameterValue(
+                    LaunchConfiguration("approach_offset_xy"),
+                    value_type=float,
+                ),
                 "use_sim_time": simulation["use_sim_time"],
             }
         ],
@@ -819,6 +823,18 @@ def generate_launch_description():
                     "Maximum wait for INSERT handoff feedback to satisfy the "
                     "fixed physical-clearance stability gate before aborting. "
                     "Default 6.0 s preserves canonical behavior."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "approach_offset_xy",
+                default_value="0.0",
+                description=(
+                    "Lateral (X-axis) offset in metres applied to the "
+                    "APPROACH descent target. Forces the peg tip to land "
+                    "offset from the hole centre so that SEARCH is entered. "
+                    "Default 0.0 preserves canonical behaviour (SEARCH may "
+                    "be bypassed if tracking is accurate). A value of 0.003 "
+                    "is used for SEARCH-validation trials."
                 ),
             ),
             DeclareLaunchArgument(

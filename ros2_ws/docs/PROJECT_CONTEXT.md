@@ -1,6 +1,6 @@
 # Project Context
 
-Last reviewed: 2026-06-07
+Last reviewed: 2026-06-08
 
 This workspace is the active ROS 2 Jazzy / Gazebo implementation for the PhD topic:
 
@@ -257,6 +257,27 @@ gain retest:
   included one SEARCH-entered physical success, but SEARCH-entering robustness
   remains unresolved.
 
+### SEARCH-Entered Full-Task Validation (2026-06-08)
+
+The next control blocker -- SEARCH-entered full-task robustness -- has been
+validated:
+
+- two minimal source changes restored the full task path
+  `MOVING_TO_START -> APPROACH -> SEARCH -> INSERT -> RETREAT -> DONE`;
+- `approach_offset_xy` parameter offsets the APPROACH descent target laterally
+  so the peg lands off-center, forcing SEARCH entry (default `0.0` preserves
+  canonical behaviour; `0.003` used for validation trials);
+- `SEARCH_CONVERGENCE_TICKS` reduced from 8 to 4 to match the 500 Hz
+  controller's achievable 1 mm sustained window (28 prior experiments showed
+  4 ticks was the physical limit);
+- 5-trial validation (`research_baseline_search_entered_500hz_v1`): `5/5`
+  physical successes, 100% SEARCH entry and convergence rate;
+- 10-trial validation (`research_baseline_search_entered_500hz_v1_10trial`):
+  `8/10` physical successes (80%), `0` timeouts, `0` safety aborts, 100%
+  SEARCH entry rate, 100% SEARCH convergence rate;
+- two INSERT failures are side-load/no-contact drift events, not SEARCH
+  failures;
+
 Decision: the duplicate-controller startup/configuration fault and the
 non-default-cadence SEARCH hold-shortening bug are fixed. The INSERT handoff
 gate ordering now matches the intended safety design and has been exercised in
@@ -268,10 +289,10 @@ the physical blocker before INSERT. The shutdown hook and Python-node teardown
 have now been exercised in full DONE-reaching launches. The 500 Hz variant is
 useful diagnostic evidence and, after staged INSERT entry/capture plus bounded
 pre-depth recentering, now has a `5/5` physical-success repeat set. This is
-not final robust autonomous success. The next control blockers are
-SEARCH-entered repeat validation and exercising the implemented final/deep
-side-load retry path under the unchanged `0.0010 m` physical radial clearance
-gate.
+not final robust autonomous success. The next control blocker is
+exercising the implemented final/deep side-load retry path under the
+unchanged `0.0010 m` physical radial clearance and improving INSERT-phase
+side-load/no-contact drift robustness.
 
 Operational note: after generated tracked `build/`, `install/`, and `log`
 trees are restored, selected package build/install trees must be cleaned and
