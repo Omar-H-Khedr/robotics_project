@@ -3,18 +3,22 @@
 Reads a multimodal observation CSV produced by
 multimodal_observation_logger and writes a parquet file with one
 fixed-length context vector per row. Used to build the training
-corpus for v2_13 context encoder and v2_14 context-conditioned action.
+corpus for v2_14 context encoder and v2_15 context-conditioned action.
 
-Context vector layout (v2_12, length = CONTEXT_DIM = 74):
+Context vector layout (v2_13, length = CONTEXT_DIM = 68):
     [ 0:48]  rgb: decode rgb_b64_png (64x36 PNG) -> resize to 8x6 -> flatten
              -> normalize to [0, 1] (uint8 / 255)
     [48:54]  depth: (w, h, min_m, max_m, roi_min_m, roi_max_m)
              bad values (NaN / inf) are replaced with 0.0
-    [54:60]  wrench: (fx, fy, fz, tx, ty, tz)
-    [60:66]  joint position: (j1..j6) in rad
-    [66:72]  joint velocity: (j1..j6) in rad/s; NaN replaced with 0.0
-    [ 72 ]   phase_int: enum encoding task_phase
-    [ 73 ]   safety_int: enum encoding safety_status
+    [54:60]  joint position: (j1..j6) in rad
+    [60:66]  joint velocity: (j1..j6) in rad/s; NaN replaced with 0.0
+    [ 66 ]   phase_int: enum encoding task_phase
+    [ 67 ]   safety_int: enum encoding safety_status
+
+Wrench features (F/T sensor) are excluded because the ft_sensor_bridge
+crashes with SIGSEGV at startup. The admittance_insertion_node still
+receives F/T through gz_ros_control, but the perception logger's
+/ft_sensor_wrench subscription gets nothing.
 
 A bad-frame mask is not stored; the convention is that bad (NaN, inf)
 values are replaced with 0.0 and the row stays in the parquet. Filtering
@@ -40,13 +44,12 @@ RGB_TARGET_W = 8
 RGB_TARGET_H = 6
 RGB_DIMS = RGB_TARGET_W * RGB_TARGET_H  # 48
 DEPTH_DIMS = 6
-WRENCH_DIMS = 6
 JOINT_POS_DIMS = 6
 JOINT_VEL_DIMS = 6
 PHASE_DIMS = 1
 SAFETY_DIMS = 1
 CONTEXT_DIM = (
-    RGB_DIMS + DEPTH_DIMS + WRENCH_DIMS
+    RGB_DIMS + DEPTH_DIMS
     + JOINT_POS_DIMS + JOINT_VEL_DIMS + PHASE_DIMS + SAFETY_DIMS
 )
 
@@ -81,8 +84,6 @@ CONTEXT_SPEC = [
 ] + [
     "depth_w", "depth_h", "depth_min_m", "depth_max_m",
     "depth_roi_min_m", "depth_roi_max_m",
-] + [
-    "ft_x_n", "ft_y_n", "ft_z_n", "ft_rx_nm", "ft_ry_nm", "ft_rz_nm",
 ] + [
     f"joint_{j}_pos_rad" for j in range(1, 7)
 ] + [
@@ -171,11 +172,6 @@ def extract(csv_path: Path, parquet_path: Path) -> dict:
         _safe_float_series(df, "depth_roi_max_m"),
     ], axis=1).astype(np.float32)
 
-    wrench_block = np.stack([
-        _safe_float_series(df, c)
-        for c in ("ft_x_n", "ft_y_n", "ft_z_n", "ft_rx_nm", "ft_ry_nm", "ft_rz_nm")
-    ], axis=1).astype(np.float32)
-
     pos_block = np.stack([
         _safe_float_series(df, f"joint_{j}_pos_rad") for j in range(1, 7)
     ], axis=1).astype(np.float32)
@@ -193,7 +189,7 @@ def extract(csv_path: Path, parquet_path: Path) -> dict:
     ).reshape(-1, 1).astype(np.int32)
 
     context = np.concatenate([
-        rgb_block, depth_block, wrench_block, pos_block, vel_block,
+        rgb_block, depth_block, pos_block, vel_block,
         phase_block, safety_block,
     ], axis=1).astype(np.float32)
 
@@ -214,12 +210,13 @@ def extract(csv_path: Path, parquet_path: Path) -> dict:
         "safety_int": safety_block.reshape(-1).astype(np.int32),
     })
     spec_json = json.dumps({
-        "version": "v2_12",
+        "version": "v2_13",
         "context_dim": CONTEXT_DIM,
         "spec": CONTEXT_SPEC,
         "phase_enum": PHASE_ENUM,
         "safety_enum": SAFETY_ENUM,
         "rgb_target": [RGB_TARGET_W, RGB_TARGET_H],
+        "note": "Wrench features excluded (ft_sensor_bridge crashes with SIGSEGV)",
     })
     out_df.attrs["context_spec_json"] = spec_json
 
@@ -237,8 +234,6 @@ def extract(csv_path: Path, parquet_path: Path) -> dict:
         "rgb_block_max": float(rgb_block.max()),
         "depth_block_min": float(depth_block.min()),
         "depth_block_max": float(depth_block.max()),
-        "wrench_block_min": float(wrench_block.min()),
-        "wrench_block_max": float(wrench_block.max()),
         "pos_block_min": float(pos_block.min()),
         "pos_block_max": float(pos_block.max()),
         "vel_block_min": float(vel_block.min()),
@@ -284,9 +279,6 @@ def main(argv=None) -> int:
     )
     print(
         f"  depth  : min={summary['depth_block_min']:.4f} max={summary['depth_block_max']:.4f}"
-    )
-    print(
-        f"  wrench : min={summary['wrench_block_min']:.4f} max={summary['wrench_block_max']:.4f}"
     )
     print(
         f"  pos    : min={summary['pos_block_min']:.4f} max={summary['pos_block_max']:.4f}"
