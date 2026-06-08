@@ -230,14 +230,31 @@ drift before descent. Both failures are INSERT-phase, not SEARCH-phase.
 Mean SEARCH convergence XY: 0.0005 mm. Mean insertion depth (successes):
 0.0200 m.
 
+**Post-fix confirmation** (`research_baseline_search_confirmation_v1`, commit
+`bc46783`): Two INSERT recovery improvements addressed the 2 prior failures:
+(1) `INSERT_SHALLOW_SIDELOAD_RECOVERY_DEPTH_M` increased from 0.006 to 0.010 m
+to close a 4mm gap where side-load recovery was unavailable; (2)
+`INSERT_PREDEPTH_RECENTER_MAX_ATTEMPTS` increased from 2 to 3. The 10-trial
+confirmation achieved `9/10` physical successes (90%), `0` timeouts, `0` safety
+abort, `1` side-load abort. 100% SEARCH entry rate, 100% SEARCH convergence
+rate. The single failure (Trial 6) was a stochastic final-descent side-load at
+depth 0.0022 m where 2 shallow recovery attempts both failed due to persistent
+lateral drift. All 9 successful trials inserted to 0.0196-0.0205 m depth with
+44.6-52.6 N insert contact force. Recovery mechanisms exercised: pre-depth
+recenter (7/10 trials, budget resets in 3), shallow side-load recovery (5/10,
+4/5 succeeded). Correct launch args: control_rate=25.0, position_gain=3000.0,
+position_derivative_gain=10.0, joint_damping_scale=10.0, inject_velocity_state,
+500hz velocity-state config, search_recenter=8.0s, search_settle=9.0s,
+handoff_timeout=12.0s, approach_offset_xy=0.003.
+
 **Honest limitations**:
 - The `approach_offset_xy` is a validation aid, not a production parameter.
   It exists to exercise the SEARCH code path. Production deployments should
   use `approach_offset_xy=0.0` and rely on controller tracking accuracy.
 - The 4-tick convergence gate is calibrated for the 500 Hz gain=3000/D=10
   configuration. Different controller settings may require re-calibration.
-- The 2 INSERT failures (side-load and no-contact drift) are the next
-  control improvement target.
+- The 1 remaining failure (stochastic final-descent side-load) is the next
+  improvement target. Recovery mechanisms successfully handle 4/5 cases.
 - This is validated SEARCH-entered simulation robustness, not final full
   autonomous peg-in-hole success.
 

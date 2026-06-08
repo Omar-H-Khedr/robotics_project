@@ -151,6 +151,18 @@ successes (80%), `0` timeouts, `0` safety aborts. 100% SEARCH entry rate,
 100% SEARCH convergence rate. The 2 INSERT failures were side-load/no-contact
 drift events, not SEARCH failures.
 
+Post-fix confirmation (`research_baseline_search_confirmation_v1`, commit
+`bc46783`): after raising `INSERT_SHALLOW_SIDELOAD_RECOVERY_DEPTH_M` from
+`0.006` to `0.010` m and increasing `INSERT_PREDEPTH_RECENTER_MAX_ATTEMPTS`
+from `2` to `3`, the 10-trial confirmation achieved `9/10` physical successes
+(90%), `0` timeouts, `0` safety aborts, `1` side-load abort. 100% SEARCH entry
+rate, 100% SEARCH convergence rate. The single failure (Trial 6) was a
+stochastic final-descent side-load at depth `0.0022` m where 2 shallow
+recovery attempts both failed. All 9 successful trials inserted to
+`0.0196`-`0.0205` m depth with `44.6`-`52.6` N insert contact force.
+Recovery mechanisms exercised: pre-depth recenter (7/10 trials), budget
+resets (3/10), shallow side-load recovery (5/10, 4/5 succeeded).
+
 Operational note: after restoring tracked generated directories, clean and
 rebuild selected package build/install trees before runtime. A stale tracked
 `install/thesis_bringup` launch file was observed to launch the older iisy3
@@ -290,6 +302,7 @@ Latest timing evidence shows the prior failed insert was partly a clock-domain b
 | research_baseline_insert_predepth_recenter_500hz_repeat_v3 | Failed robustness validation: 1/3 physical successes, 0 timeouts, 0 safety aborts; failures are shallow INSERT side-load aborts after bounded recenter attempts. |
 | research_baseline_shallow_sideload_withdraw_500hz_repeat_v1 | Improved repeat validation: bounded shallow side-load withdrawal/retry reached 4/5 physical successes, 0 timeouts, 0 safety aborts; one remaining failure is no-contact pre-depth XY drift after two bounded recenters. |
 | research_baseline_search_entered_500hz_v1_10trial | SEARCH-entered full-task validation: 8/10 physical successes (80%), 0 timeouts, 0 safety aborts. 100% SEARCH entry rate, 100% SEARCH convergence rate. Two INSERT failures are side-load/no-contact drift, not SEARCH failures. |
+| research_baseline_search_confirmation_v1 | SEARCH-entered full-task confirmation (post INSERT recovery fix): 9/10 physical successes (90%), 0 timeouts, 0 safety aborts, 1 side-load abort. 100% SEARCH entry, 100% SEARCH convergence. Insert depth 0.0196-0.0205 m, contact 44.6-52.6 N. Recovery mechanisms exercised: pre-depth recenter (7/10), shallow side-load recovery (5/10). Single failure: stochastic final-descent side-load at 0.0022 m depth. |
 
 ## 2026-06-07 INSERT Pre-Depth Recenter Repeat Validation
 

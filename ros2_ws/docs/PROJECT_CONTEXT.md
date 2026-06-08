@@ -277,6 +277,11 @@ validated:
   SEARCH entry rate, 100% SEARCH convergence rate;
 - two INSERT failures are side-load/no-contact drift events, not SEARCH
   failures;
+- post-fix confirmation (`research_baseline_search_confirmation_v1`, commit
+  `bc46783`): `9/10` physical successes (90%), `0` timeouts, `0` safety aborts,
+  100% SEARCH entry and convergence. Single failure is stochastic final-descent
+  side-load where 2 shallow recovery attempts failed. Recovery mechanisms
+  exercised: pre-depth recenter (7/10), shallow side-load (5/10, 4/5 succeeded);
 
 Decision: the duplicate-controller startup/configuration fault and the
 non-default-cadence SEARCH hold-shortening bug are fixed. The INSERT handoff
@@ -290,9 +295,9 @@ have now been exercised in full DONE-reaching launches. The 500 Hz variant is
 useful diagnostic evidence and, after staged INSERT entry/capture plus bounded
 pre-depth recentering, now has a `5/5` physical-success repeat set. This is
 not final robust autonomous success. The next control blocker is
-exercising the implemented final/deep side-load retry path under the
-unchanged `0.0010 m` physical radial clearance and improving INSERT-phase
-side-load/no-contact drift robustness.
+replacing the `approach_offset_xy` validation aid with a production-safe
+uncertainty/search-entry strategy, then collecting meaningful robot-driven
+multi-phase data from full-task trials.
 
 Operational note: after generated tracked `build/`, `install/`, and `log`
 trees are restored, selected package build/install trees must be cleaned and
