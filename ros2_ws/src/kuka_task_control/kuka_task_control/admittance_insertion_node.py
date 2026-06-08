@@ -201,6 +201,7 @@ class AdmittanceInsertionNode(Node):
             self.INSERT_HANDOFF_TIMEOUT_S,
         )
         self.declare_parameter('approach_offset_xy', 0.0)
+        self.declare_parameter('search_entry_threshold_m', 0.0)
         self.declare_parameter('tracking_log_dir', '')
 
         self._contact_threshold: float = (
@@ -251,6 +252,10 @@ class AdmittanceInsertionNode(Node):
         self._approach_offset_xy: float = max(
             0.0,
             float(self.get_parameter('approach_offset_xy').value),
+        )
+        self._search_entry_threshold_m: float = max(
+            0.0,
+            float(self.get_parameter('search_entry_threshold_m').value),
         )
         self._tracking_log_dir: str = str(
             self.get_parameter('tracking_log_dir').value or ''
@@ -367,6 +372,7 @@ class AdmittanceInsertionNode(Node):
             f'control_rate={self._control_rate:.1f} Hz, '
             f'approach_speed={self._approach_speed:.3f}, '
             f'approach_offset_xy={self._approach_offset_xy:.4f} m, '
+            f'search_entry_threshold_m={self._search_entry_threshold_m:.4f} m, '
             f'trajectory_discovery_wait_s={self._trajectory_discovery_wait_s:.1f}, '
             f'expected_trajectory_subscribers={self._expected_trajectory_subscribers}, '
             f'exit_on_done={self._exit_on_done}, '
@@ -1096,7 +1102,7 @@ class AdmittanceInsertionNode(Node):
             f'Fz={self._get_fz():.1f}N  baseline={self._baseline_fz:.1f}N'
         )
         # Check XY alignment before insertion
-        if self._pre_insertion_xy_error > self.INSERT_FINAL_XY_TOLERANCE:
+        if self._pre_insertion_xy_error > self._search_entry_threshold_m:
             if current_pos[2] > self.INSERT_PRECONDITION_MAX_Z:
                 self._abort_reason = (
                     f'SEARCH blocked: peg_z {current_pos[2]:.4f}m is above '

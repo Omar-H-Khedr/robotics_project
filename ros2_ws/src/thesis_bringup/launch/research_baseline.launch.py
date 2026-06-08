@@ -620,6 +620,10 @@ def launch_setup(context, *args, **kwargs):
                     LaunchConfiguration("approach_offset_xy"),
                     value_type=float,
                 ),
+                "search_entry_threshold_m": ParameterValue(
+                    LaunchConfiguration("search_entry_threshold_m"),
+                    value_type=float,
+                ),
                 "use_sim_time": simulation["use_sim_time"],
             }
         ],
@@ -830,11 +834,23 @@ def generate_launch_description():
                 default_value="0.0",
                 description=(
                     "Lateral (X-axis) offset in metres applied to the "
-                    "APPROACH descent target. Forces the peg tip to land "
-                    "offset from the hole centre so that SEARCH is entered. "
-                    "Default 0.0 preserves canonical behaviour (SEARCH may "
-                    "be bypassed if tracking is accurate). A value of 0.003 "
-                    "is used for SEARCH-validation trials."
+                    "APPROACH descent target. Offsets the peg tip from the "
+                    "hole centre. Default 0.0 preserves canonical behaviour. "
+                    "A value of 0.003 may be used with "
+                    "search_entry_threshold_m=0.001 for legacy validation."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "search_entry_threshold_m",
+                default_value="0.0",
+                description=(
+                    "XY error threshold in metres that triggers SEARCH entry "
+                    "after APPROACH completes. When pre-insertion XY error "
+                    "exceeds this threshold, SEARCH is entered. Default 0.0 "
+                    "means SEARCH is always entered (production-safe: handles "
+                    "any positioning uncertainty). Set to 0.001 to only enter "
+                    "SEARCH when XY error exceeds the 1 mm physical clearance "
+                    "(legacy behaviour)."
                 ),
             ),
             DeclareLaunchArgument(
