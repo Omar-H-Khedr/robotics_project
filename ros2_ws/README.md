@@ -172,6 +172,24 @@ safety aborts, `0` side-load aborts. `100%` SEARCH entry, `100%` SEARCH
 convergence. No offset hack used. Insert depth `0.0196`-`0.0210` m, contact
 `44.6`-`63.6` N. This is the production-safe default configuration.
 
+### Multi-Phase Data Collection Pipeline (2026-06-08)
+
+First real robot-driven multi-phase data collected with the perception
+pipeline. Unlike all prior phase-labeled data (which used synthetic
+time-window proxy labels via `synthetic_phase_publisher`), the
+production-safe configuration produces genuine robot-driven phase
+transitions: `MOVING_TO_START -> APPROACH -> SEARCH -> INSERT -> RETREAT`.
+
+Verified pipeline:
+1. `multimodal_observation_logger` (v2_11): logs RGB-D, joint states, F/T,
+   and task phase labels at 20 Hz to `multimodal_observation_log.csv`.
+2. `context_vector_extractor` (v2_12): converts the multimodal CSV into
+   74-dimensional context vectors in Parquet format for v2_13/v2_14 training.
+
+Known limitation: the `ft_sensor_bridge` (ros_gz_bridge) crashes with
+SIGSEGV at startup, so F/T features in the context vector are zero. Joint
+positions, velocities, RGB, depth, and phase labels are all valid.
+
 Operational note: after restoring tracked generated directories, clean and
 rebuild selected package build/install trees before runtime. A stale tracked
 `install/thesis_bringup` launch file was observed to launch the older iisy3

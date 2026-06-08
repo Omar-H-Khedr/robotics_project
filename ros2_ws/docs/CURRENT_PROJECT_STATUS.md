@@ -257,6 +257,14 @@ handoff_timeout=12.0s, approach_offset_xy=0.003.
   This is validated SEARCH-entered simulation robustness, not final full
   autonomous peg-in-hole success.
 
+### Multi-Phase Data Collection Pipeline (2026-06-08)
+
+First real robot-driven multi-phase data collected with the perception
+pipeline. `multimodal_observation_logger` (v2_11) logs RGB-D + joint states +
+F/T + phase at 20 Hz. `context_vector_extractor` (v2_12) converts to 74-dim
+context vectors in Parquet for v2_13/v2_14 training. Known limitation:
+ft_sensor_bridge crashes with SIGSEGV at startup, so F/T features are zero.
+
 ## Evidence Reviewed
 
 - `README.md`
