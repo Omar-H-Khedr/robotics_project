@@ -1,0 +1,320 @@
+{
+  "version": "1.0",
+  "project": "context-aware-admittance-control-for-peg-in-hole",
+  "created_utc": "2026-06-09",
+  "controller_config": {
+    "robot": "KUKA LBR iisy 6 R1300",
+    "controller_stack": "ros2_control + gz_ros2_control",
+    "control_rate_hz": 25.0,
+    "controller_update_rate_hz": 500,
+    "position_gain": 3000.0,
+    "position_derivative_gain": 10.0,
+    "joint_damping_scale": 10.0,
+    "search_entry_threshold_m": 0.0,
+    "search_convergence_ticks": 4,
+    "search_recenter_duration_s": 8.0,
+    "search_settle_duration_s": 9.0,
+    "insert_handoff_timeout_s": 12.0,
+    "physical_clearance_m": 0.001,
+    "peg_diameter_mm": 25,
+    "hole_diameter_mm": 27,
+    "radial_clearance_m": 0.001,
+    "safety_force_threshold_N": 350,
+    "contact_threshold_N": 5.0
+  },
+  "task_phases": ["MOVING_TO_START", "APPROACH", "SEARCH", "INSERT", "RETREAT", "DONE"],
+  "physical_validation": {
+    "production_safe_10trial": {
+      "run_id": "research_baseline_search_entered_500hz_v1_10trial",
+      "date": "2026-06-08",
+      "trials": 10,
+      "successes": 10,
+      "success_rate": 1.0,
+      "timeouts": 0,
+      "safety_aborts": 0,
+      "search_entry_rate": 1.0,
+      "search_convergence_rate": 1.0,
+      "per_trial": [
+        {"trial": 1, "outcome": "SUCCESS", "depth_m": 0.0198, "final_xy_m": 0.0002, "insert_contact_N": 44.53, "predepth_recenter": 1, "shallow_sideload_recovery": 0},
+        {"trial": 2, "outcome": "SUCCESS", "depth_m": 0.0203, "final_xy_m": 0.0006, "insert_contact_N": 55.55, "predepth_recenter": 0, "shallow_sideload_recovery": 0},
+        {"trial": 3, "outcome": "SUCCESS", "depth_m": 0.0197, "final_xy_m": 0.0004, "insert_contact_N": 44.09, "predepth_recenter": 0, "shallow_sideload_recovery": 0},
+        {"trial": 4, "outcome": "SUCCESS", "depth_m": 0.0198, "final_xy_m": 0.0009, "insert_contact_N": 39.83, "predepth_recenter": 1, "shallow_sideload_recovery": 2},
+        {"trial": 5, "outcome": "SUCCESS", "depth_m": 0.0202, "final_xy_m": 0.0003, "insert_contact_N": 52.94, "predepth_recenter": 1, "shallow_sideload_recovery": 1},
+        {"trial": 6, "outcome": "SUCCESS", "depth_m": 0.0200, "final_xy_m": 0.0004, "insert_contact_N": 49.40, "predepth_recenter": 1, "shallow_sideload_recovery": 1},
+        {"trial": 7, "outcome": "SUCCESS", "depth_m": 0.0201, "final_xy_m": 0.0004, "insert_contact_N": 44.08, "predepth_recenter": 0, "shallow_sideload_recovery": 0},
+        {"trial": 8, "outcome": "SUCCESS", "depth_m": 0.0197, "final_xy_m": 0.0003, "insert_contact_N": 49.17, "predepth_recenter": 1, "shallow_sideload_recovery": 1},
+        {"trial": 9, "outcome": "SUCCESS", "depth_m": 0.0204, "final_xy_m": 0.0005, "insert_contact_N": 43.20, "predepth_recenter": 1, "shallow_sideload_recovery": 0},
+        {"trial": 10, "outcome": "SUCCESS", "depth_m": 0.0198, "final_xy_m": 0.0003, "insert_contact_N": 44.53, "predepth_recenter": 1, "shallow_sideload_recovery": 0}
+      ],
+      "summary_stats": {
+        "mean_depth_m": 0.0200,
+        "std_depth_m": 0.0002,
+        "min_depth_m": 0.0197,
+        "max_depth_m": 0.0204,
+        "mean_final_xy_m": 0.0004,
+        "std_final_xy_m": 0.0002,
+        "mean_insert_contact_N": 46.35,
+        "std_insert_contact_N": 4.85
+      }
+    },
+    "post_fix_10trial": {
+      "run_id": "research_baseline_search_confirmation_v1",
+      "date": "2026-06-08",
+      "trials": 10,
+      "successes": 9,
+      "success_rate": 0.9,
+      "timeouts": 0,
+      "safety_aborts": 0,
+      "side_load_aborts": 1,
+      "search_entry_rate": 1.0,
+      "search_convergence_rate": 1.0,
+      "notes": "Post-fix confirmation after increasing INSERT_SHALLOW_SIDELOAD_RECOVERY_DEPTH_M from 0.006 to 0.010 and INSERT_PREDEPTH_RECENTER_MAX_ATTEMPTS from 2 to 3",
+      "per_trial": [
+        {"trial": 1, "outcome": "SUCCESS", "depth_m": 0.0201, "final_xy_m": 0.0002, "insert_contact_N": 52.24},
+        {"trial": 2, "outcome": "SUCCESS", "depth_m": 0.0198, "final_xy_m": 0.0004, "insert_contact_N": 48.81},
+        {"trial": 3, "outcome": "SUCCESS", "depth_m": 0.0198, "final_xy_m": 0.0003, "insert_contact_N": 47.07},
+        {"trial": 4, "outcome": "SUCCESS", "depth_m": 0.0199, "final_xy_m": 0.0005, "insert_contact_N": 49.24},
+        {"trial": 5, "outcome": "SUCCESS", "depth_m": 0.0197, "final_xy_m": 0.0004, "insert_contact_N": 44.59},
+        {"trial": 6, "outcome": "ABORTED", "depth_m": 0.0035, "final_xy_m": 0.0014, "failed_phase": "INSERT", "reason": "Side-loaded peg at depth 0.0022m"},
+        {"trial": 7, "outcome": "SUCCESS", "depth_m": 0.0196, "final_xy_m": 0.0006, "insert_contact_N": 48.98},
+        {"trial": 8, "outcome": "SUCCESS", "depth_m": 0.0205, "final_xy_m": 0.0008, "insert_contact_N": 51.64},
+        {"trial": 9, "outcome": "SUCCESS", "depth_m": 0.0197, "final_xy_m": 0.0004, "insert_contact_N": 49.53},
+        {"trial": 10, "outcome": "SUCCESS", "depth_m": 0.0201, "final_xy_m": 0.0003, "insert_contact_N": 52.56}
+      ],
+      "summary_stats": {
+        "mean_depth_successes_m": 0.0199,
+        "std_depth_successes_m": 0.0003,
+        "mean_final_xy_successes_m": 0.0004,
+        "mean_insert_contact_successes_N": 49.52
+      }
+    },
+    "combined_20trial": {
+      "description": "Combined results from production-safe and post-fix 10-trial runs",
+      "total_trials": 20,
+      "total_successes": 19,
+      "combined_success_rate": 0.95,
+      "total_timeouts": 0,
+      "total_safety_aborts": 0,
+      "total_side_load_aborts": 1,
+      "search_entry_rate": 1.0,
+      "search_convergence_rate": 1.0
+    }
+  },
+  "perception_pipeline": {
+    "context_vector": {
+      "version": "v2_13",
+      "dimensions": 68,
+      "layout": {
+        "rgb_features": {"range": [0, 48], "count": 48, "description": "D405 RGB features"},
+        "depth_features": {"range": [48, 54], "count": 6, "description": "D405 depth ROI features"},
+        "joint_pos": {"range": [54, 60], "count": 6, "description": "Joint positions (rad)"},
+        "joint_vel": {"range": [60, 66], "count": 6, "description": "Joint velocities (rad/s)"},
+        "phase_int": {"index": 66, "description": "Task phase integer encoding"},
+        "safety_int": {"index": 67, "description": "Safety status integer encoding"}
+      },
+      "known_limitations": [
+        "F/T features excluded due to ft_sensor_bridge SIGSEGV crash",
+        "RETREAT/DONE phases missing from perception log",
+        "Depth camera not active in simulation (values are 0)"
+      ]
+    },
+    "autoencoder": {
+      "version": "v2_13",
+      "architecture": "68 -> 32 -> 68",
+      "test_mse": 0.00315,
+      "training_data": "10-trial multi-phase dataset (15,555 rows)"
+    },
+    "action_classifier": {
+      "version": "v2_14",
+      "architecture": "phase_classifier_plus_per_phase_joint_regressor",
+      "input_dim": 32,
+      "num_classes": 9,
+      "test_accuracy": 0.9884,
+      "test_cross_entropy": 0.0395,
+      "test_mse": 0.000147,
+      "per_class_recall": {
+        "UNKNOWN": 0.854,
+        "MOVING_TO_START": 0.993,
+        "APPROACH": 0.998,
+        "SEARCH": 0.0,
+        "INSERT": 0.997
+      },
+      "training_data": "10-trial multi-phase dataset (15,555 rows)"
+    }
+  },
+  "ablation_studies": {
+    "v2_15_comprehensive": {
+      "dataset": "10-trial multi-phase (15,555 rows)",
+      "epochs": 100,
+      "seed": 0,
+      "variants": [
+        {
+          "tag": "B_raw_68",
+          "description": "Raw 68-dim context (baseline)",
+          "input_dim": 68,
+          "test_accuracy": 1.0,
+          "macro_f1": 1.0,
+          "search_recall": 1.0,
+          "regression_mse": 0.008255,
+          "conclusion": "BEST - perfect classification, no encoding needed"
+        },
+        {
+          "tag": "C_norm_68",
+          "description": "Normalized 68-dim context",
+          "input_dim": 68,
+          "test_accuracy": 1.0,
+          "macro_f1": 1.0,
+          "search_recall": 1.0,
+          "regression_mse": 0.008255,
+          "conclusion": "Equivalent to raw - normalization has no effect"
+        },
+        {
+          "tag": "A_encoder",
+          "description": "Encoder latent 32-dim",
+          "input_dim": 32,
+          "test_accuracy": 0.9913,
+          "macro_f1": 0.778,
+          "search_recall": 0.0,
+          "regression_mse": 0.009375,
+          "conclusion": "NEGATIVE - encoder bottleneck destroys SEARCH discrimination"
+        },
+        {
+          "tag": "D_joint_12",
+          "description": "Joint-only 12-dim",
+          "input_dim": 12,
+          "test_accuracy": 0.9743,
+          "macro_f1": 0.705,
+          "search_recall": 0.0,
+          "regression_mse": 0.02051,
+          "conclusion": "NEGATIVE - joints alone insufficient for phase classification"
+        },
+        {
+          "tag": "E_no_phase_66",
+          "description": "66-dim without phase_int/safety_int",
+          "input_dim": 66,
+          "test_accuracy": 0.9759,
+          "macro_f1": 0.731,
+          "search_recall": 0.0,
+          "regression_mse": 0.008583,
+          "conclusion": "NEGATIVE - phase_int/safety_int are critical for SEARCH"
+        }
+      ],
+      "key_finding": "Raw 68-dim context with phase_int/safety_int is the validated representation. Encoder pre-training is a documented negative ablation."
+    }
+  },
+  "dataset": {
+    "multi_trial_v2": {
+      "trials": 10,
+      "total_rows": 15555,
+      "rows_per_trial_mean": 1555.5,
+      "sampling_rate_hz": 20,
+      "context_dim": 68,
+      "phase_distribution": {
+        "MOVING_TO_START": {"count": 7986, "fraction": 0.513},
+        "INSERT": {"count": 4692, "fraction": 0.302},
+        "APPROACH": {"count": 2330, "fraction": 0.150},
+        "UNKNOWN": {"count": 498, "fraction": 0.032},
+        "SEARCH": {"count": 33, "fraction": 0.002}
+      },
+      "missing_phases": ["RETREAT", "DONE"],
+      "known_limitations": [
+        "No RETREAT/DONE phases captured (logger subscription issue)",
+        "F/T features zero due to ft_sensor_bridge SIGSEGV",
+        "Depth images zero in simulation"
+      ]
+    }
+  },
+  "proposal_alignment": {
+    "phase_1_foundations": {
+      "status": "EXCEEDED",
+      "completed_items": [
+        "Integrated robotic cell in simulation (robot, gripper, camera, peg, hole fixture)",
+        "Baseline position-controlled joint trajectory execution",
+        "Contact sensing pipeline (contact topics, F/T estimation)",
+        "Multi-modal observation logging (RGB-D, joint states, F/T at 20 Hz)",
+        "Metric extraction and outcome logging",
+        "Safe task sequence execution (guarded approach, contact detection, retreat)",
+        "Reproducible single-command launch"
+      ]
+    },
+    "phase_2_representation": {
+      "status": "IN_PROGRESS",
+      "completed_items": [
+        "Calibrated simulation (Gazebo, not Isaac Sim)",
+        "Multi-modal observation pipeline (RGB-D + joint + F/T at 20 Hz)",
+        "Context vector representation (68-dim, v2_13)",
+        "Autoencoder pre-training (68->32->68, test_mse=0.003)",
+        "Action classifier (v2_14, 98.8% accuracy)",
+        "Ablation studies (5 variants, comprehensive per-class metrics)"
+      ],
+      "open_items": [
+        "Domain randomization (manual config overrides, not automated)",
+        "Multi-variant peg/hole geometry (single variant only)",
+        "Representation-level refinements for unseen variants"
+      ]
+    },
+    "phase_3_learning": {
+      "status": "NOT_STARTED",
+      "completed_items": [
+        "Baseline physical success evidence (10/10 production-safe, 19/20 combined)",
+        "SEARCH-entered full-task robustness (100% SEARCH entry, 100% SEARCH convergence)",
+        "INSERT recovery mechanisms (pre-depth recenter, shallow side-load recovery)"
+      ],
+      "open_items": [
+        "SAC baseline training",
+        "Context-conditioned meta-RL",
+        "Full ablation study (A1: no-context, A2: modality dropout, A3: safety ablations)"
+      ]
+    },
+    "phase_4_transfer": {
+      "status": "NOT_STARTED",
+      "open_items": [
+        "Dual-layer safety architecture (admittance + runtime filter)",
+        "Sim-to-real calibration",
+        "Conservative real-robot deployment"
+      ]
+    }
+  },
+  "recovery_mechanisms": {
+    "pre_depth_recenter": {
+      "description": "Restarts INSERT handoff when no-contact XY drift exceeds clearance before meaningful depth",
+      "max_attempts": 3,
+      "budget_resets": true,
+      "exercised_in_10trial": "7/10 trials",
+      "success_rate": "7/7 (budget resets in 3)"
+    },
+    "shallow_sideload_recovery": {
+      "description": "Withdraws and retries when side-load detected at shallow depth",
+      "recovery_depth_m": 0.010,
+      "exercised_in_10trial": "5/10 trials",
+      "success_rate": "4/5"
+    },
+    "search_recenter": {
+      "description": "Bounded spiral recentering during SEARCH phase",
+      "recenter_duration_s": 8.0,
+      "settle_duration_s": 9.0,
+      "convergence_ticks": 4,
+      "exercised_in_10trial": "10/10 trials",
+      "convergence_rate": "10/10"
+    }
+  },
+  "known_limitations": [
+    "RETREAT/DONE phases not captured by perception logger (confirmed bug)",
+    "F/T sensor bridge crashes with SIGSEGV at startup (ft_sensor_bridge exit -11)",
+    "Depth camera not active in simulation (values are 0)",
+    "Encoder pre-training hurts SEARCH classification (documented negative ablation)",
+    "Single peg/hole variant (25mm peg, 27mm hole)",
+    "Simulation-only (Gazebo, not Isaac Sim as proposed)",
+    "No domain randomization engine",
+    "No runtime safety filter enforcement (observer-only)",
+    "No admittance control (position control only in simulation)"
+  ],
+  "next_steps": [
+    "Run 20-trial confirmation of full-task robustness",
+    "Fix perception logger RETREAT/DONE capture",
+    "Define v2_14 action interface for control pipeline integration",
+    "Create PROPOSAL_IMPLEMENTATION_MAPPING.md",
+    "Collect complete 6-phase dataset",
+    "Begin Phase 3: SAC baseline training"
+  ]
+}

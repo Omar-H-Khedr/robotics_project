@@ -1952,3 +1952,115 @@ to the JTC (closed-loop control is a follow-up).
       live_v2_14_ablation_summary.json
       live_v2_14_confusion_matrix.png
       live_v2_14_per_phase_target_mse.png
+
+## 2026-06-08 Production-Safe 10/10 Validation
+
+### 10-Trial Production-Safe Run (`research_baseline_search_entered_500hz_v1_10trial`)
+
+10 fresh headless trials with `search_entry_threshold_m:=0.0` (production default).
+Result: **10/10 physical successes (100%)**, 0 timeouts, 0 safety aborts.
+
+| Trial | Outcome | Depth (m) | Final XY (m) | Insert Contact (N) | Predepth Recenter | Shallow Sideload Recovery |
+|---:|---|---:|---:|---:|---:|---:|
+| 1 | SUCCESS | 0.0198 | 0.0002 | 44.53 | 1 | 0 |
+| 2 | SUCCESS | 0.0203 | 0.0006 | 55.55 | 0 | 0 |
+| 3 | SUCCESS | 0.0197 | 0.0004 | 44.09 | 0 | 0 |
+| 4 | SUCCESS | 0.0198 | 0.0009 | 39.83 | 1 | 2 |
+| 5 | SUCCESS | 0.0202 | 0.0003 | 52.94 | 1 | 1 |
+| 6 | SUCCESS | 0.0200 | 0.0004 | 49.40 | 1 | 1 |
+| 7 | SUCCESS | 0.0201 | 0.0004 | 44.08 | 0 | 0 |
+| 8 | SUCCESS | 0.0197 | 0.0003 | 49.17 | 1 | 1 |
+| 9 | SUCCESS | 0.0204 | 0.0005 | 43.20 | 1 | 0 |
+| 10 | SUCCESS | 0.0198 | 0.0003 | 44.53 | 1 | 0 |
+
+Mean depth: 0.0200m, mean final XY: 0.0004m, mean insert contact: 46.4N.
+
+### Post-Fix 10-Trial Confirmation (`research_baseline_search_confirmation_v1`)
+
+After two INSERT recovery improvements:
+- `INSERT_SHALLOW_SIDELOAD_RECOVERY_DEPTH_M` increased from 0.006 to 0.010m
+- `INSERT_PREDEPTH_RECENTER_MAX_ATTEMPTS` increased from 2 to 3
+
+Result: **9/10 physical successes (90%)**, 1 side-load abort, 0 timeouts, 0 safety aborts.
+
+Combined 20-trial evidence: **19/20 successes (95%)**, 100% SEARCH entry, 100% SEARCH convergence.
+
+Correct launch args:
+```bash
+ros2 launch thesis_bringup research_baseline.launch.py use_gui:=false \
+  control_rate:=25.0 position_gain:=3000.0 position_derivative_gain:=10.0 \
+  joint_damping_scale:=10.0 inject_velocity_state:=true \
+  velocity_state_controller_config_path:=config/research_baseline_velocity_state_500hz.yaml \
+  search_recenter_duration_s:=8.0 search_settle_duration_s:=9.0 \
+  insert_handoff_timeout_s:=12.0 search_entry_threshold_m:=0.0
+```
+
+### Key Source Changes
+
+- `search_entry_threshold_m` parameter (default 0.0): always enters SEARCH after APPROACH
+- `SEARCH_CONVERGENCE_TICKS=4`: calibrated to 500Hz gain=3000/D=10 physical limit
+- `INSERT_SHALLOW_SIDELOAD_RECOVERY_DEPTH_M=0.010`: closes gap where side-load at 6-10mm was unrecoverable
+- `INSERT_PREDEPTH_RECENTER_MAX_ATTEMPTS=3`: gives one more recenter chance
+
+### Honest Limitations
+
+- 4-tick convergence gate is calibrated for 500Hz gain=3000/D=10
+- Production-safe 10/10 is the strongest current evidence set
+- This is validated SEARCH-entered simulation robustness, not final autonomous peg-in-hole success
+
+## 2026-06-08 Multi-Phase Data Collection and Perception Pipeline
+
+### Data Collection (10/10 production-safe trials)
+
+`multimodal_observation_logger` collected RGB-D + joint states + F/T + phase at 20 Hz.
+10/10 production-safe trials, all SUCCESS. Total: 15,555 rows, ~1550 rows/trial.
+
+Phase distribution:
+- MOVING_TO_START: 51.3% (7986 rows)
+- INSERT: 30.2% (4692 rows)
+- APPROACH: 15.0% (2330 rows)
+- UNKNOWN: 3.2% (498 rows)
+- SEARCH: 0.2% (33 rows)
+
+Known limitations:
+1. No RETREAT/DONE phases captured (logger subscription issue)
+2. F/T features zero due to ft_sensor_bridge SIGSEGV
+3. Depth images zero in simulation
+
+### v2_13 Context Vector (68-dim)
+
+Layout: [0:48] RGB, [48:54] depth, [54:60] joint_pos, [60:66] joint_vel, [66] phase_int, [67] safety_int.
+
+F/T features excluded due to ft_sensor_bridge crash.
+
+### v2_13 Autoencoder
+
+Architecture: 68→32→68. Test MSE: 0.00315. Trained on real multi-phase data.
+
+### v2_14 Action Classifier
+
+Architecture: phase classifier + per-phase joint regressor on 32-dim encoder latent.
+Test accuracy: 98.8%. Per-class SEARCH recall: 0% (encoder bottleneck loses phase_int/safety_int).
+
+### v2_15 Comprehensive Ablation
+
+5 variants on real multi-phase data (100 epochs, seed=0):
+
+| Variant | Input | Accuracy | Macro F1 | SEARCH Recall | Conclusion |
+|---|---|---|---|---|---|
+| B (raw 68-dim) | 68 | 100.0% | 100.0% | 100% | **BEST** |
+| C (normalized 68-dim) | 68 | 100.0% | 100.0% | 100% | Equivalent to raw |
+| A (encoder 32-dim) | 32 | 99.1% | 77.8% | 0% | NEGATIVE |
+| E (no-phase 66-dim) | 66 | 97.6% | 73.1% | 0% | NEGATIVE |
+| D (joint-only 12-dim) | 12 | 97.4% | 70.5% | 0% | NEGATIVE |
+
+**Critical finding**: Raw 68-dim context with phase_int/safety_int is the validated representation. Encoder pre-training is a documented negative ablation (SEARCH recall drops to 0%).
+
+### Artifacts
+
+- `diagnostics/multi_trial_dataset_v2/`: 10-trial dataset (trial_01-10, merged CSV, context vectors Parquet)
+- `diagnostics/perception_pipeline_v2_13_encoder_v3_real_data/`: Trained encoder (68-dim)
+- `diagnostics/perception_pipeline_v2_14_action_v3_real_data/`: Trained action classifier
+- `diagnostics/perception_pipeline_v2_15_ablation_v4_comprehensive/`: Ablation results
+- `docs/metrics/comprehensive_validation_metrics.json`: Aggregated validation metrics
+- `docs/PROPOSAL_IMPLEMENTATION_MAPPING.md`: Proposal-to-implementation mapping

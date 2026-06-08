@@ -299,6 +299,39 @@ replacing the `approach_offset_xy` validation aid with a production-safe
 uncertainty/search-entry strategy, then collecting meaningful robot-driven
 multi-phase data from full-task trials.
 
+### Production-Safe 10/10 Validation (2026-06-08)
+
+The `search_entry_threshold_m` parameter (default 0.0) now guarantees SEARCH
+entry after APPROACH regardless of tracking accuracy. This replaces the
+`approach_offset_xy` hack.
+
+10 fresh headless trials: **10/10 physical successes (100%)**, 0 timeouts,
+0 safety aborts. 100% SEARCH entry, 100% SEARCH convergence.
+Mean depth: 0.0200m, mean final XY: 0.0004m.
+
+Post-fix 10-trial confirmation (after increasing
+`INSERT_SHALLOW_SIDELOAD_RECOVERY_DEPTH_M` to 0.010m and
+`INSERT_PREDEPTH_RECENTER_MAX_ATTEMPTS` to 3): **9/10 successes (90%)**.
+
+Combined 20-trial evidence: **19/20 successes (95%)**.
+
+### Multi-Phase Data Collection and Perception Pipeline
+
+10/10 production-safe trials collected with multimodal observation logging.
+15,555 total data rows at 20 Hz. 68-dim context vectors (v2_13) extracted.
+
+v2_13 autoencoder: 68→32→68, test_mse=0.003.
+v2_14 action classifier: 98.8% test accuracy on 5-phase classification.
+v2_15 comprehensive ablation: raw 68-dim context achieves 100% accuracy
+with 100% SEARCH recall. Encoder pre-training hurts (SEARCH recall drops
+to 0%). See `docs/metrics/comprehensive_validation_metrics.json` and
+`docs/PROPOSAL_IMPLEMENTATION_MAPPING.md`.
+
+Known limitations:
+- RETREAT/DONE phases not captured by perception logger
+- F/T sensor bridge crashes with SIGSEGV (wrench features are zero)
+- Encoder bottleneck destroys SEARCH discrimination
+
 Operational note: after generated tracked `build/`, `install/`, and `log`
 trees are restored, selected package build/install trees must be cleaned and
 rebuilt before runtime validation. A stale tracked `install/thesis_bringup`

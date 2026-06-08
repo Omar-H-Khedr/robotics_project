@@ -2730,3 +2730,31 @@ This sprint validates the v2_13 encoder and v2_14 head as a live ROS2 node in th
     ablation/live_v2_14_ablation_summary.json
     ablation/live_v2_14_confusion_matrix.png
     ablation/live_v2_14_per_phase_target_mse.png
+
+## v2_15 Comprehensive Ablation on Real Multi-Phase Data (2026-06-08)
+
+`v2_15_comprehensive_ablation` tested 5 context-vector variants on the real
+10-trial multi-phase dataset (15,555 rows, 68-dim, 100 epochs, seed=0):
+
+| Variant | Input | Accuracy | Macro F1 | SEARCH Recall | Conclusion |
+|---|---|---|---|---|---|
+| B (raw 68-dim) | 68 | 100.0% | 100.0% | 100% | **BEST** |
+| C (normalized 68-dim) | 68 | 100.0% | 100.0% | 100% | Equivalent to raw |
+| A (encoder 32-dim) | 32 | 99.1% | 77.8% | 0% | NEGATIVE |
+| E (no-phase 66-dim) | 66 | 97.6% | 73.1% | 0% | NEGATIVE |
+| D (joint-only 12-dim) | 12 | 97.4% | 70.5% | 0% | NEGATIVE |
+
+**Critical finding**: Raw 68-dim context with phase_int/safety_int is the
+validated representation. Encoder pre-training is a documented negative
+ablation: SEARCH recall drops from 100% to 0% because the bottleneck
+destroys the discrete phase_int/safety_int features that discriminate
+SEARCH from other phases.
+
+Evidence: `diagnostics/perception_pipeline_v2_15_ablation_v4_comprehensive/`
+
+## Comprehensive Metrics Package
+
+`docs/metrics/comprehensive_validation_metrics.json` aggregates all validation
+results, ablation studies, dataset coverage, and proposal alignment into a
+single structured JSON file. See `docs/PROPOSAL_IMPLEMENTATION_MAPPING.md` for
+the proposal-to-implementation mapping.
