@@ -190,6 +190,14 @@ Known limitation: the `ft_sensor_bridge` (ros_gz_bridge) crashes with
 SIGSEGV at startup, so F/T features in the context vector are zero. Joint
 positions, velocities, RGB, depth, and phase labels are all valid.
 
+### 10-Trial Multi-Phase Dataset (2026-06-08)
+
+Collected 10/10 production-safe trials with perception logging. All trials
+completed successfully with real robot-driven phase transitions through
+MOVING_TO_START -> APPROACH -> SEARCH -> INSERT. 15,555 total data rows
+(~1550 per trial) at 20 Hz. Merged CSV and 68-dim context vectors
+(v2_13) in Parquet format are in `diagnostics/multi_trial_dataset_v2/`.
+
 Operational note: after restoring tracked generated directories, clean and
 rebuild selected package build/install trees before runtime. A stale tracked
 `install/thesis_bringup` launch file was observed to launch the older iisy3
