@@ -178,6 +178,28 @@
       "test_mse": 0.002673,
       "training_data": "6-phase multi-trial dataset (22,070 rows after filtering)",
       "note": "Lower accuracy than v2_14_v3 (98.8%) because encoder bottleneck destroys RETREAT/DONE discrimination. Raw 68-dim achieves 99.91%."
+    },
+    "raw_safety_gated_classifier": {
+      "version": "v2_14_raw_safety_gated_v4",
+      "architecture": "RawContextClassifier: 68 -> 128 -> 128 -> 7 with ReLU + Dropout(0.2)",
+      "input_dim": 68,
+      "num_classes": 7,
+      "test_accuracy": 0.9998,
+      "training_data": "6-phase multi-trial dataset (22,070 rows after filtering)",
+      "confidence_threshold": 0.85,
+      "fallback_rate": 0.622,
+      "ml_decision_rate": 0.378,
+      "safety_rules": [
+        "INSERT phase always defers to deterministic controller",
+        "Safety-critical phases (SEARCH/INSERT/RETREAT/DONE) fallback if margin < 0.3",
+        "Any phase with confidence < 0.85 falls back",
+        "ML never overrides safety gates"
+      ],
+      "per_class_f1": {
+        "UNKNOWN": 1.0, "MOVING_TO_START": 1.0, "APPROACH": 1.0,
+        "SEARCH": 1.0, "INSERT": 1.0, "RETREAT": 0.998, "DONE": 0.996
+      },
+      "model_path": "diagnostics/v2_14_raw_safety_gated_v4/raw_context_classifier.pt"
     }
   },
   "ablation_studies": {
