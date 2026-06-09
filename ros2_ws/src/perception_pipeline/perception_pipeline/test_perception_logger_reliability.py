@@ -20,16 +20,29 @@ from pathlib import Path
 OUTCOME_PATH = Path("/tmp/insertion_trial_outcome.json")
 TEST_OUTPUT_DIR = Path("diagnostics/perception_logger_reliability_test_v1")
 TIMEOUT_S = 600.0
-DDS_SHM_GLOB = "/dev/shm/fastrtps_*"
+DDS_SHM_GLOBS = ["/dev/shm/fastrtps_*", "/dev/shm/sem.fastrtps_*"]
 
 
 def cleanup_dds_shm() -> None:
-    import glob
-    for p in glob.glob(DDS_SHM_GLOB):
-        try:
-            os.unlink(p)
-        except OSError:
-            pass
+    import glob as glob_mod
+    for pattern in DDS_SHM_GLOBS:
+        for p in glob_mod.glob(pattern):
+            try:
+                os.unlink(p)
+            except OSError:
+                pass
+
+
+def kill_all_ros_nodes() -> None:
+    for name in (
+        "safety_monitor", "data_logger_node", "trajectory_tracking_observer",
+        "wrench_state_observer", "contact_state_observer",
+        "multimodal_observation_logger", "admittance_insertion_node",
+    ):
+        subprocess.Popen(
+            ["pkill", "-9", "-f", name],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
 
 
 def kill_gazebo_residue() -> None:
@@ -38,7 +51,8 @@ def kill_gazebo_residue() -> None:
             ["pkill", "-9", "-f", name],
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         )
-    time.sleep(2.0)
+    kill_all_ros_nodes()
+    time.sleep(3.0)
 
 
 def terminate(process: subprocess.Popen) -> None:
@@ -174,11 +188,16 @@ def main() -> None:
     TEST_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     trials = 10
     results = []
+
+    kill_gazebo_residue()
+    cleanup_dds_shm()
+    time.sleep(5.0)
+
     for trial in range(1, trials + 1):
         if trial > 1:
             kill_gazebo_residue()
             cleanup_dds_shm()
-            time.sleep(8.0)
+            time.sleep(12.0)
         print(f"\n=== Trial {trial}/{trials} ===", flush=True)
         result = run_trial(trial, TEST_OUTPUT_DIR)
         results.append(result)

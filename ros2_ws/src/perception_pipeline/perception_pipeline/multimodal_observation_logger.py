@@ -251,6 +251,7 @@ class MultimodalObservationLogger(Node):
         now = time.time()
         if self._first_tick_s is None:
             self._first_tick_s = now
+            self._write_diagnostic_json()
         self._last_tick_s = now
         pos = list(js.position[:6]) + [0.0] * (6 - len(js.position[:6]))
         vel = list(js.velocity[:6]) if js.velocity else [0.0] * 6
