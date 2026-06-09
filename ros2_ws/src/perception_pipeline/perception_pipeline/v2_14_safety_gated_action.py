@@ -29,8 +29,11 @@ try:
     import torch
     import torch.nn as nn
     from torch.utils.data import DataLoader, TensorDataset
-except ImportError:
+except Exception as _e:
+    import sys
+    print(f"WARNING: torch import failed: {_e}", file=sys.stderr)
     torch = None
+    nn = None
 
 CONTEXT_DIM = 68
 NUM_CLASSES = 7
@@ -66,24 +69,28 @@ class ActionCommand:
         return asdict(self)
 
 
-class RawContextClassifier(nn.Module):
-    """Raw 68-dim input classifier for all 7 phases."""
+if nn is not None:
+    class RawContextClassifier(nn.Module):
+        """Raw 68-dim input classifier for all 7 phases."""
 
-    def __init__(self, input_dim: int = CONTEXT_DIM, hidden: int = 128,
-                 num_classes: int = NUM_CLASSES, dropout: float = 0.2):
-        super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(input_dim, hidden),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden, hidden),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden, num_classes),
-        )
+        def __init__(self, input_dim: int = CONTEXT_DIM, hidden: int = 128,
+                     num_classes: int = NUM_CLASSES, dropout: float = 0.2):
+            super().__init__()
+            self.net = nn.Sequential(
+                nn.Linear(input_dim, hidden),
+                nn.ReLU(),
+                nn.Dropout(dropout),
+                nn.Linear(hidden, hidden),
+                nn.ReLU(),
+                nn.Dropout(dropout),
+                nn.Linear(hidden, num_classes),
+            )
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.net(x)
+        def forward(self, x: torch.Tensor) -> torch.Tensor:
+            return self.net(x)
+else:
+    class RawContextClassifier:
+        pass
 
 
 class SafetyGatedActionInterface:

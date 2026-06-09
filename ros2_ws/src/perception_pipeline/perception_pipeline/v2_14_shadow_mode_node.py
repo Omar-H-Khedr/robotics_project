@@ -85,15 +85,25 @@ class V2_14ShadowModeNode(Node):
         self.declare_parameter("task_phase_topic", "/task_phase")
         self.declare_parameter("safety_status_topic", "/safety_status")
 
-        model_path = Path(str(self.get_parameter("model_path").value))
-        self.get_logger().info(f"Loading v2_14 model from {model_path}")
+        model_path = Path(str(self.get_parameter("model_path").value)).expanduser()
+        if not model_path.is_absolute():
+            model_path = Path.cwd() / model_path
+        model_path = model_path.resolve()
+        self.get_logger().info(f"Loading v2_14 model from {model_path} (exists={model_path.exists()})")
 
-        self._interface = SafetyGatedActionInterface(
-            model_path=str(model_path),
-            confidence_threshold=float(
-                self.get_parameter("confidence_threshold").value
-            ),
-        )
+        try:
+            self._interface = SafetyGatedActionInterface(
+                model_path=str(model_path),
+                confidence_threshold=float(
+                    self.get_parameter("confidence_threshold").value
+                ),
+            )
+            self.get_logger().info(
+                f"v2_14 model loaded: {self._interface._model is not None}"
+            )
+        except Exception as exc:
+            self.get_logger().error(f"Failed to load v2_14 model: {exc}")
+            self._interface = SafetyGatedActionInterface(model_path=None)
 
         output_dir = Path(str(self.get_parameter("output_dir").value))
         output_dir.mkdir(parents=True, exist_ok=True)

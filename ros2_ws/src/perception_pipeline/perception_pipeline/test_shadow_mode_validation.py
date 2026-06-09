@@ -132,6 +132,7 @@ def run_trial(trial: int, output_dir: Path) -> dict:
         "exit_on_done:=true", "shutdown_on_task_exit:=true",
         "enable_v2_14_shadow_mode:=true",
         f"v2_14_shadow_output_dir:={str(shadow_dir)}",
+        f"v2_14_shadow_model_path:={str(Path.cwd() / 'diagnostics/v2_14_raw_safety_gated_v4/raw_context_classifier.pt')}",
     ]
 
     start = time.monotonic()
