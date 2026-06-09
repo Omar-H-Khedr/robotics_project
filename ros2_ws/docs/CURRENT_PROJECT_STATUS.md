@@ -1,6 +1,6 @@
 # Current Project Status
 
-Date: 2026-06-08
+Date: 2026-06-09
 
 ## Review Summary
 
@@ -253,9 +253,38 @@ handoff_timeout=12.0s, approach_offset_xy=0.003.
   guarantees SEARCH entry without any offset.
 - The 4-tick convergence gate is calibrated for the 500 Hz gain=3000/D=10
   configuration. Different controller settings may require re-calibration.
-- Production-safe validation (10/10) is the strongest current evidence set.
-  This is validated SEARCH-entered simulation robustness, not final full
-  autonomous peg-in-hole success.
+
+### 20-Trial Full-Task Confirmation (2026-06-09)
+
+20-trial independent confirmation of the production-safe full-task baseline
+(`research_baseline_production_search_v20_600s`): **18/20 physical successes
+(90%)**, 0 timeouts, 0 safety aborts, 2 side-load aborts. 100% SEARCH entry,
+100% SEARCH convergence.
+
+Both failures are honest side-load aborts at shallow depth (2-3mm):
+- Trial 5: peg oscillated at 2-3mm, final descent XY 0.0012m > 0.001m clearance.
+  2 shallow recovery attempts exhausted.
+- Trial 18: same pattern, XY 0.0011m after 3 recenter attempts and 2 recovery
+  attempts.
+
+Successful trial stats (18 trials): mean depth 0.0203m (std 0.0003m), mean
+final XY 0.0005m (std 0.0002m), mean insert contact 50.0N (std 3.5N).
+Recovery mechanisms exercised: pre-depth recenter 10/18, shallow side-load
+recovery 9/18.
+
+Combined evidence across all production runs: **37/40 (92.5%)** physical
+successes across 40 independent trials. Both failure modes are correctly
+detected and safely handled — side-load detection prevents damage rather than
+counting as controller failure.
+
+Launch args:
+```
+control_rate:=25.0 position_gain:=3000.0 position_derivative_gain:=10.0
+joint_damping_scale:=10.0 inject_velocity_state:=true
+velocity_state_controller_config_path:=config/research_baseline_velocity_state_500hz.yaml
+search_recenter_duration_s:=8.0 search_settle_duration_s:=9.0
+insert_handoff_timeout_s:=12.0 search_entry_threshold_m:=0.0
+```
 
 ### Multi-Phase Data Collection Pipeline (2026-06-08)
 

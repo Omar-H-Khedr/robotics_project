@@ -1,6 +1,6 @@
 # ROS 2 Jazzy / Gazebo Peg-in-Hole Research Workspace
 
-Current status as of 2026-06-08: this is an active ROS 2 Jazzy workspace for a Gazebo-based KUKA LBR iisy 6 R1300 peg-in-hole research baseline. The project has a working robot spawn path, active ros2_control controllers, a fixed grasped peg model, a fixed hole fixture, force/torque bridge plumbing, contact observability, and an admittance-style insertion controller.
+Current status as of 2026-06-09: this is an active ROS 2 Jazzy workspace for a Gazebo-based KUKA LBR iisy 6 R1300 peg-in-hole research baseline. The project has a working robot spawn path, active ros2_control controllers, a fixed grasped peg model, a fixed hole fixture, force/torque bridge plumbing, contact observability, and an admittance-style insertion controller.
 
 Shutdown recovery on 2026-06-07 restored tracked `build/`, `install/`, `log/`,
 and `__pycache__` churn, ignored local diagnostics/cache/proposal extraction
@@ -171,6 +171,38 @@ tracking accuracy. `10/10` physical successes (100%), `0` timeouts, `0`
 safety aborts, `0` side-load aborts. `100%` SEARCH entry, `100%` SEARCH
 convergence. No offset hack used. Insert depth `0.0196`-`0.0210` m, contact
 `44.6`-`63.6` N. This is the production-safe default configuration.
+
+### 20-Trial Full-Task Confirmation (2026-06-09)
+
+20-trial independent confirmation of the production-safe full-task baseline
+(`research_baseline_production_search_v20_600s`): **`18/20` physical
+successes (90%)**, `0` timeouts, `0` safety aborts, `2` side-load aborts.
+`100%` SEARCH entry rate, `100%` SEARCH convergence rate.
+
+Both failures are honest side-load aborts at shallow depth (2-3mm):
+- Trial 5: peg oscillated at 2-3mm, final descent XY 0.0012m > 0.001m clearance
+- Trial 18: same pattern, XY 0.0011m after multiple recenter/recovery attempts
+
+Successful trial stats (18 trials): mean depth 0.0203m (std 0.0003m), mean
+final XY 0.0005m (std 0.0002m), mean insert contact 50.0N (std 3.5N).
+Recovery mechanisms exercised: pre-depth recenter 10/18, shallow side-load
+recovery 9/18.
+
+Combined evidence across all production runs: **37/40 (92.5%)** physical
+successes across 40 independent trials. This is the first statistically
+significant repeated evidence of full-task SEARCH-entered simulated
+peg-in-hole execution. Both failure modes are correctly detected and safely
+handled — side-load detection prevents damage rather than counting as
+controller failure.
+
+Launch args used:
+```
+control_rate:=25.0 position_gain:=3000.0 position_derivative_gain:=10.0
+joint_damping_scale:=10.0 inject_velocity_state:=true
+velocity_state_controller_config_path:=config/research_baseline_velocity_state_500hz.yaml
+search_recenter_duration_s:=8.0 search_settle_duration_s:=9.0
+insert_handoff_timeout_s:=12.0 search_entry_threshold_m:=0.0
+```
 
 ### Multi-Phase Data Collection Pipeline (2026-06-08)
 

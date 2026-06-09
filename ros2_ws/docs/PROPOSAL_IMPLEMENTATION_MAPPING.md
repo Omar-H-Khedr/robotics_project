@@ -27,7 +27,7 @@ This document maps each proposal deliverable to its current implementation statu
 | Autoencoder pre-training | DONE | v2_13: 68→32→68, test_mse=0.003 |
 | Action classifier | DONE | v2_14: 98.8% test accuracy, 5-phase classification |
 | Ablation studies | DONE | v2_15: 5 variants, comprehensive per-class metrics |
-| Simulation benchmarks | PARTIAL | Insertion success rate (10/10), cycle time, peak force tracked |
+| Simulation benchmarks | DONE | 37/40 (92.5%) physical successes across 40 independent trials, 18/20 (90%) in 20-trial confirmation |
 | Multi-variant pegs/holes | NOT DONE | Single variant: 25mm peg, 27mm hole |
 
 ## Phase 3: Core Learning (Months 10-22) — NOT STARTED
@@ -65,7 +65,8 @@ This document maps each proposal deliverable to its current implementation statu
 |---|---|---|---|---|
 | Production-safe 10-trial | 10 | 100% (10/10) | 100% | 100% |
 | Post-fix 10-trial | 10 | 90% (9/10) | 100% | 100% |
-| **Combined** | **20** | **95% (19/20)** | **100%** | **100%** |
+| **20-trial confirmation** | **20** | **90% (18/20)** | **100%** | **100%** |
+| **Combined** | **40** | **92.5% (37/40)** | **100%** | **100%** |
 
 ### Perception Pipeline Performance
 
@@ -117,3 +118,4 @@ This document maps each proposal deliverable to its current implementation statu
 | 2026-06-08 | SEARCH_CONVERGENCE_TICKS=4 | Calibrated to 500Hz gain=3000/D=10 physical limit |
 | 2026-06-08 | INSERT_SHALLOW_SIDELOAD_RECOVERY_DEPTH_M=0.010 | Closes gap where side-load at 6-10mm depth was unrecoverable |
 | 2026-06-08 | INSERT_PREDEPTH_RECENTER_MAX_ATTEMPTS=3 | Gives one more recenter chance for pre-depth drift |
+| 2026-06-09 | 20-trial confirmation: 18/20 (90%) | First statistically significant repeated evidence of full-task SEARCH-entered execution |

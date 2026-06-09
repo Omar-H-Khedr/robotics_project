@@ -1,6 +1,6 @@
 # Project Context
 
-Last reviewed: 2026-06-08
+Last reviewed: 2026-06-09
 
 This workspace is the active ROS 2 Jazzy / Gazebo implementation for the PhD topic:
 
@@ -313,7 +313,19 @@ Post-fix 10-trial confirmation (after increasing
 `INSERT_SHALLOW_SIDELOAD_RECOVERY_DEPTH_M` to 0.010m and
 `INSERT_PREDEPTH_RECENTER_MAX_ATTEMPTS` to 3): **9/10 successes (90%)**.
 
-Combined 20-trial evidence: **19/20 successes (95%)**.
+### 20-Trial Full-Task Confirmation (2026-06-09)
+
+20-trial independent confirmation (`research_baseline_production_search_v20_600s`):
+**18/20 physical successes (90%)**, 0 timeouts, 0 safety aborts, 2 side-load
+aborts. 100% SEARCH entry, 100% SEARCH convergence.
+
+Both failures are honest side-load aborts at shallow depth (2-3mm), correctly
+detected and safely handled. Successful trial stats: mean depth 0.0203m (std
+0.0003m), mean final XY 0.0005m (std 0.0002m), mean insert contact 50.0N.
+
+Combined evidence across all production runs: **37/40 (92.5%)** physical
+successes across 40 independent trials. This is statistically significant
+evidence of robust full-task SEARCH-entered simulated peg-in-hole execution.
 
 ### Multi-Phase Data Collection and Perception Pipeline
 

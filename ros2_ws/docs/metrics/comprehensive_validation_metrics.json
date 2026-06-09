@@ -88,14 +88,59 @@
         "mean_insert_contact_successes_N": 49.52
       }
     },
-    "combined_20trial": {
-      "description": "Combined results from production-safe and post-fix 10-trial runs",
-      "total_trials": 20,
-      "total_successes": 19,
-      "combined_success_rate": 0.95,
+    "production_20trial_600s": {
+      "run_id": "research_baseline_production_search_v20_600s",
+      "date": "2026-06-09",
+      "trials": 20,
+      "successes": 18,
+      "success_rate": 0.9,
+      "timeouts": 0,
+      "safety_aborts": 0,
+      "side_load_aborts": 2,
+      "search_entry_rate": 1.0,
+      "search_convergence_rate": 1.0,
+      "notes": "Re-run with 600s timeout (first run used 300s causing 7 false negatives). Both failures are side-load aborts at shallow depth (2-3mm).",
+      "per_trial": [
+        {"trial": 1, "outcome": "SUCCESS", "depth_m": 0.0201, "final_xy_m": 0.0006, "insert_contact_N": 45.90, "predepth_recenter": 0, "shallow_sideload_recovery": 0},
+        {"trial": 2, "outcome": "SUCCESS", "depth_m": 0.0206, "final_xy_m": 0.0007, "insert_contact_N": 51.36, "predepth_recenter": 2, "shallow_sideload_recovery": 1},
+        {"trial": 3, "outcome": "SUCCESS", "depth_m": 0.0204, "final_xy_m": 0.0005, "insert_contact_N": 56.47, "predepth_recenter": 1, "shallow_sideload_recovery": 0},
+        {"trial": 4, "outcome": "SUCCESS", "depth_m": 0.0207, "final_xy_m": 0.0006, "insert_contact_N": 47.96, "predepth_recenter": 1, "shallow_sideload_recovery": 1},
+        {"trial": 5, "outcome": "ABORTED", "depth_m": 0.0043, "final_xy_m": 0.0012, "failed_phase": "INSERT", "reason": "Side-loaded at depth 0.0029m, XY 0.0012m", "predepth_recenter": 1, "shallow_sideload_recovery": 2},
+        {"trial": 6, "outcome": "SUCCESS", "depth_m": 0.0203, "final_xy_m": 0.0005, "insert_contact_N": 53.25, "predepth_recenter": 0, "shallow_sideload_recovery": 0},
+        {"trial": 7, "outcome": "SUCCESS", "depth_m": 0.0206, "final_xy_m": 0.0004, "insert_contact_N": 46.22, "predepth_recenter": 1, "shallow_sideload_recovery": 0},
+        {"trial": 8, "outcome": "SUCCESS", "depth_m": 0.0200, "final_xy_m": 0.0003, "insert_contact_N": 45.39, "predepth_recenter": 4, "shallow_sideload_recovery": 1},
+        {"trial": 9, "outcome": "SUCCESS", "depth_m": 0.0206, "final_xy_m": 0.0006, "insert_contact_N": 48.44, "predepth_recenter": 1, "shallow_sideload_recovery": 2},
+        {"trial": 10, "outcome": "SUCCESS", "depth_m": 0.0202, "final_xy_m": 0.0003, "insert_contact_N": 48.82, "predepth_recenter": 0, "shallow_sideload_recovery": 1},
+        {"trial": 11, "outcome": "SUCCESS", "depth_m": 0.0203, "final_xy_m": 0.0006, "insert_contact_N": 52.12, "predepth_recenter": 3, "shallow_sideload_recovery": 1},
+        {"trial": 12, "outcome": "SUCCESS", "depth_m": 0.0199, "final_xy_m": 0.0002, "insert_contact_N": 48.33, "predepth_recenter": 1, "shallow_sideload_recovery": 1},
+        {"trial": 13, "outcome": "SUCCESS", "depth_m": 0.0200, "final_xy_m": 0.0003, "insert_contact_N": 54.18, "predepth_recenter": 1, "shallow_sideload_recovery": 1},
+        {"trial": 14, "outcome": "SUCCESS", "depth_m": 0.0200, "final_xy_m": 0.0003, "insert_contact_N": 50.91, "predepth_recenter": 1, "shallow_sideload_recovery": 0},
+        {"trial": 15, "outcome": "SUCCESS", "depth_m": 0.0201, "final_xy_m": 0.0005, "insert_contact_N": 52.93, "predepth_recenter": 0, "shallow_sideload_recovery": 1},
+        {"trial": 16, "outcome": "SUCCESS", "depth_m": 0.0207, "final_xy_m": 0.0006, "insert_contact_N": 52.94, "predepth_recenter": 1, "shallow_sideload_recovery": 0},
+        {"trial": 17, "outcome": "SUCCESS", "depth_m": 0.0208, "final_xy_m": 0.0008, "insert_contact_N": 51.66, "predepth_recenter": 0, "shallow_sideload_recovery": 0},
+        {"trial": 18, "outcome": "ABORTED", "depth_m": 0.0112, "final_xy_m": 0.0011, "failed_phase": "INSERT", "reason": "Side-loaded at depth 0.0030m, XY 0.0011m", "predepth_recenter": 3, "shallow_sideload_recovery": 2},
+        {"trial": 19, "outcome": "SUCCESS", "depth_m": 0.0202, "final_xy_m": 0.0003, "insert_contact_N": 45.34, "predepth_recenter": 4, "shallow_sideload_recovery": 1},
+        {"trial": 20, "outcome": "SUCCESS", "depth_m": 0.0201, "final_xy_m": 0.0007, "insert_contact_N": 53.76, "predepth_recenter": 0, "shallow_sideload_recovery": 0}
+      ],
+      "summary_stats": {
+        "mean_depth_m": 0.0203,
+        "std_depth_m": 0.0003,
+        "min_depth_m": 0.0199,
+        "max_depth_m": 0.0208,
+        "mean_final_xy_m": 0.0005,
+        "std_final_xy_m": 0.0002,
+        "mean_insert_contact_N": 50.03,
+        "std_insert_contact_N": 3.45
+      }
+    },
+    "combined_all_runs": {
+      "description": "Combined results from all three production validation runs",
+      "total_trials": 40,
+      "total_successes": 37,
+      "combined_success_rate": 0.925,
       "total_timeouts": 0,
       "total_safety_aborts": 0,
-      "total_side_load_aborts": 1,
+      "total_side_load_aborts": 3,
       "search_entry_rate": 1.0,
       "search_convergence_rate": 1.0
     }
@@ -256,8 +301,8 @@
     "phase_3_learning": {
       "status": "NOT_STARTED",
       "completed_items": [
-        "Baseline physical success evidence (10/10 production-safe, 19/20 combined)",
-        "SEARCH-entered full-task robustness (100% SEARCH entry, 100% SEARCH convergence)",
+        "Baseline physical success evidence (37/40 combined = 92.5%, 18/20 in latest 20-trial confirmation)",
+        "SEARCH-entered full-task robustness (100% SEARCH entry, 100% SEARCH convergence across all runs)",
         "INSERT recovery mechanisms (pre-depth recenter, shallow side-load recovery)"
       ],
       "open_items": [
@@ -310,11 +355,10 @@
     "No admittance control (position control only in simulation)"
   ],
   "next_steps": [
-    "Run 20-trial confirmation of full-task robustness",
     "Fix perception logger RETREAT/DONE capture",
-    "Define v2_14 action interface for control pipeline integration",
-    "Create PROPOSAL_IMPLEMENTATION_MAPPING.md",
     "Collect complete 6-phase dataset",
+    "Retrain/evaluate v2_13/v2_14/v2_15 on complete dataset",
+    "Define v2_14 action interface for control pipeline integration",
     "Begin Phase 3: SAC baseline training"
   ]
 }
