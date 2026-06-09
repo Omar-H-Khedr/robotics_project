@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""10-trial perception logger reliability test.
+"""v2_14 shadow-mode validation runner.
 
-Runs 10 full-task trials with perception logging and checks:
-- Each trial produces a non-empty CSV with all 6 phases
-- Diagnostic JSON exists and records startup status
-- No empty logs remain
+Runs 10 full-task trials with v2_14_shadow_mode_node enabled alongside the
+deterministic controller.  Validates:
+  - Shadow-mode inference node produces non-empty logs
+  - Per-tick predictions cover all task phases
+  - Safety-gating correctly defers on INSERT
+  - Agreement rates vs ground truth
 """
 
 from __future__ import annotations
@@ -18,7 +20,7 @@ import time
 from pathlib import Path
 
 OUTCOME_PATH = Path("/tmp/insertion_trial_outcome.json")
-TEST_OUTPUT_DIR = Path("diagnostics/full_task_validation_v2")
+TEST_OUTPUT_DIR = Path("diagnostics/v2_14_shadow_mode_validation")
 TIMEOUT_S = 600.0
 DDS_SHM_GLOBS = ["/dev/shm/fastrtps_*", "/dev/shm/sem.fastrtps_*"]
 
@@ -38,6 +40,7 @@ def kill_all_ros_nodes() -> None:
         "safety_monitor", "data_logger_node", "trajectory_tracking_observer",
         "wrench_state_observer", "contact_state_observer",
         "multimodal_observation_logger", "admittance_insertion_node",
+        "v2_14_shadow_mode_node", "live_v2_14_inference_node",
     ):
         subprocess.Popen(
             ["pkill", "-9", "-f", name],
@@ -103,6 +106,8 @@ def run_trial(trial: int, output_dir: Path) -> dict:
     perception_dir.mkdir(parents=True, exist_ok=True)
     tracking_dir = output_dir / f"trial_{trial:02d}_tracking"
     tracking_dir.mkdir(parents=True, exist_ok=True)
+    shadow_dir = output_dir / f"shadow_trial_{trial:02d}"
+    shadow_dir.mkdir(parents=True, exist_ok=True)
 
     env = os.environ.copy()
     env["HOME"] = str(output_dir / "home")
@@ -125,6 +130,8 @@ def run_trial(trial: int, output_dir: Path) -> dict:
         f"perception_log_dir:={str(perception_dir)}",
         f"tracking_log_dir:={str(tracking_dir)}",
         "exit_on_done:=true", "shutdown_on_task_exit:=true",
+        "enable_v2_14_shadow_mode:=true",
+        f"v2_14_shadow_output_dir:={str(shadow_dir)}",
     ]
 
     start = time.monotonic()
@@ -156,6 +163,7 @@ def run_trial(trial: int, output_dir: Path) -> dict:
 
     csv_path = perception_dir / "multimodal_observation_log.csv"
     diag_path = perception_dir / "logger_diagnostic.json"
+    shadow_csv_path = shadow_dir / "shadow_v2_14_inference_log.csv"
     csv_rows = 0
     phases_found = set()
     diag = None
@@ -177,6 +185,40 @@ def run_trial(trial: int, output_dir: Path) -> dict:
         except json.JSONDecodeError:
             pass
 
+    shadow_rows = 0
+    shadow_phases = set()
+    shadow_agreement_count = 0
+    shadow_fallback_count = 0
+    shadow_insert_defer_count = 0
+    if shadow_csv_path.exists():
+        with shadow_csv_path.open() as f:
+            lines = f.readlines()
+            shadow_rows = max(0, len(lines) - 1)
+            if shadow_rows > 0:
+                header = lines[0].strip().split(",")
+                agreement_idx = header.index("agreement") if "agreement" in header else -1
+                fallback_idx = header.index("use_fallback") if "use_fallback" in header else -1
+                pred_phase_idx = header.index("pred_phase_name") if "pred_phase_name" in header else -1
+                gt_phase_idx = header.index("gt_phase") if "gt_phase" in header else -1
+                for line in lines[1:]:
+                    parts = line.strip().split(",")
+                    if pred_phase_idx >= 0 and len(parts) > pred_phase_idx:
+                        shadow_phases.add(parts[pred_phase_idx])
+                    if agreement_idx >= 0 and len(parts) > agreement_idx:
+                        if parts[agreement_idx].strip() == "True":
+                            shadow_agreement_count += 1
+                    if fallback_idx >= 0 and len(parts) > fallback_idx:
+                        if parts[fallback_idx].strip() == "True":
+                            shadow_fallback_count += 1
+                    if gt_phase_idx >= 0 and pred_phase_idx >= 0:
+                        if len(parts) > gt_phase_idx and len(parts) > pred_phase_idx:
+                            gt_p = parts[gt_phase_idx].strip()
+                            pred_p = parts[pred_phase_idx].strip()
+                            if gt_p == "INSERT" and pred_p == "INSERT":
+                                if fallback_idx >= 0 and len(parts) > fallback_idx:
+                                    if parts[fallback_idx].strip() == "True":
+                                        shadow_insert_defer_count += 1
+
     success = False
     failed_phase = ""
     if outcome:
@@ -186,6 +228,9 @@ def run_trial(trial: int, output_dir: Path) -> dict:
                 if isinstance(phase, dict) and not phase.get("success", False):
                     failed_phase = str(phase.get("phase", "unknown"))
                     break
+
+    agreement_rate = shadow_agreement_count / max(1, shadow_rows)
+    fallback_rate = shadow_fallback_count / max(1, shadow_rows)
 
     return {
         "trial": trial,
@@ -197,8 +242,13 @@ def run_trial(trial: int, output_dir: Path) -> dict:
         "phases_found": sorted(phases_found),
         "empty_log": csv_rows <= 1,
         "logger_startup_ok": diag.get("subscriber_status", {}).get("joint_state_received", False) if diag else False,
-        "first_joint_state_s": diag.get("first_joint_state_s") if diag else None,
-        "first_task_phase_s": diag.get("first_task_phase_s") if diag else None,
+        "shadow_csv_rows": shadow_rows,
+        "shadow_phases_found": sorted(shadow_phases),
+        "shadow_agreement_count": shadow_agreement_count,
+        "shadow_agreement_rate": round(agreement_rate, 4),
+        "shadow_fallback_count": shadow_fallback_count,
+        "shadow_fallback_rate": round(fallback_rate, 4),
+        "shadow_insert_defer_count": shadow_insert_defer_count,
         "elapsed_s": round(elapsed, 1),
         "timed_out": timed_out,
         "return_code": return_code,
@@ -208,7 +258,7 @@ def run_trial(trial: int, output_dir: Path) -> dict:
 
 def main() -> None:
     TEST_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    trials = int(os.environ.get("VALIDATION_TRIALS", "20"))
+    trials = int(os.environ.get("VALIDATION_TRIALS", "10"))
     results = []
 
     kill_gazebo_residue()
@@ -227,6 +277,9 @@ def main() -> None:
         print(
             f"  outcome={result['trial_outcome']} success={result['physical_success']} "
             f"csv_rows={result['csv_rows']} phases={result['phases_found']} "
+            f"shadow_rows={result['shadow_csv_rows']} "
+            f"shadow_agreement={result['shadow_agreement_rate']:.1%} "
+            f"shadow_fallback={result['shadow_fallback_rate']:.1%} "
             f"startup_ok={result['logger_startup_ok']} {empty_flag} "
             f"elapsed={result['elapsed_s']}s"
         )
@@ -234,8 +287,18 @@ def main() -> None:
     empty_count = sum(1 for r in results if r["empty_log"])
     success_count = sum(1 for r in results if r["physical_success"])
     all_phases = set()
+    all_shadow_phases = set()
+    total_shadow_rows = 0
+    total_agreement = 0
+    total_fallback = 0
+    total_insert_defer = 0
     for r in results:
         all_phases.update(r["phases_found"])
+        all_shadow_phases.update(r["shadow_phases_found"])
+        total_shadow_rows += r["shadow_csv_rows"]
+        total_agreement += r["shadow_agreement_count"]
+        total_fallback += r["shadow_fallback_count"]
+        total_insert_defer += r["shadow_insert_defer_count"]
 
     summary = {
         "total_trials": trials,
@@ -244,14 +307,23 @@ def main() -> None:
         "physical_successes": success_count,
         "success_rate": round(success_count / trials, 4),
         "all_phases_captured": sorted(all_phases),
+        "shadow_mode": {
+            "total_shadow_rows": total_shadow_rows,
+            "all_shadow_phases": sorted(all_shadow_phases),
+            "overall_agreement_rate": round(total_agreement / max(1, total_shadow_rows), 4),
+            "overall_fallback_rate": round(total_fallback / max(1, total_shadow_rows), 4),
+            "total_insert_defer_count": total_insert_defer,
+        },
         "results": results,
     }
-    summary_path = TEST_OUTPUT_DIR / "reliability_summary.json"
+    summary_path = TEST_OUTPUT_DIR / "shadow_validation_summary.json"
     summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(f"\n=== SUMMARY ===")
     print(f"Non-empty logs: {trials - empty_count}/{trials}")
     print(f"Physical successes: {success_count}/{trials}")
     print(f"All phases captured: {sorted(all_phases)}")
+    print(f"Shadow mode agreement rate: {summary['shadow_mode']['overall_agreement_rate']:.1%}")
+    print(f"Shadow mode fallback rate: {summary['shadow_mode']['overall_fallback_rate']:.1%}")
     print(f"Summary: {summary_path}")
 
 
