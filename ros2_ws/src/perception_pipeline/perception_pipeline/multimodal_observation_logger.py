@@ -109,12 +109,13 @@ class MultimodalObservationLogger(Node):
             )
         self.create_subscription(
             String, self.get_parameter("task_phase_topic").value,
-            lambda msg: setattr(self, "_task_phase", msg.data), 10,
+            self._on_task_phase, 10,
         )
         self.create_subscription(
             String, self.get_parameter("safety_status_topic").value,
             lambda msg: setattr(self, "_safety_status", msg.data), 10,
         )
+        self._last_forced_phase: str = ""
 
         self._tick_index = 0
         self._start_time = self.get_clock().now()
@@ -217,6 +218,15 @@ class MultimodalObservationLogger(Node):
             roi_max = float(np.max(roi_valid))
         return (w, h, d_min, d_max, roi_min, roi_max)
 
+    def _on_task_phase(self, msg: Any) -> None:
+        new_phase = str(msg.data)
+        old_phase = self._task_phase
+        self._task_phase = new_phase
+        if new_phase in ('RETREAT', 'DONE', 'ABORT') and new_phase != old_phase:
+            if new_phase != self._last_forced_phase:
+                self._last_forced_phase = new_phase
+                self._on_tick()
+
     def _on_tick(self) -> None:
         js = self._joint_state
         if js is None or len(js.position) < 6:
@@ -257,8 +267,22 @@ class MultimodalObservationLogger(Node):
 
 
 def main(args: list[str] | None = None) -> None:
+    import signal
+    import sys
     rclpy.init(args=args)
     node = MultimodalObservationLogger()
+
+    def _shutdown_handler(signum, frame):
+        node.get_logger().info("Shutdown signal received; flushing CSV.")
+        try:
+            node.destroy_node()
+        except Exception:
+            pass
+        rclpy.shutdown()
+        sys.exit(0)
+
+    signal.signal(signal.SIGTERM, _shutdown_handler)
+    signal.signal(signal.SIGINT, _shutdown_handler)
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
