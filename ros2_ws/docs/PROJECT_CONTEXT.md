@@ -329,20 +329,22 @@ evidence of robust full-task SEARCH-entered simulated peg-in-hole execution.
 
 ### Multi-Phase Data Collection and Perception Pipeline
 
-10/10 production-safe trials collected with multimodal observation logging.
-15,555 total data rows at 20 Hz. 68-dim context vectors (v2_13) extracted.
+After fixing RETREAT/DONE capture (force-write CSV rows on phase transitions),
+10 single-trial runs collected with perception logging. 22,083 total rows
+at 20 Hz. 68-dim context vectors (v2_13) extracted. All 6 phases present
+in aggregate data.
 
-v2_13 autoencoder: 68→32→68, test_mse=0.003.
-v2_14 action classifier: 98.8% test accuracy on 5-phase classification.
-v2_15 comprehensive ablation: raw 68-dim context achieves 100% accuracy
-with 100% SEARCH recall. Encoder pre-training hurts (SEARCH recall drops
-to 0%). See `docs/metrics/comprehensive_validation_metrics.json` and
+v2_13 autoencoder (6-phase): 68→32→68, test_mse=0.003670.
+v2_14 action classifier (6-phase): 92.6% test accuracy on 7-class classification.
+v2_15 comprehensive ablation (6-phase): raw 68-dim context achieves 99.91%
+accuracy with 100% SEARCH recall. Encoder pre-training hurts (SEARCH recall
+drops to 0%). See `docs/metrics/comprehensive_validation_metrics.json` and
 `docs/PROPOSAL_IMPLEMENTATION_MAPPING.md`.
 
 Known limitations:
-- RETREAT/DONE phases not captured by perception logger
 - F/T sensor bridge crashes with SIGSEGV (wrench features are zero)
-- Encoder bottleneck destroys SEARCH discrimination
+- Encoder bottleneck destroys SEARCH/RETREAT/DONE discrimination
+- Depth images zero in simulation
 
 Operational note: after generated tracked `build/`, `install/`, and `log`
 trees are restored, selected package build/install trees must be cleaned and

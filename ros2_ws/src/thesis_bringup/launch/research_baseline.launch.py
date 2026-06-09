@@ -863,8 +863,9 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 "done_exit_delay_s",
-                default_value="0.5",
-                description="Delay between final outcome logging and task-node exit.",
+                default_value="10.0",
+                description="Delay between final outcome logging and task-node exit. "
+                            "Longer delay ensures perception logger captures RETREAT/DONE phases.",
             ),
             DeclareLaunchArgument(
                 "shutdown_on_task_exit",

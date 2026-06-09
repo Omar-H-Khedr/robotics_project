@@ -24,8 +24,8 @@ This document maps each proposal deliverable to its current implementation statu
 | Domain randomization | PARTIAL | Manual config overrides; no automated engine |
 | Multi-modal observation pipeline | DONE | D405 RGB-D + joint states + F/T at 20 Hz |
 | Context vector representation | DONE | v2_13: 68-dim (RGB + depth + joints + phase + safety) |
-| Autoencoder pre-training | DONE | v2_13: 68→32→68, test_mse=0.003 |
-| Action classifier | DONE | v2_14: 98.8% test accuracy, 5-phase classification |
+| Autoencoder pre-training | DONE | v2_13: 68→32→68, test_mse=0.003670 (6-phase) |
+| Action classifier | DONE | v2_14: 92.6% test accuracy, 7-class classification (6-phase). Raw 68-dim achieves 99.91%. |
 | Ablation studies | DONE | v2_15: 5 variants, comprehensive per-class metrics |
 | Simulation benchmarks | DONE | 37/40 (92.5%) physical successes across 40 independent trials, 18/20 (90%) in 20-trial confirmation |
 | Multi-variant pegs/holes | NOT DONE | Single variant: 25mm peg, 27mm hole |
@@ -72,8 +72,8 @@ This document maps each proposal deliverable to its current implementation statu
 
 | Component | Metric | Value |
 |---|---|---|
-| v2_13 Autoencoder | Test MSE | 0.00315 |
-| v2_14 Action Classifier | Test Accuracy | 98.8% |
+| v2_13 Autoencoder | Test MSE | 0.003670 (6-phase) |
+| v2_14 Action Classifier | Test Accuracy | 92.6% (7 classes, 6-phase). Raw 68-dim ablation: 99.91% |
 | v2_15 Best Variant (raw 68-dim) | Test Accuracy | 100% |
 | v2_15 Best Variant | SEARCH Recall | 100% |
 

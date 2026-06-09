@@ -159,96 +159,133 @@
       },
       "known_limitations": [
         "F/T features excluded due to ft_sensor_bridge SIGSEGV crash",
-        "RETREAT/DONE phases missing from perception log",
         "Depth camera not active in simulation (values are 0)"
       ]
     },
     "autoencoder": {
-      "version": "v2_13",
+      "version": "v2_13_v4",
       "architecture": "68 -> 32 -> 68",
-      "test_mse": 0.00315,
-      "training_data": "10-trial multi-phase dataset (15,555 rows)"
+      "test_mse": 0.003670,
+      "training_data": "6-phase multi-trial dataset (22,070 rows after filtering)"
     },
     "action_classifier": {
-      "version": "v2_14",
+      "version": "v2_14_v4",
       "architecture": "phase_classifier_plus_per_phase_joint_regressor",
       "input_dim": 32,
-      "num_classes": 9,
-      "test_accuracy": 0.9884,
-      "test_cross_entropy": 0.0395,
-      "test_mse": 0.000147,
-      "per_class_recall": {
-        "UNKNOWN": 0.854,
-        "MOVING_TO_START": 0.993,
-        "APPROACH": 0.998,
-        "SEARCH": 0.0,
-        "INSERT": 0.997
-      },
-      "training_data": "10-trial multi-phase dataset (15,555 rows)"
+      "num_classes": 7,
+      "test_accuracy": 0.926,
+      "test_cross_entropy": 0.2058,
+      "test_mse": 0.002673,
+      "training_data": "6-phase multi-trial dataset (22,070 rows after filtering)",
+      "note": "Lower accuracy than v2_14_v3 (98.8%) because encoder bottleneck destroys RETREAT/DONE discrimination. Raw 68-dim achieves 99.91%."
     }
   },
   "ablation_studies": {
-    "v2_15_comprehensive": {
+    "v2_15_comprehensive_5phase": {
+      "description": "Original 5-phase ablation (pre-RETREAT/DONE fix)",
       "dataset": "10-trial multi-phase (15,555 rows)",
       "epochs": 100,
       "seed": 0,
       "variants": [
+        {"tag": "B_raw_68", "test_accuracy": 1.0, "macro_f1": 1.0, "search_recall": 1.0, "conclusion": "BEST on 5-phase"},
+        {"tag": "C_norm_68", "test_accuracy": 1.0, "macro_f1": 1.0, "search_recall": 1.0, "conclusion": "Equivalent to raw"},
+        {"tag": "A_encoder", "test_accuracy": 0.9913, "macro_f1": 0.778, "search_recall": 0.0, "conclusion": "NEGATIVE - encoder hurts"},
+        {"tag": "D_joint_12", "test_accuracy": 0.9743, "macro_f1": 0.705, "search_recall": 0.0, "conclusion": "NEGATIVE - joints insufficient"},
+        {"tag": "E_no_phase_66", "test_accuracy": 0.9759, "macro_f1": 0.731, "search_recall": 0.0, "conclusion": "NEGATIVE - phase_int critical"}
+      ],
+      "key_finding": "Raw 68-dim context is the validated representation."
+    },
+    "v2_15_comprehensive_6phase": {
+      "description": "Complete 6-phase ablation (after RETREAT/DONE fix)",
+      "dataset": "6-phase multi-trial (22,070 rows after filtering)",
+      "epochs": 30,
+      "seed": 0,
+      "variants": [
         {
           "tag": "B_raw_68",
-          "description": "Raw 68-dim context (baseline)",
+          "description": "Raw 68-dim context",
           "input_dim": 68,
-          "test_accuracy": 1.0,
-          "macro_f1": 1.0,
+          "test_accuracy": 0.9991,
+          "macro_f1": 0.9991,
           "search_recall": 1.0,
-          "regression_mse": 0.008255,
-          "conclusion": "BEST - perfect classification, no encoding needed"
+          "regression_mse": 0.00746450,
+          "conclusion": "BEST - 99.91% accuracy, all 7 classes including RETREAT/DONE classified"
         },
         {
           "tag": "C_norm_68",
           "description": "Normalized 68-dim context",
           "input_dim": 68,
-          "test_accuracy": 1.0,
-          "macro_f1": 1.0,
+          "test_accuracy": 0.9991,
+          "macro_f1": 0.9991,
           "search_recall": 1.0,
-          "regression_mse": 0.008255,
           "conclusion": "Equivalent to raw - normalization has no effect"
         },
         {
           "tag": "A_encoder",
           "description": "Encoder latent 32-dim",
           "input_dim": 32,
-          "test_accuracy": 0.9913,
-          "macro_f1": 0.778,
+          "test_accuracy": 0.9241,
+          "macro_f1": 0.4470,
           "search_recall": 0.0,
-          "regression_mse": 0.009375,
-          "conclusion": "NEGATIVE - encoder bottleneck destroys SEARCH discrimination"
+          "conclusion": "NEGATIVE - encoder bottleneck destroys RETREAT/DONE/SEARCH discrimination"
         },
         {
           "tag": "D_joint_12",
           "description": "Joint-only 12-dim",
           "input_dim": 12,
-          "test_accuracy": 0.9743,
-          "macro_f1": 0.705,
+          "test_accuracy": 0.9273,
+          "macro_f1": 0.4713,
           "search_recall": 0.0,
-          "regression_mse": 0.02051,
-          "conclusion": "NEGATIVE - joints alone insufficient for phase classification"
+          "conclusion": "NEGATIVE - joints alone insufficient"
         },
         {
           "tag": "E_no_phase_66",
           "description": "66-dim without phase_int/safety_int",
           "input_dim": 66,
-          "test_accuracy": 0.9759,
-          "macro_f1": 0.731,
+          "test_accuracy": 0.9193,
+          "macro_f1": 0.4530,
           "search_recall": 0.0,
-          "regression_mse": 0.008583,
-          "conclusion": "NEGATIVE - phase_int/safety_int are critical for SEARCH"
+          "conclusion": "NEGATIVE - phase_int/safety_int critical for SEARCH/RETREAT/DONE"
         }
       ],
-      "key_finding": "Raw 68-dim context with phase_int/safety_int is the validated representation. Encoder pre-training is a documented negative ablation."
+      "per_class_metrics_B_raw_68": {
+        "UNKNOWN": {"support": 55, "precision": 1.0, "recall": 1.0, "f1": 1.0},
+        "MOVING_TO_START": {"support": 898, "precision": 0.9967, "recall": 0.9989, "f1": 0.9978},
+        "APPROACH": {"support": 510, "precision": 0.9980, "recall": 0.9941, "f1": 0.9961},
+        "SEARCH": {"support": 6, "precision": 1.0, "recall": 1.0, "f1": 1.0},
+        "INSERT": {"support": 2719, "precision": 1.0, "recall": 1.0, "f1": 1.0},
+        "RETREAT": {"support": 152, "precision": 1.0, "recall": 1.0, "f1": 1.0},
+        "DONE": {"support": 74, "precision": 1.0, "recall": 1.0, "f1": 1.0}
+      },
+      "key_finding": "Raw 68-dim context achieves 99.91% accuracy on all 7 classes including RETREAT and DONE. Encoder pre-training remains a documented negative ablation."
     }
   },
   "dataset": {
-    "multi_trial_v2": {
+    "multi_trial_v3_6phase": {
+      "description": "Complete 6-phase dataset with RETREAT/DONE capture fix",
+      "trials": 10,
+      "trials_with_all_6_phases": 7,
+      "total_rows": 22083,
+      "rows_after_filtering": 22070,
+      "rows_per_trial_mean": 2208.3,
+      "sampling_rate_hz": 20,
+      "context_dim": 68,
+      "phase_distribution": {
+        "INSERT": {"count": 13666, "fraction": 0.619},
+        "MOVING_TO_START": {"count": 4384, "fraction": 0.199},
+        "APPROACH": {"count": 2516, "fraction": 0.114},
+        "RETREAT": {"count": 846, "fraction": 0.038},
+        "DONE": {"count": 376, "fraction": 0.017},
+        "UNKNOWN": {"count": 97, "fraction": 0.004},
+        "SEARCH": {"count": 27, "fraction": 0.001}
+      },
+      "known_limitations": [
+        "4/10 trials had empty perception logs (logger didn't start)",
+        "F/T features zero due to ft_sensor_bridge SIGSEGV",
+        "Depth images zero in simulation"
+      ]
+    },
+    "multi_trial_v2_5phase": {
       "trials": 10,
       "total_rows": 15555,
       "rows_per_trial_mean": 1555.5,

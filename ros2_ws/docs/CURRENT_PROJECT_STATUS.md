@@ -2037,59 +2037,52 @@ ros2 launch thesis_bringup research_baseline.launch.py use_gui:=false \
 - Production-safe 10/10 is the strongest current evidence set
 - This is validated SEARCH-entered simulation robustness, not final autonomous peg-in-hole success
 
-## 2026-06-08 Multi-Phase Data Collection and Perception Pipeline
+## 2026-06-09 6-Phase Complete Dataset and Retrained Perception Pipeline
 
-### Data Collection (10/10 production-safe trials)
+### RETREAT/DONE Capture Fix
 
-`multimodal_observation_logger` collected RGB-D + joint states + F/T + phase at 20 Hz.
-10/10 production-safe trials, all SUCCESS. Total: 15,555 rows, ~1550 rows/trial.
+Root cause: `multimodal_observation_logger` uses `use_sim_time`, so when
+Gazebo shuts down the sim-time timer stops and no more CSV rows are written.
+Fix: added `_on_task_phase` callback that forces a CSV row write when phase
+transitions to RETREAT, DONE, or ABORT. Also fixed missing `sys` import in
+shutdown handler. Verified: single trial produces all 6 phases.
 
-Phase distribution:
-- MOVING_TO_START: 51.3% (7986 rows)
-- INSERT: 30.2% (4692 rows)
-- APPROACH: 15.0% (2330 rows)
-- UNKNOWN: 3.2% (498 rows)
-- SEARCH: 0.2% (33 rows)
+### 6-Phase Data Collection (10 single-trial runs)
 
-Known limitations:
-1. No RETREAT/DONE phases captured (logger subscription issue)
-2. F/T features zero due to ft_sensor_bridge SIGSEGV
-3. Depth images zero in simulation
+10 single-trial runs with perception logging. 22,083 total rows.
+7/10 trials have all 6 phases (trials 1, 3, 4, 5, 6, 7, 8).
+Phase distribution (aggregate): INSERT 61.9%, MOVING_TO_START 19.9%,
+APPROACH 11.4%, RETREAT 3.8%, DONE 1.7%, UNKNOWN 0.4%, SEARCH 0.1%.
 
-### v2_13 Context Vector (68-dim)
+### v2_13 Autoencoder (6-phase)
 
-Layout: [0:48] RGB, [48:54] depth, [54:60] joint_pos, [60:66] joint_vel, [66] phase_int, [67] safety_int.
+Architecture: 68→32→68. Test MSE: 0.003670. Trained on 22,070 rows.
 
-F/T features excluded due to ft_sensor_bridge crash.
-
-### v2_13 Autoencoder
-
-Architecture: 68→32→68. Test MSE: 0.00315. Trained on real multi-phase data.
-
-### v2_14 Action Classifier
+### v2_14 Action Classifier (6-phase)
 
 Architecture: phase classifier + per-phase joint regressor on 32-dim encoder latent.
-Test accuracy: 98.8%. Per-class SEARCH recall: 0% (encoder bottleneck loses phase_int/safety_int).
+Test accuracy: 92.6% (lower than 5-phase 98.8% because RETREAT/DONE are new classes).
 
-### v2_15 Comprehensive Ablation
-
-5 variants on real multi-phase data (100 epochs, seed=0):
+### v2_15 Comprehensive Ablation (6-phase, 30 epochs)
 
 | Variant | Input | Accuracy | Macro F1 | SEARCH Recall | Conclusion |
 |---|---|---|---|---|---|
-| B (raw 68-dim) | 68 | 100.0% | 100.0% | 100% | **BEST** |
-| C (normalized 68-dim) | 68 | 100.0% | 100.0% | 100% | Equivalent to raw |
-| A (encoder 32-dim) | 32 | 99.1% | 77.8% | 0% | NEGATIVE |
-| E (no-phase 66-dim) | 66 | 97.6% | 73.1% | 0% | NEGATIVE |
-| D (joint-only 12-dim) | 12 | 97.4% | 70.5% | 0% | NEGATIVE |
+| B (raw 68-dim) | 68 | 99.91% | 99.91% | 100% | **BEST** |
+| C (normalized 68-dim) | 68 | 99.91% | 99.91% | 100% | Equivalent to raw |
+| A (encoder 32-dim) | 32 | 92.41% | 44.70% | 0% | NEGATIVE |
+| D (joint-only 12-dim) | 12 | 92.73% | 47.13% | 0% | NEGATIVE |
+| E (no-phase 66-dim) | 66 | 91.93% | 45.30% | 0% | NEGATIVE |
 
-**Critical finding**: Raw 68-dim context with phase_int/safety_int is the validated representation. Encoder pre-training is a documented negative ablation (SEARCH recall drops to 0%).
+**Critical finding**: Raw 68-dim context achieves 99.91% accuracy on all 7
+classes including RETREAT and DONE. Encoder pre-training remains a documented
+negative ablation: the 32-dim bottleneck destroys discrimination for SEARCH
+(0% recall), RETREAT (0% F1), and DONE (0% F1).
 
 ### Artifacts
 
-- `diagnostics/multi_trial_dataset_v2/`: 10-trial dataset (trial_01-10, merged CSV, context vectors Parquet)
-- `diagnostics/perception_pipeline_v2_13_encoder_v3_real_data/`: Trained encoder (68-dim)
-- `diagnostics/perception_pipeline_v2_14_action_v3_real_data/`: Trained action classifier
-- `diagnostics/perception_pipeline_v2_15_ablation_v4_comprehensive/`: Ablation results
+- `diagnostics/multi_trial_dataset_v3/`: 6-phase merged CSV + context vectors Parquet (22,083 rows)
+- `diagnostics/v2_13_encoder_v4_6phase/`: Retrained encoder (test_mse=0.003670)
+- `diagnostics/v2_14_action_v4_6phase/`: Retrained action classifier (92.6% acc)
+- `diagnostics/v2_15_ablation_v5_6phase/`: Ablation results (99.91% best)
 - `docs/metrics/comprehensive_validation_metrics.json`: Aggregated validation metrics
 - `docs/PROPOSAL_IMPLEMENTATION_MAPPING.md`: Proposal-to-implementation mapping

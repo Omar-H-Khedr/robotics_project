@@ -222,13 +222,18 @@ Known limitation: the `ft_sensor_bridge` (ros_gz_bridge) crashes with
 SIGSEGV at startup, so F/T features in the context vector are zero. Joint
 positions, velocities, RGB, depth, and phase labels are all valid.
 
-### 10-Trial Multi-Phase Dataset (2026-06-08)
+### 6-Phase Complete Dataset (2026-06-09)
 
-Collected 10/10 production-safe trials with perception logging. All trials
-completed successfully with real robot-driven phase transitions through
-MOVING_TO_START -> APPROACH -> SEARCH -> INSERT. 15,555 total data rows
-(~1550 per trial) at 20 Hz. Merged CSV and 68-dim context vectors
-(v2_13) in Parquet format are in `diagnostics/multi_trial_dataset_v2/`.
+After fixing RETREAT/DONE capture in the perception logger (force-write CSV
+rows on RETREAT/DONE/ABORT phase transitions), collected 10 single-trial
+runs with perception logging. 22,083 total rows, all 6 phases present
+(MOVING_TO_START, APPROACH, SEARCH, INSERT, RETREAT, DONE). Context
+vectors extracted as 68-dim Parquet. Merged dataset and parquet in
+`diagnostics/multi_trial_dataset_v3/`.
+
+v2_13 autoencoder retrained: test_mse=0.003670 (6-phase).
+v2_14 action classifier retrained: 92.6% test accuracy (7 classes).
+v2_15 comprehensive ablation retrained on 6-phase data:
 
 Operational note: after restoring tracked generated directories, clean and
 rebuild selected package build/install trees before runtime. A stale tracked
@@ -2763,26 +2768,26 @@ This sprint validates the v2_13 encoder and v2_14 head as a live ROS2 node in th
     ablation/live_v2_14_confusion_matrix.png
     ablation/live_v2_14_per_phase_target_mse.png
 
-## v2_15 Comprehensive Ablation on Real Multi-Phase Data (2026-06-08)
+## v2_15 Comprehensive Ablation on Complete 6-Phase Data (2026-06-09)
 
-`v2_15_comprehensive_ablation` tested 5 context-vector variants on the real
-10-trial multi-phase dataset (15,555 rows, 68-dim, 100 epochs, seed=0):
+`v2_15_comprehensive_ablation` tested 5 context-vector variants on the
+complete 6-phase dataset (22,070 rows after filtering, 68-dim, 30 epochs,
+seed=0):
 
 | Variant | Input | Accuracy | Macro F1 | SEARCH Recall | Conclusion |
 |---|---|---|---|---|---|
-| B (raw 68-dim) | 68 | 100.0% | 100.0% | 100% | **BEST** |
-| C (normalized 68-dim) | 68 | 100.0% | 100.0% | 100% | Equivalent to raw |
-| A (encoder 32-dim) | 32 | 99.1% | 77.8% | 0% | NEGATIVE |
-| E (no-phase 66-dim) | 66 | 97.6% | 73.1% | 0% | NEGATIVE |
-| D (joint-only 12-dim) | 12 | 97.4% | 70.5% | 0% | NEGATIVE |
+| B (raw 68-dim) | 68 | 99.91% | 99.91% | 100% | **BEST** |
+| C (normalized 68-dim) | 68 | 99.91% | 99.91% | 100% | Equivalent to raw |
+| A (encoder 32-dim) | 32 | 92.41% | 44.70% | 0% | NEGATIVE |
+| D (joint-only 12-dim) | 12 | 92.73% | 47.13% | 0% | NEGATIVE |
+| E (no-phase 66-dim) | 66 | 91.93% | 45.30% | 0% | NEGATIVE |
 
-**Critical finding**: Raw 68-dim context with phase_int/safety_int is the
-validated representation. Encoder pre-training is a documented negative
-ablation: SEARCH recall drops from 100% to 0% because the bottleneck
-destroys the discrete phase_int/safety_int features that discriminate
-SEARCH from other phases.
+**Critical finding**: Raw 68-dim context achieves 99.91% accuracy on all 7
+classes including RETREAT and DONE. Encoder pre-training remains a documented
+negative ablation: the 32-dim bottleneck destroys discrimination for SEARCH
+(0% recall), RETREAT (0% F1), and DONE (0% F1).
 
-Evidence: `diagnostics/perception_pipeline_v2_15_ablation_v4_comprehensive/`
+Evidence: `diagnostics/v2_15_ablation_v5_6phase/`
 
 ## Comprehensive Metrics Package
 
