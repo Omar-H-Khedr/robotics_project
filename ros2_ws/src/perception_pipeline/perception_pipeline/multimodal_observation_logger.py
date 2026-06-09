@@ -25,6 +25,7 @@ from __future__ import annotations
 import base64
 import csv
 import io
+import json
 import time
 from pathlib import Path
 from typing import Any
@@ -119,6 +120,14 @@ class MultimodalObservationLogger(Node):
 
         self._tick_index = 0
         self._start_time = self.get_clock().now()
+        self._wall_start_s = time.time()
+        self._first_joint_state_s: float | None = None
+        self._first_task_phase_s: float | None = None
+        self._first_rgb_s: float | None = None
+        self._first_depth_s: float | None = None
+        self._first_tick_s: float | None = None
+        self._last_tick_s: float | None = None
+
         self._csv_file = open(self._csv_path, "w", newline="")
         self._writer = csv.writer(self._csv_file)
         self._writer.writerow(self._csv_header())
@@ -151,6 +160,8 @@ class MultimodalObservationLogger(Node):
 
     def _on_joint_state(self, msg: JointState) -> None:
         self._joint_state = msg
+        if self._first_joint_state_s is None:
+            self._first_joint_state_s = time.time()
 
     def _on_ft(self, msg: Any) -> None:
         if WrenchStamped is not None and isinstance(msg, WrenchStamped):
@@ -163,9 +174,13 @@ class MultimodalObservationLogger(Node):
 
     def _on_rgb(self, msg: Image) -> None:
         self._latest_rgb = msg
+        if self._first_rgb_s is None:
+            self._first_rgb_s = time.time()
 
     def _on_depth(self, msg: Image) -> None:
         self._latest_depth = msg
+        if self._first_depth_s is None:
+            self._first_depth_s = time.time()
 
     def _encode_rgb(self, msg: Image) -> tuple[int, int, str]:
         try:
@@ -222,6 +237,8 @@ class MultimodalObservationLogger(Node):
         new_phase = str(msg.data)
         old_phase = self._task_phase
         self._task_phase = new_phase
+        if self._first_task_phase_s is None:
+            self._first_task_phase_s = time.time()
         if new_phase in ('RETREAT', 'DONE', 'ABORT') and new_phase != old_phase:
             if new_phase != self._last_forced_phase:
                 self._last_forced_phase = new_phase
@@ -231,6 +248,10 @@ class MultimodalObservationLogger(Node):
         js = self._joint_state
         if js is None or len(js.position) < 6:
             return
+        now = time.time()
+        if self._first_tick_s is None:
+            self._first_tick_s = now
+        self._last_tick_s = now
         pos = list(js.position[:6]) + [0.0] * (6 - len(js.position[:6]))
         vel = list(js.velocity[:6]) if js.velocity else [0.0] * 6
         vel = vel + [0.0] * (6 - len(vel))
@@ -258,12 +279,67 @@ class MultimodalObservationLogger(Node):
         self._csv_file.flush()
         self._tick_index += 1
 
+    def _write_diagnostic_json(self) -> None:
+        """Write a companion diagnostic JSON with startup/shutdown status."""
+        wall_now = time.time()
+        diag = {
+            "csv_path": str(self._csv_path),
+            "total_rows_written": self._tick_index,
+            "empty_log": self._tick_index <= 1,
+            "wall_start_s": self._wall_start_s,
+            "wall_end_s": wall_now,
+            "wall_elapsed_s": round(wall_now - self._wall_start_s, 3),
+            "first_joint_state_s": (
+                round(self._first_joint_state_s - self._wall_start_s, 3)
+                if self._first_joint_state_s else None
+            ),
+            "first_task_phase_s": (
+                round(self._first_task_phase_s - self._wall_start_s, 3)
+                if self._first_task_phase_s else None
+            ),
+            "first_rgb_s": (
+                round(self._first_rgb_s - self._wall_start_s, 3)
+                if self._first_rgb_s else None
+            ),
+            "first_depth_s": (
+                round(self._first_depth_s - self._wall_start_s, 3)
+                if self._first_depth_s else None
+            ),
+            "first_tick_s": (
+                round(self._first_tick_s - self._wall_start_s, 3)
+                if self._first_tick_s else None
+            ),
+            "last_tick_s": (
+                round(self._last_tick_s - self._wall_start_s, 3)
+                if self._last_tick_s else None
+            ),
+            "subscriber_status": {
+                "joint_state_received": self._first_joint_state_s is not None,
+                "task_phase_received": self._first_task_phase_s is not None,
+                "rgb_received": self._first_rgb_s is not None,
+                "depth_received": self._first_depth_s is not None,
+            },
+        }
+        diag_path = self._output_dir / "logger_diagnostic.json"
+        try:
+            diag_path.write_text(json.dumps(diag, indent=2), encoding="utf-8")
+        except Exception as exc:
+            self.get_logger().warning(f"Failed to write diagnostic JSON: {exc}")
+
     def destroy_node(self) -> None:
         try:
-            if not self._csv_file.closed:
+            self._write_diagnostic_json()
+        except Exception:
+            pass
+        try:
+            if hasattr(self, "_csv_file") and not self._csv_file.closed:
                 self._csv_file.close()
-        finally:
+        except Exception:
+            pass
+        try:
             super().destroy_node()
+        except Exception:
+            pass
 
 
 def main(args: list[str] | None = None) -> None:
@@ -279,7 +355,6 @@ def main(args: list[str] | None = None) -> None:
         except Exception:
             pass
         rclpy.shutdown()
-        sys.exit(0)
 
     signal.signal(signal.SIGTERM, _shutdown_handler)
     signal.signal(signal.SIGINT, _shutdown_handler)
@@ -288,8 +363,14 @@ def main(args: list[str] | None = None) -> None:
     except KeyboardInterrupt:
         pass
     finally:
-        node.destroy_node()
-        rclpy.shutdown()
+        try:
+            node.destroy_node()
+        except Exception:
+            pass
+        try:
+            rclpy.shutdown()
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":

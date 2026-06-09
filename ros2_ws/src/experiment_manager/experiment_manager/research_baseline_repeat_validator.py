@@ -181,9 +181,42 @@ def _terminate(process: subprocess.Popen[str]) -> None:
             process.wait(timeout=5)
 
 
+def _cleanup_dds_shm() -> None:
+    """Remove stale DDS shared-memory port files from a prior trial.
+
+    Fast-RTPS locks ``/dev/shm/fastrtps_*`` files.  If the previous trial
+    was killed without a clean DDS shutdown (e.g. timeout), these files
+    remain and block the next trial's DDS initialization, which prevents
+    Gazebo clock from reaching the controller_manager.
+    """
+    import glob as _glob
+    for p in _glob.glob("/dev/shm/fastrtps_*"):
+        try:
+            os.unlink(p)
+        except OSError:
+            pass
+
+
+def _kill_gazebo_residue() -> None:
+    """Best-effort kill of any leftover Gazebo/controller processes.
+
+    After a trial timeout the launch process tree may leave orphaned
+    gzserver, gz, or python nodes.  SIGTERM each and give them a short
+    window to exit before the next trial starts.
+    """
+    for name in ("gzserver", "gz", "gzclient"):
+        subprocess.Popen(
+            ["pkill", "-9", "-f", name],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+    time.sleep(2.0)
+
+
 def _run_trial(trial: int, args: argparse.Namespace, output_dir: Path) -> dict[str, Any]:
     if OUTCOME_PATH.exists():
         OUTCOME_PATH.unlink()
+
+    _cleanup_dds_shm()
 
     log_path = output_dir / f"trial_{trial:02d}.log"
     env = os.environ.copy()
@@ -399,7 +432,13 @@ def main() -> None:
 
     output_dir = Path(args.output_dir).expanduser()
     output_dir.mkdir(parents=True, exist_ok=True)
-    rows = [_run_trial(trial, args, output_dir) for trial in range(1, args.trials + 1)]
+    rows: list[dict[str, Any]] = []
+    for trial in range(1, args.trials + 1):
+        if trial > 1:
+            _kill_gazebo_residue()
+            _cleanup_dds_shm()
+            time.sleep(8.0)
+        rows.append(_run_trial(trial, args, output_dir))
     _write_outputs(rows, output_dir, args)
     print(json.dumps({"output_dir": str(output_dir), "trials": len(rows)}, indent=2))
 
