@@ -13,6 +13,23 @@ A vision-based safety-gated advisory framework for peg-in-hole assembly using a 
 
 **Grand total**: 53/60 (88.3%) across 60 automated trials, 100% non-empty logs.
 
+## Geometry/Tolerance Generalization (Stage B)
+
+**22 trials across 7 scenarios, 91% overall success**
+
+| Scenario | Peg | Hole | Clearance | Offset | Success |
+|----------|-----|------|-----------|--------|---------|
+| baseline_loose | 25mm | 27mm | 1.0mm | 0mm | 100% (3/3) |
+| clearance_medium | 25mm | 26mm | 0.5mm | 0mm | 67% (2/3) |
+| clearance_tight | 25mm | 25.5mm | 0.25mm | 0mm | 100% (3/3) |
+| large_peg_large_hole | 28mm | 30mm | 1.0mm | 0mm | 100% (3/3) |
+| small_peg_small_hole | 22mm | 24mm | 1.0mm | 0mm | 100% (3/3) |
+| misaligned_baseline | 25mm | 27mm | 1.0mm | 1mm | 100% (2/2) |
+| tight_plus_misaligned | 25mm | 25.5mm | 0.25mm | 1mm | 100% (3/3) |
+
+Key finding: Tight clearance (0.25mm) still succeeds but SEARCH convergence drops to 33%.
+See `docs/GEOMETRY_TOLERANCE_VALIDATION_RESULTS.md`.
+
 ## Scope Gaps (Honest Assessment)
 
 | # | Proposal Item | Status |

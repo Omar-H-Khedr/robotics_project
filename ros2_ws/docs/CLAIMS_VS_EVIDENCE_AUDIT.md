@@ -184,11 +184,11 @@ For each major claim, we list:
 
 | # | Item | Status | Gap Severity |
 |---|------|--------|-------------|
-| 1 | Different peg geometries | NOT IMPLEMENTED | CRITICAL |
-| 2 | Different hole geometries | NOT IMPLEMENTED | CRITICAL |
-| 3 | Different clearance/tolerance levels | NOT IMPLEMENTED (config only) | CRITICAL |
-| 4 | Product/tolerance variation | NOT IMPLEMENTED | CRITICAL |
-| 5 | Systematic generalization | NOT IMPLEMENTED | CRITICAL |
+| 1 | Different peg geometries | PARTIALLY IMPLEMENTED (3 cylindrical) | MEDIUM |
+| 2 | Different hole geometries | PARTIALLY IMPLEMENTED (4 circular) | MEDIUM |
+| 3 | Different clearance/tolerance levels | IMPLEMENTED (3 levels) | LOW |
+| 4 | Product/tolerance variation | PARTIALLY IMPLEMENTED | MEDIUM |
+| 5 | Systematic generalization | PARTIALLY IMPLEMENTED (Stage B) | MEDIUM |
 | 6 | Trained SAC policy | SCAFFOLD ONLY | HIGH |
 | 7 | Trained meta-RL policy | NOT IMPLEMENTED | HIGH |
 | 8 | Context-based meta-RL | NOT IMPLEMENTED | HIGH |
@@ -196,8 +196,6 @@ For each major claim, we list:
 | 10 | Hardware KUKA validation | NOT IMPLEMENTED | HIGH |
 | 11 | Sim-to-real transfer | NOT IMPLEMENTED | HIGH |
 
-**Honest assessment**: Items 1-5 (geometry/tolerance generalization) are the most critical gap.
-The project validates a single geometry. A doctoral thesis requires demonstrating generalization.
-See `docs/MILESTONE_GEOMETRY_TOLERANCE_MATRIX.md` for the required scenario matrix.
-Items 6-8 (SAC/meta-RL) require GPU cluster and are deferred. Items 10-11 (hardware/sim-to-real)
-require physical KUKA access.
+**Progress**: Items 1-5 moved from NOT IMPLEMENTED to PARTIALLY/IMPLEMENTED.
+22 geometry/tolerance trials completed (91% success across 7 scenarios).
+See `docs/GEOMETRY_TOLERANCE_VALIDATION_RESULTS.md` for full results.

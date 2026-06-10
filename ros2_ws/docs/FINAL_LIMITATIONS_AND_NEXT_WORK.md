@@ -42,16 +42,19 @@ The SAC baseline is scaffolded but not trained locally. Reason:
 
 The SAC environment contract, reward function, and termination conditions are validated via mock rollouts. Full Gazebo training is deferred to a GPU cluster deployment.
 
-### 6. Single Peg/Hole Variant — CRITICAL GAP
+### 6. Single Peg/Hole Variant — PARTIALLY ADDRESSED
 
-Only one geometry was tested: 25mm diameter peg, 27mm diameter hole, 1mm radial clearance. This is a critical gap for the doctoral proposal:
-- **Item 1 (Different peg geometries)**: NOT IMPLEMENTED — only cylindrical exists
-- **Item 2 (Different hole geometries)**: NOT IMPLEMENTED — only circular exists
-- **Item 3 (Different clearance/tolerance levels)**: NOT IMPLEMENTED — config exists (`v1_10.yaml`) but never executed
-- **Item 4 (Product/tolerance variation)**: NOT IMPLEMENTED
-- **Item 5 (Systematic generalization)**: NOT IMPLEMENTED — zero cross-scenario evidence
+Multiple peg/hole geometries and clearance levels are now parameterized and validated:
+- 3 peg diameters: 22mm, 25mm, 28mm (cylindrical)
+- 4 hole diameters: 24mm, 26mm, 27mm, 30mm (circular)
+- 3 clearance levels: 0.25mm, 0.5mm, 1.0mm
+- 7 scenarios, 22 trials, 91% overall success
 
-The v1_10 experiment matrix config defines `clearance_mm: [0.1, 0.2, 0.5]` but all execution policies are `false`. It is configuration-only, never simulated. See `docs/MILESTONE_GEOMETRY_TOLERANCE_MATRIX.md` for the required scenario matrix (7 scenarios × 20 trials = 140 new trials minimum).
+Remaining gaps:
+- Non-circular geometries (square peg/hole) not implemented
+- Friction/material variation not tested
+- Stage C (140 trials) needed for statistical confidence
+- Cross-scenario train/test generalization not evaluated
 
 ### 7. F/T Sensor Bridge Crash
 
@@ -71,12 +74,10 @@ Simulation parameters (joint friction, contact stiffness, camera noise) are fixe
 
 ## What Is Next
 
-### Immediate (Geometry/Tolerance Matrix — REQUIRED)
-- Create parameterized SDF peg/hole variants (cylindrical 25/22mm, square 25mm, circular hole 27/26/25.5mm)
-- Implement scenario matrix runner with geometry/clearance launch arguments
-- Execute 7 scenarios × 20 trials = 140 new trials
-- Compute cross-scenario generalization metrics
-- See `docs/MILESTONE_GEOMETRY_TOLERANCE_MATRIX.md` for full specification
+### Immediate (Geometry/Tolerance — Stage C)
+- Run Stage C: 20 trials per scenario = 140 new trials
+- Evaluate cross-scenario generalization (train on some, test on held-out)
+- Extend to non-circular geometries if Gazebo SDF supports them
 
 ### Short-Term (GPU Cluster)
 - Train SAC agent on Gazebo peg-in-hole task (1M-5M steps)

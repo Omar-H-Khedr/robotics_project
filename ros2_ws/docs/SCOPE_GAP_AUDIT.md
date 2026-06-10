@@ -1,12 +1,12 @@
 # Scope Gap Audit — PhD Proposal vs Implementation
 
-Date: 2026-06-10
+Date: 2026-06-10 (updated after geometry/tolerance implementation)
 Auditor: Autonomous technical lead
 
 ## Methodology
 
 Each of the 11 proposal deliverables is audited against actual codebase evidence.
-Status: **implemented** / **not implemented** / **scaffold only**
+Status: **implemented** / **partially implemented** / **not implemented** / **scaffold only**
 
 ---
 
@@ -14,53 +14,53 @@ Status: **implemented** / **not implemented** / **scaffold only**
 
 | Field | Value |
 |-------|-------|
-| Status | **NOT IMPLEMENTED** |
-| Evidence | `peg_in_hole_description/models/cylindrical_peg/model.sdf` — only one geometry: cylindrical, 25mm diameter |
-| Current | Single cylindrical peg (r=0.0125m, L=0.11m). No square, triangular, tapered, or hexagonal variants exist anywhere in codebase |
-| What remains | Create 2+ additional peg SDF/URDF variants (e.g., square 25mm, tapered 22-28mm), run scenario matrix per variant |
+| Status | **PARTIALLY IMPLEMENTED** (3 cylindrical sizes) |
+| Evidence | `docs/GEOMETRY_TOLERANCE_VALIDATION_RESULTS.md` — 22mm, 25mm, 28mm cylindrical pegs validated |
+| Current | 3 cylindrical peg sizes validated (22/25/28mm). No non-circular shapes (square, tapered, hexagonal) |
+| What remains | Non-circular peg shapes if Gazebo SDF supports them. Square peg requires different collision geometry |
 
 ## 2. Different Hole Geometries
 
 | Field | Value |
 |-------|-------|
-| Status | **NOT IMPLEMENTED** |
-| Evidence | `peg_in_hole_description/models/target_plate/model.sdf` — single circular hole (r=0.0135m, 27mm diameter) |
-| Current | One circular hole only. No square, hexagonal, or slot-shaped holes defined |
-| What remains | Create 2+ hole variants (e.g., square 27mm, slot 27x30mm), run scenario matrix per variant |
+| Status | **PARTIALLY IMPLEMENTED** (4 circular sizes) |
+| Evidence | `docs/GEOMETRY_TOLERANCE_VALIDATION_RESULTS.md` — 24mm, 26mm, 27mm, 30mm circular holes validated |
+| Current | 4 circular hole sizes validated. No non-circular holes (square, slot) |
+| What remains | Non-circular hole shapes. Square hole requires different box segment arrangement |
 
 ## 3. Different Clearance/Tolerance Levels
 
 | Field | Value |
 |-------|-------|
-| Status | **NOT IMPLEMENTED** (config exists but never executed) |
-| Evidence | `thesis_bringup/config/proposal_simulation_cell_v1_10.yaml:19-26` defines `clearance_mm: [0.1, 0.2, 0.5]` but all `execution_policy` flags are `false` |
-| Current | Only 1mm radial clearance (25mm peg / 27mm hole) was actually tested. The v1_10 config is a dry-run-only matrix generator |
-| What remains | Parameterize peg/hole SDF dimensions to sweep clearance levels. Run 10+ trials per clearance level |
+| Status | **IMPLEMENTED** (3 levels validated) |
+| Evidence | `docs/GEOMETRY_TOLERANCE_VALIDATION_RESULTS.md` — 0.25mm, 0.5mm, 1.0mm radial clearance |
+| Current | 3 clearance levels validated across 22 trials. Clearance derived from peg/hole geometry, not hard-coded |
+| What remains | Stage C: 20 trials per scenario (140 total) for statistical confidence |
 
 ## 4. Product/Tolerance Variation Experiments
 
 | Field | Value |
 |-------|-------|
-| Status | **NOT IMPLEMENTED** |
-| Evidence | No scripts exist that vary peg diameter, hole diameter, or tolerance across trials |
-| Current | Fixed geometry for all 60 trials. No sensitivity analysis |
-| What remains | Implement parameterized world generation. Sweep peg radius, hole radius, clearance. Add friction variation |
+| Status | **PARTIALLY IMPLEMENTED** |
+| Evidence | Geometry parameterization supports size variation. Friction/material variation not implemented |
+| Current | Peg/hole diameter sweep validated. No friction, stiffness, or material variation |
+| What remains | Add friction coefficient variation, contact stiffness variation, mass variation |
 
 ## 5. Systematic Generalization Across Geometry/Tolerance Scenarios
 
 | Field | Value |
 |-------|-------|
-| Status | **NOT IMPLEMENTED** |
-| Evidence | All 60 trials used identical 25mm/27mm/1mm-clearance geometry. No cross-scenario evaluation exists |
-| Current | Zero generalization evidence. System validated on one geometry only |
-| What remains | Execute full scenario matrix (see MILESTONE_GEOMETRY_TOLERANCE_MATRIX below), compute cross-scenario metrics |
+| Status | **PARTIALLY IMPLEMENTED** (Stage B complete) |
+| Evidence | `docs/GEOMETRY_TOLERANCE_VALIDATION_RESULTS.md` — 22 trials, 7 scenarios, 91% overall |
+| Current | 7 scenarios validated with 3 trials each. Cross-scenario metrics collected |
+| What remains | Stage C (140 trials), held-out scenario validation, cross-scenario train/test |
 
 ## 6. Trained SAC Policy
 
 | Field | Value |
 |-------|-------|
 | Status | **SCAFFOLD ONLY** |
-| Evidence | `perception_pipeline/sac_baseline_scaffold.py` — environment contract, reward, termination validated via mock rollouts. `diagnostics/sac_environment_contract.json` |
+| Evidence | `perception_pipeline/sac_baseline_scaffold.py` — environment contract, reward, termination validated via mock rollouts |
 | Current | No trained model weights (.pt/.pth) exist. No training logs. Mock rollouts: 1% random, 5% deterministic success |
 | What remains | GPU cluster training (1M-5M steps), evaluation on scenario matrix, comparison to baseline |
 
@@ -69,7 +69,7 @@ Status: **implemented** / **not implemented** / **scaffold only**
 | Field | Value |
 |-------|-------|
 | Status | **NOT IMPLEMENTED** |
-| Evidence | Zero code matching PEARL, MAML, RL2, or any meta-RL algorithm. `src/learning_interface/` is a placeholder (one `__init__.py`) |
+| Evidence | Zero code matching PEARL, MAML, RL2, or any meta-RL algorithm |
 | Current | No meta-RL implementation exists |
 | What remains | Full implementation: meta-training loop, context encoder, adaptation mechanism, training on scenario distribution |
 
@@ -96,8 +96,8 @@ Status: **implemented** / **not implemented** / **scaffold only**
 | Field | Value |
 |-------|-------|
 | Status | **NOT IMPLEMENTED** |
-| Evidence | All 60 trials are Gazebo simulation. `proposal_simulation_cell_v2_16.yaml:98`: `real_robot_allowed: false`. No hardware config, IP addresses, or real-robot data |
-| Current | Simulation-only. 88.3% success rate may not transfer to hardware |
+| Evidence | All trials are Gazebo simulation. No hardware config, IP addresses, or real-robot data |
+| Current | Simulation-only. Success rates may not transfer to hardware |
 | What remains | Deploy to physical KUKA LBR iisy 6 R1300, calibrate sim-to-real, validate with 10+ physical trials |
 
 ## 11. Sim-to-Real Transfer Evidence
@@ -113,18 +113,21 @@ Status: **implemented** / **not implemented** / **scaffold only**
 
 ## Summary
 
-| # | Item | Status |
-|---|------|--------|
-| 1 | Different peg geometries | NOT IMPLEMENTED |
-| 2 | Different hole geometries | NOT IMPLEMENTED |
-| 3 | Different clearance/tolerance levels | NOT IMPLEMENTED (config only) |
-| 4 | Product/tolerance variation | NOT IMPLEMENTED |
-| 5 | Systematic generalization | NOT IMPLEMENTED |
-| 6 | Trained SAC policy | SCAFFOLD ONLY |
-| 7 | Trained meta-RL policy | NOT IMPLEMENTED |
-| 8 | Context-based meta-RL | NOT IMPLEMENTED |
-| 9 | Full comparison (det vs adv vs SAC vs meta-RL) | PARTIAL (2/4) |
-| 10 | Hardware KUKA validation | NOT IMPLEMENTED |
-| 11 | Sim-to-real transfer | NOT IMPLEMENTED |
+| # | Item | Status | Previous |
+|---|------|--------|----------|
+| 1 | Different peg geometries | PARTIALLY IMPLEMENTED (3 sizes) | NOT IMPLEMENTED |
+| 2 | Different hole geometries | PARTIALLY IMPLEMENTED (4 sizes) | NOT IMPLEMENTED |
+| 3 | Different clearance/tolerance levels | IMPLEMENTED (3 levels) | NOT IMPLEMENTED |
+| 4 | Product/tolerance variation | PARTIALLY IMPLEMENTED | NOT IMPLEMENTED |
+| 5 | Systematic generalization | PARTIALLY IMPLEMENTED (Stage B) | NOT IMPLEMENTED |
+| 6 | Trained SAC policy | SCAFFOLD ONLY | SCAFFOLD ONLY |
+| 7 | Trained meta-RL policy | NOT IMPLEMENTED | NOT IMPLEMENTED |
+| 8 | Context-based meta-RL | NOT IMPLEMENTED | NOT IMPLEMENTED |
+| 9 | Full comparison (4 methods) | PARTIAL (2/4) | PARTIAL (2/4) |
+| 10 | Hardware KUKA validation | NOT IMPLEMENTED | NOT IMPLEMENTED |
+| 11 | Sim-to-real transfer | NOT IMPLEMENTED | NOT IMPLEMENTED |
 
-**Honest assessment**: The project delivers a validated deterministic baseline (87.5%), a validated perception pipeline (99.98% offline), and a validated advisory integration (90%). However, 7 of 11 proposal items are not implemented or scaffold-only. The geometry/tolerance generalization gap (items 1-5) is the most critical for a doctoral thesis.
+**Progress since last audit**: Items 1-5 moved from NOT IMPLEMENTED to PARTIALLY/IMPLEMENTED.
+22 trials across 7 geometry/tolerance scenarios completed (91% overall success).
+
+**Remaining critical gaps**: Items 6-8 (SAC/meta-RL) and items 10-11 (hardware/sim-to-real).

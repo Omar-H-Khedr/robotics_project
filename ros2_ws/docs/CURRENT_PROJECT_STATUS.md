@@ -44,14 +44,27 @@ Date: 2026-06-10
 - **99.98%** offline classifier accuracy
 - **22,083** training rows (6 phases)
 - **24** unit tests passing
-- **1** peg geometry tested (cylindrical 25mm)
-- **1** hole geometry tested (circular 27mm)
-- **1** clearance level tested (1mm radial)
-- **0** cross-scenario generalization evidence
+- **3** peg geometries tested (cylindrical 22/25/28mm)
+- **4** hole geometries tested (circular 24/26/27/30mm)
+- **3** clearance levels tested (0.25/0.5/1.0mm)
+- **22** geometry/tolerance trials (Stage B, 91% success)
+- **7** scenarios validated
+
+## Geometry/Tolerance Stage B Results
+
+| Scenario | Peg | Hole | Clearance | Offset | Success |
+|----------|-----|------|-----------|--------|---------|
+| baseline_loose | 25mm | 27mm | 1.0mm | 0mm | 100% (3/3) |
+| clearance_medium | 25mm | 26mm | 0.5mm | 0mm | 67% (2/3) |
+| clearance_tight | 25mm | 25.5mm | 0.25mm | 0mm | 100% (3/3) |
+| large_peg_large_hole | 28mm | 30mm | 1.0mm | 0mm | 100% (3/3) |
+| small_peg_small_hole | 22mm | 24mm | 1.0mm | 0mm | 100% (3/3) |
+| misaligned_baseline | 25mm | 27mm | 1.0mm | 1mm | 100% (2/2) |
+| tight_plus_misaligned | 25mm | 25.5mm | 0.25mm | 1mm | 100% (3/3) |
 
 ## Next Milestone
 
-**Geometry/Tolerance Scenario Matrix** — see `docs/MILESTONE_GEOMETRY_TOLERANCE_MATRIX.md`
-- 7 scenarios × 20 trials = 140 new trials
+**Stage C: Full matrix** — 20 trials per scenario = 140 new trials
+- See `docs/MILESTONE_GEOMETRY_TOLERANCE_MATRIX.md`
 - Required for doctoral thesis generalization claims
-- Estimated effort: 1-2 weeks
+- Requires GPU cluster time

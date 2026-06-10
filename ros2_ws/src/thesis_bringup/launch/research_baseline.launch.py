@@ -668,6 +668,31 @@ def launch_setup(context, *args, **kwargs):
                     LaunchConfiguration("search_entry_threshold_m"),
                     value_type=float,
                 ),
+                "peg_radius_m": ParameterValue(
+                    LaunchConfiguration("peg_radius_m"),
+                    value_type=float,
+                ),
+                "hole_radius_m": ParameterValue(
+                    LaunchConfiguration("hole_radius_m"),
+                    value_type=float,
+                ),
+                "peg_length_m": ParameterValue(
+                    LaunchConfiguration("peg_length_m"),
+                    value_type=float,
+                ),
+                "hole_center_x": ParameterValue(
+                    LaunchConfiguration("hole_center_x"),
+                    value_type=float,
+                ),
+                "hole_center_y": ParameterValue(
+                    LaunchConfiguration("hole_center_y"),
+                    value_type=float,
+                ),
+                "hole_top_z": ParameterValue(
+                    LaunchConfiguration("hole_top_z"),
+                    value_type=float,
+                ),
+                "scenario_id": LaunchConfiguration("scenario_id"),
                 "use_sim_time": simulation["use_sim_time"],
             }
         ],
@@ -898,6 +923,41 @@ def generate_launch_description():
                     "SEARCH when XY error exceeds the 1 mm physical clearance "
                     "(legacy behaviour)."
                 ),
+            ),
+            DeclareLaunchArgument(
+                "peg_radius_m",
+                default_value="0.0125",
+                description="Peg radius in metres for scenario geometry.",
+            ),
+            DeclareLaunchArgument(
+                "hole_radius_m",
+                default_value="0.0135",
+                description="Hole radius in metres for scenario geometry.",
+            ),
+            DeclareLaunchArgument(
+                "peg_length_m",
+                default_value="0.11",
+                description="Peg length in metres for scenario geometry.",
+            ),
+            DeclareLaunchArgument(
+                "hole_center_x",
+                default_value="0.52",
+                description="Hole centre X in world frame (metres).",
+            ),
+            DeclareLaunchArgument(
+                "hole_center_y",
+                default_value="-0.20",
+                description="Hole centre Y in world frame (metres).",
+            ),
+            DeclareLaunchArgument(
+                "hole_top_z",
+                default_value="0.810",
+                description="Z position of hole top surface (metres).",
+            ),
+            DeclareLaunchArgument(
+                "scenario_id",
+                default_value="",
+                description="Scenario identifier for logging and metrics.",
             ),
             DeclareLaunchArgument(
                 "exit_on_done",

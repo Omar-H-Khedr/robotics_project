@@ -1,0 +1,100 @@
+# Geometry/Tolerance Scenario Matrix
+# Date: 2026-06-10
+#
+# Each scenario defines peg/hole geometry and trial parameters.
+# The runner generates SDF worlds and launch args for each scenario.
+#
+# Scenarios are grouped into tiers:
+#   Tier 1 — Clearance sweep (same geometry, different tolerance)
+#   Tier 2 — Size variation (different peg/hole pairs)
+#   Tier 3 — Combined difficulty (tighter + misalignment)
+
+# Default hole center position (world frame)
+hole_center_x: 0.52
+hole_center_y: -0.20
+fixture_z: 0.75
+plate_z: 0.79
+peg_length: 0.11
+
+# Default task parameters (can be overridden per scenario)
+default_task_params:
+  control_rate: 25.0
+  position_gain: 3000.0
+  position_derivative_gain: 10.0
+  joint_damping_scale: 10.0
+  inject_velocity_state: true
+  velocity_state_controller_config_path: config/research_baseline_velocity_state_500hz.yaml
+  search_recenter_duration_s: 8.0
+  search_settle_duration_s: 9.0
+  insert_handoff_timeout_s: 12.0
+  search_entry_threshold_m: 0.0
+  exit_on_done: true
+  shutdown_on_task_exit: true
+
+scenarios:
+  # ── Tier 1: Clearance sweep ──────────────────────────────────────────────
+
+  - id: baseline_loose
+    description: "Baseline: 25mm peg / 27mm hole / 1.0mm radial clearance"
+    tier: 1
+    peg_radius_m: 0.0125
+    hole_radius_m: 0.0135
+    initial_xy_offset_m: 0.0
+    approach_offset_xy: 0.0
+    # Derived: clearance = 1.0mm
+
+  - id: clearance_medium
+    description: "Medium clearance: 25mm peg / 26mm hole / 0.5mm radial clearance"
+    tier: 1
+    peg_radius_m: 0.0125
+    hole_radius_m: 0.0130
+    initial_xy_offset_m: 0.0
+    approach_offset_xy: 0.0
+    # Derived: clearance = 0.5mm
+
+  - id: clearance_tight
+    description: "Tight clearance: 25mm peg / 25.5mm hole / 0.25mm radial clearance"
+    tier: 1
+    peg_radius_m: 0.0125
+    hole_radius_m: 0.01275
+    initial_xy_offset_m: 0.0
+    approach_offset_xy: 0.0
+    # Derived: clearance = 0.25mm
+
+  # ── Tier 2: Size variation ──────────────────────────────────────────────
+
+  - id: small_peg_small_hole
+    description: "Small pair: 22mm peg / 24mm hole / 1.0mm radial clearance"
+    tier: 2
+    peg_radius_m: 0.011
+    hole_radius_m: 0.012
+    initial_xy_offset_m: 0.0
+    approach_offset_xy: 0.0
+    # Derived: clearance = 1.0mm
+
+  - id: large_peg_large_hole
+    description: "Large pair: 28mm peg / 30mm hole / 1.0mm radial clearance"
+    tier: 2
+    peg_radius_m: 0.014
+    hole_radius_m: 0.015
+    initial_xy_offset_m: 0.0
+    approach_offset_xy: 0.0
+    # Derived: clearance = 1.0mm
+
+  # ── Tier 3: Combined difficulty ─────────────────────────────────────────
+
+  - id: misaligned_baseline
+    description: "Baseline geometry + 1mm XY misalignment at start"
+    tier: 3
+    peg_radius_m: 0.0125
+    hole_radius_m: 0.0135
+    initial_xy_offset_m: 0.001
+    approach_offset_xy: 0.001
+
+  - id: tight_plus_misaligned
+    description: "Tight clearance (0.25mm) + 1mm XY misalignment"
+    tier: 3
+    peg_radius_m: 0.0125
+    hole_radius_m: 0.01275
+    initial_xy_offset_m: 0.001
+    approach_offset_xy: 0.001

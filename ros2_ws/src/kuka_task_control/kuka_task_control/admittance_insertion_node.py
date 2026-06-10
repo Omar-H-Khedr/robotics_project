@@ -203,6 +203,14 @@ class AdmittanceInsertionNode(Node):
         self.declare_parameter('approach_offset_xy', 0.0)
         self.declare_parameter('search_entry_threshold_m', 0.0)
         self.declare_parameter('tracking_log_dir', '')
+        # Geometry parameters (overridable per scenario)
+        self.declare_parameter('peg_radius_m', self.PEG_RADIUS_M)
+        self.declare_parameter('hole_radius_m', self.HOLE_RADIUS_M)
+        self.declare_parameter('peg_length_m', 0.11)
+        self.declare_parameter('hole_center_x', self.HOLE_CENTRE_XY[0])
+        self.declare_parameter('hole_center_y', self.HOLE_CENTRE_XY[1])
+        self.declare_parameter('hole_top_z', self.HOLE_TOP_Z)
+        self.declare_parameter('scenario_id', '')
 
         self._contact_threshold: float = (
             self.get_parameter('contact_threshold').value
@@ -259,6 +267,47 @@ class AdmittanceInsertionNode(Node):
         )
         self._tracking_log_dir: str = str(
             self.get_parameter('tracking_log_dir').value or ''
+        )
+
+        # Geometry parameters — override class constants from ROS params
+        self.PEG_RADIUS_M: float = float(
+            self.get_parameter('peg_radius_m').value
+        )
+        self.HOLE_RADIUS_M: float = float(
+            self.get_parameter('hole_radius_m').value
+        )
+        self.peg_length_m: float = float(
+            self.get_parameter('peg_length_m').value
+        )
+        self.INSERT_FINAL_XY_TOLERANCE = self.HOLE_RADIUS_M - self.PEG_RADIUS_M
+        self._hole_center_x: float = float(
+            self.get_parameter('hole_center_x').value
+        )
+        self._hole_center_y: float = float(
+            self.get_parameter('hole_center_y').value
+        )
+        self.HOLE_CENTRE_XY = np.array([self._hole_center_x, self._hole_center_y])
+        self._hole_top_z: float = float(
+            self.get_parameter('hole_top_z').value
+        )
+        self.HOLE_TOP_Z = self._hole_top_z
+        self.INSERT_ENTRY_TARGET_Z = self.HOLE_TOP_Z + 0.004
+        self.INSERT_CAPTURE_TARGET_Z = self.HOLE_TOP_Z - 0.002
+        self.AXIS_ALIGN_POSE = np.array([
+            self._hole_center_x, self._hole_center_y, 0.885,
+        ])
+        self.TOUCH_POSE = np.array([
+            self._hole_center_x, self._hole_center_y, 0.830,
+        ])
+        self.HOLD_POSE = np.array([
+            self._hole_center_x, self._hole_center_y, self.HOLE_TOP_Z,
+        ])
+        self.FINAL_INSERTION_POSE = np.array([
+            self._hole_center_x, self._hole_center_y, 0.790,
+        ])
+        self.RETREAT_CLEARANCE_Z = self.AXIS_ALIGN_POSE[2]
+        self._scenario_id: str = str(
+            self.get_parameter('scenario_id').value or ''
         )
 
         self._state: str = self.IDLE
