@@ -373,7 +373,14 @@ def run_trial(
 
 
 def _parse_trial_outcome(stdout: str, stderr: str, duration_s: float) -> TrialResult:
-    """Parse trial outcome from Gazebo stdout/stderr logs."""
+    """Parse trial outcome from Gazebo stdout/stderr logs.
+
+    Correct detection: look at the LAST 'Task phase updated:' message.
+    If it says DONE -> success. If it says ABORT -> failure.
+    The 'DONE outcome written' message is logged even on ABORT because
+    the node always exits cleanly after writing the outcome.
+    """
+    import re
     success = False
     search_entered = False
     search_converged = False
@@ -390,13 +397,16 @@ def _parse_trial_outcome(stdout: str, stderr: str, duration_s: float) -> TrialRe
 
     combined = stdout + "\n" + stderr
 
-    # Check for DONE outcome (authoritative success indicator)
-    if "DONE outcome written" in combined:
-        success = True
-    elif "ABORT" in combined and "outcome" in combined.lower():
-        success = False
-        safety_abort = True
-        failure_phase = "ABORT"
+    # Correct success detection: last "Task phase updated: PHASE" message
+    phase_updates = re.findall(r'Task phase updated: (\w+)', combined)
+    if phase_updates:
+        last_phase = phase_updates[-1]
+        if last_phase == "DONE":
+            success = True
+        elif last_phase == "ABORT":
+            success = False
+            safety_abort = True
+            failure_phase = "ABORT"
 
     # Check for SEARCH phase
     if "Attempting search phase" in combined or "SEARCH" in combined:
@@ -405,8 +415,6 @@ def _parse_trial_outcome(stdout: str, stderr: str, duration_s: float) -> TrialRe
         search_converged = True
 
     # Extract insertion depth from INSERT log lines
-    # Pattern: physical_depth=0.0200m
-    import re
     depth_matches = re.findall(r'physical_depth=([0-9.]+)m', combined)
     if depth_matches:
         insertion_depth = max(float(d) for d in depth_matches)
@@ -429,12 +437,22 @@ def _parse_trial_outcome(stdout: str, stderr: str, duration_s: float) -> TrialRe
     # Extract sideload recovery attempts
     sideload_matches = re.findall(r'sideload_recovery_attempts[=:]\s*(\d+)', combined)
     if sideload_matches:
-        sideload_recovery = max(int(s) for r in sideload_matches)
+        sideload_recovery = max(int(s) for s in sideload_matches)
 
     # Check for timeout
-    if "timeout" in combined.lower() and not success:
+    if ("SEARCH timeout" in combined or "recenter_budget exhausted" in combined) and not success:
         timeout = True
         failure_phase = "TIMEOUT"
+
+    # Check for specific failure reasons
+    if "handoff settle timeout" in combined.lower():
+        failure_reason = "handoff_settle_timeout"
+    elif "SEARCH timeout" in combined or "recenter_budget exhausted" in combined:
+        failure_reason = "search_timeout"
+    elif "side-load abort" in combined.lower() or "sideload" in combined.lower():
+        failure_reason = "sideload_abort"
+    elif safety_abort and not failure_reason:
+        failure_reason = "safety_abort"
 
     return TrialResult(
         scenario_id="",

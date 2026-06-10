@@ -280,6 +280,10 @@ class AdmittanceInsertionNode(Node):
             self.get_parameter('peg_length_m').value
         )
         self.INSERT_FINAL_XY_TOLERANCE = self.HOLE_RADIUS_M - self.PEG_RADIUS_M
+        # Clearance-derived gates: scale with radial clearance
+        _radial_clearance = self.HOLE_RADIUS_M - self.PEG_RADIUS_M
+        self.INSERT_SIDELOAD_DEPTH_GATE_M = max(0.0005, _radial_clearance)
+        self.INSERT_CAPTURE_Z_MARGIN_M = max(0.0005, _radial_clearance * 0.5)
         self._hole_center_x: float = float(
             self.get_parameter('hole_center_x').value
         )
