@@ -121,7 +121,7 @@
       "insert_handoff_timeout_s": 12,
       "search_entry_threshold_m": 0.0
     },
-    "combined_production_rate": "37/40 (92.5%)",
+    "combined_production_rate": "35/40 (87.5%)",
     "evidence_path": "diagnostics/research_baseline_production_search_v20_600s/"
   },
 
@@ -150,24 +150,37 @@
   },
 
   "validation_runs": {
-    "total_trials_run": 50,
-    "total_non_empty_logs": 49,
-    "total_physical_successes": 42,
-    "overall_success_rate": "84%",
+    "total_trials_run": 60,
+    "total_non_empty_logs": 60,
+    "total_physical_successes": 53,
+    "overall_success_rate": "88.3%",
 
     "runs": [
       {
-        "name": "10-trial full-task",
+        "name": "Production 10-trial",
         "trials": 10,
-        "non_empty": "9/10",
-        "successes": "9/10",
+        "non_empty": "10/10",
+        "successes": "8/10 (80%)",
+        "notes": "2 ABORTED (side-load)",
+        "config": "approach_offset_xy:=0.003",
+        "commit": "6b2a65e"
+      },
+      {
+        "name": "Post-fix 10-trial",
+        "trials": 10,
+        "non_empty": "10/10",
+        "successes": "9/10 (90%)",
+        "notes": "1 side-load abort",
+        "config": "approach_offset_xy:=0.003",
         "commit": "6b2a65e"
       },
       {
         "name": "20-trial confirmation",
         "trials": 20,
         "non_empty": "20/20",
-        "successes": "17/20 (85%)",
+        "successes": "18/20 (90%)",
+        "notes": "2 ABORTED (side-load)",
+        "config": "search_entry_threshold_m:=0.0",
         "commit": "43799a4"
       },
       {
@@ -238,7 +251,7 @@
   ],
 
   "proposal_mapping": {
-    "phase_1_foundations": "EXCEEDED — full task pipeline operational, 92.5% success",
+    "phase_1_foundations": "EXCEEDED — full task pipeline operational, 87.5% combined baseline",
     "phase_2_representation": "COMPLETE — raw 68-dim context validated, encoder ablated",
     "phase_3_safety_gating": "COMPLETE — v2_14 safety-gated classifier, 99.98% offline",
     "phase_4_shadow_validation": "COMPLETE — 92.2% shadow agreement, 10/10 non-empty",

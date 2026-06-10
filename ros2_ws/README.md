@@ -1,33 +1,91 @@
 # ROS 2 Jazzy / Gazebo Peg-in-Hole Research Workspace
 
-Current status as of 2026-06-09: this is an active ROS 2 Jazzy workspace for a Gazebo-based KUKA LBR iisy 6 R1300 peg-in-hole research baseline. The project has a working robot spawn path, active ros2_control controllers, a fixed grasped peg model, a fixed hole fixture, force/torque bridge plumbing, contact observability, and an admittance-style insertion controller.
+**Last updated**: 2026-06-10 | **Branch**: `robot-review` | **HEAD**: `1bb7a7b`
 
-Shutdown recovery on 2026-06-07 restored tracked `build/`, `install/`, `log/`,
-and `__pycache__` churn, ignored local diagnostics/cache/proposal extraction
-artifacts, and kept only intentional source/docs. The latest verified milestone
-from docs and git history is split by subsystem:
+## What This Project Does
 
-- Perception: `live_v2_14_inference_node_validation` from `ab2a747`, a passive
-  20 Hz live node with 62.6% live accuracy and no controller output.
-- Control: `research_baseline_search_post_settle_count_recenter8_gain3000_damping10_25hz_v1`,
-  a retained SEARCH sequencing fix on top of the earlier single-plugin startup,
-  seconds-based SEARCH settling, and INSERT handoff-ordering fixes. SEARCH now
-  counts a valid post-settle inside-clearance sample before sending another
-  command, without exposing or relaxing the fixed 1 mm / 8-tick gate. The run
-  reached INSERT and launch exited cleanly after final DONE status, but the task
-  still aborted before descent: INSERT handoff feedback timed out at `0.0023 m`
-  XY error against the `0.0010 m` physical radial clearance. No insertion
-  success is claimed.
+A vision-based safety-gated advisory framework for peg-in-hole assembly using a KUKA LBR iisy 6 R1300 in Gazebo Harmonic simulation. The system combines:
 
-Follow-up diagnostic
-`research_baseline_current_joint_handoff_recenter8_gain3000_damping10_25hz_v1`
-tested a candidate current-joint INSERT handoff hold, but SEARCH failed closed
-before INSERT and no handoff command was published. The candidate source edit
-was reverted; the retained evidence is a SEARCH instability diagnostic, not an
-insertion milestone.
+1. **Deterministic admittance controller** — 87.5% success rate (35/40 trials)
+2. **v2_14 safety-gated ML classifier** — 99.98% offline accuracy on 68-dim context
+3. **Guarded advisory layer** — ML advises, deterministic controller decides
+4. **Safety invariants** — DONE never trusted from ML, INSERT always deterministic
 
-The latest source milestone,
-`research_baseline_clean_python_shutdown_recenter8_gain3000_damping10_25hz_v3`,
+**Grand total**: 53/60 (88.3%) across 60 automated trials, 100% non-empty logs.
+
+## Quick Start
+
+```bash
+# Build
+source /opt/ros/jazzy/setup.bash
+colcon build --packages-select perception_pipeline thesis_bringup
+source install/setup.bash
+
+# Run unit tests (24 tests)
+python3 -m pytest install/perception_pipeline/lib/python3.12/site-packages/perception_pipeline/test_advisory_safety.py -v
+
+# Run a single trial
+ros2 launch thesis_bringup research_baseline.launch.py \
+  use_gui:=false control_rate:=25.0 position_gain:=3000.0 \
+  position_derivative_gain:=10.0 joint_damping_scale:=10.0 \
+  inject_velocity_state:=true \
+  velocity_state_controller_config_path:=config/research_baseline_velocity_state_500hz.yaml \
+  search_recenter_duration_s:=8.0 search_settle_duration_s:=9.0 \
+  insert_handoff_timeout_s:=12.0 search_entry_threshold_m:=0.0 \
+  exit_on_done:=true shutdown_on_task_exit:=true
+```
+
+## Where the Evidence Is
+
+| What | Path |
+|------|------|
+| Validation metrics (all-in-one) | `docs/metrics/comprehensive_validation_metrics.json` |
+| Claims audit | `docs/CLAIMS_VS_EVIDENCE_AUDIT.md` |
+| Architecture | `docs/FINAL_SYSTEM_ARCHITECTURE.md` |
+| Limitations | `docs/FINAL_LIMITATIONS_AND_NEXT_WORK.md` |
+| Proposal narrative | `docs/DOCTORAL_PROPOSAL_RESULTS_NARRATIVE.md` |
+| Evidence index | `docs/EVIDENCE_INDEX.md` |
+| Proposal mapping | `docs/PROPOSAL_IMPLEMENTATION_MAPPING.md` |
+| Reproducibility guide | `docs/reproducibility/REPRODUCIBILITY_GUIDE.md` |
+
+## What Is Validated
+
+- Full-task peg-in-hole execution (5 phases) in Gazebo: 88.3% success
+- v2_14 classifier offline: 99.98% accuracy, all classes F1 >= 0.996
+- v2_14 shadow-mode: 92.2% live agreement, all phases captured
+- v2_14 advisory: all safety invariants hold, 485 unsafe predictions blocked
+- Encoder negative ablation: raw 68-dim (99.91%) >> encoder 32-dim (92.4%)
+- Perception logger: 100% reliability after DDS fix
+
+## What Is NOT Validated
+
+- Physical hardware (Gazebo simulation only)
+- Multi-variant peg/hole (single geometry: 25mm peg, 27mm hole)
+- SAC training (scaffolded, requires GPU cluster)
+- Sim-to-real transfer
+- F/T features (ft_sensor_bridge crash, wrench zeros in context)
+
+## Current Best Result
+
+**88.3% full-task success** (53/60) across 60 automated trials with 100% non-empty logs. The v2_14 guarded advisory layer runs alongside the deterministic controller with all safety invariants verified by 24 unit tests and 10 live validation trials.
+
+## Limitations
+
+- Simulation only, no hardware validation
+- DONE precision = 3.4% (structural, blocked by advisory safety gate)
+- Single peg/hole variant
+- No domain randomization
+- SAC training deferred to GPU cluster
+
+## Next Step for Cluster SAC Training
+
+```bash
+# On GPU cluster with Gazebo:
+python3 -m perception_pipeline.sac_feasibility_assessment  # verify contract
+# Then implement GazeboEnvironment(gym.Env) wrapper around research_baseline.launch.py
+# Train: 1M-5M steps, SAC with the reward/termination from sac_baseline_scaffold.py
+# Compare against deterministic baseline (87.5%) and v2_14 advisory (88.3%)
+```
 cleans shutdown handling for Python observers, the safety monitor, and the data
 logger after DONE-reaching launch runs. The retained validation reached DONE
 with launch exit code `0`; those Python processes finished cleanly and the data

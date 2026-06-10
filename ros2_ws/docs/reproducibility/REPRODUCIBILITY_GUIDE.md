@@ -144,12 +144,12 @@ python3 -m perception_pipeline.test_v2_14_safety_gated_offline \
 
 | Run | Trials | Successes | Rate | Non-Empty | Path |
 |---|---:|---:|---:|---:|---|
-| Production 10-trial | 10 | 10 | 100% | 10/10 | `diagnostics/research_baseline_search_entered_500hz_v1_10trial/` |
-| Post-fix 10-trial | 10 | 9 | 90% | 9/10 | `diagnostics/research_baseline_search_confirmation_v1/` |
-| 20-trial confirmation | 20 | 17 | 85% | 20/20 | `diagnostics/research_baseline_production_search_v20_600s/` |
+| Production 10-trial | 10 | 8 | 80% | 10/10 | `diagnostics/research_baseline_search_entered_500hz_v1_10trial/` |
+| Post-fix 10-trial | 10 | 9 | 90% | 10/10 | `diagnostics/research_baseline_search_confirmation_v1/` |
+| 20-trial confirmation | 20 | 18 | 90% | 20/20 | `diagnostics/research_baseline_production_search_v20_600s/` |
 | Shadow-mode validation | 10 | 9 | 90% | 10/10 | `diagnostics/v2_14_shadow_mode_validation/` |
 | Guarded advisory validation | 10 | 9 | 90% | 10/10 | `diagnostics/v2_14_advisory_validation/` |
-| **Grand Total** | **50** | **42** | **84%** | **49/50** | All runs |
+| **Grand Total** | **60** | **53** | **88.3%** | **60/60** | All runs |
 
 ## Perception Pipeline Evidence
 

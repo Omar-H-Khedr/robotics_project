@@ -27,7 +27,7 @@ This document maps each proposal deliverable to its current implementation statu
 | Autoencoder pre-training | DONE | v2_13: 68→32→68, test_mse=0.003670 (6-phase). Encoder is a documented negative ablation. |
 | Action classifier | DONE | v2_14: 99.98% offline accuracy, 7-class classification (6-phase). Raw 68-dim validated. |
 | Ablation studies | DONE | v2_15: 5 variants, comprehensive per-class metrics. Raw 68-dim optimal. |
-| Simulation benchmarks | DONE | 50 trials total: 92.5% combined (37/40), 90% shadow-mode (9/10), 90% advisory (9/10) |
+| Simulation benchmarks | DONE | 60 trials total: 87.5% combined baseline (35/40), 88.3% grand total (53/60), 90% shadow-mode (9/10), 90% advisory (9/10) |
 | Multi-variant pegs/holes | NOT DONE | Single variant: 25mm peg, 27mm hole |
 
 ## Phase 3: Core Learning (Months 10-22) — IN PROGRESS
@@ -65,13 +65,13 @@ This document maps each proposal deliverable to its current implementation statu
 
 | Run | Trials | Success Rate | Non-Empty Logs | Notes |
 |---|---|---|---|---|
-| Production-safe 10-trial | 10 | 100% (10/10) | 10/10 | Initial validation |
-| Post-fix 10-trial | 10 | 90% (9/10) | 9/10 | DDS fix |
-| **20-trial confirmation** | **20** | **85% (17/20)** | **20/20** | Improved DDS cleanup |
-| **Combined (40 trials)** | **40** | **92.5% (37/40)** | **39/40** | Production baseline |
+| Production-safe 10-trial | 10 | 80% (8/10) | 10/10 | Initial validation (2 ABORTED) |
+| Post-fix 10-trial | 10 | 90% (9/10) | 10/10 | 1 side-load abort |
+| **20-trial confirmation** | **20** | **90% (18/20)** | **20/20** | Improved DDS cleanup |
+| **Combined baseline (40 trials)** | **40** | **87.5% (35/40)** | **40/40** | Production baseline |
 | Shadow-mode validation | 10 | 90% (9/10) | 10/10 | v2_14 passive inference |
 | Guarded advisory validation | 10 | 90% (9/10) | 10/10 | Safety-gated advisory |
-| **Grand Total** | **50** | **84% (42/50)** | **49/50** | All automated runs |
+| **Grand Total** | **60** | **88.3% (53/60)** | **60/60** | All automated runs |
 
 ### Perception Pipeline Performance
 
@@ -129,7 +129,7 @@ This document maps each proposal deliverable to its current implementation statu
 | 2026-06-08 | SEARCH_CONVERGENCE_TICKS=4 | Calibrated to 500Hz gain=3000/D=10 physical limit |
 | 2026-06-08 | INSERT_SHALLOW_SIDELOAD_RECOVERY_DEPTH_M=0.010 | Closes gap where side-load at 6-10mm depth was unrecoverable |
 | 2026-06-08 | INSERT_PREDEPTH_RECENTER_MAX_ATTEMPTS=3 | Gives one more recenter chance for pre-depth drift |
-| 2026-06-09 | 20-trial confirmation: 17/20 (85%) | Improved DDS cleanup, 20/20 non-empty logs |
+| 2026-06-09 | 20-trial confirmation: 18/20 (90%) | Independent validation with search_entry_threshold_m:=0.0 |
 | 2026-06-10 | DONE NEVER trusted from ML (3.4% precision) | 461/461 FP from RETREAT. Structural issue: context similarity + class imbalance |
 | 2026-06-10 | INSERT ALWAYS defers to deterministic controller | Safety-critical phase, ML confidence irrelevant for control authority |
 | 2026-06-10 | RETREAT advisory requires confidence>0.95 AND margin>0.5 | RETREAT recall=78.1%, some misclassified as DONE |
