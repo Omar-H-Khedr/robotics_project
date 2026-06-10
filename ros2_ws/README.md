@@ -13,6 +13,26 @@ A vision-based safety-gated advisory framework for peg-in-hole assembly using a 
 
 **Grand total**: 53/60 (88.3%) across 60 automated trials, 100% non-empty logs.
 
+## Scope Gaps (Honest Assessment)
+
+| # | Proposal Item | Status |
+|---|--------------|--------|
+| 1 | Different peg geometries | NOT IMPLEMENTED |
+| 2 | Different hole geometries | NOT IMPLEMENTED |
+| 3 | Different clearance/tolerance levels | NOT IMPLEMENTED (config only) |
+| 4 | Product/tolerance variation | NOT IMPLEMENTED |
+| 5 | Systematic generalization | NOT IMPLEMENTED |
+| 6 | Trained SAC policy | SCAFFOLD ONLY |
+| 7 | Trained meta-RL policy | NOT IMPLEMENTED |
+| 8 | Context-based meta-RL | NOT IMPLEMENTED |
+| 9 | Full comparison (4 methods) | PARTIAL (2/4) |
+| 10 | Hardware KUKA validation | NOT IMPLEMENTED |
+| 11 | Sim-to-real transfer | NOT IMPLEMENTED |
+
+**Critical gap**: Items 1-5 (geometry/tolerance generalization) — only 1 geometry tested.
+**Next milestone**: Geometry/Tolerance Scenario Matrix (7 scenarios × 20 trials = 140 new trials).
+See `docs/SCOPE_GAP_AUDIT.md` and `docs/MILESTONE_GEOMETRY_TOLERANCE_MATRIX.md`.
+
 ## Quick Start
 
 ```bash
@@ -39,6 +59,9 @@ ros2 launch thesis_bringup research_baseline.launch.py \
 
 | What | Path |
 |------|------|
+| **Scope gap audit (11 items)** | `docs/SCOPE_GAP_AUDIT.md` |
+| **Geometry/tolerance matrix milestone** | `docs/MILESTONE_GEOMETRY_TOLERANCE_MATRIX.md` |
+| **Current project status** | `docs/CURRENT_PROJECT_STATUS.md` |
 | Validation metrics (all-in-one) | `docs/metrics/comprehensive_validation_metrics.json` |
 | Claims audit | `docs/CLAIMS_VS_EVIDENCE_AUDIT.md` |
 | Architecture | `docs/FINAL_SYSTEM_ARCHITECTURE.md` |

@@ -73,6 +73,16 @@ This document maps each proposal deliverable to its current implementation statu
 | Guarded advisory validation | 10 | 90% (9/10) | 10/10 | Safety-gated advisory |
 | **Grand Total** | **60** | **88.3% (53/60)** | **60/60** | All automated runs |
 
+### Geometry/Tolerance Coverage
+
+| Dimension | Status | Evidence |
+|---|---|---|
+| Peg geometries tested | 1 (cylindrical 25mm) | `peg_in_hole_description/models/cylindrical_peg/model.sdf` |
+| Hole geometries tested | 1 (circular 27mm) | `peg_in_hole_description/models/target_plate/model.sdf` |
+| Clearance levels tested | 1 (1mm radial) | `peg_in_hole_description/config/task_geometry.yaml` |
+| Cross-scenario generalization | 0 scenarios | All 60 trials identical geometry |
+| Scenario matrix execution | NOT STARTED | `docs/MILESTONE_GEOMETRY_TOLERANCE_MATRIX.md` defined |
+
 ### Perception Pipeline Performance
 
 | Component | Metric | Value | Notes |

@@ -177,3 +177,27 @@ For each major claim, we list:
 - **No hidden failures or fabricated results**
 - **All limitations documented**
 - **All negative results preserved (encoder ablation, DONE precision)**
+
+---
+
+## Scope Gap Audit: 11 Proposal Items
+
+| # | Item | Status | Gap Severity |
+|---|------|--------|-------------|
+| 1 | Different peg geometries | NOT IMPLEMENTED | CRITICAL |
+| 2 | Different hole geometries | NOT IMPLEMENTED | CRITICAL |
+| 3 | Different clearance/tolerance levels | NOT IMPLEMENTED (config only) | CRITICAL |
+| 4 | Product/tolerance variation | NOT IMPLEMENTED | CRITICAL |
+| 5 | Systematic generalization | NOT IMPLEMENTED | CRITICAL |
+| 6 | Trained SAC policy | SCAFFOLD ONLY | HIGH |
+| 7 | Trained meta-RL policy | NOT IMPLEMENTED | HIGH |
+| 8 | Context-based meta-RL | NOT IMPLEMENTED | HIGH |
+| 9 | Full comparison (det vs adv vs SAC vs meta-RL) | PARTIAL (2/4) | MEDIUM |
+| 10 | Hardware KUKA validation | NOT IMPLEMENTED | HIGH |
+| 11 | Sim-to-real transfer | NOT IMPLEMENTED | HIGH |
+
+**Honest assessment**: Items 1-5 (geometry/tolerance generalization) are the most critical gap.
+The project validates a single geometry. A doctoral thesis requires demonstrating generalization.
+See `docs/MILESTONE_GEOMETRY_TOLERANCE_MATRIX.md` for the required scenario matrix.
+Items 6-8 (SAC/meta-RL) require GPU cluster and are deferred. Items 10-11 (hardware/sim-to-real)
+require physical KUKA access.
