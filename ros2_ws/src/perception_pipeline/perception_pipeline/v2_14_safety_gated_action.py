@@ -112,7 +112,10 @@ class SafetyGatedActionInterface:
         self._scaler_range: np.ndarray | None = None
 
         if model_path and torch is not None:
-            self.load_model(model_path)
+            try:
+                self.load_model(model_path)
+            except Exception:
+                self._model = None
 
     def load_model(self, model_path: str | Path) -> None:
         model_path = Path(model_path)

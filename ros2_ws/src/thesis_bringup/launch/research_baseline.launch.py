@@ -601,6 +601,28 @@ def launch_setup(context, *args, **kwargs):
         condition=IfCondition(LaunchConfiguration("enable_v2_14_shadow_mode")),
     )
 
+    v2_14_advisory_node = Node(
+        package="perception_pipeline",
+        executable="v2_14_advisory_node",
+        parameters=[
+            {
+                "use_sim_time": simulation["use_sim_time"],
+                "model_path": LaunchConfiguration("v2_14_advisory_model_path"),
+                "output_dir": LaunchConfiguration("v2_14_advisory_output_dir"),
+                "rate_hz": 20.0,
+                "confidence_threshold": 0.85,
+                "rgb_topic": "/d405/color/image_raw",
+                "depth_topic": "/d405/depth/image_rect_raw",
+                "joint_state_topic": "/joint_states",
+                "ft_topic": "/ft_sensor_wrench",
+                "task_phase_topic": "/task_phase",
+                "safety_status_topic": "/safety_status",
+            }
+        ],
+        output="screen",
+        condition=IfCondition(LaunchConfiguration("enable_v2_14_advisory")),
+    )
+
     admittance_insertion = Node(
         package="kuka_task_control",
         executable="admittance_insertion_node",
@@ -752,6 +774,7 @@ def launch_setup(context, *args, **kwargs):
         synthetic_phase_publisher_node,
         live_v2_14_inference_node,
         v2_14_shadow_mode_node,
+        v2_14_advisory_node,
         RegisterEventHandler(
             OnProcessExit(
                 target_action=admittance_insertion,
@@ -1112,6 +1135,27 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 "v2_14_shadow_output_dir",
                 default_value="diagnostics/v2_14_shadow_mode_v1",
+            ),
+            DeclareLaunchArgument(
+                "enable_v2_14_advisory",
+                default_value="false",
+                description=(
+                    "If true, spawn v2_14_advisory_node from "
+                    "perception_pipeline. Guarded advisory integration: "
+                    "subscribes to live topics, computes 68-dim context, "
+                    "runs SafetyGatedActionInterface.predict() with strict "
+                    "safety guards. INSERT always defers to deterministic. "
+                    "DONE never trusted from ML. Advisory only. "
+                    "Does NOT control the robot."
+                ),
+            ),
+            DeclareLaunchArgument(
+                "v2_14_advisory_model_path",
+                default_value="diagnostics/v2_14_raw_safety_gated_v4/raw_context_classifier.pt",
+            ),
+            DeclareLaunchArgument(
+                "v2_14_advisory_output_dir",
+                default_value="diagnostics/v2_14_advisory_v1",
             ),
             OpaqueFunction(function=launch_setup),
         ]

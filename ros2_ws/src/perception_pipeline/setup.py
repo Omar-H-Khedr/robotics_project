@@ -30,7 +30,9 @@ setup(
             "v2_15_comprehensive_ablation = perception_pipeline.v2_15_comprehensive_ablation:main",
             "live_v2_14_inference_node = perception_pipeline.live_v2_14_inference_node:main",
             "v2_14_shadow_mode_node = perception_pipeline.v2_14_shadow_mode_node:main",
+            "v2_14_advisory_node = perception_pipeline.v2_14_advisory_node:main",
             "test_shadow_mode_validation = perception_pipeline.test_shadow_mode_validation:main",
+            "test_advisory_validation = perception_pipeline.test_advisory_validation:main",
         ],
     },
 )
