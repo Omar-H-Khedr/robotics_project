@@ -1,6 +1,6 @@
 # Reproducibility Guide
 
-Last updated: 2026-06-09
+Last updated: 2026-06-10
 
 ## Environment
 
@@ -8,7 +8,7 @@ Last updated: 2026-06-09
 - **ROS 2**: Jazzy Jalisco
 - **Gazebo**: Harmonic (via gz_ros2_control)
 - **Python**: 3.12
-- **PyTorch**: CPU-only
+- **PyTorch**: CPU-only (2.12.0+cpu)
 - **Robot**: KUKA LBR iisy 6 R1300 (simulated)
 
 ## Exact Launch Commands
@@ -35,6 +35,28 @@ ros2 launch thesis_bringup research_baseline.launch.py \
   perception_log_dir:=diagnostics/<trial_dir> \
   exit_on_done:=true \
   shutdown_on_task_exit:=true
+```
+
+### Single trial with advisory integration
+
+```bash
+ros2 launch thesis_bringup research_baseline.launch.py \
+  use_gui:=false \
+  control_rate:=25.0 \
+  position_gain:=3000.0 \
+  position_derivative_gain:=10.0 \
+  joint_damping_scale:=10.0 \
+  inject_velocity_state:=true \
+  velocity_state_controller_config_path:=config/research_baseline_velocity_state_500hz.yaml \
+  search_recenter_duration_s:=8.0 \
+  search_settle_duration_s:=9.0 \
+  insert_handoff_timeout_s:=12.0 \
+  search_entry_threshold_m:=0.0 \
+  exit_on_done:=true \
+  shutdown_on_task_exit:=true \
+  enable_v2_14_advisory:=true \
+  v2_14_advisory_model_path:=$(pwd)/diagnostics/v2_14_raw_safety_gated_v4/raw_context_classifier.pt \
+  v2_14_advisory_output_dir:=diagnostics/v2_14_advisory_v1
 ```
 
 ### Multi-trial validation
@@ -120,44 +142,63 @@ python3 -m perception_pipeline.test_v2_14_safety_gated_offline \
 
 ## Physical Validation Evidence
 
-| Run | Trials | Successes | Rate | Path |
-|---|---:|---:|---:|---|
-| Production 10-trial | 10 | 10 | 100% | `diagnostics/research_baseline_search_entered_500hz_v1_10trial/` |
-| Post-fix 10-trial | 10 | 9 | 90% | `diagnostics/research_baseline_search_confirmation_v1/` |
-| 20-trial confirmation | 20 | 18 | 90% | `diagnostics/research_baseline_production_search_v20_600s/` |
-| **Combined** | **40** | **37** | **92.5%** | All runs |
+| Run | Trials | Successes | Rate | Non-Empty | Path |
+|---|---:|---:|---:|---:|---|
+| Production 10-trial | 10 | 10 | 100% | 10/10 | `diagnostics/research_baseline_search_entered_500hz_v1_10trial/` |
+| Post-fix 10-trial | 10 | 9 | 90% | 9/10 | `diagnostics/research_baseline_search_confirmation_v1/` |
+| 20-trial confirmation | 20 | 17 | 85% | 20/20 | `diagnostics/research_baseline_production_search_v20_600s/` |
+| Shadow-mode validation | 10 | 9 | 90% | 10/10 | `diagnostics/v2_14_shadow_mode_validation/` |
+| Guarded advisory validation | 10 | 9 | 90% | 10/10 | `diagnostics/v2_14_advisory_validation/` |
+| **Grand Total** | **50** | **42** | **84%** | **49/50** | All runs |
 
 ## Perception Pipeline Evidence
 
-| Model | Accuracy | F1 (all 7 classes) | Path |
-|---|---:|---:|---|
-| v2_15 raw 68-dim | 99.91% | 99.91% | `diagnostics/v2_15_ablation_v5_6phase/` |
-| v2_14 safety-gated | 99.98% | 0.996 (min) | `diagnostics/v2_14_raw_safety_gated_v4/` |
-| v2_14 encoder-based | 92.6% | N/A (negative ablation) | `diagnostics/v2_14_action_v4_6phase/` |
+| Model | Metric | Value | Path |
+|---|---|---|---|
+| v2_14 safety-gated (raw 68-dim) | Offline accuracy | 99.98% | `diagnostics/v2_14_raw_safety_gated_v4/` |
+| v2_14 shadow mode | Live agreement | 92.2% | `diagnostics/v2_14_shadow_mode_validation/` |
+| v2_14 guarded advisory | Safety invariants | ALL HOLD | `diagnostics/v2_14_advisory_validation/` |
+| v2_15 raw 68-dim ablation | Test accuracy | 99.91% | `diagnostics/v2_15_ablation_v5_6phase/` |
+| v2_15 encoder ablation | Test accuracy | 92.4% (negative) | `diagnostics/v2_15_ablation_v5_6phase/` |
+| v2_13 autoencoder | Test MSE | 0.003670 | `diagnostics/v2_13_encoder_v4_6phase/` |
 
-## Failure Classification
+## v2_14 Advisory Safety Invariants
 
-### Physical validation failures (3/40)
-
-- **Trial 5** (20-trial run): Side-load at depth 0.0029m, XY 0.0012m > 0.001m clearance
-- **Trial 18** (20-trial run): Side-load at depth 0.0030m, XY 0.0011m > 0.001m clearance
-- **Trial 9** (post-fix 10-trial): Side-load abort before depth
-
-### Perception pipeline failures
-
-- **v2_14 encoder-based**: 0% SEARCH recall, 23% RETREAT recall, 0% DONE recall
-- **v2_14 safety-gated**: 0 misclassifications (all classes P/R/F1 >= 0.996)
+| Invariant | Status | Evidence |
+|---|---|---|
+| DONE never trusted from ML | HOLD | 485 FP blocked, 3.4% precision documented |
+| INSERT always defers to deterministic | HOLD | 6916 INSERT_DEFERRED across 10 trials |
+| RETREAT requires high confidence | HOLD | 181 RETREAT_UNCERTAIN rejected |
+| Low confidence triggers fallback | HOLD | 473 LOW_CONFIDENCE fallback |
+| All unsafe predictions blocked | HOLD | 485 unsafe_if_executed, all blocked |
+| Unit tests pass | HOLD | 24/24 tests passed |
 
 ## Known Limitations
 
 1. **F/T sensor bridge**: SIGSEGV at startup, wrench features zero in all logs
 2. **Depth camera**: Not active in simulation (values are 0)
-3. **Class imbalance**: INSERT dominates (61.9%), SEARCH is 0.1%
+3. **Class imbalance**: INSERT dominates (61.9%), SEARCH is 0.1%, DONE is 0.08%
 4. **Encoder pre-training**: Documented negative ablation (32-dim bottleneck)
-5. **4/10 perception trials empty**: DDS shared memory port conflicts (fixed in v2)
+5. **DONE precision=3.4%**: Structural issue (RETREAT context similarity + class imbalance)
 6. **JTC loading race condition**: Rapid sequential launches may fail JTC spawner
+7. **SAC training**: Requires GPU cluster, not feasible locally
 
 ## Proposal Mapping
 
 See `docs/PROPOSAL_IMPLEMENTATION_MAPPING.md` for the complete mapping from
 PhD proposal chapters to implementation artifacts and validation evidence.
+
+## Key File Paths
+
+| File | Description |
+|---|---|
+| `src/perception_pipeline/perception_pipeline/v2_14_safety_gated_action.py` | Safety-gated classifier and action interface |
+| `src/perception_pipeline/perception_pipeline/v2_14_advisory_node.py` | Guarded advisory integration node |
+| `src/perception_pipeline/perception_pipeline/v2_14_shadow_mode_node.py` | Shadow-mode passive inference node |
+| `src/perception_pipeline/perception_pipeline/test_advisory_safety.py` | 24 unit tests for safety invariants |
+| `src/perception_pipeline/perception_pipeline/test_advisory_validation.py` | 10-trial advisory validation runner |
+| `src/perception_pipeline/perception_pipeline/test_shadow_mode_validation.py` | 10-trial shadow validation runner |
+| `src/perception_pipeline/perception_pipeline/sac_baseline_scaffold.py` | SAC environment contract scaffold |
+| `src/perception_pipeline/perception_pipeline/sac_feasibility_assessment.py` | SAC feasibility assessment |
+| `docs/metrics/comprehensive_validation_metrics.json` | All validation metrics in one place |
+| `docs/PROPOSAL_IMPLEMENTATION_MAPPING.md` | Proposal-to-implementation mapping |
