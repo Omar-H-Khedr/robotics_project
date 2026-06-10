@@ -110,6 +110,10 @@ def run_trial(trial: int, output_dir: Path) -> dict:
     shadow_dir.mkdir(parents=True, exist_ok=True)
 
     env = os.environ.copy()
+    real_home = os.path.expanduser("~")
+    real_local = str(Path(real_home) / ".local" / "lib" / "python3.12" / "site-packages")
+    existing_pp = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = f"{real_local}:{existing_pp}" if existing_pp else real_local
     env["HOME"] = str(output_dir / "home")
     env["ROS_HOME"] = str(output_dir / "ros_home")
     env["ROS_LOG_DIR"] = str(output_dir / "ros_logs")
