@@ -65,6 +65,7 @@ class TrialResult:
     physical_success: bool
     search_entered: bool
     search_converged: bool
+    contact_guided_insertion: bool
     insertion_depth_m: float
     final_xy_error_m: float
     max_contact_force_n: float
@@ -278,7 +279,7 @@ def run_trial(
             f.write(result.stderr)
 
         # Parse outcome from logs
-        outcome = _parse_trial_outcome(result.stdout, result.stderr, duration_s)
+        outcome = _parse_trial_outcome(result.stdout, result.stderr, duration_s, trial_dir)
         outcome.scenario_id = scenario.id
         outcome.trial_index = trial_index
         outcome.peg_radius_m = scenario.peg_radius_m
@@ -301,6 +302,7 @@ def run_trial(
             physical_success=False,
             search_entered=False,
             search_converged=False,
+            contact_guided_insertion=False,
             insertion_depth_m=0.0,
             final_xy_error_m=0.0,
             max_contact_force_n=0.0,
@@ -327,6 +329,7 @@ def run_trial(
             physical_success=False,
             search_entered=False,
             search_converged=False,
+            contact_guided_insertion=False,
             insertion_depth_m=0.0,
             final_xy_error_m=0.0,
             max_contact_force_n=0.0,
@@ -355,6 +358,7 @@ def run_trial(
             "physical_success": outcome.physical_success,
             "search_entered": outcome.search_entered,
             "search_converged": outcome.search_converged,
+            "contact_guided_insertion": outcome.contact_guided_insertion,
             "insertion_depth_m": outcome.insertion_depth_m,
             "final_xy_error_m": outcome.final_xy_error_m,
             "max_contact_force_n": outcome.max_contact_force_n,
@@ -372,8 +376,9 @@ def run_trial(
     return outcome
 
 
-def _parse_trial_outcome(stdout: str, stderr: str, duration_s: float) -> TrialResult:
-    """Parse trial outcome from Gazebo stdout/stderr logs.
+def _parse_trial_outcome(stdout: str, stderr: str, duration_s: float,
+                          trial_dir: str = '') -> TrialResult:
+    """Parse trial outcome from Gazebo stdout/stderr logs and outcome JSON.
 
     Correct detection: look at the LAST 'Task phase updated:' message.
     If it says DONE -> success. If it says ABORT -> failure.
@@ -384,6 +389,7 @@ def _parse_trial_outcome(stdout: str, stderr: str, duration_s: float) -> TrialRe
     success = False
     search_entered = False
     search_converged = False
+    contact_guided_insertion = False
     insertion_depth = 0.0
     final_xy = 0.0
     max_force = 0.0
@@ -397,62 +403,90 @@ def _parse_trial_outcome(stdout: str, stderr: str, duration_s: float) -> TrialRe
 
     combined = stdout + "\n" + stderr
 
-    # Correct success detection: last "Task phase updated: PHASE" message
-    phase_updates = re.findall(r'Task phase updated: (\w+)', combined)
-    if phase_updates:
-        last_phase = phase_updates[-1]
-        if last_phase == "DONE":
+    # Try to read trial_outcome.json first (more reliable)
+    outcome_json_path = os.path.join(trial_dir, "trial_outcome.json") if trial_dir else ""
+    outcome_data = None
+    if outcome_json_path and os.path.exists(outcome_json_path):
+        try:
+            with open(outcome_json_path) as f:
+                outcome_data = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            outcome_data = None
+
+    if outcome_data:
+        # Parse from outcome JSON (most reliable)
+        trial_outcome = outcome_data.get("trial_outcome", "")
+        if trial_outcome == "SUCCESS":
             success = True
-        elif last_phase == "ABORT":
+        elif trial_outcome == "ABORTED":
             success = False
             safety_abort = True
             failure_phase = "ABORT"
+        metrics = outcome_data.get("metrics", {})
+        search_converged = metrics.get("search_converged", False)
+        contact_guided_insertion = metrics.get("contact_guided_insertion", False)
+        insertion_depth = metrics.get("insertion_depth_m", 0.0)
+        final_xy = metrics.get("final_insertion_xy_error_m", 0.0)
+        max_force = metrics.get("max_insert_contact_force_N", 0.0)
+        predepth_recenter = metrics.get("insert_predepth_recenter_attempts", 0)
+        sideload_recovery = metrics.get("insert_shallow_sideload_recovery_attempts", 0)
+        # Parse failure reason from outcome
+        reason = outcome_data.get("reason", "")
+        if not success:
+            failure_reason = reason[:200] if reason else "unknown"
+        search_entered = "SEARCH" in str(outcome_data.get("phases", []))
 
-    # Check for SEARCH phase
-    if "Attempting search phase" in combined or "SEARCH" in combined:
-        search_entered = True
-    if "SEARCH converged" in combined:
-        search_converged = True
+    else:
+        # Fallback: parse from stdout
+        phase_updates = re.findall(r'Task phase updated: (\w+)', combined)
+        if phase_updates:
+            last_phase = phase_updates[-1]
+            if last_phase == "DONE":
+                success = True
+            elif last_phase == "ABORT":
+                success = False
+                safety_abort = True
+                failure_phase = "ABORT"
 
-    # Extract insertion depth from INSERT log lines
-    depth_matches = re.findall(r'physical_depth=([0-9.]+)m', combined)
-    if depth_matches:
-        insertion_depth = max(float(d) for d in depth_matches)
+        if "Attempting search phase" in combined or "SEARCH" in combined:
+            search_entered = True
+        if "SEARCH converged" in combined:
+            search_converged = True
+        if "contact-guided insertion" in combined.lower():
+            contact_guided_insertion = True
 
-    # Extract max contact force
-    force_matches = re.findall(r'contact=([0-9.]+)N', combined)
-    if force_matches:
-        max_force = max(float(f) for f in force_matches)
+        depth_matches = re.findall(r'physical_depth=([0-9.]+)m', combined)
+        if depth_matches:
+            insertion_depth = max(float(d) for d in depth_matches)
 
-    # Extract final XY error from last INSERT line
-    xy_matches = re.findall(r'xy_error=([0-9.]+)m', combined)
-    if xy_matches:
-        final_xy = float(xy_matches[-1])
+        force_matches = re.findall(r'contact=([0-9.]+)N', combined)
+        if force_matches:
+            max_force = max(float(f) for f in force_matches)
 
-    # Extract recenter attempts
-    recenter_matches = re.findall(r'predepth_recenter_attempts[=:]\s*(\d+)', combined)
-    if recenter_matches:
-        predepth_recenter = max(int(r) for r in recenter_matches)
+        xy_matches = re.findall(r'xy_error=([0-9.]+)m', combined)
+        if xy_matches:
+            final_xy = float(xy_matches[-1])
 
-    # Extract sideload recovery attempts
-    sideload_matches = re.findall(r'sideload_recovery_attempts[=:]\s*(\d+)', combined)
-    if sideload_matches:
-        sideload_recovery = max(int(s) for s in sideload_matches)
+        recenter_matches = re.findall(r'predepth_recenter_attempts[=:]\s*(\d+)', combined)
+        if recenter_matches:
+            predepth_recenter = max(int(r) for r in recenter_matches)
 
-    # Check for timeout
-    if ("SEARCH timeout" in combined or "recenter_budget exhausted" in combined) and not success:
-        timeout = True
-        failure_phase = "TIMEOUT"
+        sideload_matches = re.findall(r'sideload_recovery_attempts[=:]\s*(\d+)', combined)
+        if sideload_matches:
+            sideload_recovery = max(int(s) for s in sideload_matches)
 
-    # Check for specific failure reasons
-    if "handoff settle timeout" in combined.lower():
-        failure_reason = "handoff_settle_timeout"
-    elif "SEARCH timeout" in combined or "recenter_budget exhausted" in combined:
-        failure_reason = "search_timeout"
-    elif "side-load abort" in combined.lower() or "sideload" in combined.lower():
-        failure_reason = "sideload_abort"
-    elif safety_abort and not failure_reason:
-        failure_reason = "safety_abort"
+        if ("SEARCH timeout" in combined or "recenter_budget exhausted" in combined) and not success:
+            timeout = True
+            failure_phase = "TIMEOUT"
+
+        if "handoff settle timeout" in combined.lower():
+            failure_reason = "handoff_settle_timeout"
+        elif "SEARCH timeout" in combined or "recenter_budget exhausted" in combined:
+            failure_reason = "search_timeout"
+        elif "side-load abort" in combined.lower() or "sideload" in combined.lower():
+            failure_reason = "sideload_abort"
+        elif safety_abort and not failure_reason:
+            failure_reason = "safety_abort"
 
     return TrialResult(
         scenario_id="",
@@ -465,6 +499,7 @@ def _parse_trial_outcome(stdout: str, stderr: str, duration_s: float) -> TrialRe
         physical_success=success,
         search_entered=search_entered,
         search_converged=search_converged,
+        contact_guided_insertion=contact_guided_insertion,
         insertion_depth_m=insertion_depth,
         final_xy_error_m=final_xy,
         max_contact_force_n=max_force,
@@ -495,6 +530,7 @@ def generate_scenario_summary(
     sideload_aborts = sum(1 for r in results if r.sideload_abort)
     search_entered = sum(1 for r in results if r.search_entered)
     search_converged = sum(1 for r in results if r.search_converged)
+    contact_guided = sum(1 for r in results if r.contact_guided_insertion)
 
     avg_depth = (sum(r.insertion_depth_m for r in results) / n) if n else 0
     avg_xy = (sum(r.final_xy_error_m for r in results) / n) if n else 0
@@ -520,6 +556,8 @@ def generate_scenario_summary(
         "search_entered_rate": search_entered / n,
         "search_converged_count": search_converged,
         "search_converged_rate": search_converged / n,
+        "contact_guided_count": contact_guided,
+        "contact_guided_rate": contact_guided / n,
         "avg_insertion_depth_m": avg_depth,
         "avg_final_xy_error_m": avg_xy,
         "avg_max_contact_force_n": avg_force,
@@ -546,8 +584,8 @@ def generate_markdown_report(
         "# Geometry/Tolerance Scenario Matrix — Validation Results\n",
         f"Date: {time.strftime('%Y-%m-%d %H:%M:%S')}\n",
         "## Summary Table\n",
-        "| Scenario | Peg Dia | Hole Dia | Clearance | Offset | Trials | Success Rate | SEARCH Entry | SEARCH Converge | Avg Depth | Avg XY | Avg Force |",
-        "|----------|---------|----------|-----------|--------|--------|-------------|-------------|----------------|-----------|--------|-----------|",
+        "| Scenario | Peg Dia | Hole Dia | Clearance | Offset | Trials | Success Rate | SEARCH Entry | SEARCH Converge | Contact-Guided | Avg Depth | Avg XY | Avg Force |",
+        "|----------|---------|----------|-----------|--------|--------|-------------|-------------|----------------|----------------|-----------|--------|-----------|",
     ]
 
     for s in summaries:
@@ -561,6 +599,7 @@ def generate_markdown_report(
             f"| {s['success_rate']*100:.1f}% "
             f"| {s['search_entered_rate']*100:.0f}% "
             f"| {s['search_converged_rate']*100:.0f}% "
+            f"| {s.get('contact_guided_rate', 0)*100:.0f}% "
             f"| {s['avg_insertion_depth_m']*1000:.1f}mm "
             f"| {s['avg_final_xy_error_m']*1000:.2f}mm "
             f"| {s['avg_max_contact_force_n']:.1f}N |"
@@ -583,6 +622,7 @@ def generate_markdown_report(
         lines.append(f"- **Side-load aborts**: {s['sideload_aborts']}")
         lines.append(f"- **SEARCH entered**: {s['search_entered_rate']*100:.0f}%")
         lines.append(f"- **SEARCH converged**: {s['search_converged_rate']*100:.0f}%")
+        lines.append(f"- **Contact-guided insertions**: {s.get('contact_guided_count', 0)} ({s.get('contact_guided_rate', 0)*100:.0f}%)")
         lines.append(f"- **Avg insertion depth**: {s['avg_insertion_depth_m']*1000:.1f} mm")
         lines.append(f"- **Avg final XY error**: {s['avg_final_xy_error_m']*1000:.2f} mm")
         lines.append(f"- **Avg max contact force**: {s['avg_max_contact_force_n']:.1f} N")
@@ -684,13 +724,48 @@ def main():
         scenario_results = []
 
         for trial_idx in range(trial_count):
-            result = run_trial(
-                scenario=scenario,
-                trial_index=trial_idx,
-                output_dir=args.output_dir,
-                world_dir=world_dir,
-                config_path=args.config,
-            )
+            trial_dir = os.path.join(args.output_dir, scenario.id, f"trial_{trial_idx:03d}")
+            stdout_path = os.path.join(trial_dir, "stdout.log")
+            result_json_path = os.path.join(trial_dir, "trial_result.json")
+
+            # Skip completed trials (resume support)
+            if os.path.exists(stdout_path) and os.path.exists(result_json_path):
+                print(f"  trial_{trial_idx:03d}: SKIP (already completed)")
+                # Load existing result
+                with open(result_json_path) as f:
+                    rd = json.load(f)
+                result = TrialResult(
+                    scenario_id=rd.get("scenario_id", scenario.id),
+                    trial_index=rd.get("trial_index", trial_idx),
+                    peg_radius_m=rd.get("peg_radius_m", scenario.peg_radius_m),
+                    hole_radius_m=rd.get("hole_radius_m", scenario.hole_radius_m),
+                    clearance_mm=rd.get("clearance_mm", scenario.clearance_mm),
+                    initial_xy_offset_m=rd.get("initial_xy_offset_m", scenario.initial_xy_offset_m),
+                    approach_offset_xy=rd.get("approach_offset_xy", scenario.approach_offset_xy),
+                    physical_success=rd.get("physical_success", False),
+                    search_entered=rd.get("search_entered", False),
+                    search_converged=rd.get("search_converged", False),
+                    contact_guided_insertion=rd.get("contact_guided_insertion", False),
+                    insertion_depth_m=rd.get("insertion_depth_m", 0.0),
+                    final_xy_error_m=rd.get("final_xy_error_m", 0.0),
+                    max_contact_force_n=rd.get("max_contact_force_n", 0.0),
+                    predepth_recenter_attempts=rd.get("predepth_recenter_attempts", 0),
+                    shallow_sideload_recovery_attempts=rd.get("shallow_sideload_recovery_attempts", 0),
+                    timeout=rd.get("timeout", False),
+                    safety_abort=rd.get("safety_abort", False),
+                    sideload_abort=rd.get("sideload_abort", False),
+                    failure_phase=rd.get("failure_phase", ""),
+                    failure_reason=rd.get("failure_reason", ""),
+                    duration_s=rd.get("duration_s", 0.0),
+                )
+            else:
+                result = run_trial(
+                    scenario=scenario,
+                    trial_index=trial_idx,
+                    output_dir=args.output_dir,
+                    world_dir=world_dir,
+                    config_path=args.config,
+                )
             result.scenario_id = scenario.id
             result.peg_radius_m = scenario.peg_radius_m
             result.hole_radius_m = scenario.hole_radius_m
@@ -718,6 +793,7 @@ def main():
             "scenario_id", "trial_index", "peg_radius_m", "hole_radius_m",
             "clearance_mm", "initial_xy_offset_m", "approach_offset_xy",
             "physical_success", "search_entered", "search_converged",
+            "contact_guided_insertion",
             "insertion_depth_m", "final_xy_error_m", "max_contact_force_n",
             "predepth_recenter_attempts", "shallow_sideload_recovery_attempts",
             "timeout", "safety_abort", "sideload_abort",

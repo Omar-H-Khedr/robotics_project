@@ -153,6 +153,7 @@ class AdmittanceInsertionNode(Node):
     PEG_RADIUS_M = 0.0125
     HOLE_RADIUS_M = 0.0135
     INSERT_FINAL_XY_TOLERANCE = HOLE_RADIUS_M - PEG_RADIUS_M
+    SEARCH_CONVERGENCE_MIN_THRESHOLD_M = 0.001
     INSERT_PRECONTACT_CLEARANCE_TICKS = 3
     INSERT_SIDELOAD_DEPTH_GATE_M = 0.001
     INSERT_SIDELOAD_SETTLE_TICKS = 3
@@ -284,6 +285,13 @@ class AdmittanceInsertionNode(Node):
         _radial_clearance = self.HOLE_RADIUS_M - self.PEG_RADIUS_M
         self.INSERT_SIDELOAD_DEPTH_GATE_M = max(0.0005, _radial_clearance)
         self.INSERT_CAPTURE_Z_MARGIN_M = max(0.0005, _radial_clearance * 0.5)
+        # SEARCH convergence threshold: clearance-aware minimum prevents
+        # sub-noise-floor gates for tight clearance (0.25mm). Contact
+        # guidance handles final alignment within ~1mm.
+        self._search_convergence_threshold_m = max(
+            _radial_clearance,
+            self.SEARCH_CONVERGENCE_MIN_THRESHOLD_M,
+        )
         self._hole_center_x: float = float(
             self.get_parameter('hole_center_x').value
         )
@@ -402,6 +410,7 @@ class AdmittanceInsertionNode(Node):
         self._insertion_depth_m: float = 0.0
         self._final_insertion_xy_error_m: float = 0.0
         self._raw_force_abort_reason: str = ''
+        self._contact_guided_insertion: bool = False
 
         # Search state
         self._search_angle: float = 0.0
@@ -411,6 +420,7 @@ class AdmittanceInsertionNode(Node):
         self._search_convergence_ticks: int = 0
         self._search_recenter_attempts: int = 0
         self._search_stability_ready_s: float = 0.0
+        self._search_converged: bool = False
         self._search_trace_writer: csv.DictWriter | None = None
         self._search_trace_file = None
         self._setup_search_gate_trace()
@@ -755,6 +765,7 @@ class AdmittanceInsertionNode(Node):
             self._search_convergence_ticks = 0
             self._search_recenter_attempts = 0
             self._search_stability_ready_s = 0.0
+            self._search_converged = False
 
         state_msg = String()
         state_msg.data = self._state
@@ -1235,19 +1246,19 @@ class AdmittanceInsertionNode(Node):
             peg, _ = self._kinematics.pose(self.current_joints)
             xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
             convergence_before = self._search_convergence_ticks
-            if xy_err <= self.INSERT_FINAL_XY_TOLERANCE:
+            if xy_err <= self._search_convergence_threshold_m:
                 self._abort_reason = (
                     f'SEARCH timeout ({self.SEARCH_TIMEOUT_S:.0f}s). '
                     f'Instantaneous XY error {xy_err:.4f}m is within '
-                    f'physical clearance {self.INSERT_FINAL_XY_TOLERANCE:.4f}m '
+                    f'convergence threshold {self._search_convergence_threshold_m:.4f}m '
                     f'but was not sustained for '
                     f'{self.SEARCH_CONVERGENCE_TICKS} post-command ticks.'
                 )
             else:
                 self._abort_reason = (
                     f'SEARCH timeout ({self.SEARCH_TIMEOUT_S:.0f}s). '
-                    f'XY error {xy_err:.4f}m remains above physical '
-                    f'clearance {self.INSERT_FINAL_XY_TOLERANCE:.4f}m.'
+                    f'XY error {xy_err:.4f}m remains above convergence '
+                    f'threshold {self._search_convergence_threshold_m:.4f}m.'
                 )
             self.get_logger().error(self._abort_reason)
             self._write_search_gate_trace(
@@ -1291,7 +1302,7 @@ class AdmittanceInsertionNode(Node):
             xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
             convergence_before = self._search_convergence_ticks
             decision = 'settling_reset'
-            if ready_to_count and xy_err <= self.INSERT_FINAL_XY_TOLERANCE:
+            if ready_to_count and xy_err <= self._search_convergence_threshold_m:
                 self._search_convergence_ticks += 1
                 decision = 'settling_count'
                 if self._search_convergence_ticks >= self.SEARCH_CONVERGENCE_TICKS:
@@ -1308,15 +1319,17 @@ class AdmittanceInsertionNode(Node):
                     )
                     self.get_logger().info(
                         f'SEARCH converged. XY error {xy_err:.4f}m within '
-                        f'physical clearance for '
+                        f'convergence threshold '
+                        f'{self._search_convergence_threshold_m:.4f}m for '
                         f'{self._search_convergence_ticks} ticks.'
                     )
+                    self._search_converged = True
                     self._end_phase(
                         True,
                         xy_err,
                         0.0,
                         False,
-                        'SEARCH converged with sustained physical clearance',
+                        f'SEARCH converged (threshold={self._search_convergence_threshold_m:.4f}m)',
                     )
                     self._pre_insertion_xy_error = xy_err
                     if not self._insert_preconditions_ok(peg):
@@ -1374,7 +1387,7 @@ class AdmittanceInsertionNode(Node):
         peg, _ = self._kinematics.pose(self.current_joints)
         xy_err = np.linalg.norm(peg[:2] - self.HOLE_CENTRE_XY)
         convergence_before = self._search_convergence_ticks
-        if ready_to_count and xy_err <= self.INSERT_FINAL_XY_TOLERANCE:
+        if ready_to_count and xy_err <= self._search_convergence_threshold_m:
             self._search_convergence_ticks += 1
             self._state_entry_ticks += 1
             if self._search_convergence_ticks >= self.SEARCH_CONVERGENCE_TICKS:
@@ -1391,15 +1404,17 @@ class AdmittanceInsertionNode(Node):
                 )
                 self.get_logger().info(
                     f'SEARCH converged. XY error {xy_err:.4f}m within '
-                    f'physical clearance for '
+                    f'convergence threshold '
+                    f'{self._search_convergence_threshold_m:.4f}m for '
                     f'{self._search_convergence_ticks} ticks.'
                 )
+                self._search_converged = True
                 self._end_phase(
                     True,
                     xy_err,
                     0.0,
                     False,
-                    'SEARCH converged with sustained physical clearance',
+                    f'SEARCH converged (threshold={self._search_convergence_threshold_m:.4f}m)',
                 )
                 self._pre_insertion_xy_error = xy_err
                 if not self._insert_preconditions_ok(peg):
@@ -1446,8 +1461,8 @@ class AdmittanceInsertionNode(Node):
                     f'SEARCH recenter {self._search_recenter_attempts}: '
                     f'xy_error={xy_err:.4f}m is inside coarse band '
                     f'{self.SEARCH_RECENTER_XY_TOLERANCE:.4f}m but not '
-                    f'sustained physical clearance '
-                    f'{self.INSERT_FINAL_XY_TOLERANCE:.4f}m; '
+                    f'within convergence threshold '
+                    f'{self._search_convergence_threshold_m:.4f}m; '
                     f'holding centered target for '
                     f'{self._search_recenter_duration_s:.1f}s.'
                 )
@@ -2315,10 +2330,19 @@ class AdmittanceInsertionNode(Node):
         elif had_timeout:
             self._trial_outcome = 'DEGRADED'
             reason = 'Some phases completed with timeout (degraded tracking)'
-        else:
+        elif self._search_converged:
             self._trial_outcome = 'SUCCESS'
             reason = (
-                f'Full cycle completed. Insertion depth '
+                f'SEARCH converged. Insertion depth '
+                f'{self._insertion_depth_m:.3f}m, contact '
+                f'{self._max_insert_contact_force:.1f}N during INSERT.'
+            )
+        else:
+            self._trial_outcome = 'SUCCESS'
+            self._contact_guided_insertion = True
+            reason = (
+                f'Contact-guided insertion (SEARCH did not converge but '
+                f'INSERT succeeded). Insertion depth '
                 f'{self._insertion_depth_m:.3f}m, contact '
                 f'{self._max_insert_contact_force:.1f}N during INSERT.'
             )
@@ -2355,6 +2379,12 @@ class AdmittanceInsertionNode(Node):
                     self.SEARCH_CONVERGENCE_TICKS / self._control_rate,
                     3,
                 ),
+                'search_convergence_threshold_m': round(
+                    self._search_convergence_threshold_m,
+                    6,
+                ),
+                'search_converged': self._search_converged,
+                'contact_guided_insertion': self._contact_guided_insertion,
                 'search_recenter_duration_s': round(
                     self._search_recenter_duration_s,
                     3,
@@ -2427,6 +2457,16 @@ class AdmittanceInsertionNode(Node):
         log_msg = String()
         log_msg.data = json.dumps(outcome, sort_keys=False)
         self._log_pub.publish(log_msg)
+
+        # Write outcome JSON to tracking log dir for offline analysis
+        if self._tracking_log_dir:
+            try:
+                outcome_path = Path(self._tracking_log_dir) / 'trial_outcome.json'
+                with open(outcome_path, 'w', encoding='utf-8') as f:
+                    json.dump(outcome, f, indent=2)
+                self.get_logger().info(f'Outcome written to {outcome_path}')
+            except OSError as exc:
+                self.get_logger().warn(f'Could not write outcome JSON: {exc}')
 
         with open('/tmp/insertion_trial_outcome.json', 'w') as f:
             json.dump(outcome, f, indent=2)

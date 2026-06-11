@@ -11,80 +11,122 @@ from pathlib import Path
 
 
 def parse_trial(trial_dir: str) -> dict:
-    """Parse trial outcome from stdout.log (correct method)."""
+    """Parse trial outcome from stdout.log or trial_outcome.json."""
     stdout_path = os.path.join(trial_dir, "stdout.log")
     result_path = os.path.join(trial_dir, "trial_result.json")
+    outcome_path = os.path.join(trial_dir, "trial_outcome.json")
 
-    if not os.path.exists(stdout_path):
+    if not os.path.exists(stdout_path) and not os.path.exists(outcome_path):
         return None
 
-    with open(stdout_path) as f:
-        stdout = f.read()
+    # Try trial_outcome.json first (most reliable)
+    outcome_data = None
+    if os.path.exists(outcome_path):
+        try:
+            with open(outcome_path) as f:
+                outcome_data = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            outcome_data = None
 
-    # Read trial_result.json for launch args / timing
     result_data = {}
     if os.path.exists(result_path):
         with open(result_path) as f:
             result_data = json.load(f)
 
-    # Correct success detection
-    phase_updates = re.findall(r'Task phase updated: (\w+)', stdout)
-    success = False
-    if phase_updates:
-        last_phase = phase_updates[-1]
-        if last_phase == "DONE":
-            success = True
-
-    # Extract metrics
-    search_entered = bool(re.search(r'Attempting search phase|SEARCH', stdout))
-    search_converged = "SEARCH converged" in stdout
-
-    depth_matches = re.findall(r'physical_depth=([0-9.]+)m', stdout)
-    insertion_depth = max((float(d) for d in depth_matches), default=0.0)
-
-    force_matches = re.findall(r'contact=([0-9.]+)N', stdout)
-    max_force = max((float(f) for f in force_matches), default=0.0)
-
-    xy_matches = re.findall(r'xy_error=([0-9.]+)m', stdout)
-    final_xy = float(xy_matches[-1]) if xy_matches else 0.0
-
-    recenter_matches = re.findall(r'predepth_recenter_attempts[=:]\s*(\d+)', stdout)
-    predepth_recenter = max((int(r) for r in recenter_matches), default=0)
-
-    sideload_matches = re.findall(r'sideload_recovery_attempts[=:]\s*(\d+)', stdout)
-    sideload_recovery = max((int(s) for s in sideload_matches), default=0)
-
-    # Failure classification
-    failure_phase = ""
-    failure_reason = ""
-    if not success and phase_updates:
-        last = phase_updates[-1]
-        if last == "ABORT":
-            failure_phase = "ABORT"
-            if "handoff settle timeout" in stdout.lower():
+    if outcome_data:
+        # Parse from outcome JSON
+        trial_outcome = outcome_data.get("trial_outcome", "")
+        success = trial_outcome == "SUCCESS"
+        metrics = outcome_data.get("metrics", {})
+        search_entered = "SEARCH" in str(outcome_data.get("phases", []))
+        search_converged = metrics.get("search_converged", False)
+        contact_guided = metrics.get("contact_guided_insertion", False)
+        insertion_depth = metrics.get("insertion_depth_m", 0.0)
+        max_force = metrics.get("max_insert_contact_force_N", 0.0)
+        final_xy = metrics.get("final_insertion_xy_error_m", 0.0)
+        predepth_recenter = metrics.get("insert_predepth_recenter_attempts", 0)
+        sideload_recovery = metrics.get("insert_shallow_sideload_recovery_attempts", 0)
+        # Failure classification
+        failure_phase = ""
+        failure_reason = ""
+        if not success:
+            reason = outcome_data.get("reason", "")
+            if "ABORT" in str(outcome_data.get("phases", [])):
+                failure_phase = "ABORT"
+            if "handoff settle timeout" in reason.lower():
                 failure_reason = "handoff_settle_timeout"
-            elif "recenter_budget exhausted" in stdout or "SEARCH timeout" in stdout:
+            elif "SEARCH timeout" in reason or "recenter_budget" in reason:
                 failure_reason = "search_timeout"
-            elif "no-contact XY error" in stdout:
-                failure_reason = "no_contact_xy_exceeded"
-            elif "side-load" in stdout.lower():
+            elif "side-load" in reason.lower():
                 failure_reason = "sideload_abort"
+            elif "XY error" in reason and "exceeds" in reason:
+                failure_reason = "xy_exceeded"
+            elif failure_phase == "ABORT":
+                failure_reason = "safety_abort"
             else:
-                failure_reason = "unknown_abort"
-        elif last == "MOVING_TO_START":
-            failure_phase = "MOVING_TO_START"
-            failure_reason = "startup_stuck"
-        elif last == "APPROACH":
-            failure_phase = "APPROACH"
-            failure_reason = "approach_stuck"
-        else:
-            failure_phase = last
-            failure_reason = f"stuck_in_{last}"
+                failure_reason = reason[:100] if reason else "unknown"
+    else:
+        # Fallback: parse from stdout
+        with open(stdout_path) as f:
+            stdout = f.read()
+
+        phase_updates = re.findall(r'Task phase updated: (\w+)', stdout)
+        success = False
+        if phase_updates:
+            last_phase = phase_updates[-1]
+            if last_phase == "DONE":
+                success = True
+
+        search_entered = bool(re.search(r'Attempting search phase|SEARCH', stdout))
+        search_converged = "SEARCH converged" in stdout
+        contact_guided = "contact-guided insertion" in stdout.lower()
+
+        depth_matches = re.findall(r'physical_depth=([0-9.]+)m', stdout)
+        insertion_depth = max((float(d) for d in depth_matches), default=0.0)
+
+        force_matches = re.findall(r'contact=([0-9.]+)N', stdout)
+        max_force = max((float(f) for f in force_matches), default=0.0)
+
+        xy_matches = re.findall(r'xy_error=([0-9.]+)m', stdout)
+        final_xy = float(xy_matches[-1]) if xy_matches else 0.0
+
+        recenter_matches = re.findall(r'predepth_recenter_attempts[=:]\s*(\d+)', stdout)
+        predepth_recenter = max((int(r) for r in recenter_matches), default=0)
+
+        sideload_matches = re.findall(r'sideload_recovery_attempts[=:]\s*(\d+)', stdout)
+        sideload_recovery = max((int(s) for s in sideload_matches), default=0)
+
+        failure_phase = ""
+        failure_reason = ""
+        if not success and phase_updates:
+            last = phase_updates[-1]
+            if last == "ABORT":
+                failure_phase = "ABORT"
+                if "handoff settle timeout" in stdout.lower():
+                    failure_reason = "handoff_settle_timeout"
+                elif "recenter_budget exhausted" in stdout or "SEARCH timeout" in stdout:
+                    failure_reason = "search_timeout"
+                elif "no-contact XY error" in stdout:
+                    failure_reason = "no_contact_xy_exceeded"
+                elif "side-load" in stdout.lower():
+                    failure_reason = "sideload_abort"
+                else:
+                    failure_reason = "unknown_abort"
+            elif last == "MOVING_TO_START":
+                failure_phase = "MOVING_TO_START"
+                failure_reason = "startup_stuck"
+            elif last == "APPROACH":
+                failure_phase = "APPROACH"
+                failure_reason = "approach_stuck"
+            else:
+                failure_phase = last
+                failure_reason = f"stuck_in_{last}"
 
     return {
         "success": success,
         "search_entered": search_entered,
         "search_converged": search_converged,
+        "contact_guided_insertion": contact_guided,
         "insertion_depth_m": insertion_depth,
         "max_contact_force_n": max_force,
         "final_xy_error_m": final_xy,
@@ -116,6 +158,7 @@ def analyze_scenario(scenario_dir: str, scenario_id: str) -> dict:
     successes = sum(1 for t in trials if t["success"])
     search_entered = sum(1 for t in trials if t["search_entered"])
     search_converged = sum(1 for t in trials if t["search_converged"])
+    contact_guided = sum(1 for t in trials if t.get("contact_guided_insertion", False))
     durations = [t["duration_s"] for t in trials if t["duration_s"] > 0]
     forces = [t["max_contact_force_n"] for t in trials]
     depths = [t["insertion_depth_m"] for t in trials if t["insertion_depth_m"] > 0]
@@ -133,6 +176,8 @@ def analyze_scenario(scenario_dir: str, scenario_id: str) -> dict:
         "success_rate": successes / n if n > 0 else 0,
         "search_entry_rate": search_entered / n if n > 0 else 0,
         "search_converge_rate": search_converged / n if n > 0 else 0,
+        "contact_guided_count": contact_guided,
+        "contact_guided_rate": contact_guided / n if n > 0 else 0,
         "avg_duration_s": sum(durations) / len(durations) if durations else 0,
         "max_force_n": max(forces) if forces else 0,
         "avg_force_n": sum(forces) / len(forces) if forces else 0,
@@ -159,8 +204,8 @@ def main():
     total_trials = 0
     total_successes = 0
 
-    print(f"{'Scenario':<25} {'N':>3} {'OK':>3} {'Rate':>6} {'SEARCH':>7} {'Converge':>8} {'AvgDur':>7}")
-    print("-" * 75)
+    print(f"{'Scenario':<25} {'N':>3} {'OK':>3} {'Rate':>6} {'SEARCH':>7} {'Converge':>8} {'CG':>4} {'AvgDur':>7}")
+    print("-" * 80)
 
     for scenario in scenarios:
         scenario_dir = os.path.join(output_dir, scenario)
@@ -180,12 +225,14 @@ def main():
         print(
             f"{scenario:<25} {result['n_trials']:>3} {result['successes']:>3} "
             f"{result['success_rate']:>5.0%} {result['search_entry_rate']:>6.0%} "
-            f"{result['search_converge_rate']:>7.0%} {result['avg_duration_s']:>6.0f}s"
+            f"{result['search_converge_rate']:>7.0%} {result['contact_guided_count']:>4} "
+            f"{result['avg_duration_s']:>6.0f}s"
         )
 
-    print("-" * 75)
+    print("-" * 80)
     rate = total_successes / total_trials if total_trials > 0 else 0
-    print(f"{'TOTAL':<25} {total_trials:>3} {total_successes:>3} {rate:>5.0%}")
+    total_cg = sum(r.get("contact_guided_count", 0) for r in all_results.values())
+    print(f"{'TOTAL':<25} {total_trials:>3} {total_successes:>3} {rate:>5.0%} {'':>6} {'':>8} {total_cg:>4}")
 
     # Write JSON summary
     summary = {
