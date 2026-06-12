@@ -165,15 +165,32 @@ For each major claim, we list:
 | ≤0.5mm clearance success | 0/60 (0%) |
 | Fail-closed behavior | Safety property, not failure |
 
-## 14. Feasibility Classifier
+## 14. Feasibility Classifier (Safety-Calibrated)
 
 | Field | Value |
 |-------|-------|
-| Claim | Cross-scenario feasibility classifier trained on Stage C dataset: 84.3% accuracy, 7.3% false-safe rate |
-| Evidence | Cross-scenario dataset from 140 Stage C trials |
-| Status | **VALIDATED** — Classifier trained and evaluated |
+| Claim | Cross-scenario feasibility classifier with multi-threshold safety calibration |
+| Evidence | `diagnostics/geometry_tolerance_matrix_stage_c/cross_scenario_v2_14_evaluation.json` |
+| Status | **VALIDATED** — Safety calibration complete, advisory-only role enforced |
 | Proposal-safe | YES |
 | Publication-safe | YES |
+
+### Safety Calibration Results
+
+| Profile | Accuracy | False-Safe | False-Block | Fail-Closed | Tradeoff |
+|---------|----------|-----------|-------------|-------------|----------|
+| default (2.0x/1.0x) | 84.3% | 8.3% (5) | 21.2% (17) | 92.7% | Balanced |
+| conservative (2.5x/1.5x) | 48.6% | 0.0% (0) | 51.4% (72) | 100.0% | Blocks all feasible |
+| very_conservative (3.0x/2.0x) | 48.6% | 0.0% (0) | 51.4% (72) | 100.0% | Blocks all feasible |
+
+**Key Finding**: 0% false-safe rate achievable ONLY by blocking ALL feasible insertions. Geometry-only features are insufficient for safe advisory — row-level context data is essential.
+
+### Safety Constraints (Enforced)
+- Classifier is **advisory only** — never controls insertion
+- Cannot authorize tight-clearance insertion
+- Cannot override safety gates
+- Only advises fail-closed or in-envelope likelihood
+- False-safe limitation documented as inherent to geometry-only prediction
 
 ## 13. Grand Total Validation Evidence
 

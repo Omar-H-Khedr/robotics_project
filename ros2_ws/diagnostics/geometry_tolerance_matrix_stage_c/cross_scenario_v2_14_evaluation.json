@@ -1,69 +1,214 @@
 {
-  "feasibility_classifier_evaluation": {
-    "total_trials": 140,
-    "accuracy": 0.8429,
-    "false_safe_count": 5,
-    "false_safe_rate": 0.0735,
-    "fail_closed_detection_rate": 0.9265,
-    "precision": 0.9167,
-    "recall": 0.7639,
-    "f1": 0.8333,
-    "confusion_matrix": {
-      "tp": 55,
-      "fp": 5,
-      "tn": 63,
-      "fn": 17
+  "classifier_safety_calibration": {
+    "default": {
+      "total_trials": 140,
+      "accuracy": 0.8429,
+      "false_safe_count": 5,
+      "false_safe_rate": 0.0833,
+      "false_block_count": 17,
+      "false_block_rate": 0.2125,
+      "fail_closed_detection_rate": 0.9265,
+      "precision": 0.9167,
+      "recall": 0.7639,
+      "f1": 0.8333,
+      "confusion_matrix": {
+        "tp": 55,
+        "fp": 5,
+        "tn": 63,
+        "fn": 17
+      },
+      "per_scenario": {
+        "baseline_loose": {
+          "tp": 16,
+          "fp": 4,
+          "tn": 0,
+          "fn": 0,
+          "total": 20
+        },
+        "clearance_medium": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 20,
+          "fn": 0,
+          "total": 20
+        },
+        "clearance_tight": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 20,
+          "fn": 0,
+          "total": 20
+        },
+        "large_peg_large_hole": {
+          "tp": 19,
+          "fp": 1,
+          "tn": 0,
+          "fn": 0,
+          "total": 20
+        },
+        "misaligned_baseline": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 3,
+          "fn": 17,
+          "total": 20
+        },
+        "small_peg_small_hole": {
+          "tp": 20,
+          "fp": 0,
+          "tn": 0,
+          "fn": 0,
+          "total": 20
+        },
+        "tight_plus_misaligned": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 20,
+          "fn": 0,
+          "total": 20
+        }
+      },
+      "profile": "default"
     },
-    "per_scenario": {
-      "baseline_loose": {
-        "tp": 16,
-        "fp": 4,
-        "tn": 0,
-        "fn": 0,
-        "total": 20
-      },
-      "clearance_medium": {
+    "conservative": {
+      "total_trials": 140,
+      "accuracy": 0.4857,
+      "false_safe_count": 0,
+      "false_safe_rate": 0,
+      "false_block_count": 72,
+      "false_block_rate": 0.5143,
+      "fail_closed_detection_rate": 1.0,
+      "precision": 0,
+      "recall": 0.0,
+      "f1": 0,
+      "confusion_matrix": {
         "tp": 0,
         "fp": 0,
-        "tn": 20,
-        "fn": 0,
-        "total": 20
+        "tn": 68,
+        "fn": 72
       },
-      "clearance_tight": {
+      "per_scenario": {
+        "baseline_loose": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 4,
+          "fn": 16,
+          "total": 20
+        },
+        "clearance_medium": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 20,
+          "fn": 0,
+          "total": 20
+        },
+        "clearance_tight": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 20,
+          "fn": 0,
+          "total": 20
+        },
+        "large_peg_large_hole": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 1,
+          "fn": 19,
+          "total": 20
+        },
+        "misaligned_baseline": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 3,
+          "fn": 17,
+          "total": 20
+        },
+        "small_peg_small_hole": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 0,
+          "fn": 20,
+          "total": 20
+        },
+        "tight_plus_misaligned": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 20,
+          "fn": 0,
+          "total": 20
+        }
+      },
+      "profile": "conservative"
+    },
+    "very_conservative": {
+      "total_trials": 140,
+      "accuracy": 0.4857,
+      "false_safe_count": 0,
+      "false_safe_rate": 0,
+      "false_block_count": 72,
+      "false_block_rate": 0.5143,
+      "fail_closed_detection_rate": 1.0,
+      "precision": 0,
+      "recall": 0.0,
+      "f1": 0,
+      "confusion_matrix": {
         "tp": 0,
         "fp": 0,
-        "tn": 20,
-        "fn": 0,
-        "total": 20
+        "tn": 68,
+        "fn": 72
       },
-      "large_peg_large_hole": {
-        "tp": 19,
-        "fp": 1,
-        "tn": 0,
-        "fn": 0,
-        "total": 20
+      "per_scenario": {
+        "baseline_loose": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 4,
+          "fn": 16,
+          "total": 20
+        },
+        "clearance_medium": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 20,
+          "fn": 0,
+          "total": 20
+        },
+        "clearance_tight": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 20,
+          "fn": 0,
+          "total": 20
+        },
+        "large_peg_large_hole": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 1,
+          "fn": 19,
+          "total": 20
+        },
+        "misaligned_baseline": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 3,
+          "fn": 17,
+          "total": 20
+        },
+        "small_peg_small_hole": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 0,
+          "fn": 20,
+          "total": 20
+        },
+        "tight_plus_misaligned": {
+          "tp": 0,
+          "fp": 0,
+          "tn": 20,
+          "fn": 0,
+          "total": 20
+        }
       },
-      "misaligned_baseline": {
-        "tp": 0,
-        "fp": 0,
-        "tn": 3,
-        "fn": 17,
-        "total": 20
-      },
-      "small_peg_small_hole": {
-        "tp": 20,
-        "fp": 0,
-        "tn": 0,
-        "fn": 0,
-        "total": 20
-      },
-      "tight_plus_misaligned": {
-        "tp": 0,
-        "fp": 0,
-        "tn": 20,
-        "fn": 0,
-        "total": 20
-      }
+      "profile": "very_conservative"
     }
   },
   "held_out_scenario_evaluation": {
@@ -80,127 +225,127 @@
       "train_success_rate": 0.4667,
       "test_size": 20,
       "test_success_rate": 0.8,
-      "false_safe_on_held_out": 4,
+      "false_safe_on_held_out": 0,
       "held_out_predictions": [
         {
           "trial_id": "trial_000",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_001",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": false,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_002",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_003",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_004",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_005",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_006",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_007",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_008",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_009",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_010",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_011",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_012",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": false,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_013",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_014",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_015",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_016",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_017",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": false,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_018",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_019",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": false,
-          "zone": "robust"
+          "zone": "marginal"
         }
       ]
     },
@@ -217,127 +362,127 @@
       "train_success_rate": 0.4417,
       "test_size": 20,
       "test_success_rate": 0.95,
-      "false_safe_on_held_out": 1,
+      "false_safe_on_held_out": 0,
       "held_out_predictions": [
         {
           "trial_id": "trial_000",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_001",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_002",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_003",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_004",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_005",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": false,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_006",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_007",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_008",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_009",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_010",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_011",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_012",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_013",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_014",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_015",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_016",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_017",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_018",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_019",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         }
       ]
     },
@@ -358,123 +503,123 @@
       "held_out_predictions": [
         {
           "trial_id": "trial_000",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_001",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_002",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_003",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_004",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_005",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_006",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_007",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_008",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_009",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_010",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_011",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_012",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_013",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_014",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_015",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_016",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_017",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_018",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         },
         {
           "trial_id": "trial_019",
-          "predicted_feasible": true,
+          "predicted_feasible": false,
           "actual_success": true,
-          "zone": "robust"
+          "zone": "marginal"
         }
       ]
     },
@@ -753,14 +898,47 @@
       ]
     }
   },
-  "limitations": {
+  "best_profile": "conservative",
+  "safety_documentation": {
+    "classifier_role": "advisory_only",
+    "controls_insertion": false,
+    "authorizes_tight_clearance": false,
+    "overrides_safety_gates": false,
+    "advises": "fail_closed_or_in_envelope_likelihood",
+    "false_safe_limitation": "Cannot reach 0% false-safe without excessive false-block rate",
+    "tradeoff": "geometry-only prediction has inherent false-safe/false-block tradeoff"
+  },
+  "row_level_data_gap": {
     "row_level_data_available": false,
     "trial_level_only": true,
     "required_data": "68-dim context vectors from multimodal perception pipeline",
-    "blocking_step": "Run Stage C trials with perception logging to collect row-level data"
+    "blocking_step": "Run Stage C trials with perception logging to collect row-level data",
+    "current_classifier_inputs": [
+      "radial_clearance_mm",
+      "initial_xy_offset_mm"
+    ],
+    "full_classifier_inputs": "68-dim context vector (RGB + depth + joints + phase + safety)"
+  },
+  "data_collection_plan": {
+    "description": "Collect row-level perception data for v2_14 cross-scenario evaluation",
+    "required_scenarios": [
+      "baseline_loose",
+      "clearance_medium",
+      "clearance_tight",
+      "large_peg_large_hole",
+      "small_peg_small_hole",
+      "misaligned_baseline",
+      "tight_plus_misaligned"
+    ],
+    "trials_per_scenario": "5-10 (sufficient for initial evaluation)",
+    "logging": "multimodal_observation_logger with 68-dim context vector extraction",
+    "estimated_data_per_trial": "~646MB raw CSV, ~1000 context vectors per trial",
+    "total_estimated_data": "~4.5GB compressed context vectors for 70 trials",
+    "compute_requirement": "GPU cluster for v2_14 fine-tuning on multi-scenario data"
   },
   "v2_14_role": {
     "description": "Safety-gated phase/action advisory layer",
+    "validated_for": "single/envelope 6-phase data (baseline only)",
     "controls_insertion": false,
     "overrides_safety_gates": false,
     "authorized_phases": [
@@ -773,6 +951,7 @@
       "tight_clearance_insertion"
     ],
     "operating_envelope_aware": true,
-    "fallback": "deterministic_controller when confidence < 0.85 or outside envelope"
+    "fallback": "deterministic_controller when confidence < 0.85 or outside envelope",
+    "cross_scenario_generalization": "trial-level only, not row-level"
   }
 }

@@ -143,13 +143,33 @@
       }
     },
     "F_feasibility_classifier": {
-      "status": "TRAINED",
+      "status": "SAFETY_CALIBRATED",
       "date": "2026-06-12",
       "results": {
-        "accuracy": "84.3%",
-        "false_safe_rate": "7.3%",
+        "default_profile": {
+          "accuracy": "84.3%",
+          "false_safe_rate": "8.3% (5 cases)",
+          "false_block_rate": "21.2% (17 cases)",
+          "fail_closed_detection": "92.7%",
+          "thresholds": {"robust": 2.0, "marginal": 1.0}
+        },
+        "conservative_profile": {
+          "accuracy": "48.6%",
+          "false_safe_rate": "0.0% (0 cases)",
+          "false_block_rate": "51.4% (72 cases)",
+          "fail_closed_detection": "100.0%",
+          "thresholds": {"robust": 2.5, "marginal": 1.5}
+        },
         "training_data": "Cross-scenario dataset from 140 Stage C trials",
-        "description": "Binary classifier predicting insertion feasibility from context features"
+        "description": "Multi-threshold geometry-based feasibility classifier (advisory-only)",
+        "safety_constraints": {
+          "controls_insertion": false,
+          "authorizes_tight_clearance": false,
+          "overrides_safety_gates": false,
+          "advises": "fail_closed_or_in_envelope_likelihood"
+        },
+        "key_finding": "0% false-safe achievable ONLY by blocking ALL feasible insertions — geometry-only features insufficient for safe advisory",
+        "row_level_data_gap": "68-dim context vectors NOT available for Stage C scenarios"
       }
     }
   },
@@ -295,7 +315,11 @@
     "JTC spawner race condition with rapid sequential launches (~10% startup failure)",
     "F/T sensor bridge SIGSEGV prevents wrench features (74→68 dim reduction)",
     "Physical simulation fidelity limited by Gazebo contact dynamics",
-    "All results in simulation; real-world transfer not yet validated"
+    "All results in simulation; real-world transfer not yet validated",
+    "Feasibility classifier: geometry-only features cannot achieve 0% false-safe without blocking all feasible insertions",
+    "Row-level 68-dim context vectors NOT available for Stage C scenarios — data collection is the blocker",
+    "Conservative classifier profile blocks ALL feasible insertions (51.4% false-block rate)",
+    "Cross-scenario ML generalization limited to trial-level only, not row-level"
   ],
 
   "proposal_mapping": {

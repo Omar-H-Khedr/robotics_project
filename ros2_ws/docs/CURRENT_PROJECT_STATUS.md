@@ -20,7 +20,7 @@ Date: 2026-06-12
 | Geometry/tolerance scenario matrix | VALIDATED | 140 trials across 7 scenarios (Stage C) |
 | Clearance-aware convergence | VALIDATED | max(clearance, 1mm) threshold works |
 | Cross-scenario dataset | BUILT | 140 trials from Stage C, Parquet format |
-| Feasibility classifier | TRAINED | 84.3% accuracy, 7.3% false-safe rate |
+| Feasibility classifier | SAFETY-CALIBRATED | Multi-threshold, advisory-only role enforced |
 | SAC scenario-randomization scaffold | IMPLEMENTED | Not trained (requires GPU cluster) |
 
 ## What Is NOT Implemented (Scope Gaps)
@@ -52,8 +52,9 @@ Date: 2026-06-12
 - **3** peg sizes validated (22/25/28mm at 1.0mm clearance)
 - **3** clearance levels tested (0.25/0.5/1.0mm)
 - **7** scenarios validated
-- **84.3%** feasibility classifier accuracy
-- **7.3%** feasibility classifier false-safe rate
+- **84.3%** feasibility classifier accuracy (default profile)
+- **0.0%** false-safe rate (conservative profile, but blocks all feasible insertions)
+- **Advisory-only** classifier role enforced
 
 ## Geometry/Tolerance Stage C Results (Final)
 

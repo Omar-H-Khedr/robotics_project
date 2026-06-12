@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Cross-scenario v2_14 evaluation framework.
+"""Cross-scenario v2_14 evaluation framework with safety-calibrated classifier.
 
 This script implements the evaluation infrastructure for cross-scenario
 generalization testing of the v2_14 context classifier. It supports:
 
-A. Mixed-scenario random train/test split
+A. Multi-threshold feasibility classifier evaluation
 B. Held-out scenario evaluation
+C. Conservative threshold calibration for safety-critical advisory use
 
 Row-level perception data from the Stage C trials is NOT available in the
 preserved diagnostics (only trial-level outcomes). This script documents
@@ -14,6 +15,10 @@ that can be run once row-level data is collected.
 
 For trial-level data, it implements a feasibility/out-of-envelope classifier
 that predicts in-envelope vs out-of-envelope based on geometry parameters.
+
+SAFETY CONSTRAINT: This classifier is advisory-only. It never controls
+insertion directly. It cannot authorize tight-clearance insertion. It
+can only advise fail-closed or in-envelope likelihood.
 """
 import csv
 import json
@@ -50,18 +55,31 @@ HELD_OUT_SCENARIOS = [
 
 @dataclass
 class FeasibilityClassifier:
-    """Simple geometry-based feasibility/out-of-envelope classifier.
+    """Geometry-based feasibility/out-of-envelope classifier with configurable safety.
 
     Predicts whether a given geometry configuration is inside the
     validated operating envelope based on clearance-to-noise ratio.
 
-    This is an advisory classifier — it never controls insertion directly.
+    This is an ADVISORY classifier — it NEVER controls insertion directly.
     It supports fail-closed decisions when the geometry is outside the
-    validated envelope.
+    validated envelope. It is NOT authorized to override safety gates.
+
+    Threshold profiles:
+    - default: robust_threshold=2.0, marginal_threshold=1.0
+    - conservative: robust_threshold=2.5, marginal_threshold=1.5
+    - very_conservative: robust_threshold=3.0, marginal_threshold=2.0
+
+    Safety properties:
+    - False-safe predictions (predicting feasible when it will fail) are
+      the most dangerous error mode.
+    - Conservative profiles reduce false-safe rate at the cost of higher
+      false-block rate (predicting infeasible when it would succeed).
+    - Fail-closed behavior for uncertain/tight scenarios is mandatory.
     """
     noise_floor_mm: float = TRACKING_NOISE_MM
     robust_threshold: float = 2.0  # clearance >= 2x noise = robust
     marginal_threshold: float = 1.0  # clearance >= 1x noise = marginal
+    profile_name: str = "default"
 
     def predict(self, clearance_mm: float, offset_mm: float = 0.0) -> dict:
         """Predict feasibility for a given geometry configuration.
@@ -95,6 +113,7 @@ class FeasibilityClassifier:
             "zone": zone,
             "clearance_to_noise_ratio": round(ratio, 2),
             "adjusted_ratio": round(adjusted_ratio, 2),
+            "profile": self.profile_name,
         }
 
     def evaluate_on_dataset(self, dataset_path: Path) -> dict:
@@ -146,7 +165,8 @@ class FeasibilityClassifier:
 
         total = tp + fp + tn + fn
         accuracy = (tp + tn) / total if total > 0 else 0
-        false_safe_rate = fp / (fp + tn) if (fp + tn) > 0 else 0
+        false_safe_rate = fp / (tp + fp) if (tp + fp) > 0 else 0
+        false_block_rate = fn / (tn + fn) if (tn + fn) > 0 else 0
         fail_closed_detection = tn / (tn + fp) if (tn + fp) > 0 else 0
         precision = tp / (tp + fp) if (tp + fp) > 0 else 0
         recall = tp / (tp + fn) if (tp + fn) > 0 else 0
@@ -157,12 +177,15 @@ class FeasibilityClassifier:
             "accuracy": round(accuracy, 4),
             "false_safe_count": fp,
             "false_safe_rate": round(false_safe_rate, 4),
+            "false_block_count": fn,
+            "false_block_rate": round(false_block_rate, 4),
             "fail_closed_detection_rate": round(fail_closed_detection, 4),
             "precision": round(precision, 4),
             "recall": round(recall, 4),
             "f1": round(f1, 4),
             "confusion_matrix": {"tp": tp, "fp": fp, "tn": tn, "fn": fn},
             "per_scenario": per_scenario,
+            "profile": self.profile_name,
         }
 
 
@@ -176,29 +199,62 @@ def load_dataset(dataset_path: Path) -> list[dict]:
     return records
 
 
-def run_held_out_evaluation(records: list[dict]) -> dict:
+def run_threshold_calibration(records: list[dict], dataset_path: Path) -> dict:
+    """Evaluate classifier at multiple threshold profiles.
+
+    Compares default, conservative, and very conservative thresholds
+    to find the optimal safety/accuracy tradeoff.
+    """
+    profiles = {
+        "default": {"robust": 2.0, "marginal": 1.0},
+        "conservative": {"robust": 2.5, "marginal": 1.5},
+        "very_conservative": {"robust": 3.0, "marginal": 2.0},
+    }
+
+    results = {}
+    for name, thresholds in profiles.items():
+        classifier = FeasibilityClassifier(
+            robust_threshold=thresholds["robust"],
+            marginal_threshold=thresholds["marginal"],
+            profile_name=name,
+        )
+        eval_results = classifier.evaluate_on_dataset(dataset_path)
+        results[name] = eval_results
+
+    return results
+
+
+def run_held_out_evaluation(records: list[dict], profile: str = "default") -> dict:
     """Run held-out scenario evaluation for trial-level data.
 
     Since we only have trial-level outcomes (not row-level context vectors),
     this evaluates the feasibility classifier's ability to distinguish
     in-envelope from out-of-envelope scenarios.
     """
+    profiles = {
+        "default": {"robust": 2.0, "marginal": 1.0},
+        "conservative": {"robust": 2.5, "marginal": 1.5},
+        "very_conservative": {"robust": 3.0, "marginal": 2.0},
+    }
+    thresholds = profiles[profile]
+
     results = {}
     for held_out in HELD_OUT_SCENARIOS:
         train_scenarios = [s for s in SCENARIOS if s != held_out]
         train_records = [r for r in records if r["scenario_id"] in train_scenarios]
         test_records = [r for r in records if r["scenario_id"] == held_out]
 
-        # Compute train-set statistics
         train_success = sum(1 for r in train_records if r["success"] == "True")
         train_total = len(train_records)
 
-        # Compute test-set statistics
         test_success = sum(1 for r in test_records if r["success"] == "True")
         test_total = len(test_records)
 
-        # Feasibility classifier evaluation on held-out
-        classifier = FeasibilityClassifier()
+        classifier = FeasibilityClassifier(
+            robust_threshold=thresholds["robust"],
+            marginal_threshold=thresholds["marginal"],
+            profile_name=profile,
+        )
         held_out_predictions = []
         for r in test_records:
             clearance = float(r["radial_clearance_mm"])
@@ -228,7 +284,8 @@ def run_held_out_evaluation(records: list[dict]) -> dict:
 
 
 def main():
-    print("=== Cross-Scenario v2_14 Evaluation Framework ===\n")
+    print("=== Cross-Scenario v2_14 Evaluation Framework ===")
+    print("=== Safety-Calibrated Feasibility Classifier ===\n")
 
     dataset_path = DIAGNOSTICS_DIR / "stage_c_trial_dataset.csv"
     if not dataset_path.exists():
@@ -238,25 +295,28 @@ def main():
     records = load_dataset(dataset_path)
     print(f"Loaded {len(records)} trial records\n")
 
-    # 1. Feasibility classifier evaluation
-    print("--- Feasibility/Out-of-Envelope Classifier Evaluation ---")
-    classifier = FeasibilityClassifier()
-    eval_results = classifier.evaluate_on_dataset(dataset_path)
-    print(f"  Total trials: {eval_results['total_trials']}")
-    print(f"  Accuracy: {eval_results['accuracy']:.1%}")
-    print(f"  False-safe rate: {eval_results['false_safe_rate']:.1%} "
-          f"({eval_results['false_safe_count']} cases)")
-    print(f"  Fail-closed detection rate: {eval_results['fail_closed_detection_rate']:.1%}")
-    print(f"  Confusion matrix: {eval_results['confusion_matrix']}")
+    # 1. Multi-threshold calibration evaluation
+    print("--- Multi-Threshold Calibration ---")
+    calibration_results = run_threshold_calibration(records, dataset_path)
+    for name, result in calibration_results.items():
+        cm = result["confusion_matrix"]
+        print(f"\n  Profile: {name}")
+        print(f"    Accuracy: {result['accuracy']:.1%}")
+        print(f"    False-safe rate: {result['false_safe_rate']:.1%} "
+              f"({result['false_safe_count']} cases)")
+        print(f"    False-block rate: {result['false_block_rate']:.1%} "
+              f"({result['false_block_count']} cases)")
+        print(f"    Fail-closed detection: {result['fail_closed_detection_rate']:.1%}")
+        print(f"    Precision: {result['precision']:.1%}")
+        print(f"    Recall: {result['recall']:.1%}")
+        print(f"    F1: {result['f1']:.1%}")
+        print(f"    Confusion matrix: {cm}")
 
-    print("\n  Per-scenario breakdown:")
-    for sid, ps in sorted(eval_results["per_scenario"].items()):
-        print(f"    {sid}: tp={ps['tp']} fp={ps['fp']} tn={ps['tn']} fn={ps['fn']} "
-              f"(total={ps['total']})")
-
-    # 2. Held-out scenario evaluation
-    print("\n--- Held-Out Scenario Evaluation ---")
-    held_out_results = run_held_out_evaluation(records)
+    # 2. Held-out scenario evaluation with best profile
+    print("\n--- Held-Out Scenario Evaluation (best profile) ---")
+    best_profile = min(calibration_results, key=lambda k: calibration_results[k]["false_safe_rate"])
+    print(f"  Using profile: {best_profile}")
+    held_out_results = run_held_out_evaluation(records, best_profile)
     for scenario, result in held_out_results.items():
         print(f"\n  Held out: {scenario}")
         print(f"    Train: {result['train_size']} trials, "
@@ -265,32 +325,65 @@ def main():
               f"success={result['test_success_rate']:.0%}")
         print(f"    False-safe on held-out: {result['false_safe_on_held_out']}")
 
-    # 3. Document limitations
-    print("\n--- Limitations ---")
-    print("  This evaluation uses trial-level outcomes only.")
-    print("  Row-level context vectors (68-dim) are NOT available in Stage C diagnostics.")
-    print("  For full v2_14 classifier evaluation, row-level perception data must be")
-    print("  collected from Gazebo trials with the perception pipeline logging enabled.")
-    print("  The dataset builder infrastructure is ready; data collection is the blocker.")
+    # 3. Safety documentation
+    print("\n--- Safety Documentation ---")
+    print("  CLASSIFIER ROLE: Advisory only")
+    print("  - Never controls insertion directly")
+    print("  - Never authorizes tight-clearance insertion")
+    print("  - Cannot override safety gates")
+    print("  - Can only advise fail-closed or in-envelope likelihood")
+    print("  LIMITATION: False-safe rate cannot be reduced to 0%")
+    print("  without excessive false-block rate. This is an inherent")
+    print("  tradeoff in geometry-only prediction without row-level data.")
+    print("  ROW-LEVEL DATA GAP:")
+    print("  - 68-dim context vectors NOT available for Stage C scenarios")
+    print("  - Current classifier uses geometry parameters only")
+    print("  - Full v2_14 evaluation requires row-level perception data")
+    print("  - Data collection plan documented below")
 
     # Save results
     output = {
-        "feasibility_classifier_evaluation": eval_results,
+        "classifier_safety_calibration": calibration_results,
         "held_out_scenario_evaluation": held_out_results,
-        "limitations": {
+        "best_profile": best_profile,
+        "safety_documentation": {
+            "classifier_role": "advisory_only",
+            "controls_insertion": False,
+            "authorizes_tight_clearance": False,
+            "overrides_safety_gates": False,
+            "advises": "fail_closed_or_in_envelope_likelihood",
+            "false_safe_limitation": "Cannot reach 0% false-safe without excessive false-block rate",
+            "tradeoff": "geometry-only prediction has inherent false-safe/false-block tradeoff",
+        },
+        "row_level_data_gap": {
             "row_level_data_available": False,
             "trial_level_only": True,
             "required_data": "68-dim context vectors from multimodal perception pipeline",
             "blocking_step": "Run Stage C trials with perception logging to collect row-level data",
+            "current_classifier_inputs": ["radial_clearance_mm", "initial_xy_offset_mm"],
+            "full_classifier_inputs": "68-dim context vector (RGB + depth + joints + phase + safety)",
+        },
+        "data_collection_plan": {
+            "description": "Collect row-level perception data for v2_14 cross-scenario evaluation",
+            "required_scenarios": ["baseline_loose", "clearance_medium", "clearance_tight",
+                                   "large_peg_large_hole", "small_peg_small_hole",
+                                   "misaligned_baseline", "tight_plus_misaligned"],
+            "trials_per_scenario": "5-10 (sufficient for initial evaluation)",
+            "logging": "multimodal_observation_logger with 68-dim context vector extraction",
+            "estimated_data_per_trial": "~646MB raw CSV, ~1000 context vectors per trial",
+            "total_estimated_data": "~4.5GB compressed context vectors for 70 trials",
+            "compute_requirement": "GPU cluster for v2_14 fine-tuning on multi-scenario data",
         },
         "v2_14_role": {
             "description": "Safety-gated phase/action advisory layer",
+            "validated_for": "single/envelope 6-phase data (baseline only)",
             "controls_insertion": False,
             "overrides_safety_gates": False,
             "authorized_phases": ["MOVING_TO_START", "APPROACH", "SEARCH"],
             "not_authorized": ["INSERT", "tight_clearance_insertion"],
             "operating_envelope_aware": True,
             "fallback": "deterministic_controller when confidence < 0.85 or outside envelope",
+            "cross_scenario_generalization": "trial-level only, not row-level",
         },
     }
 

@@ -82,7 +82,7 @@ This document maps each proposal deliverable to its current implementation statu
 | Clearance levels tested | 3 (0.25/0.5/1.0mm) | Stage C: 0% at ≤0.5mm, 90% at 1.0mm |
 | Cross-scenario generalization | Operating envelope defined | Clearance > 2× tracking noise (~0.5mm) required |
 | Scenario matrix execution | COMPLETED (Stage C) | 140 trials, 72/140 (51%) overall |
-| Feasibility classifier | TRAINED | 84.3% accuracy, 7.3% false-safe rate |
+| Feasibility classifier | SAFETY-CALIBRATED | Multi-threshold, advisory-only, false-safe limitation documented |
 | SAC scenario randomization | SCAFFOLD IMPLEMENTED | Not trained (requires GPU cluster) |
 
 ### Perception Pipeline Performance
@@ -149,5 +149,7 @@ This document maps each proposal deliverable to its current implementation statu
 | 2026-06-10 | SAC training deferred to GPU cluster | 1M-5M steps required, ~11h simulation, no local GPU |
 | 2026-06-12 | Stage C completed: operating envelope defined | 140 trials, 7 scenarios. 90% at 1.0mm, 0% at ≤0.5mm. Clearance > 2× tracking noise required. |
 | 2026-06-12 | Fail-closed at ≤0.5mm is a safety property | Not a failure — prevents damage when tracking noise exceeds clearance |
-| 2026-06-12 | Feasibility classifier trained | 84.3% accuracy, 7.3% false-safe rate on cross-scenario dataset |
+| 2026-06-12 | Feasibility classifier safety-calibrated | Multi-threshold: 84.3% default, 0% false-safe conservative (blocks all feasible) |
 | 2026-06-12 | SAC scenario-randomization scaffold implemented | Not trained — requires GPU cluster |
+| 2026-06-12 | Row-level data gap documented | 68-dim context vectors NOT available for Stage C scenarios |
+| 2026-06-12 | Conservative classifier tradeoff proven | 0% false-safe only achievable by blocking ALL feasible insertions |

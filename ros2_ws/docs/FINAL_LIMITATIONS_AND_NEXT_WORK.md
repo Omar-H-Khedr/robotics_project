@@ -59,7 +59,7 @@ Multiple peg/hole geometries and clearance levels are now validated (Stage C, 14
 Remaining gaps:
 - Non-circular geometries (square peg/hole) not implemented
 - Friction/material variation not tested
-- Cross-scenario train/test generalization not yet evaluated
+- Cross-scenario train/test generalization limited to trial-level (row-level data gap)
 
 ### 7. F/T Sensor Bridge Crash
 
@@ -79,10 +79,12 @@ Simulation parameters (joint friction, contact stiffness, camera noise) are fixe
 
 ## What Is Next
 
-### Immediate (Post-Stage C)
-- Row-level data collection for v2_14 cross-scenario evaluation
-- Cross-scenario train/test generalization (train on some scenarios, test on held-out)
-- Extend to non-circular geometries if Gazebo SDF supports them
+### Immediate (Post-Stage C) — BLOCKED by Row-Level Data Gap
+- Row-level data collection for v2_14 cross-scenario evaluation (ESSENTIAL)
+- Current classifier uses geometry-only features (insufficient for safe advisory)
+- Conservative profile achieves 0% false-safe but blocks ALL feasible insertions
+- Row-level context vectors (68-dim) required for reduced false-safe rate
+- Data collection plan: 7 scenarios × 5-10 trials with perception logging
 
 ### Short-Term (GPU Cluster)
 - Train SAC agent with scenario randomization (1M-5M steps)
