@@ -1,0 +1,100 @@
+{
+  "dataset_name": "multi_scenario_row_level_context_vectors",
+  "version": "1.0",
+  "created": "2026-06-12",
+  "description": "68-dim context vectors from 7 geometry/tolerance scenarios",
+  "total_rows": 17651,
+  "total_columns": 17,
+  "context_dim": 68,
+  "context_layout": {
+    "rgb": {
+      "start": 0,
+      "end": 48,
+      "description": "8x6 grayscale RGB features"
+    },
+    "depth": {
+      "start": 48,
+      "end": 54,
+      "description": "depth camera features"
+    },
+    "joint_positions": {
+      "start": 54,
+      "end": 60,
+      "description": "6 joint positions in rad"
+    },
+    "joint_velocities": {
+      "start": 60,
+      "end": 66,
+      "description": "6 joint velocities in rad/s"
+    },
+    "phase_int": {
+      "index": 66,
+      "description": "task phase integer encoding"
+    },
+    "safety_int": {
+      "index": 67,
+      "description": "safety status integer encoding"
+    }
+  },
+  "scenarios": [
+    "baseline_loose",
+    "clearance_medium",
+    "clearance_tight",
+    "large_peg_large_hole",
+    "small_peg_small_hole",
+    "misaligned_baseline",
+    "tight_plus_misaligned"
+  ],
+  "n_scenarios": 7,
+  "n_trials": 14,
+  "per_scenario_rows": {
+    "baseline_loose": 6267,
+    "clearance_medium": 5902,
+    "large_peg_large_hole": 2113,
+    "tight_plus_misaligned": 1092,
+    "clearance_tight": 1005,
+    "small_peg_small_hole": 638,
+    "misaligned_baseline": 634
+  },
+  "feasibility_distribution": {
+    "in_envelope": 9652,
+    "marginal": 5902,
+    "out_of_envelope": 2097
+  },
+  "phase_distribution": {
+    "INSERT": 6866,
+    "MOVING_TO_START": 6785,
+    "APPROACH": 2415,
+    "DONE": 885,
+    "RETREAT": 481,
+    "UNKNOWN": 177,
+    "SEARCH": 29,
+    "ABORT": 13
+  },
+  "trial_outcome_distribution": {
+    "false": 17651
+  },
+  "limitations": [
+    "RGB and depth features are empty (Gazebo D405 camera limitation)",
+    "F/T sensor features are zeros (ft_sensor_bridge SIGSEGV)",
+    "Only 3 trials per scenario (minimum for cross-scenario evaluation)",
+    "Some trials failed to extract context vectors (empty CSVs)",
+    "Trial outcomes are timeout-based (300s limit), not full task completion"
+  ],
+  "source_files": [
+    "/tmp/multi_scenario_row_data/baseline_loose/trial_000/context_vectors.parquet",
+    "/tmp/multi_scenario_row_data/baseline_loose/trial_001/context_vectors.parquet",
+    "/tmp/multi_scenario_row_data/baseline_loose/trial_002/context_vectors.parquet",
+    "/tmp/multi_scenario_row_data/clearance_medium/trial_000/context_vectors.parquet",
+    "/tmp/multi_scenario_row_data/clearance_medium/trial_001/context_vectors.parquet",
+    "/tmp/multi_scenario_row_data/clearance_medium/trial_002/context_vectors.parquet",
+    "/tmp/multi_scenario_row_data/clearance_tight/trial_001/context_vectors.parquet",
+    "/tmp/multi_scenario_row_data/large_peg_large_hole/trial_000/context_vectors.parquet",
+    "/tmp/multi_scenario_row_data/large_peg_large_hole/trial_002/context_vectors.parquet",
+    "/tmp/multi_scenario_row_data/misaligned_baseline/trial_000/context_vectors.parquet",
+    "/tmp/multi_scenario_row_data/misaligned_baseline/trial_001/context_vectors.parquet",
+    "/tmp/multi_scenario_row_data/small_peg_small_hole/trial_001/context_vectors.parquet",
+    "/tmp/multi_scenario_row_data/tight_plus_misaligned/trial_000/context_vectors.parquet",
+    "/tmp/multi_scenario_row_data/tight_plus_misaligned/trial_002/context_vectors.parquet"
+  ]
+}

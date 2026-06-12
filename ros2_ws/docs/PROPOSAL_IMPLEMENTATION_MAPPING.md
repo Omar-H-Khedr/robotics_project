@@ -80,10 +80,12 @@ This document maps each proposal deliverable to its current implementation statu
 | Peg geometries tested | 3 (cylindrical 22/25/28mm) | Stage C: 140 trials across 7 scenarios |
 | Hole geometries tested | 4 (circular 24/26/27/30mm) | Stage C: 140 trials across 7 scenarios |
 | Clearance levels tested | 3 (0.25/0.5/1.0mm) | Stage C: 0% at ≤0.5mm, 90% at 1.0mm |
-| Cross-scenario generalization | Operating envelope defined | Clearance > 2× tracking noise (~0.5mm) required |
+| Cross-scenario generalization | HONEST NEGATIVE RESULT | v2_14: 38.9% mixed, 20.9% held-out |
 | Scenario matrix execution | COMPLETED (Stage C) | 140 trials, 72/140 (51%) overall |
-| Feasibility classifier | SAFETY-CALIBRATED | Multi-threshold, advisory-only, false-safe limitation documented |
-| SAC scenario randomization | SCAFFOLD IMPLEMENTED | Not trained (requires GPU cluster) |
+| Feasibility classifier | EXCELLENT | 96.4% accuracy, 0% false-safe (geometry-only) |
+| SAC scenario randomization | CLUSTER-READY | Not trained (requires GPU cluster) |
+| Hardware validation protocol | CREATED | FUTURE WORK |
+| Sim-to-real transfer plan | CREATED | FUTURE WORK |
 
 ### Perception Pipeline Performance
 
@@ -153,3 +155,9 @@ This document maps each proposal deliverable to its current implementation statu
 | 2026-06-12 | SAC scenario-randomization scaffold implemented | Not trained — requires GPU cluster |
 | 2026-06-12 | Row-level data gap documented | 68-dim context vectors NOT available for Stage C scenarios |
 | 2026-06-12 | Conservative classifier tradeoff proven | 0% false-safe only achievable by blocking ALL feasible insertions |
+| 2026-06-12 | Multi-scenario row-level data collected | 17,651 context vectors from 7 scenarios |
+| 2026-06-12 | Cross-scenario v2_14 evaluation completed | Honest negative: 38.9% mixed, 20.9% held-out |
+| 2026-06-12 | Geometry-only feasibility excellent | 96.4% accuracy, 0% false-safe rate |
+| 2026-06-12 | SAC cluster package created | Training, evaluation, SLURM scripts |
+| 2026-06-12 | Hardware validation protocol created | FUTURE WORK documented |
+| 2026-06-12 | Sim-to-real transfer plan created | FUTURE WORK documented |

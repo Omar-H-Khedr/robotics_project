@@ -143,33 +143,69 @@
       }
     },
     "F_feasibility_classifier": {
-      "status": "SAFETY_CALIBRATED",
+      "status": "EXCELLENT",
       "date": "2026-06-12",
       "results": {
-        "default_profile": {
-          "accuracy": "84.3%",
-          "false_safe_rate": "8.3% (5 cases)",
-          "false_block_rate": "21.2% (17 cases)",
-          "fail_closed_detection": "92.7%",
-          "thresholds": {"robust": 2.0, "marginal": 1.0}
-        },
-        "conservative_profile": {
-          "accuracy": "48.6%",
+        "geometry_only": {
+          "accuracy": "96.4%",
           "false_safe_rate": "0.0% (0 cases)",
-          "false_block_rate": "51.4% (72 cases)",
+          "false_block_rate": "6.6%",
           "fail_closed_detection": "100.0%",
-          "thresholds": {"robust": 2.5, "marginal": 1.5}
+          "description": "Geometry-only feasibility classifier using clearance and offset parameters"
+        },
+        "safety_calibration": {
+          "default_profile": {
+            "accuracy": "84.3%",
+            "false_safe_rate": "8.3% (5 cases)",
+            "thresholds": {"robust": 2.0, "marginal": 1.0}
+          },
+          "conservative_profile": {
+            "accuracy": "48.6%",
+            "false_safe_rate": "0.0% (0 cases)",
+            "thresholds": {"robust": 2.5, "marginal": 1.5}
+          }
         },
         "training_data": "Cross-scenario dataset from 140 Stage C trials",
-        "description": "Multi-threshold geometry-based feasibility classifier (advisory-only)",
         "safety_constraints": {
           "controls_insertion": false,
           "authorizes_tight_clearance": false,
           "overrides_safety_gates": false,
           "advises": "fail_closed_or_in_envelope_likelihood"
+        }
+      }
+    },
+    "G_cross_scenario_v2_14": {
+      "status": "NEGATIVE_RESULT",
+      "date": "2026-06-12",
+      "results": {
+        "mixed_scenario_split": {
+          "accuracy": "38.9%",
+          "macro_f1": "8.3%",
+          "weighted_f1": "21.9%",
+          "search_recall": "0.0%",
+          "retreat_recall": "0.0%",
+          "done_recall": "1.0%"
         },
-        "key_finding": "0% false-safe achievable ONLY by blocking ALL feasible insertions — geometry-only features insufficient for safe advisory",
-        "row_level_data_gap": "68-dim context vectors NOT available for Stage C scenarios"
+        "held_out_scenario": {
+          "mean_accuracy": "20.9% +/- 27.2%",
+          "min_accuracy": "0.0% (misaligned_baseline)",
+          "max_accuracy": "75.1% (clearance_tight)",
+          "mean_macro_f1": "5.6%"
+        },
+        "safety_gated_advisory": {
+          "accuracy": "30.8%",
+          "fallback_rate": "100.0%",
+          "unsafe_advice_blocked": 4,
+          "description": "All predictions deferred to deterministic controller"
+        },
+        "training_data": "17,651 context vectors from 7 scenarios (row-level)",
+        "root_causes": [
+          "Empty RGB/depth features (Gazebo D405 limitation)",
+          "Only 3 trials per scenario (insufficient training data)",
+          "Domain shift between scenarios",
+          "Phase distribution imbalance"
+        ],
+        "honest_assessment": "v2_14 does NOT generalize well across scenarios"
       }
     }
   },
@@ -311,15 +347,16 @@
     "Operating envelope: tracking noise floor (~0.5mm) limits minimum clearance to >1.0mm",
     "Fail-closed behavior at <=0.5mm clearance is a safety property, not a failure",
     "SAC training requires GPU cluster not available locally",
-    "SAC/meta-RL: scaffold only, not trained",
+    "SAC/meta-RL: cluster-ready only, not trained",
     "JTC spawner race condition with rapid sequential launches (~10% startup failure)",
     "F/T sensor bridge SIGSEGV prevents wrench features (74→68 dim reduction)",
     "Physical simulation fidelity limited by Gazebo contact dynamics",
     "All results in simulation; real-world transfer not yet validated",
-    "Feasibility classifier: geometry-only features cannot achieve 0% false-safe without blocking all feasible insertions",
-    "Row-level 68-dim context vectors NOT available for Stage C scenarios — data collection is the blocker",
-    "Conservative classifier profile blocks ALL feasible insertions (51.4% false-block rate)",
-    "Cross-scenario ML generalization limited to trial-level only, not row-level"
+    "v2_14 cross-scenario generalization is POOR (38.9% mixed, 20.9% held-out)",
+    "Empty RGB/depth features in Gazebo severely limit neural network performance",
+    "Only 3 trials per scenario in row-level dataset (minimum viable)",
+    "Geometry-only feasibility classifier is the practical advisory approach (96.4% accuracy)",
+    "Safety-gated advisory falls back to deterministic for ALL predictions (100% fallback rate)"
   ],
 
   "proposal_mapping": {

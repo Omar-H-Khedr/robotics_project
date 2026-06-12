@@ -19,9 +19,12 @@ Date: 2026-06-12
 | Research baseline launch system | VALIDATED | Parameterized, reproducible |
 | Geometry/tolerance scenario matrix | VALIDATED | 140 trials across 7 scenarios (Stage C) |
 | Clearance-aware convergence | VALIDATED | max(clearance, 1mm) threshold works |
-| Cross-scenario dataset | BUILT | 140 trials from Stage C, Parquet format |
-| Feasibility classifier | SAFETY-CALIBRATED | Multi-threshold, advisory-only role enforced |
-| SAC scenario-randomization scaffold | IMPLEMENTED | Not trained (requires GPU cluster) |
+| Cross-scenario dataset | COLLECTED | 17,651 context vectors from 7 scenarios |
+| Cross-scenario v2_14 evaluation | COMPLETED | 38.9% mixed, 20.9% held-out (negative result) |
+| Geometry-only feasibility classifier | EXCELLENT | 96.4% accuracy, 0% false-safe rate |
+| SAC scenario-randomization scaffold | CLUSTER-READY | Not trained (requires GPU cluster) |
+| Hardware validation protocol | CREATED | FUTURE WORK |
+| Sim-to-real transfer plan | CREATED | FUTURE WORK |
 
 ## What Is NOT Implemented (Scope Gaps)
 
@@ -54,7 +57,12 @@ Date: 2026-06-12
 - **7** scenarios validated
 - **84.3%** feasibility classifier accuracy (default profile)
 - **0.0%** false-safe rate (conservative profile, but blocks all feasible insertions)
+- **96.4%** geometry-only feasibility classifier accuracy (row-level evaluation)
+- **0.0%** false-safe rate (geometry-only, row-level evaluation)
+- **38.9%** v2_14 cross-scenario accuracy (mixed split, honest negative result)
+- **20.9%** v2_14 cross-scenario held-out mean accuracy (honest negative result)
 - **Advisory-only** classifier role enforced
+- **100%** safety-gated advisory fallback rate
 
 ## Geometry/Tolerance Stage C Results (Final)
 

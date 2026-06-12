@@ -1,0 +1,106 @@
+{
+  "total_rows": 17651,
+  "total_columns": 17,
+  "context_dim": 68,
+  "per_scenario_rows": {
+    "baseline_loose": 6267,
+    "clearance_medium": 5902,
+    "large_peg_large_hole": 2113,
+    "tight_plus_misaligned": 1092,
+    "clearance_tight": 1005,
+    "small_peg_small_hole": 638,
+    "misaligned_baseline": 634
+  },
+  "n_scenarios": 7,
+  "per_phase_rows": {
+    "INSERT": 6866,
+    "MOVING_TO_START": 6785,
+    "APPROACH": 2415,
+    "DONE": 885,
+    "RETREAT": 481,
+    "UNKNOWN": 177,
+    "SEARCH": 29,
+    "ABORT": 13
+  },
+  "n_phases": 8,
+  "n_trials": 14,
+  "rows_per_trial": {
+    "baseline_loose/trial_000": 2654,
+    "baseline_loose/trial_001": 2056,
+    "baseline_loose/trial_002": 1557,
+    "clearance_medium/trial_000": 2277,
+    "clearance_medium/trial_001": 2036,
+    "clearance_medium/trial_002": 1589,
+    "clearance_tight/trial_001": 1005,
+    "large_peg_large_hole/trial_000": 1256,
+    "large_peg_large_hole/trial_002": 857,
+    "misaligned_baseline/trial_000": 432,
+    "misaligned_baseline/trial_001": 202,
+    "small_peg_small_hole/trial_001": 638,
+    "tight_plus_misaligned/trial_000": 657,
+    "tight_plus_misaligned/trial_002": 435
+  },
+  "missing_values": 0,
+  "feasibility_distribution": {
+    "in_envelope": 9652,
+    "marginal": 5902,
+    "out_of_envelope": 2097
+  },
+  "trial_outcome_distribution": {
+    "false": 17651
+  },
+  "phase_per_scenario": {
+    "baseline_loose": {
+      "INSERT": 3270,
+      "MOVING_TO_START": 1599,
+      "APPROACH": 680,
+      "RETREAT": 445,
+      "DONE": 216,
+      "UNKNOWN": 45,
+      "SEARCH": 10,
+      "ABORT": 2
+    },
+    "clearance_medium": {
+      "INSERT": 2729,
+      "MOVING_TO_START": 2078,
+      "APPROACH": 703,
+      "DONE": 291,
+      "UNKNOWN": 51,
+      "RETREAT": 36,
+      "SEARCH": 12,
+      "ABORT": 2
+    },
+    "clearance_tight": {
+      "MOVING_TO_START": 751,
+      "APPROACH": 157,
+      "DONE": 77,
+      "UNKNOWN": 17,
+      "ABORT": 3
+    },
+    "large_peg_large_hole": {
+      "INSERT": 866,
+      "MOVING_TO_START": 557,
+      "APPROACH": 449,
+      "DONE": 204,
+      "UNKNOWN": 26,
+      "SEARCH": 7,
+      "ABORT": 4
+    },
+    "misaligned_baseline": {
+      "MOVING_TO_START": 628,
+      "UNKNOWN": 6
+    },
+    "small_peg_small_hole": {
+      "MOVING_TO_START": 520,
+      "DONE": 97,
+      "UNKNOWN": 18,
+      "ABORT": 2,
+      "INSERT": 1
+    },
+    "tight_plus_misaligned": {
+      "MOVING_TO_START": 652,
+      "APPROACH": 426,
+      "UNKNOWN": 14
+    }
+  }
+}
