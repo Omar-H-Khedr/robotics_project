@@ -1,0 +1,78 @@
+{
+  "trial_outcome": "ABORTED",
+  "reason": "INSERT aborted: XY error 0.4097m exceeded force-safe limit 0.0150m at physical depth 0.0000m.",
+  "phases": [
+    {
+      "phase": "MOVING_TO_START",
+      "success": true,
+      "cart_error_m": 0.000413,
+      "joint_error_rad": 0.002084,
+      "timed_out": false,
+      "duration_s": 40.12,
+      "message": ""
+    },
+    {
+      "phase": "APPROACH",
+      "success": true,
+      "cart_error_m": 0.013273,
+      "joint_error_rad": 0.023709,
+      "timed_out": false,
+      "duration_s": 11.64,
+      "message": ""
+    },
+    {
+      "phase": "SEARCH",
+      "success": true,
+      "cart_error_m": 0.000637,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 0.32,
+      "message": "SEARCH converged (threshold=0.0010m)"
+    },
+    {
+      "phase": "INSERT",
+      "success": false,
+      "cart_error_m": 0.409676,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 138.92,
+      "message": "INSERT aborted: XY error 0.4097m exceeded force-safe limit 0.0150m at physical depth 0.0000m."
+    }
+  ],
+  "metrics": {
+    "initial_xy_error_m": 0.0003,
+    "pre_insertion_xy_error_m": 0.0006,
+    "final_insertion_xy_error_m": 0.0013,
+    "insert_final_xy_tolerance_m": 0.001,
+    "insertion_depth_m": 0.0206,
+    "max_fz_N": 97.63,
+    "max_abs_fz_N": 97.63,
+    "max_force_norm_N": 170.02,
+    "baseline_fz_N": 42.54,
+    "max_contact_force_N": 64.87,
+    "max_insert_contact_force_N": 49.15,
+    "contact_threshold_N": 5.0,
+    "control_rate_hz": 25.0,
+    "search_convergence_required_ticks": 4,
+    "search_convergence_required_duration_s": 0.16,
+    "search_convergence_threshold_m": 0.001,
+    "search_converged": true,
+    "contact_guided_insertion": false,
+    "search_recenter_duration_s": 8.0,
+    "search_settle_duration_s": 9.0,
+    "insert_handoff_hold_duration_s": 2.0,
+    "insert_handoff_timeout_s": 12.0,
+    "insert_predepth_recenter_attempts": 2,
+    "insert_predepth_recenter_budget_attempts": 0,
+    "insert_predepth_recenter_budget_resets": 2,
+    "insert_max_predepth_xy_error_m": 0.4097,
+    "insert_entry_descent_count": 6,
+    "insert_capture_descent_count": 3,
+    "insert_shallow_sideload_recovery_attempts": 2,
+    "insert_final_sideload_retry_attempts": 1,
+    "gravity_baseline_valid": true,
+    "baseline_window_samples": 50,
+    "approach_offset_xy_m": 0.0
+  },
+  "status": "ABORT"
+}

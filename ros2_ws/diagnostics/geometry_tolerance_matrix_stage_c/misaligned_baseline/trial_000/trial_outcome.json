@@ -1,0 +1,87 @@
+{
+  "trial_outcome": "SUCCESS",
+  "reason": "SEARCH converged. Insertion depth 0.020m, contact 54.0N during INSERT.",
+  "phases": [
+    {
+      "phase": "MOVING_TO_START",
+      "success": true,
+      "cart_error_m": 0.000885,
+      "joint_error_rad": 0.001021,
+      "timed_out": false,
+      "duration_s": 40.08,
+      "message": ""
+    },
+    {
+      "phase": "APPROACH",
+      "success": true,
+      "cart_error_m": 0.014188,
+      "joint_error_rad": 0.025117,
+      "timed_out": false,
+      "duration_s": 11.6,
+      "message": ""
+    },
+    {
+      "phase": "SEARCH",
+      "success": true,
+      "cart_error_m": 0.000691,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 3.12,
+      "message": "SEARCH converged (threshold=0.0010m)"
+    },
+    {
+      "phase": "INSERT",
+      "success": true,
+      "cart_error_m": 0.0,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 50.08,
+      "message": "Insertion depth 0.020m with insert contact evidence 54.0N and final XY error 0.0006m"
+    },
+    {
+      "phase": "RETREAT",
+      "success": true,
+      "cart_error_m": 0.0,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 24.64,
+      "message": ""
+    }
+  ],
+  "metrics": {
+    "initial_xy_error_m": 0.0007,
+    "pre_insertion_xy_error_m": 0.0007,
+    "final_insertion_xy_error_m": 0.0006,
+    "insert_final_xy_tolerance_m": 0.001,
+    "insertion_depth_m": 0.0203,
+    "max_fz_N": 97.83,
+    "max_abs_fz_N": 97.83,
+    "max_force_norm_N": 170.0,
+    "baseline_fz_N": 38.92,
+    "max_contact_force_N": 73.33,
+    "max_insert_contact_force_N": 53.98,
+    "contact_threshold_N": 5.0,
+    "control_rate_hz": 25.0,
+    "search_convergence_required_ticks": 4,
+    "search_convergence_required_duration_s": 0.16,
+    "search_convergence_threshold_m": 0.001,
+    "search_converged": true,
+    "contact_guided_insertion": false,
+    "search_recenter_duration_s": 8.0,
+    "search_settle_duration_s": 9.0,
+    "insert_handoff_hold_duration_s": 2.0,
+    "insert_handoff_timeout_s": 12.0,
+    "insert_predepth_recenter_attempts": 0,
+    "insert_predepth_recenter_budget_attempts": 0,
+    "insert_predepth_recenter_budget_resets": 0,
+    "insert_max_predepth_xy_error_m": 0.002,
+    "insert_entry_descent_count": 1,
+    "insert_capture_descent_count": 1,
+    "insert_shallow_sideload_recovery_attempts": 0,
+    "insert_final_sideload_retry_attempts": 0,
+    "gravity_baseline_valid": true,
+    "baseline_window_samples": 50,
+    "approach_offset_xy_m": 0.001
+  },
+  "status": "DONE"
+}

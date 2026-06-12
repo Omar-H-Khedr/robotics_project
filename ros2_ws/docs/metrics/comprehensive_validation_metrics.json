@@ -1,6 +1,6 @@
 {
   "project": "Vision-Based Safety-Gated Peg-in-Hole Assembly",
-  "last_updated": "2026-06-10",
+  "last_updated": "2026-06-12",
   "git_branch": "robot-review",
   "git_head": "b93d003",
   
@@ -104,7 +104,52 @@
         },
         "gazebo_interface": "NOT implemented",
         "training_feasibility": "REQUIRES GPU cluster",
-        "recommendation": "Deferred to compute cluster deployment"
+        "recommendation": "Deferred to compute cluster deployment",
+        "scenario_randomization": "SCAFFOLD IMPLEMENTED (not trained)"
+      }
+    },
+    "E_geometry_tolerance_matrix": {
+      "status": "COMPLETE",
+      "date": "2026-06-12",
+      "results": {
+        "total_trials": 140,
+        "total_successes": 72,
+        "overall_success_rate": "51% (72/140)",
+        "scenarios": 7,
+        "operating_envelope": {
+          "robust_zone": {
+            "clearance": "1.0mm",
+            "successes": "72/80",
+            "rate": "90%",
+            "description": "All peg sizes, with/without misalignment"
+          },
+          "fail_closed_zone": {
+            "clearance": "<=0.5mm",
+            "successes": "0/60",
+            "rate": "0%",
+            "description": "Tracking noise floor prevents insertion"
+          },
+          "key_finding": "Clearance must be >2x tracking noise (~0.5mm) for reliable insertion"
+        },
+        "per_scenario": {
+          "baseline_loose": {"n": 20, "successes": 16, "rate": "80%"},
+          "clearance_medium": {"n": 20, "successes": 0, "rate": "0%"},
+          "clearance_tight": {"n": 20, "successes": 0, "rate": "0%"},
+          "large_peg_large_hole": {"n": 20, "successes": 19, "rate": "95%"},
+          "small_peg_small_hole": {"n": 20, "successes": 20, "rate": "100%"},
+          "misaligned_baseline": {"n": 20, "successes": 17, "rate": "85%"},
+          "tight_plus_misaligned": {"n": 20, "successes": 0, "rate": "0%"}
+        }
+      }
+    },
+    "F_feasibility_classifier": {
+      "status": "TRAINED",
+      "date": "2026-06-12",
+      "results": {
+        "accuracy": "84.3%",
+        "false_safe_rate": "7.3%",
+        "training_data": "Cross-scenario dataset from 140 Stage C trials",
+        "description": "Binary classifier predicting insertion feasibility from context features"
       }
     }
   },
@@ -243,7 +288,10 @@
   "limitations": [
     "DONE precision=3.4% due to context similarity with RETREAT and class imbalance",
     "Encoder pre-training is a documented negative ablation (92.4% vs 99.91%)",
+    "Operating envelope: tracking noise floor (~0.5mm) limits minimum clearance to >1.0mm",
+    "Fail-closed behavior at <=0.5mm clearance is a safety property, not a failure",
     "SAC training requires GPU cluster not available locally",
+    "SAC/meta-RL: scaffold only, not trained",
     "JTC spawner race condition with rapid sequential launches (~10% startup failure)",
     "F/T sensor bridge SIGSEGV prevents wrench features (74→68 dim reduction)",
     "Physical simulation fidelity limited by Gazebo contact dynamics",

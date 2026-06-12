@@ -1,6 +1,6 @@
 # Current Project Status
 
-Date: 2026-06-11
+Date: 2026-06-12
 
 ## What Is Implemented and Validated
 
@@ -19,6 +19,9 @@ Date: 2026-06-11
 | Research baseline launch system | VALIDATED | Parameterized, reproducible |
 | Geometry/tolerance scenario matrix | VALIDATED | 140 trials across 7 scenarios (Stage C) |
 | Clearance-aware convergence | VALIDATED | max(clearance, 1mm) threshold works |
+| Cross-scenario dataset | BUILT | 140 trials from Stage C, Parquet format |
+| Feasibility classifier | TRAINED | 84.3% accuracy, 7.3% false-safe rate |
+| SAC scenario-randomization scaffold | IMPLEMENTED | Not trained (requires GPU cluster) |
 
 ## What Is NOT Implemented (Scope Gaps)
 
@@ -28,7 +31,7 @@ Date: 2026-06-11
 | Different peg geometries | NOT IMPLEMENTED | MEDIUM | Create 2+ SDF variants, run matrix |
 | Different hole geometries | NOT IMPLEMENTED | MEDIUM | Create 2+ hole variants, run matrix |
 | Product/tolerance variation | NOT IMPLEMENTED | MEDIUM | Add friction/size variation |
-| Trained SAC policy | SCAFFOLD ONLY | HIGH | GPU cluster training |
+| Trained SAC policy | SCAFFOLD ONLY | HIGH | GPU cluster training (scenario-randomization scaffold implemented) |
 | Trained meta-RL policy | NOT IMPLEMENTED | HIGH | Full implementation + training |
 | Context-based meta-RL | NOT IMPLEMENTED | HIGH | PEARL/MAML/RL2 or equivalent |
 | Full comparison (4 methods) | PARTIAL (2/4) | MEDIUM | Need SAC + meta-RL |
@@ -49,6 +52,8 @@ Date: 2026-06-11
 - **3** peg sizes validated (22/25/28mm at 1.0mm clearance)
 - **3** clearance levels tested (0.25/0.5/1.0mm)
 - **7** scenarios validated
+- **84.3%** feasibility classifier accuracy
+- **7.3%** feasibility classifier false-safe rate
 
 ## Geometry/Tolerance Stage C Results (Final)
 
@@ -70,3 +75,5 @@ Date: 2026-06-11
 - See `docs/CROSS_SCENARIO_GENERALIZATION_PLAN.md`
 - Validates that learning generalizes across geometry variations
 - Requires multi-scenario dataset from Stage C (now complete)
+- Row-level data collection planned for v2_14 cross-scenario evaluation
+- SAC training with scenario randomization requires GPU cluster

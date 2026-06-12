@@ -1,0 +1,128 @@
+{
+  "total_trials": 140,
+  "total_successes": 72,
+  "overall_success_rate": 0.5142857142857142,
+  "scenarios": {
+    "baseline_loose": {
+      "scenario_id": "baseline_loose",
+      "n_trials": 20,
+      "successes": 16,
+      "success_rate": 0.8,
+      "search_entry_rate": 1.0,
+      "search_converge_rate": 1.0,
+      "contact_guided_count": 0,
+      "contact_guided_rate": 0.0,
+      "avg_duration_s": 450.871269762516,
+      "max_force_n": 62.39,
+      "avg_force_n": 52.424,
+      "max_depth_m": 0.0208,
+      "failure_counts": {
+        "INSERT aborted: XY error 0.4097m exceeded force-safe limit 0.0150m at physical depth 0.0000m.": 1,
+        "sideload_abort": 3
+      }
+    },
+    "clearance_medium": {
+      "scenario_id": "clearance_medium",
+      "n_trials": 20,
+      "successes": 0,
+      "success_rate": 0.0,
+      "search_entry_rate": 1.0,
+      "search_converge_rate": 1.0,
+      "contact_guided_count": 0,
+      "contact_guided_rate": 0.0,
+      "avg_duration_s": 175.9899917125702,
+      "max_force_n": 65.58,
+      "avg_force_n": 32.085,
+      "max_depth_m": 0,
+      "failure_counts": {
+        "xy_exceeded": 14,
+        "handoff_settle_timeout": 6
+      }
+    },
+    "clearance_tight": {
+      "scenario_id": "clearance_tight",
+      "n_trials": 20,
+      "successes": 0,
+      "success_rate": 0.0,
+      "search_entry_rate": 1.0,
+      "search_converge_rate": 1.0,
+      "contact_guided_count": 0,
+      "contact_guided_rate": 0.0,
+      "avg_duration_s": 158.4681514263153,
+      "max_force_n": 62.19,
+      "avg_force_n": 15.842500000000001,
+      "max_depth_m": 0,
+      "failure_counts": {
+        "handoff_settle_timeout": 6,
+        "xy_exceeded": 14
+      }
+    },
+    "large_peg_large_hole": {
+      "scenario_id": "large_peg_large_hole",
+      "n_trials": 20,
+      "successes": 19,
+      "success_rate": 0.95,
+      "search_entry_rate": 1.0,
+      "search_converge_rate": 1.0,
+      "contact_guided_count": 0,
+      "contact_guided_rate": 0.0,
+      "avg_duration_s": 335.7770547747612,
+      "max_force_n": 56.91,
+      "avg_force_n": 50.358999999999995,
+      "max_depth_m": 0.021,
+      "failure_counts": {
+        "handoff_settle_timeout": 1
+      }
+    },
+    "small_peg_small_hole": {
+      "scenario_id": "small_peg_small_hole",
+      "n_trials": 20,
+      "successes": 20,
+      "success_rate": 1.0,
+      "search_entry_rate": 1.0,
+      "search_converge_rate": 1.0,
+      "contact_guided_count": 0,
+      "contact_guided_rate": 0.0,
+      "avg_duration_s": 359.70525379180907,
+      "max_force_n": 60.39,
+      "avg_force_n": 51.888999999999996,
+      "max_depth_m": 0.0208,
+      "failure_counts": {}
+    },
+    "misaligned_baseline": {
+      "scenario_id": "misaligned_baseline",
+      "n_trials": 20,
+      "successes": 17,
+      "success_rate": 0.85,
+      "search_entry_rate": 1.0,
+      "search_converge_rate": 1.0,
+      "contact_guided_count": 0,
+      "contact_guided_rate": 0.0,
+      "avg_duration_s": 375.50349524146634,
+      "max_force_n": 56.7,
+      "avg_force_n": 51.307,
+      "max_depth_m": 0.0206,
+      "failure_counts": {
+        "xy_exceeded": 2,
+        "sideload_abort": 1
+      }
+    },
+    "tight_plus_misaligned": {
+      "scenario_id": "tight_plus_misaligned",
+      "n_trials": 20,
+      "successes": 0,
+      "success_rate": 0.0,
+      "search_entry_rate": 1.0,
+      "search_converge_rate": 1.0,
+      "contact_guided_count": 0,
+      "contact_guided_rate": 0.0,
+      "avg_duration_s": 154.92760599851607,
+      "max_force_n": 0.0,
+      "avg_force_n": 0.0,
+      "max_depth_m": 0,
+      "failure_counts": {
+        "xy_exceeded": 20
+      }
+    }
+  }
+}

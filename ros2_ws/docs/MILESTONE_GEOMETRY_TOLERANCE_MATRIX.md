@@ -1,7 +1,7 @@
 # Milestone: Geometry/Tolerance Scenario Matrix
 
-Date: 2026-06-10
-Status: PLANNED (not started)
+Date: 2026-06-12
+Status: COMPLETED (Stage C)
 
 ## Motivation
 
@@ -101,3 +101,32 @@ evaluation matrix.
 - 140 Gazebo trials: 3-5 days (parallelized)
 - Analysis and documentation: 1-2 days
 - **Total: 1-2 weeks**
+
+---
+
+## Stage C Results (Completed 2026-06-12)
+
+**140 trials across 7 scenarios completed.**
+
+| Scenario | Peg | Hole | Clearance | Offset | N | Success | Rate |
+|----------|-----|------|-----------|--------|---|---------|------|
+| baseline_loose | 25mm | 27mm | 1.0mm | 0mm | 20 | 16 | 80% |
+| clearance_medium | 25mm | 26mm | 0.5mm | 0mm | 20 | 0 | 0% |
+| clearance_tight | 25mm | 25.5mm | 0.25mm | 0mm | 20 | 0 | 0% |
+| large_peg_large_hole | 28mm | 30mm | 1.0mm | 0mm | 20 | 19 | 95% |
+| small_peg_small_hole | 22mm | 24mm | 1.0mm | 0mm | 20 | 20 | 100% |
+| misaligned_baseline | 25mm | 27mm | 1.0mm | 1mm | 20 | 17 | 85% |
+| tight_plus_misaligned | 25mm | 25.5mm | 0.25mm | 1mm | 20 | 0 | 0% |
+
+### Operating Envelope
+
+| Zone | Clearance | Success | Description |
+|------|-----------|---------|-------------|
+| Robust | 1.0mm | 72/80 (90%) | All peg sizes, with/without misalignment |
+| Fails closed | ≤0.5mm | 0/60 (0%) | Tracking noise floor prevents insertion |
+
+**Key finding**: Clearance must be >2× tracking noise (~0.5mm) for reliable insertion. Sub-mm clearance is a hard physical limit of the current sensor stack.
+
+### Cross-Scenario Dataset
+
+Built from 140 Stage C trials. Feasibility classifier: 84.3% accuracy, 7.3% false-safe rate.

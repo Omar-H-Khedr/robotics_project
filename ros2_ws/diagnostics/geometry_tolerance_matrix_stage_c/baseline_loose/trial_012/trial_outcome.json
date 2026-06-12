@@ -1,0 +1,78 @@
+{
+  "trial_outcome": "ABORTED",
+  "reason": "INSERT aborted: side-loaded peg at depth 0.0051m with XY error 0.0014m, exceeding physical clearance 0.0010m for 3 ticks.",
+  "phases": [
+    {
+      "phase": "MOVING_TO_START",
+      "success": true,
+      "cart_error_m": 0.001047,
+      "joint_error_rad": 0.003454,
+      "timed_out": false,
+      "duration_s": 40.08,
+      "message": ""
+    },
+    {
+      "phase": "APPROACH",
+      "success": true,
+      "cart_error_m": 0.013829,
+      "joint_error_rad": 0.024791,
+      "timed_out": false,
+      "duration_s": 11.6,
+      "message": ""
+    },
+    {
+      "phase": "SEARCH",
+      "success": true,
+      "cart_error_m": 6.9e-05,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 0.16,
+      "message": "SEARCH converged (threshold=0.0010m)"
+    },
+    {
+      "phase": "INSERT",
+      "success": false,
+      "cart_error_m": 0.001374,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 105.52,
+      "message": "INSERT aborted: side-loaded peg at depth 0.0051m with XY error 0.0014m, exceeding physical clearance 0.0010m for 3 ticks."
+    }
+  ],
+  "metrics": {
+    "initial_xy_error_m": 0.001,
+    "pre_insertion_xy_error_m": 0.0001,
+    "final_insertion_xy_error_m": 0.0014,
+    "insert_final_xy_tolerance_m": 0.001,
+    "insertion_depth_m": 0.0059,
+    "max_fz_N": 96.65,
+    "max_abs_fz_N": 96.65,
+    "max_force_norm_N": 169.22,
+    "baseline_fz_N": 44.38,
+    "max_contact_force_N": 74.69,
+    "max_insert_contact_force_N": 47.24,
+    "contact_threshold_N": 5.0,
+    "control_rate_hz": 25.0,
+    "search_convergence_required_ticks": 4,
+    "search_convergence_required_duration_s": 0.16,
+    "search_convergence_threshold_m": 0.001,
+    "search_converged": true,
+    "contact_guided_insertion": false,
+    "search_recenter_duration_s": 8.0,
+    "search_settle_duration_s": 9.0,
+    "insert_handoff_hold_duration_s": 2.0,
+    "insert_handoff_timeout_s": 12.0,
+    "insert_predepth_recenter_attempts": 3,
+    "insert_predepth_recenter_budget_attempts": 1,
+    "insert_predepth_recenter_budget_resets": 2,
+    "insert_max_predepth_xy_error_m": 0.0032,
+    "insert_entry_descent_count": 4,
+    "insert_capture_descent_count": 5,
+    "insert_shallow_sideload_recovery_attempts": 2,
+    "insert_final_sideload_retry_attempts": 0,
+    "gravity_baseline_valid": true,
+    "baseline_window_samples": 50,
+    "approach_offset_xy_m": 0.0
+  },
+  "status": "ABORT"
+}

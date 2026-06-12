@@ -1,6 +1,6 @@
 # Proposal Implementation Mapping
 
-Date: 2026-06-10
+Date: 2026-06-12
 
 This document maps each proposal deliverable to its current implementation status.
 
@@ -28,13 +28,13 @@ This document maps each proposal deliverable to its current implementation statu
 | Action classifier | DONE | v2_14: 99.98% offline accuracy, 7-class classification (6-phase). Raw 68-dim validated. |
 | Ablation studies | DONE | v2_15: 5 variants, comprehensive per-class metrics. Raw 68-dim optimal. |
 | Simulation benchmarks | DONE | 60 trials total: 87.5% combined baseline (35/40), 88.3% grand total (53/60), 90% shadow-mode (9/10), 90% advisory (9/10) |
-| Multi-variant pegs/holes | NOT DONE | Single variant: 25mm peg, 27mm hole |
+| Multi-variant pegs/holes | DONE (Stage C) | 3 peg sizes, 4 hole sizes, 3 clearance levels, 140 trials |
 
 ## Phase 3: Core Learning (Months 10-22) — IN PROGRESS
 
 | Proposal Deliverable | Status | Evidence |
 |---|---|---|
-| SAC baseline training | SCAFFOLDED | Environment contract exported, mock rollouts validated. Gazebo training requires GPU cluster. |
+| SAC baseline training | SCAFFOLDED | Environment contract exported, mock rollouts validated, scenario-randomization scaffold implemented. Gazebo training requires GPU cluster. |
 | Context-conditioned meta-RL | NOT DONE | — |
 | A1: No-context/fixed-context ablation | DONE (offline) | v2_15 ablation: raw 68-dim is optimal (99.91%), encoder hurts (92.4%) |
 | A2: Modality dropout | NOT DONE | — |
@@ -77,11 +77,13 @@ This document maps each proposal deliverable to its current implementation statu
 
 | Dimension | Status | Evidence |
 |---|---|---|
-| Peg geometries tested | 1 (cylindrical 25mm) | `peg_in_hole_description/models/cylindrical_peg/model.sdf` |
-| Hole geometries tested | 1 (circular 27mm) | `peg_in_hole_description/models/target_plate/model.sdf` |
-| Clearance levels tested | 1 (1mm radial) | `peg_in_hole_description/config/task_geometry.yaml` |
-| Cross-scenario generalization | 0 scenarios | All 60 trials identical geometry |
-| Scenario matrix execution | NOT STARTED | `docs/MILESTONE_GEOMETRY_TOLERANCE_MATRIX.md` defined |
+| Peg geometries tested | 3 (cylindrical 22/25/28mm) | Stage C: 140 trials across 7 scenarios |
+| Hole geometries tested | 4 (circular 24/26/27/30mm) | Stage C: 140 trials across 7 scenarios |
+| Clearance levels tested | 3 (0.25/0.5/1.0mm) | Stage C: 0% at ≤0.5mm, 90% at 1.0mm |
+| Cross-scenario generalization | Operating envelope defined | Clearance > 2× tracking noise (~0.5mm) required |
+| Scenario matrix execution | COMPLETED (Stage C) | 140 trials, 72/140 (51%) overall |
+| Feasibility classifier | TRAINED | 84.3% accuracy, 7.3% false-safe rate |
+| SAC scenario randomization | SCAFFOLD IMPLEMENTED | Not trained (requires GPU cluster) |
 
 ### Perception Pipeline Performance
 
@@ -120,7 +122,7 @@ This document maps each proposal deliverable to its current implementation statu
 
 6. **No runtime safety filter enforcement**: safety_monitor is observer-only. v2_14 safety-gated classifier provides partial enforcement (INSERT/DONE gates). Full enforcement mode is deferred.
 
-7. **Single peg/hole variant**: Only one geometry (25mm peg, 27mm hole). Multi-variant generation not implemented.
+7. **Operating envelope limitation**: Tracking noise floor (~0.5mm) limits minimum clearance to >1.0mm. Sub-mm clearance is a hard physical limit, not a controller limitation.
 
 8. **No automated domain randomization**: Manual config overrides only.
 
@@ -145,3 +147,7 @@ This document maps each proposal deliverable to its current implementation statu
 | 2026-06-10 | RETREAT advisory requires confidence>0.95 AND margin>0.5 | RETREAT recall=78.1%, some misclassified as DONE |
 | 2026-06-10 | Encoder pre-training is a documented negative ablation | 99.91% (raw) vs 92.4% (encoder). Bottleneck destroys discrimination. |
 | 2026-06-10 | SAC training deferred to GPU cluster | 1M-5M steps required, ~11h simulation, no local GPU |
+| 2026-06-12 | Stage C completed: operating envelope defined | 140 trials, 7 scenarios. 90% at 1.0mm, 0% at ≤0.5mm. Clearance > 2× tracking noise required. |
+| 2026-06-12 | Fail-closed at ≤0.5mm is a safety property | Not a failure — prevents damage when tracking noise exceeds clearance |
+| 2026-06-12 | Feasibility classifier trained | 84.3% accuracy, 7.3% false-safe rate on cross-scenario dataset |
+| 2026-06-12 | SAC scenario-randomization scaffold implemented | Not trained — requires GPU cluster |

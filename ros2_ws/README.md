@@ -1,6 +1,6 @@
 # ROS 2 Jazzy / Gazebo Peg-in-Hole Research Workspace
 
-**Last updated**: 2026-06-10 | **Branch**: `robot-review` | **HEAD**: `1bb7a7b`
+**Last updated**: 2026-06-12 | **Branch**: `robot-review` | **HEAD**: `1bb7a7b`
 
 ## What This Project Does
 
@@ -13,41 +13,42 @@ A vision-based safety-gated advisory framework for peg-in-hole assembly using a 
 
 **Grand total**: 53/60 (88.3%) across 60 automated trials, 100% non-empty logs.
 
-## Geometry/Tolerance Generalization (Stage B)
+## Geometry/Tolerance Generalization (Stage C — Completed)
 
-**22 trials across 7 scenarios, 91% overall success**
+**140 trials across 7 scenarios, 51% overall success**
 
-| Scenario | Peg | Hole | Clearance | Offset | Success |
-|----------|-----|------|-----------|--------|---------|
-| baseline_loose | 25mm | 27mm | 1.0mm | 0mm | 100% (3/3) |
-| clearance_medium | 25mm | 26mm | 0.5mm | 0mm | 67% (2/3) |
-| clearance_tight | 25mm | 25.5mm | 0.25mm | 0mm | 100% (3/3) |
-| large_peg_large_hole | 28mm | 30mm | 1.0mm | 0mm | 100% (3/3) |
-| small_peg_small_hole | 22mm | 24mm | 1.0mm | 0mm | 100% (3/3) |
-| misaligned_baseline | 25mm | 27mm | 1.0mm | 1mm | 100% (2/2) |
-| tight_plus_misaligned | 25mm | 25.5mm | 0.25mm | 1mm | 100% (3/3) |
+| Scenario | Peg | Hole | Clearance | Offset | N | Success | Rate |
+|----------|-----|------|-----------|--------|---|---------|------|
+| baseline_loose | 25mm | 27mm | 1.0mm | 0mm | 20 | 16 | 80% |
+| clearance_medium | 25mm | 26mm | 0.5mm | 0mm | 20 | 0 | 0% |
+| clearance_tight | 25mm | 25.5mm | 0.25mm | 0mm | 20 | 0 | 0% |
+| large_peg_large_hole | 28mm | 30mm | 1.0mm | 0mm | 20 | 19 | 95% |
+| small_peg_small_hole | 22mm | 24mm | 1.0mm | 0mm | 20 | 20 | 100% |
+| misaligned_baseline | 25mm | 27mm | 1.0mm | 1mm | 20 | 17 | 85% |
+| tight_plus_misaligned | 25mm | 25.5mm | 0.25mm | 1mm | 20 | 0 | 0% |
 
-Key finding: Tight clearance (0.25mm) still succeeds but SEARCH convergence drops to 33%.
-See `docs/GEOMETRY_TOLERANCE_VALIDATION_RESULTS.md`.
+**Operating envelope**: Robust at 1.0mm clearance (72/80, 90%). Fails closed at ≤0.5mm (0/60, 0%). Clearance must be >2× tracking noise (~0.5mm) for reliable insertion. Sub-mm clearance is a hard physical limit of the current sensor stack.
+Cross-scenario dataset and feasibility classifier (84.3% accuracy, 7.3% false-safe rate) available.
+SAC scenario-randomization scaffold implemented (not trained).
+See `docs/MILESTONE_GEOMETRY_TOLERANCE_MATRIX.md` and `docs/CURRENT_PROJECT_STATUS.md`.
 
 ## Scope Gaps (Honest Assessment)
 
 | # | Proposal Item | Status |
 |---|--------------|--------|
-| 1 | Different peg geometries | NOT IMPLEMENTED |
-| 2 | Different hole geometries | NOT IMPLEMENTED |
-| 3 | Different clearance/tolerance levels | NOT IMPLEMENTED (config only) |
+| 1 | Different peg geometries | PARTIALLY IMPLEMENTED (3 cylindrical) |
+| 2 | Different hole geometries | PARTIALLY IMPLEMENTED (4 circular) |
+| 3 | Different clearance/tolerance levels | IMPLEMENTED (3 levels, 0% at ≤0.5mm) |
 | 4 | Product/tolerance variation | NOT IMPLEMENTED |
-| 5 | Systematic generalization | NOT IMPLEMENTED |
-| 6 | Trained SAC policy | SCAFFOLD ONLY |
+| 5 | Systematic generalization | VALIDATED inside 1.0mm envelope only |
+| 6 | Trained SAC policy | SCAFFOLD ONLY (scenario-randomization added, not trained) |
 | 7 | Trained meta-RL policy | NOT IMPLEMENTED |
 | 8 | Context-based meta-RL | NOT IMPLEMENTED |
 | 9 | Full comparison (4 methods) | PARTIAL (2/4) |
 | 10 | Hardware KUKA validation | NOT IMPLEMENTED |
 | 11 | Sim-to-real transfer | NOT IMPLEMENTED |
 
-**Critical gap**: Items 1-5 (geometry/tolerance generalization) — only 1 geometry tested.
-**Next milestone**: Geometry/Tolerance Scenario Matrix (7 scenarios × 20 trials = 140 new trials).
+**Operating envelope**: clearance > 2× tracking noise (~0.5mm) required. Geometry/tolerance generalization validated inside 1.0mm envelope, NOT universal.
 See `docs/SCOPE_GAP_AUDIT.md` and `docs/MILESTONE_GEOMETRY_TOLERANCE_MATRIX.md`.
 
 ## Quick Start
@@ -90,32 +91,41 @@ ros2 launch thesis_bringup research_baseline.launch.py \
 
 ## What Is Validated
 
-- Full-task peg-in-hole execution (5 phases) in Gazebo: 88.3% success
+- Full-task peg-in-hole execution (5 phases) in Gazebo: 88.3% success (baseline)
+- Geometry/tolerance matrix (Stage C): 140 trials, 72/140 (51%) overall, 90% at 1.0mm, 0% at ≤0.5mm
+- Operating envelope: clearance must be >2× tracking noise (~0.5mm)
 - v2_14 classifier offline: 99.98% accuracy, all classes F1 >= 0.996
 - v2_14 shadow-mode: 92.2% live agreement, all phases captured
 - v2_14 advisory: all safety invariants hold, 485 unsafe predictions blocked
 - Encoder negative ablation: raw 68-dim (99.91%) >> encoder 32-dim (92.4%)
 - Perception logger: 100% reliability after DDS fix
+- Cross-scenario dataset built from 140 Stage C trials
+- Feasibility classifier: 84.3% accuracy, 7.3% false-safe rate
 
 ## What Is NOT Validated
 
 - Physical hardware (Gazebo simulation only)
-- Multi-variant peg/hole (single geometry: 25mm peg, 27mm hole)
-- SAC training (scaffolded, requires GPU cluster)
+- Clearance ≤ 0.5mm (out-of-envelope, fails closed — 0/60 success)
+- SAC training (scaffolded with scenario randomization, requires GPU cluster)
+- SAC/meta-RL: scaffold only, not trained
 - Sim-to-real transfer
 - F/T features (ft_sensor_bridge crash, wrench zeros in context)
 
 ## Current Best Result
 
-**88.3% full-task success** (53/60) across 60 automated trials with 100% non-empty logs. The v2_14 guarded advisory layer runs alongside the deterministic controller with all safety invariants verified by 24 unit tests and 10 live validation trials.
+**Baseline**: 88.3% full-task success (53/60) across 60 automated trials with 100% non-empty logs.
+**Stage C**: 140 geometry/tolerance trials, 72/140 (51%) overall. Operating envelope: 90% at 1.0mm clearance, 0% at ≤0.5mm.
+The v2_14 guarded advisory layer runs alongside the deterministic controller with all safety invariants verified by 24 unit tests and 10 live validation trials.
 
 ## Limitations
 
 - Simulation only, no hardware validation
 - DONE precision = 3.4% (structural, blocked by advisory safety gate)
-- Single peg/hole variant
+- Operating envelope: tracking noise floor (~0.5mm) limits minimum clearance to >1.0mm
+- Fail-closed behavior at ≤0.5mm clearance is a safety property, not a failure
 - No domain randomization
 - SAC training deferred to GPU cluster
+- SAC/meta-RL: scaffold only, not trained
 
 ## Next Step for Cluster SAC Training
 

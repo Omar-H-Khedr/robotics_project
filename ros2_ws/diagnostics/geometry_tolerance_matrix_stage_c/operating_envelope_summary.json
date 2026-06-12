@@ -1,0 +1,265 @@
+{
+  "analysis_date": "2026-06-12",
+  "total_trials": 140,
+  "tracking_noise_floor_mm": 0.5,
+  "envelope_definition": {
+    "robust": "clearance >= 2x tracking noise (>= 1.0mm)",
+    "marginal": "clearance >= 1x tracking noise (>= 0.5mm)",
+    "out_of_envelope": "clearance < 1x tracking noise (< 0.5mm)"
+  },
+  "robust_zone_scenarios": [
+    {
+      "scenario_id": "baseline_loose",
+      "radial_clearance_mm": 1.0,
+      "success_rate": 0.8,
+      "clearance_to_noise_ratio": 2.0
+    },
+    {
+      "scenario_id": "large_peg_large_hole",
+      "radial_clearance_mm": 1.0,
+      "success_rate": 0.95,
+      "clearance_to_noise_ratio": 2.0
+    },
+    {
+      "scenario_id": "small_peg_small_hole",
+      "radial_clearance_mm": 1.0,
+      "success_rate": 1.0,
+      "clearance_to_noise_ratio": 2.0
+    },
+    {
+      "scenario_id": "misaligned_baseline",
+      "radial_clearance_mm": 1.0,
+      "success_rate": 0.85,
+      "clearance_to_noise_ratio": 2.0
+    }
+  ],
+  "marginal_zone_scenarios": [
+    {
+      "scenario_id": "clearance_medium",
+      "radial_clearance_mm": 0.5,
+      "success_rate": 0.0,
+      "clearance_to_noise_ratio": 1.0
+    }
+  ],
+  "out_of_envelope_scenarios": [
+    {
+      "scenario_id": "clearance_tight",
+      "radial_clearance_mm": 0.25,
+      "success_rate": 0.0,
+      "clearance_to_noise_ratio": 0.5
+    },
+    {
+      "scenario_id": "tight_plus_misaligned",
+      "radial_clearance_mm": 0.25,
+      "success_rate": 0.0,
+      "clearance_to_noise_ratio": 0.5
+    }
+  ],
+  "scenarios": {
+    "baseline_loose": {
+      "scenario_id": "baseline_loose",
+      "peg_diameter_mm": 25.0,
+      "hole_diameter_mm": 27.0,
+      "radial_clearance_mm": 1.0,
+      "initial_xy_offset_mm": 0.0,
+      "tier": "clearance_sweep",
+      "n_trials": 20,
+      "successes": 16,
+      "success_rate": 0.8,
+      "search_converge_rate": 1.0,
+      "contact_guided_count": 0,
+      "timeout_count": 0,
+      "safety_abort_count": 4,
+      "sideload_abort_count": 3,
+      "xy_exceeded_count": 0,
+      "handoff_timeout_count": 0,
+      "failure_reasons": {
+        "INSERT aborted: XY error 0.4097m exceeded force-safe limit 0.0150m at physical depth 0.0000m.": 1,
+        "sideload_abort": 3
+      },
+      "envelope_zone": "robust",
+      "feasibility_label": "in_envelope",
+      "clearance_to_noise_ratio": 2.0,
+      "avg_duration_s": 45.3,
+      "avg_insertion_depth_m": 0.0182,
+      "max_insertion_depth_m": 0.0208,
+      "avg_final_xy_error_m": 0.0004,
+      "avg_max_force_n": 52.9
+    },
+    "clearance_medium": {
+      "scenario_id": "clearance_medium",
+      "peg_diameter_mm": 25.0,
+      "hole_diameter_mm": 26.0,
+      "radial_clearance_mm": 0.5,
+      "initial_xy_offset_mm": 0.0,
+      "tier": "clearance_sweep",
+      "n_trials": 20,
+      "successes": 0,
+      "success_rate": 0.0,
+      "search_converge_rate": 1.0,
+      "contact_guided_count": 0,
+      "timeout_count": 0,
+      "safety_abort_count": 20,
+      "sideload_abort_count": 0,
+      "xy_exceeded_count": 14,
+      "handoff_timeout_count": 6,
+      "failure_reasons": {
+        "xy_exceeded": 14,
+        "handoff_settle_timeout": 6
+      },
+      "envelope_zone": "marginal",
+      "feasibility_label": "marginal",
+      "clearance_to_noise_ratio": 1.0,
+      "avg_duration_s": 13.4,
+      "avg_insertion_depth_m": 0.0,
+      "max_insertion_depth_m": 0.0,
+      "avg_final_xy_error_m": 0.0,
+      "avg_max_force_n": 0.0
+    },
+    "clearance_tight": {
+      "scenario_id": "clearance_tight",
+      "peg_diameter_mm": 25.0,
+      "hole_diameter_mm": 25.5,
+      "radial_clearance_mm": 0.25,
+      "initial_xy_offset_mm": 0.0,
+      "tier": "clearance_sweep",
+      "n_trials": 20,
+      "successes": 0,
+      "success_rate": 0.0,
+      "search_converge_rate": 1.0,
+      "contact_guided_count": 0,
+      "timeout_count": 0,
+      "safety_abort_count": 20,
+      "sideload_abort_count": 0,
+      "xy_exceeded_count": 14,
+      "handoff_timeout_count": 6,
+      "failure_reasons": {
+        "handoff_settle_timeout": 6,
+        "xy_exceeded": 14
+      },
+      "envelope_zone": "out_of_envelope",
+      "feasibility_label": "out_of_envelope",
+      "clearance_to_noise_ratio": 0.5,
+      "avg_duration_s": 3.8,
+      "avg_insertion_depth_m": 0.0,
+      "max_insertion_depth_m": 0.0,
+      "avg_final_xy_error_m": 0.0,
+      "avg_max_force_n": 0.0
+    },
+    "large_peg_large_hole": {
+      "scenario_id": "large_peg_large_hole",
+      "peg_diameter_mm": 28.0,
+      "hole_diameter_mm": 30.0,
+      "radial_clearance_mm": 1.0,
+      "initial_xy_offset_mm": 0.0,
+      "tier": "size_variation",
+      "n_trials": 20,
+      "successes": 19,
+      "success_rate": 0.95,
+      "search_converge_rate": 1.0,
+      "contact_guided_count": 0,
+      "timeout_count": 0,
+      "safety_abort_count": 1,
+      "sideload_abort_count": 0,
+      "xy_exceeded_count": 0,
+      "handoff_timeout_count": 1,
+      "failure_reasons": {
+        "handoff_settle_timeout": 1
+      },
+      "envelope_zone": "robust",
+      "feasibility_label": "in_envelope",
+      "clearance_to_noise_ratio": 2.0,
+      "avg_duration_s": 25.2,
+      "avg_insertion_depth_m": 0.0194,
+      "max_insertion_depth_m": 0.021,
+      "avg_final_xy_error_m": 0.0005,
+      "avg_max_force_n": 50.2
+    },
+    "small_peg_small_hole": {
+      "scenario_id": "small_peg_small_hole",
+      "peg_diameter_mm": 22.0,
+      "hole_diameter_mm": 24.0,
+      "radial_clearance_mm": 1.0,
+      "initial_xy_offset_mm": 0.0,
+      "tier": "size_variation",
+      "n_trials": 20,
+      "successes": 20,
+      "success_rate": 1.0,
+      "search_converge_rate": 1.0,
+      "contact_guided_count": 0,
+      "timeout_count": 0,
+      "safety_abort_count": 0,
+      "sideload_abort_count": 0,
+      "xy_exceeded_count": 0,
+      "handoff_timeout_count": 0,
+      "failure_reasons": {},
+      "envelope_zone": "robust",
+      "feasibility_label": "in_envelope",
+      "clearance_to_noise_ratio": 2.0,
+      "avg_duration_s": 24.6,
+      "avg_insertion_depth_m": 0.0203,
+      "max_insertion_depth_m": 0.0208,
+      "avg_final_xy_error_m": 0.0004,
+      "avg_max_force_n": 51.9
+    },
+    "misaligned_baseline": {
+      "scenario_id": "misaligned_baseline",
+      "peg_diameter_mm": 25.0,
+      "hole_diameter_mm": 27.0,
+      "radial_clearance_mm": 1.0,
+      "initial_xy_offset_mm": 1.0,
+      "tier": "combined_difficulty",
+      "n_trials": 20,
+      "successes": 17,
+      "success_rate": 0.85,
+      "search_converge_rate": 1.0,
+      "contact_guided_count": 0,
+      "timeout_count": 0,
+      "safety_abort_count": 3,
+      "sideload_abort_count": 1,
+      "xy_exceeded_count": 2,
+      "handoff_timeout_count": 0,
+      "failure_reasons": {
+        "xy_exceeded": 2,
+        "sideload_abort": 1
+      },
+      "envelope_zone": "robust",
+      "feasibility_label": "in_envelope",
+      "clearance_to_noise_ratio": 2.0,
+      "avg_duration_s": 35.8,
+      "avg_insertion_depth_m": 0.0186,
+      "max_insertion_depth_m": 0.0206,
+      "avg_final_xy_error_m": 0.0006,
+      "avg_max_force_n": 51.6
+    },
+    "tight_plus_misaligned": {
+      "scenario_id": "tight_plus_misaligned",
+      "peg_diameter_mm": 25.0,
+      "hole_diameter_mm": 25.5,
+      "radial_clearance_mm": 0.25,
+      "initial_xy_offset_mm": 1.0,
+      "tier": "combined_difficulty",
+      "n_trials": 20,
+      "successes": 0,
+      "success_rate": 0.0,
+      "search_converge_rate": 1.0,
+      "contact_guided_count": 0,
+      "timeout_count": 0,
+      "safety_abort_count": 20,
+      "sideload_abort_count": 0,
+      "xy_exceeded_count": 20,
+      "handoff_timeout_count": 0,
+      "failure_reasons": {
+        "xy_exceeded": 20
+      },
+      "envelope_zone": "out_of_envelope",
+      "feasibility_label": "out_of_envelope",
+      "clearance_to_noise_ratio": 0.5,
+      "avg_duration_s": 1.9,
+      "avg_insertion_depth_m": 0.0,
+      "max_insertion_depth_m": 0.0,
+      "avg_final_xy_error_m": 0.0,
+      "avg_max_force_n": 0.0
+    }
+  }
+}

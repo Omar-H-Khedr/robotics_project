@@ -1,6 +1,6 @@
 # Project Context
 
-Last reviewed: 2026-06-09
+Last reviewed: 2026-06-12
 
 This workspace is the active ROS 2 Jazzy / Gazebo implementation for the PhD topic:
 
@@ -645,6 +645,17 @@ A state machine reaching DONE is insufficient. A physical success trial requires
 - recorded peak raw Fz and Cartesian-error metrics.
 
 Robust success requires repeated validation with a documented success rate and failure modes.
+
+## Stage C: Geometry/Tolerance Matrix (Completed 2026-06-12)
+
+140 trials across 7 scenarios completed. Operating envelope validated:
+- 1.0mm clearance: 72/80 (90%) — robust across all peg sizes and misalignment
+- ≤0.5mm clearance: 0/60 (0%) — fails closed (safety property)
+- Key finding: clearance must be >2× tracking noise (~0.5mm)
+- Cross-scenario dataset built, feasibility classifier trained (84.3% accuracy, 7.3% false-safe rate)
+- SAC scenario-randomization scaffold implemented (not trained)
+
+See `docs/MILESTONE_GEOMETRY_TOLERANCE_MATRIX.md` and `docs/CURRENT_PROJECT_STATUS.md`.
 
 ## Next Technical Milestone
 

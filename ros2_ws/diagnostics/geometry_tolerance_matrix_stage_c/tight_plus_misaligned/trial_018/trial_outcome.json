@@ -1,0 +1,69 @@
+{
+  "trial_outcome": "ABORTED",
+  "reason": "INSERT blocked: no-contact XY error 0.0007m exceeds physical radial clearance 0.0002m.",
+  "phases": [
+    {
+      "phase": "MOVING_TO_START",
+      "success": true,
+      "cart_error_m": 0.00046,
+      "joint_error_rad": 0.001001,
+      "timed_out": false,
+      "duration_s": 40.12,
+      "message": ""
+    },
+    {
+      "phase": "APPROACH",
+      "success": true,
+      "cart_error_m": 0.014245,
+      "joint_error_rad": 0.025037,
+      "timed_out": false,
+      "duration_s": 11.64,
+      "message": ""
+    },
+    {
+      "phase": "SEARCH",
+      "success": true,
+      "cart_error_m": 0.000679,
+      "joint_error_rad": 0.0,
+      "timed_out": false,
+      "duration_s": 0.16,
+      "message": "SEARCH converged (threshold=0.0010m)"
+    }
+  ],
+  "metrics": {
+    "initial_xy_error_m": 0.0004,
+    "pre_insertion_xy_error_m": 0.0007,
+    "final_insertion_xy_error_m": 0.0,
+    "insert_final_xy_tolerance_m": 0.0002,
+    "insertion_depth_m": 0.0,
+    "max_fz_N": 99.05,
+    "max_abs_fz_N": 99.05,
+    "max_force_norm_N": 171.26,
+    "baseline_fz_N": 42.55,
+    "max_contact_force_N": 73.72,
+    "max_insert_contact_force_N": 0.0,
+    "contact_threshold_N": 5.0,
+    "control_rate_hz": 25.0,
+    "search_convergence_required_ticks": 4,
+    "search_convergence_required_duration_s": 0.16,
+    "search_convergence_threshold_m": 0.001,
+    "search_converged": true,
+    "contact_guided_insertion": false,
+    "search_recenter_duration_s": 8.0,
+    "search_settle_duration_s": 9.0,
+    "insert_handoff_hold_duration_s": 2.0,
+    "insert_handoff_timeout_s": 12.0,
+    "insert_predepth_recenter_attempts": 0,
+    "insert_predepth_recenter_budget_attempts": 0,
+    "insert_predepth_recenter_budget_resets": 0,
+    "insert_max_predepth_xy_error_m": 0.0,
+    "insert_entry_descent_count": 0,
+    "insert_capture_descent_count": 0,
+    "insert_shallow_sideload_recovery_attempts": 0,
+    "insert_final_sideload_retry_attempts": 0,
+    "gravity_baseline_valid": true,
+    "baseline_window_samples": 50,
+    "approach_offset_xy_m": 0.001
+  },
+  "status": "ABORT"
+}

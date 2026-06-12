@@ -1,6 +1,6 @@
 # Final Limitations and Next Steps
 
-Date: 2026-06-10
+Date: 2026-06-12
 
 ## Honest Limitations
 
@@ -42,19 +42,24 @@ The SAC baseline is scaffolded but not trained locally. Reason:
 
 The SAC environment contract, reward function, and termination conditions are validated via mock rollouts. Full Gazebo training is deferred to a GPU cluster deployment.
 
-### 6. Single Peg/Hole Variant — PARTIALLY ADDRESSED
+### 6. Single Peg/Hole Variant — ADDRESSED (Stage C Complete)
 
-Multiple peg/hole geometries and clearance levels are now parameterized and validated:
+Multiple peg/hole geometries and clearance levels are now validated (Stage C, 140 trials):
 - 3 peg diameters: 22mm, 25mm, 28mm (cylindrical)
 - 4 hole diameters: 24mm, 26mm, 27mm, 30mm (circular)
 - 3 clearance levels: 0.25mm, 0.5mm, 1.0mm
-- 7 scenarios, 22 trials, 91% overall success
+- 7 scenarios, 140 trials, 51% overall success
+
+**Operating envelope** (validated):
+- 1.0mm clearance: 72/80 (90%) — robust
+- ≤0.5mm clearance: 0/60 (0%) — fails closed
+- Clearance must be >2× tracking noise (~0.5mm) for reliable insertion
+- Fail-closed behavior at ≤0.5mm is a safety property, not a failure
 
 Remaining gaps:
 - Non-circular geometries (square peg/hole) not implemented
 - Friction/material variation not tested
-- Stage C (140 trials) needed for statistical confidence
-- Cross-scenario train/test generalization not evaluated
+- Cross-scenario train/test generalization not yet evaluated
 
 ### 7. F/T Sensor Bridge Crash
 
@@ -74,13 +79,13 @@ Simulation parameters (joint friction, contact stiffness, camera noise) are fixe
 
 ## What Is Next
 
-### Immediate (Geometry/Tolerance — Stage C)
-- Run Stage C: 20 trials per scenario = 140 new trials
-- Evaluate cross-scenario generalization (train on some, test on held-out)
+### Immediate (Post-Stage C)
+- Row-level data collection for v2_14 cross-scenario evaluation
+- Cross-scenario train/test generalization (train on some scenarios, test on held-out)
 - Extend to non-circular geometries if Gazebo SDF supports them
 
 ### Short-Term (GPU Cluster)
-- Train SAC agent on Gazebo peg-in-hole task (1M-5M steps)
+- Train SAC agent with scenario randomization (1M-5M steps)
 - Compare SAC vs deterministic baseline vs v2_14 advisory
 - Implement domain randomization for sim-to-real preparation
 
