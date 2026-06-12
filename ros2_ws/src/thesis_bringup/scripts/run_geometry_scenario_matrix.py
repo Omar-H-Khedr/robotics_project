@@ -729,10 +729,11 @@ def main():
             result_json_path = os.path.join(trial_dir, "trial_result.json")
 
             # Skip completed trials (resume support)
-            if os.path.exists(stdout_path) and os.path.exists(result_json_path):
+            resume_path = result_json_path if os.path.exists(result_json_path) else os.path.join(trial_dir, "trial_outcome.json")
+            if os.path.exists(resume_path):
                 print(f"  trial_{trial_idx:03d}: SKIP (already completed)")
                 # Load existing result
-                with open(result_json_path) as f:
+                with open(resume_path) as f:
                     rd = json.load(f)
                 result = TrialResult(
                     scenario_id=rd.get("scenario_id", scenario.id),
@@ -742,20 +743,20 @@ def main():
                     clearance_mm=rd.get("clearance_mm", scenario.clearance_mm),
                     initial_xy_offset_m=rd.get("initial_xy_offset_m", scenario.initial_xy_offset_m),
                     approach_offset_xy=rd.get("approach_offset_xy", scenario.approach_offset_xy),
-                    physical_success=rd.get("physical_success", False),
+                    physical_success=rd.get("physical_success", rd.get("trial_outcome", "") == "SUCCESS"),
                     search_entered=rd.get("search_entered", False),
-                    search_converged=rd.get("search_converged", False),
-                    contact_guided_insertion=rd.get("contact_guided_insertion", False),
-                    insertion_depth_m=rd.get("insertion_depth_m", 0.0),
-                    final_xy_error_m=rd.get("final_xy_error_m", 0.0),
-                    max_contact_force_n=rd.get("max_contact_force_n", 0.0),
+                    search_converged=rd.get("search_converged", rd.get("metrics", {}).get("search_converged", False)),
+                    contact_guided_insertion=rd.get("contact_guided_insertion", rd.get("metrics", {}).get("contact_guided_insertion", False)),
+                    insertion_depth_m=rd.get("insertion_depth_m", rd.get("metrics", {}).get("insertion_depth_m", 0.0)),
+                    final_xy_error_m=rd.get("final_xy_error_m", rd.get("metrics", {}).get("final_insertion_xy_error_m", 0.0)),
+                    max_contact_force_n=rd.get("max_contact_force_n", rd.get("metrics", {}).get("max_contact_force_N", 0.0)),
                     predepth_recenter_attempts=rd.get("predepth_recenter_attempts", 0),
                     shallow_sideload_recovery_attempts=rd.get("shallow_sideload_recovery_attempts", 0),
                     timeout=rd.get("timeout", False),
                     safety_abort=rd.get("safety_abort", False),
                     sideload_abort=rd.get("sideload_abort", False),
                     failure_phase=rd.get("failure_phase", ""),
-                    failure_reason=rd.get("failure_reason", ""),
+                    failure_reason=rd.get("failure_reason", rd.get("reason", "")),
                     duration_s=rd.get("duration_s", 0.0),
                 )
             else:
