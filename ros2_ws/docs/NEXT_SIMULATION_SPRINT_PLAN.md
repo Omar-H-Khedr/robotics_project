@@ -1,0 +1,208 @@
+# Next Simulation Sprint Plan
+
+Date: 2026-06-13
+Sprint type: simulation-only planning for the next implementation sprint.
+
+## Sprint Goal
+
+Create a credible observation/contact foundation for the next research phase without running long experiments, training SAC/meta-RL, or changing the architecture.
+
+The sprint should answer:
+
+1. Are visual/depth features valid enough to support learning?
+2. Are contact labels consistent enough to support contact-rich claims and RL rewards?
+3. Can all scenarios and outcomes be represented in a simulator-neutral contract before adding MuJoCo or Isaac Sim?
+
+## Non-Goals
+
+- No hardware execution.
+- No SAC/meta-RL training.
+- No long Gazebo batch experiments.
+- No full simulator migration.
+- No new publication claims.
+- No relaxation of the <=0.5 mm fail-closed result.
+
+## Tasks
+
+### Task 1. Add Observation Validity Audit
+
+Purpose:
+
+- Detect empty RGB/depth rows, invalid depth dimensions, NaN/Inf depth, and missing scenario metadata before classifier training.
+
+Expected files to change:
+
+- `src/perception_pipeline/perception_pipeline/context_vector.py`
+- `src/perception_pipeline/perception_pipeline/context_vector_extractor.py`
+- `src/thesis_bringup/scripts/aggregate_multi_scenario_dataset.py`
+- `docs/CROSS_SCENARIO_ROW_LEVEL_DATASET.md`
+- New diagnostic report under `diagnostics/` only after short smoke data is generated.
+
+Validation commands:
+
+```bash
+python3 -m compileall src/perception_pipeline src/thesis_bringup
+python3 src/thesis_bringup/scripts/aggregate_multi_scenario_dataset.py --help
+```
+
+Success criteria:
+
+- Existing row-level dataset can be audited without mutation.
+- Report includes RGB validity, depth validity, feature masks, phase distribution, and scenario coverage.
+- Empty Gazebo D405 features are flagged explicitly.
+
+Stop conditions:
+
+- If existing data lacks enough metadata to map rows to scenarios, stop and document the missing schema before adding learning code.
+
+Expected commit name:
+
+- `Add observation validity audit for row-level datasets`
+
+### Task 2. Reconcile Contact Labels
+
+Purpose:
+
+- Compare task-side wrench-derived contact, Gazebo contact-topic observations, phase-state contact, and geometry-derived proximity labels.
+
+Expected files to change:
+
+- `src/thesis_bringup/thesis_bringup/wrench_state_observer.py`
+- `src/thesis_bringup/thesis_bringup/contact_state_observer.py`
+- `src/thesis_bringup/scripts/analyze_geometry_matrix.py`
+- New script or report module under `src/thesis_bringup/scripts/`
+- Documentation update in `docs/OPERATING_ENVELOPE_ANALYSIS.md` or a new contact-label report.
+
+Validation commands:
+
+```bash
+python3 -m compileall src/thesis_bringup
+python3 src/thesis_bringup/scripts/analyze_geometry_matrix.py --help
+```
+
+Success criteria:
+
+- Contact evidence is separated into at least four labels: wrench-derived, contact-topic, geometric/proximity, and task-state.
+- Known zero contact-topic positives are preserved as a limitation.
+- No result claims contact-topic confirmation unless contact-topic labels are positive.
+
+Stop conditions:
+
+- If contact topics cannot be recovered from existing diagnostics, report the limitation and design a short future Gazebo probe instead of inventing labels.
+
+Expected commit name:
+
+- `Add contact label reconciliation audit`
+
+### Task 3. Define Simulator-Neutral Scenario and Result Contract
+
+Purpose:
+
+- Prepare for a future Gazebo plus MuJoCo or Gazebo plus Isaac Sim architecture without implementing the simulator now.
+
+Expected files to change:
+
+- New `docs/SIMULATION_DATA_CONTRACT.md`
+- `src/thesis_bringup/config/geometry_tolerance_scenarios.yaml` only if comments/schema metadata are needed
+- `diagnostics/sac_scenario_randomization_contract.json` only if a non-training schema consistency update is necessary
+
+Validation commands:
+
+```bash
+python3 -m json.tool diagnostics/sac_scenario_randomization_contract.json >/tmp/sac_contract_checked.json
+python3 - <<'PY'
+import yaml
+from pathlib import Path
+path = Path("src/thesis_bringup/config/geometry_tolerance_scenarios.yaml")
+with path.open() as f:
+    data = yaml.safe_load(f)
+print(type(data).__name__)
+PY
+```
+
+Success criteria:
+
+- Stage C scenarios are representable in the contract.
+- Observation, action, reward, termination, safety, and result fields are named.
+- Feature validity masks are included.
+- The contract supports Gazebo validation and future MuJoCo/Isaac adapters.
+
+Stop conditions:
+
+- If the current scenario YAML format is inconsistent with the SAC contract, stop after documenting the mismatch. Do not implement a simulator adapter yet.
+
+Expected commit name:
+
+- `Document simulator-neutral scenario contract`
+
+### Task 4. Short Smoke Validation Only
+
+Purpose:
+
+- Verify that audits run on existing artifacts and, if necessary, one short local Gazebo smoke trial. Avoid long experiments.
+
+Expected files to change:
+
+- None beyond reports/docs generated by Tasks 1-3.
+
+Validation commands:
+
+```bash
+python3 -m compileall src/perception_pipeline src/thesis_bringup src/kuka_task_control
+python3 -m json.tool docs/metrics/comprehensive_validation_metrics.json >/tmp/comprehensive_validation_metrics_checked.json
+git diff --check
+```
+
+Optional short launch only if needed:
+
+```bash
+ros2 launch thesis_bringup research_baseline.launch.py use_gui:=false exit_on_done:=true shutdown_on_task_exit:=true
+```
+
+Success criteria:
+
+- Static checks pass.
+- No long training or long scenario matrix is launched.
+- Existing failure boundaries remain documented.
+
+Stop conditions:
+
+- If Gazebo launch becomes necessary and exceeds a short smoke timeout, stop and report. Do not run Stage C or RL training.
+
+Expected commit name:
+
+- `Validate simulation data audit smoke checks`
+
+## Sprint Success Criteria
+
+The sprint is successful if it produces:
+
+- A dataset-quality audit that explains exactly why current visual/depth learning is weak.
+- A contact-label audit that separates wrench-derived contact from Gazebo contact-topic evidence.
+- A simulator-neutral contract that can support future MuJoCo or Isaac Sim work.
+- No overclaiming of tight-clearance insertion, visual learning, contact fidelity, SAC, meta-RL, or hardware transfer.
+
+## Risks
+
+- Existing row-level data may not contain enough visual/depth validity metadata.
+- Contact-topic evidence may remain unavailable or zero.
+- Adding validity checks may make previous datasets look weaker. That is acceptable and scientifically useful.
+- Simulator-neutral schema work can expand into architecture work. Keep it as documentation and validation only in this sprint.
+
+## Exact Next Simulation-Only Sprint
+
+The next sprint should be:
+
+**"Observation and contact fidelity audit for hybrid simulation readiness."**
+
+It should prioritize visual/depth feature validity and contact-label consistency before any MuJoCo, Isaac Sim, SAC, or meta-RL implementation.
+
+## What Should Not Be Done In This Sprint
+
+- Do not implement MuJoCo or Isaac Sim adapters.
+- Do not train SAC.
+- Do not implement meta-RL.
+- Do not execute hardware protocols.
+- Do not run another full Stage C matrix.
+- Do not edit controller behavior to improve tight-clearance success.
+- Do not present <=0.5 mm failures as solved.
