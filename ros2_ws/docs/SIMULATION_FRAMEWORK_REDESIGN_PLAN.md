@@ -3,6 +3,11 @@
 Date: 2026-06-13
 Basis: local ROS 2/Gazebo project evidence plus general simulator knowledge.
 
+For the end-to-end PhD roadmap and final simulation-framework decision, see
+`docs/FULL_PHD_COMPLETION_ROADMAP.md`. This document remains the focused
+simulation-framework redesign note; the full roadmap supersedes it for phase
+ordering, publication strategy, and final architecture authority.
+
 ## Executive Recommendation
 
 Keep ROS 2/Gazebo as the integration, safety, controller, and evidence-validation harness. Do not migrate the whole project now. Add a simulator-neutral experiment contract, then pilot a fast simulator for learning only after the next simulation-only data/contact sprint.
